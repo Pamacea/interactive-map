@@ -28,15 +28,19 @@
 
 ## Table of Contents
 
-1. [About the Project](#about-the-project)
-2. [Built With](#built-with)
-3. [Getting Started](#getting-started)
-4. [Usage](#usage)
-5. [Roadmap](#roadmap)
-6. [Contributing](#contributing)
-7. [License](#license)
-8. [Contact](#contact)
-9. [Acknowledgments](#acknowledgments)
+- [Table of Contents](#table-of-contents)
+- [About the Project](#about-the-project)
+  - [Key Features](#key-features)
+- [Built With](#built-with)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+- [Usage](#usage)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
+- [Acknowledgments](#acknowledgments)
 
 ## About the Project
 
