@@ -14,31 +14,32 @@
     "@radix-ui/react-slot": "^1.2.0",
     "@react-three/fiber": "^9.1.2",
     "@tanstack/react-form": "^1.9.0",
-    "@tanstack/react-query": "^5.74.11",
+    "@tanstack/react-query": "5.75.0",
     "better-auth": "^1.2.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "framer-motion": "^12.9.2",
-    "lucide-react": "^0.503.0",
+    "framer-motion": "12.9.4",
+    "lucide-react": "0.506.0",
     "next": "15.3.1",
+    "next-zod-route": "^0.2.5",
     "prisma": "^6.7.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^3.2.0",
     "three": "^0.176.0",
     "zod": "^3.24.3",
-    "zustand": "^5.0.3"
+    "zustand": "5.0.4"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/node": "22.15.3",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.3.1",
     "tailwindcss": "^4",
-    "tw-animate-css": "^1.2.8",
+    "tw-animate-css": "1.2.9",
     "typescript": "^5"
   }
 }
