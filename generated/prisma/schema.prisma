@@ -13,3 +13,190 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// Users schemas 
+model User {
+  id              String    @id
+  name            String
+  email           String
+  emailVerified   Boolean
+  image           String?
+  createdAt       DateTime
+  updatedAt       DateTime
+  username        String?
+  displayUsername String?
+  isAnonymous     Boolean?
+  role            String?
+  banned          Boolean?
+  banReason       String?
+  banExpires      DateTime?
+  sessions        Session[]
+  accounts        Account[]
+
+  maps Map[] @relation("UserMaps")
+
+  @@unique([email])
+  @@unique([username])
+  @@map("user")
+}
+
+model Session {
+  id             String   @id
+  expiresAt      DateTime
+  token          String
+  createdAt      DateTime
+  updatedAt      DateTime
+  ipAddress      String?
+  userAgent      String?
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  impersonatedBy String?
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
+}
+
+// Maps and lore schemas !
+model Map {
+  id          String  @id @unique
+  name        String
+  url         String
+  description String?
+
+  countries  Country[]         @relation("Map")
+  towns      Town[]            @relation("Map")
+  villages   Village[]         @relation("Map")
+  poi        PointOfInterest[] @relation("Map")
+  population Population[]      @relation("Map")
+  culture    Culture[]         @relation("Map")
+
+  owner String
+  user  User   @relation("UserMaps", fields: [owner], references: [username])
+
+  createdAt DateTime?
+  updateAt  DateTime?
+
+  @@map("map")
+}
+
+model Country {
+  id          String  @id
+  name        String
+  area        String
+  description String?
+
+  map  String
+  maps Map    @relation("Map", fields: [map], references: [id])
+
+  createdAt DateTime?
+  updatedAt DateTime?
+
+  @@map("country")
+}
+
+model Town {
+  id          String  @id
+  name        String
+  icon        String
+  description String?
+
+  map  String
+  maps Map               @relation("Map", fields: [map], references: [id])
+  poi  PointOfInterest[] @relation("Town")
+
+  createdAt DateTime?
+  updatedAt DateTime?
+
+  @@map("town")
+}
+
+model Village {
+  id          String  @id
+  name        String
+  icon        String
+  description String?
+
+  map  String
+  maps Map    @relation("Map", fields: [map], references: [id])
+
+  createdAt DateTime?
+  updatedAt DateTime?
+
+  @@map("village")
+}
+
+model PointOfInterest {
+  id          String  @id
+  name        String
+  icon        String
+  description String?
+
+  map  String
+  maps Map    @relation("Map", fields: [map], references: [id])
+
+  town  String
+  towns Town   @relation("Town", fields: [town], references: [id])
+
+  createdAt DateTime?
+  updatedAt DateTime?
+
+  @@map("pointofinterest")
+}
+
+model Population {
+  id          String  @id @unique
+  name        String
+  description String?
+
+  map  String
+  maps Map    @relation("Map", fields: [map], references: [id])
+
+  createdAt DateTime?
+  updatedAt DateTime?
+
+  @@map("population")
+}
+
+model Culture {
+  id          String  @id
+  name        String
+  description String?
+
+  map  String
+  maps Map    @relation("Map", fields: [map], references: [id])
+
+  createdAt DateTime?
+  updatedAt DateTime?
+
+  @@map("culture")
+}

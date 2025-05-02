@@ -120,9 +120,157 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.UserScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  email: 'email',
+  emailVerified: 'emailVerified',
+  image: 'image',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  username: 'username',
+  displayUsername: 'displayUsername',
+  isAnonymous: 'isAnonymous',
+  role: 'role',
+  banned: 'banned',
+  banReason: 'banReason',
+  banExpires: 'banExpires'
+};
+
+exports.Prisma.SessionScalarFieldEnum = {
+  id: 'id',
+  expiresAt: 'expiresAt',
+  token: 'token',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  ipAddress: 'ipAddress',
+  userAgent: 'userAgent',
+  userId: 'userId',
+  impersonatedBy: 'impersonatedBy'
+};
+
+exports.Prisma.AccountScalarFieldEnum = {
+  id: 'id',
+  accountId: 'accountId',
+  providerId: 'providerId',
+  userId: 'userId',
+  accessToken: 'accessToken',
+  refreshToken: 'refreshToken',
+  idToken: 'idToken',
+  accessTokenExpiresAt: 'accessTokenExpiresAt',
+  refreshTokenExpiresAt: 'refreshTokenExpiresAt',
+  scope: 'scope',
+  password: 'password',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.VerificationScalarFieldEnum = {
+  id: 'id',
+  identifier: 'identifier',
+  value: 'value',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.MapScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  url: 'url',
+  description: 'description',
+  owner: 'owner',
+  createdAt: 'createdAt',
+  updateAt: 'updateAt'
+};
+
+exports.Prisma.CountryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  area: 'area',
+  description: 'description',
+  map: 'map',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.TownScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  icon: 'icon',
+  description: 'description',
+  map: 'map',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.VillageScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  icon: 'icon',
+  description: 'description',
+  map: 'map',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PointOfInterestScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  icon: 'icon',
+  description: 'description',
+  map: 'map',
+  town: 'town',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PopulationScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  map: 'map',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.CultureScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  map: 'map',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SortOrder = {
+  asc: 'asc',
+  desc: 'desc'
+};
+
+exports.Prisma.QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+};
+
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+
 
 exports.Prisma.ModelName = {
-
+  User: 'User',
+  Session: 'Session',
+  Account: 'Account',
+  Verification: 'Verification',
+  Map: 'Map',
+  Country: 'Country',
+  Town: 'Town',
+  Village: 'Village',
+  PointOfInterest: 'PointOfInterest',
+  Population: 'Population',
+  Culture: 'Culture'
 };
 
 /**
