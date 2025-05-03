@@ -13,7 +13,7 @@ export const NextChapter = () => {
   const router = useRouter();
   // Play animation when element is in view
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: false, margin: "-100px" });
+  const isInView = useInView(ref, { once: false });
 
   const nextSection = useCallback(() => {
     switch (section) {
@@ -57,10 +57,15 @@ export const NextChapter = () => {
         <h2 className="text-2xl text-chart-2 font-jaini uppercase">
           {section === "about" ? "Chapter One" : "Next Chapter"}
         </h2>
-        <h1 className="text-6xl text-chart-1 font-grenze uppercase">{nextSection()}</h1>
+        <h1 className="text-6xl text-chart-1 font-grenze uppercase">
+          {nextSection()}
+        </h1>
       </div>
       <div className="relative">
-        <Button className="flex justify-center items-center bg-chart-2 rounded-full w-16 h-16" asChild>
+        <Button
+          className="flex justify-center items-center bg-chart-2 rounded-full w-16 h-16"
+          asChild
+        >
           <Link href={`/?${nextSection()}`}>
             <ChevronDown className="w-9 h-9 text-chart-1 mb-4" />
           </Link>
