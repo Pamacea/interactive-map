@@ -3,7 +3,7 @@ import { Label } from "./ui/label";
 
 export const Game = () => {
   return (
-    <section className=" flex flex-col items-center justify-center min-h-screen mt-12">
+    <section className=" flex flex-col items-center justify-center min-h-screen mt-20">
       <div className="flex flex-col items-center justify-center font-bold uppercse gap-8">
         <h2 className="text-xl text-chart-2 font-jaini uppercase">
           chapter two
