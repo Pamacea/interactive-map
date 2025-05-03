@@ -1,6 +1,49 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "@components/ui/sonner";
+import localFont from "next/font/local";
+
+const grenze = localFont({
+  src: [
+    {
+      path: "./fonts/grenze/Grenze-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "./fonts/grenze/Grenze-Medium.ttf",
+      weight: "600",
+      style: "medium",
+    },
+    {
+      path: "./fonts/grenze/Grenze-SemiBold.ttf",
+      weight: "700",
+      style: "semibold",
+    },
+    {
+      path: "./fonts/grenze/Grenze-Bold.ttf",
+      weight: "800",
+      style: "bold",
+    },
+    {
+      path: "./fonts/grenze/Grenze-Italic.ttf",
+      weight: "400",
+      style: "italic",
+    },
+  ],
+  variable: "--font-grenze",
+});
+
+const jaini = localFont({
+  src: [
+    {
+      path: "./fonts/jaini/Jaini-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+  ],
+  variable: "--font-jaini",
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -14,8 +57,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body>{children}</body>
-      <Toaster />
+      <body className={`${grenze.variable} ${jaini.variable}`}>
+        {children}
+        <Toaster />
+      </body>
     </html>
   );
 }

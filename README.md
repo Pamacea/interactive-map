@@ -44,7 +44,7 @@
 
 ## About the Project
 
-![Map Screenshot]()
+[Prototype](https://www.figma.com/proto/GOJ1UNgkjBnB9YYx4k1KEB/interactive-map?node-id=10-154&t=YYGYrEkN926vRJYc-1)
 
 **Interactive RPG Map** is a tool designed for tabletop RPG players and worldbuilders. Whether you're creating your own fantasy realm, tracking campaign progress, or organizing complex lore, this project helps bring your world to life with a modern, web-based interface.
 

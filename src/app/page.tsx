@@ -1,5 +1,5 @@
 export default function Home() {
   return (
-    <div> Begin a new project !</div>
+    <div className="font-grenze"> Begin a new project !</div>
   );
 }
