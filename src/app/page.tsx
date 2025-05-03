@@ -1,5 +1,10 @@
-export default function Home() {
+import { Header } from "@/components/layout/Header";
+
+export default function App() {
   return (
-    <div className="font-grenze"> Begin a new project !</div>
+    <>
+        <Header />
+      <main></main>
+    </>
   );
 }
