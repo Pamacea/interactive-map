@@ -3,15 +3,16 @@ import { Label } from "./ui/label";
 
 export const Game = () => {
   return (
-    <section className=" flex flex-col items-center justify-center min-h-screen mt-20">
+    <section className=" flex flex-col items-center justify-center min-h-screen mt-12">
       <div className="flex flex-col items-center justify-center font-bold uppercse gap-8">
         <h2 className="text-xl text-chart-2 font-jaini uppercase">
           chapter two
         </h2>
-        <h1 className="text-6xl text-chart-1 font-grenze uppercase">game</h1>
+        <h1 className="text-4xl md:text-6xl text-chart-1 font-grenze uppercase">game</h1>
+        <div className="w-4/5 md:w-2/3">
         <svg
-          width="600"
-          height="30"
+          width="100%"
+          height="100%"
           viewBox="0 0 385 15"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -48,7 +49,8 @@ export const Game = () => {
             mask="url(#path-1-outside-1_21_2)"
           />
         </svg>
-        <div className="flex flex-col items-center justify-center pt-8 pb-4 w-1/3 gap-8 ">
+        </div>
+        <div className="flex flex-col items-center justify-center pt-8 pb-4 w-4/5 md:w-1/3 gap-8 ">
           <h1 className="text-3xl text-chart-1 font-jaini uppercase">
             THE PRINCIPLE
           </h1>
@@ -59,7 +61,7 @@ export const Game = () => {
             customizable map.
           </p>
         </div>
-        <div className="flex flex-col items-center justify-center pt-8 pb-4 w-1/3 gap-8 ">
+        <div className="flex flex-col items-center justify-center pt-8 pb-4 w-4/5 md:w-1/3  gap-8 ">
           <h1 className="text-3xl text-chart-1 font-jaini uppercase">WHY ?</h1>
           <p className="text-xl text-chart-1 font-grenze text-center">
             In my experience as a game master and worldbuilder, I&apos;ve always

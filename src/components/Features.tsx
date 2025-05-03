@@ -8,12 +8,13 @@ export const Features = () => {
         <h2 className="text-xl text-chart-2 font-jaini uppercase">
           chapter three
         </h2>
-        <h1 className="text-6xl text-chart-1 font-grenze uppercase">
+        <h1 className="text-4xl md:text-6xl text-chart-1 font-grenze uppercase">
           features
         </h1>
+        <div className="w-4/5 md:w-2/3 ">
         <svg
-          width="600"
-          height="30"
+          width="100%"
+          height="100%"
           viewBox="0 0 385 15"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -50,11 +51,12 @@ export const Features = () => {
             mask="url(#path-1-outside-1_21_2)"
           />
         </svg>
-        <div className="flex items-center justify-center gap-8 w-2/3">
+        </div>
+        <div className="flex flex-col md:flex-row w-4/5 md:w-2/3 items-center justify-center gap-8 ">
           {FeaturesData.map((feature, index) => (
             <div
               key={index}
-              className="flex flex-row items-center justify-center pt-8 pb-4 w-2/3 gap-8 "
+              className="flex flex-row items-center justify-center pt-8 pb-4  w-4/5 md:w-1/3 gap-8 "
             >
               <div className="bg-card text-card-foreground flex flex-col justify-center items-center gap-6 rounded-xl p-8 shadow-2xl ">
                 <Badge
