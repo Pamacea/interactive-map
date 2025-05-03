@@ -1,6 +1,6 @@
 import { Globe, Info } from "lucide-react";
 import { Button } from "../ui/button";
-import { Tab } from "./Tab";
+import { Tab } from "./_components/Tab";
 
 export const Header = () => {
   return (

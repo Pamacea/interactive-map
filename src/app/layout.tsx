@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@components/ui/sonner";
 import localFont from "next/font/local";
+import { Suspense } from "react";
 
 const grenze = localFont({
   src: [
@@ -58,7 +59,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${grenze.variable} ${jaini.variable}`}>
-        {children}
+        <Suspense fallback={<p>Loading</p>}>{children}</Suspense>
         <Toaster />
       </body>
     </html>

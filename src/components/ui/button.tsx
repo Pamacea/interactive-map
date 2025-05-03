@@ -9,6 +9,7 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
+        none: "",
         default:
           "bg-primary text-primary-foreground shadow-xs hover:bg-primary/90",
         destructive:
@@ -36,6 +37,7 @@ const buttonVariants = cva(
         tab: "h-9 w-1/4 rounded-none gap-2 px-4 has-[>svg]:px-3",
         sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
         lg: "h-10 rounded-md px-6 has-[>svg]:px-x",
+        xl: "h-18 rounded-md px-8 has-[>svg]:px-x",
         icon: "size-9",
       },
     },
@@ -61,6 +63,7 @@ function Button({
   const isHeader = variant === "header";
   const isBtnHeader = variant === "btnheader";
   const isTab = variant === "tab";
+  const isNone = variant === "none";
 
   let buttonClass;
   if (isHeader) {
@@ -69,6 +72,8 @@ function Button({
     buttonClass = cn(buttonVariants({ variant: "tab", size }));
   } else if (isBtnHeader) {
     buttonClass = cn(buttonVariants({ variant: "btnheader", size }));
+  } else if (isNone) {
+    buttonClass = cn(buttonVariants({ variant: "none", size }));
   } else {
     buttonClass = cn(buttonVariants({ variant, size }), className);
   }

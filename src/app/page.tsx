@@ -1,10 +1,10 @@
-import { Header } from "@/components/layout/Header";
+import { Home } from "@/components/Home";
+import { Layout } from "@/components/layout/Layout";
 
 export default function App() {
   return (
-    <>
-        <Header />
-      <main></main>
-    </>
+    <Layout>
+      <Home />
+    </Layout>
   );
 }
