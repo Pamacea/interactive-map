@@ -1,17 +1,29 @@
 import Link from "next/link";
 import { Button } from "./ui/button";
+import { motion } from "framer-motion";
 
 export const About = () => {
   return (
     <section className=" flex flex-col items-center justify-center min-h-screen mt-12">
-      <div className="flex flex-col items-center justify-center font-bold uppercse gap-8">
-        <h2 className="text-xl text-chart-2 font-jaini uppercase">
-          chapter four
-        </h2>
-        <h1 className="text-4xl md:text-6xl text-chart-1 font-grenze uppercase">
-          about
-        </h1>
-        <div className="w-4/5 md:w-2/3">
+     <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1, delay: 0.5 }}
+        className="flex flex-col items-center justify-center font-bold uppercse gap-8"
+      >
+
+          <h2 className="text-xl text-chart-2 font-jaini uppercase">
+            chapter four
+          </h2>
+          <h1 className="text-4xl md:text-6xl text-chart-1 font-grenze uppercase">
+            about
+          </h1>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 1 }}
+          className="w-4/5 md:w-2/3"
+        >
           <svg
             width="100%"
             height="100%"
@@ -51,7 +63,7 @@ export const About = () => {
               mask="url(#path-1-outside-1_21_2)"
             />
           </svg>
-        </div>
+        </motion.div>
         <div className="flex flex-col items-center justify-center pt-8 pb-4 w-4/5 md:w-1/3 gap-8 ">
           <h1 className="text-3xl text-chart-1 font-jaini uppercase">ME</h1>
           <p className="text-xl text-chart-1 font-grenze text-center">
@@ -86,7 +98,7 @@ export const About = () => {
             </Link>
           </Button>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 };

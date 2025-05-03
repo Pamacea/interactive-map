@@ -1,15 +1,19 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useSection } from "@/store/section.store";
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../ui/button";
+import { motion, useInView } from "framer-motion";
 
 export const NextChapter = () => {
   const { section } = useSection();
   const router = useRouter();
+  // Play animation when element is in view
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: false, margin: "-100px" });
 
   const nextSection = useCallback(() => {
     switch (section) {
@@ -41,7 +45,13 @@ export const NextChapter = () => {
   }, [nextSection, router]);
 
   return (
-    <div className="flex flex-col items-center">
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 20 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.6 }}
+      className="flex flex-col items-center"
+    >
       <div className="w-full flex flex-col items-center justify-center gap-8 py-8">
         <div className="h-0.5 w-1/4 bg-chart-3" />
         <h2 className="text-2xl text-chart-2 font-jaini uppercase">
@@ -57,6 +67,6 @@ export const NextChapter = () => {
         </Button>
         <div className="absolute w-full h-7 bg-background bottom-0" />
       </div>
-    </div>
+    </motion.div>
   );
 };
