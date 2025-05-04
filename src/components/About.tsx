@@ -81,19 +81,19 @@ export const About = () => {
             className="bg-transparent border-2 border-border p-6 shadow-xl hover:bg-linear-to-r/shorter hover:from-chart-3/50 hover:to-chart-2/25 hover:border-0 text-2xl"
             asChild
           >
-            <Link href="https://github.com/Pamacea">GITHUB</Link>
+            <Link href="https://github.com/Pamacea" target="_blank">GITHUB</Link>
           </Button>
           <Button
             className="bg-transparent border-2 border-border p-6 shadow-xl hover:bg-linear-to-r/shorter hover:from-chart-3/50 hover:to-chart-2/25 hover:border-0 text-2xl"
             asChild
           >
-            <Link href="www.linkedin.com/in/yanis-dessaint">LINKEDIN</Link>
+            <Link href="www.linkedin.com/in/yanis-dessaint" target="_blank">LINKEDIN</Link>
           </Button>
           <Button
             className="bg-transparent border-2 border-border p-6 shadow-xl hover:bg-linear-to-r/shorter hover:from-chart-3/50 hover:to-chart-2/25 hover:border-0 text-2xl"
             asChild
           >
-            <Link href="https://pamacea-portfolio.vercel.app/fr">
+            <Link href="https://pamacea-portfolio.vercel.app/fr" target="_blank">
               MY PORTFOLIO
             </Link>
           </Button>

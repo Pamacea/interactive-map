@@ -58,7 +58,7 @@ export const NextChapter = () => {
           {section === "about" ? "Chapter One" : "Next Chapter"}
         </h2>
         <h1 className="text-6xl text-chart-1 font-grenze uppercase">
-          {nextSection()}
+          {section === "about" ? "What it is ?" : nextSection()}
         </h1>
       </div>
       <div className="relative">
