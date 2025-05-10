@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSection } from "@/store/section.store";
-import { Game } from "./Game";
+import { PlayGame } from "./PlayGame";
 import { Hero } from "./Hero";
 import { Features } from "./Features";
 import { About } from "./About";
@@ -38,7 +38,7 @@ export const Home = () => {
   return (
     <>
       {section === "hero" && <Hero />}
-      {section === "game" && <Game />}
+      {section === "game" && <PlayGame />}
       {section === "features" && <Features />}
       {section === "about" && <About />}
     </>

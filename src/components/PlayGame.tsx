@@ -2,7 +2,7 @@ import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { motion } from "framer-motion";
 
-export const Game = () => {
+export const PlayGame = () => {
   return (
     <section className=" flex flex-col items-center justify-center min-h-screen mt-12">
       <motion.div
