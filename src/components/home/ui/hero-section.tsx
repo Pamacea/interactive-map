@@ -1,97 +1,86 @@
-import { ArrowRight, Sparkles, Globe, Map } from "lucide-react";
+"use client";
+
+import { ArrowRight, Map } from "lucide-react";
 import { MetallicButton } from "@/components/ui/metallic-button";
-import { cn } from "@/lib/utils";
+
+const stats = [
+  { value: "10K+", label: "Worlds" },
+  { value: "50K+", label: "Creators" },
+  { value: "1M+", label: "Locations" }
+];
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center px-4 overflow-hidden">
-      {/* Max-width container - OBLIGATORY */}
-      <div className="w-full max-w-[1440px] mx-auto">
-        {/* 60/40 asymmetric grid layout - OBLIGATORY */}
-        <div className="grid grid-cols-1 lg:grid-cols-[60%_40%] gap-x-8 gap-y-12 items-center">
+    <section className="relative min-h-screen flex items-center  px-6 bg-background-base ">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-250 h-150 bg-accent-gold/3 rounded-full blur-[150px]" />
+      </div>
 
-          {/* LEFT COLUMN (60%) - Information - LEFT ALIGNED */}
-          <div className="flex flex-col items-start text-left">
+      <div className="relative w-full max-w-2/3 mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-[58%_42%] gap-16 items-center px-4">
 
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-background-card/80 backdrop-blur-md border border-accent-gold/30 shadow-lg mb-8">
-              <Sparkles className="w-4 h-4 text-accent-gold" />
-              <span className="text-sm font-display font-semibold text-accent-gold tracking-wide">
-                World Building Evolved
-              </span>
-            </div>
+          <div className="flex flex-col gap-12">
 
-            {/* H1 - text-7xl - Maximum size */}
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-display font-semibold tracking-wide leading-tight text-text-primary mb-6">
-              Craft Epic
+            <h1 className="text-6xl sm:text-7xl lg:text-8xl font-display font-semibold tracking-tight text-text-primary leading-[1.05]">
+              Build worlds
               <br />
-              <span className="bg-gradient-to-r from-accent-gold via-yellow-400 to-accent-gold bg-clip-text text-transparent">
-                Fantasy Worlds
-              </span>
+              <span className="text-accent-gold">worth exploring</span>
             </h1>
 
-            {/* Body - text-base - Second size */}
-            <p className="text-base text-text-secondary leading-relaxed max-w-2xl mb-8">
-              Build immersive interactive maps for your RPG campaigns, fantasy novels, and game worlds.
-              <span className="block mt-2 text-accent-gold/80">Inspired by the greatest fantasy realms.</span>
+            <p className="text-xl text-text-secondary leading-relaxed">
+              The definitive platform for crafting immersive fantasy maps. Designed for RPG campaigns, novels, and game worlds.
             </p>
 
-            {/* CTA Buttons - Left aligned with text */}
-            <div className="flex flex-col sm:flex-row items-start gap-4 mb-12">
-              <MetallicButton variant="gold" size="lg" className="rounded-lg">
-                <Sparkles className="w-5 h-5" />
-                Create Your World
+            <div className="flex items-center gap-4">
+              <MetallicButton variant="gold" size="lg">
+                Start Creating
                 <ArrowRight className="w-5 h-5" />
               </MetallicButton>
-              <MetallicButton variant="silver" size="lg" className="rounded-lg">
-                <Globe className="w-5 h-5" />
-                Explore Worlds
-                <ArrowRight className="w-5 h-5" />
+              <MetallicButton variant="silver" size="lg">
+                <Map className="w-5 h-5" />
+                Browse Maps
               </MetallicButton>
             </div>
 
-            {/* Stats - Left aligned, horizontal layout */}
-            <div className="flex flex-wrap items-center gap-x-12 gap-y-4">
-              <div>
-                <div className="text-2xl font-display font-semibold text-gradient">10K+</div>
-                <div className="text-sm text-text-muted mt-1">Worlds Created</div>
-              </div>
-              <div className="hidden sm:block w-px h-12 bg-border-subtle" />
-              <div>
-                <div className="text-2xl font-display font-semibold text-gradient">50K+</div>
-                <div className="text-sm text-text-muted mt-1">Active Users</div>
-              </div>
-              <div className="hidden sm:block w-px h-12 bg-border-subtle" />
-              <div>
-                <div className="text-2xl font-display font-semibold text-gradient">1M+</div>
-                <div className="text-sm text-text-muted mt-1">Map Pins</div>
-              </div>
-            </div>
-          </div>
-
-          {/* RIGHT COLUMN (40%) - Visual signal */}
-          <div className="relative flex items-center justify-center">
-            {/* Placeholder for visual element */}
-            <div className="relative w-full aspect-square max-w-sm rounded-2xl bg-gradient-to-br from-background-card to-background-elevated border border-border-subtle overflow-hidden">
-              {/* Decorative elements */}
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(212,175,55,0.1),transparent_50%)]" />
-
-              {/* Centered map icon */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-accent-gold/20 blur-3xl rounded-full" />
-                  <Map className="relative w-32 h-32 text-accent-gold" strokeWidth={1} />
+            <div className="flex items-center gap-16 pt-8 border-t-2 border-t-accent-gold-dark">
+              {stats.map((stat) => (
+                <div key={stat.label}>
+                  <div className="text-3xl font-display font-semibold text-text-primary">{stat.value}</div>
+                  <div className="text-sm text-text-muted mt-1">{stat.label}</div>
                 </div>
-              </div>
+              ))}
+            </div>
 
-              {/* Floating decorative elements */}
-              <div className="absolute top-12 right-12 w-16 h-16 rounded-lg bg-accent-gold/10 border border-accent-gold/30" />
-              <div className="absolute bottom-12 left-12 w-12 h-12 rounded-md bg-accent-gold/10 border border-accent-gold/30" />
-              <div className="absolute top-1/2 right-8 w-8 h-8 rounded-md bg-accent-gold/10 border border-accent-gold/30" />
+          </div>
+
+          <div className="relative flex items-center justify-center">
+            <div className="relative w-full aspect-square">
+              <div className="absolute inset-0 bg-linear-to-br from-accent-gold/15 to-transparent rounded-3xl blur-3xl" />
+
+              <div className="relative w-full h-full rounded-3xl bg-linear-to-br from-background-card to-background-elevated border border-border-subtle overflow-hidden">
+                <div className="absolute inset-0 bg-linear-to-br from-accent-gold/5 to-transparent" />
+
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-accent-gold/20 blur-3xl rounded-full" />
+                    <Map className="relative w-40 h-40 text-accent-gold" strokeWidth={0.75} />
+                  </div>
+                </div>
+
+                <div className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-background-card to-transparent" />
+              </div>
             </div>
           </div>
+
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-12px); }
+        }
+      `}</style>
     </section>
   );
 }

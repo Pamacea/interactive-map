@@ -29,7 +29,7 @@ export function WorldsGrid({ worlds, viewMode, onClearFilters }: WorldsGridProps
     <div className={cn(
       viewMode === "grid"
         ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-        : "space-y-4"
+        : "flex flex-col gap-4"
     )}>
       {worlds.map((world) => (
         <WorldCard key={world.id} {...world} />
@@ -40,10 +40,12 @@ export function WorldsGrid({ worlds, viewMode, onClearFilters }: WorldsGridProps
 
 function EmptyState({ onClearFilters }: { onClearFilters: () => void }) {
   return (
-    <div className="text-center py-16 sm:py-24">
+    <div className="text-center py-16 sm:py-24 flex flex-col items-center gap-6">
       <EmptyStateIcon />
-      <EmptyStateTitle />
-      <EmptyStateDescription />
+      <div className="flex flex-col gap-2">
+        <EmptyStateTitle />
+        <EmptyStateDescription />
+      </div>
       <EmptyStateAction onClearFilters={onClearFilters} />
     </div>
   );
@@ -51,7 +53,7 @@ function EmptyState({ onClearFilters }: { onClearFilters: () => void }) {
 
 function EmptyStateIcon() {
   return (
-    <div className="inline-flex items-center justify-center w-16 h-16 rounded-lg bg-background-card border border-border-subtle mb-6">
+    <div className="inline-flex items-center justify-center w-16 h-16 rounded-lg bg-background-card border border-border-subtle">
       <Search className="w-8 h-8 text-text-muted" />
     </div>
   );
@@ -59,7 +61,7 @@ function EmptyStateIcon() {
 
 function EmptyStateTitle() {
   return (
-    <h3 className="text-4xl font-display font-semibold text-text-primary mb-4">
+    <h3 className="text-4xl font-display font-semibold text-text-primary">
       No worlds found
     </h3>
   );
@@ -67,7 +69,7 @@ function EmptyStateTitle() {
 
 function EmptyStateDescription() {
   return (
-    <p className="text-base text-text-secondary mb-6">
+    <p className="text-xl text-text-secondary">
       Try adjusting your search or filters to find what you're looking for.
     </p>
   );

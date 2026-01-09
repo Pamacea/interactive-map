@@ -24,7 +24,7 @@ export function ResultsHeader({
   onClearAllFilters,
 }: ResultsHeaderProps) {
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between gap-4">
       <ResultsCount count={filteredCount} activeFilters={activeFilters} onToggleFilter={onToggleFilter} onClearAll={onClearAllFilters} />
       <Actions viewMode={viewMode} showFilters={showFilters} onViewModeChange={onViewModeChange} onToggleFilters={onToggleFilters} />
     </div>

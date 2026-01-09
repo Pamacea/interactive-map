@@ -35,9 +35,9 @@ const features = [
 
 export function FeaturesSection() {
   return (
-    <section className="relative py-20 sm:py-32 px-4 bg-gradient-to-b from-background-base to-background-elevated">
+    <section className="relative py-20 sm:py-32 px-4 bg-gradient-to-b from-background-base to-background-elevated border-b-2 border-b-accent-gold">
       <div className="absolute inset-0 bg-[linear-gradient(rgba(212,175,55,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(212,175,55,0.02)_1px,transparent_1px)] bg-[length:100px_100px]" />
-      <div className="relative flex flex-col items-center">
+      <div className="relative max-w-2/3 mx-auto flex flex-col items-center">
         <FeaturesHeader />
         <FeaturesGrid />
       </div>
@@ -50,7 +50,7 @@ function FeaturesHeader() {
     <div className="text-center mb-12 sm:mb-16">
       <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-text-primary mb-4">
         Everything You Need to{" "}
-        <span className="bg-gradient-to-r from-accent-gold to-accent-gold-light bg-clip-text text-transparent">
+        <span className="bg-linear-to-r from-accent-gold to-accent-gold-light bg-clip-text text-transparent">
           Build
         </span>
       </h2>
