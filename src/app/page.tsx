@@ -9,15 +9,22 @@ import { Footer } from "@/components/home/ui/footer";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-background-base">
-      <GridBackground />
-      <FloatingParticles />
-      <NavigationBar />
-      <HeroSection />
-      <FeaturesSection />
-      <FeaturedWorldsSection />
-      <CTASection />
-      <Footer />
+    <div className="relative min-h-screen bg-background-base">
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <GridBackground />
+        <FloatingParticles />
+      </div>
+
+      <div className="relative z-10 flex flex-col">
+        <NavigationBar />
+        <main className="flex flex-col">
+          <HeroSection />
+          <FeaturesSection />
+          <FeaturedWorldsSection />
+          <CTASection />
+        </main>
+        <Footer />
+      </div>
     </div>
   );
 }

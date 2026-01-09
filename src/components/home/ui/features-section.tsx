@@ -37,7 +37,7 @@ export function FeaturesSection() {
   return (
     <section className="relative py-20 sm:py-32 px-4 bg-gradient-to-b from-background-base to-background-elevated">
       <div className="absolute inset-0 bg-[linear-gradient(rgba(212,175,55,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(212,175,55,0.02)_1px,transparent_1px)] bg-[length:100px_100px]" />
-      <div className="relative max-w-7xl mx-auto">
+      <div className="relative flex flex-col items-center">
         <FeaturesHeader />
         <FeaturesGrid />
       </div>
@@ -63,22 +63,23 @@ function FeaturesHeader() {
 
 function FeaturesGrid() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-      {features.map((feature, index) => (
-        <FeatureCard key={index} {...feature} />
-      ))}
+    <div className="w-full">
+      <div className="flex flex-col divide-y divide-border-subtle">
+        {features.map((feature, index) => (
+          <FeatureItem key={index} {...feature} />
+        ))}
+      </div>
     </div>
   );
 }
 
-function FeatureCard({ icon: Icon, title, description }: typeof features[0]) {
+function FeatureItem({ icon: Icon, title, description }: typeof features[0]) {
   return (
-    <div className="group relative p-6 bg-background-card/50 backdrop-blur-sm border border-border-subtle hover:border-accent-gold/30 transition-all duration-300 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-accent-gold/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      <div className="relative z-10">
-        <div className="w-12 h-12 rounded-sm bg-gradient-to-br from-accent-gold/20 to-accent-gold/5 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-          <Icon className="w-6 h-6 text-accent-gold" />
-        </div>
+    <div className="flex items-start gap-6 py-8 hover:bg-muted/50 transition-colors duration-200 -mx-4 px-4 rounded-sm">
+      <div className="w-12 h-12 rounded-sm bg-gradient-to-br from-accent-gold/20 to-accent-gold/5 flex items-center justify-center flex-shrink-0">
+        <Icon className="w-6 h-6 text-accent-gold" />
+      </div>
+      <div className="flex-1 pt-1">
         <h3 className="text-lg sm:text-xl font-display font-semibold text-text-primary mb-2">
           {title}
         </h3>

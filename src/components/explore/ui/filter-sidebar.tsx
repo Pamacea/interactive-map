@@ -1,4 +1,4 @@
-import { SlidersHorizontal, X } from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface FilterSidebarProps {
@@ -12,25 +12,23 @@ export function FilterSidebar({ showFilters, activeFilters, onToggleFilter, onCl
   return (
     <aside
       className={cn(
-        "lg:w-64 flex-shrink-0",
-        "bg-background-card/80 backdrop-blur-md rounded-sm border border-border-subtle shadow-lg",
-        "transition-all duration-300",
+        "w-[280px] flex-shrink-0",
+        "py-6 pr-8",
+        "divide-y divide-border-subtle",
         !showFilters && "hidden lg:block"
       )}
     >
-      <div className="p-4 sm:p-6 space-y-6">
-        <FilterHeader activeFilters={activeFilters} onClearAll={onClearAll} />
-        <ContentTypeFilter onToggle={onToggleFilter} activeFilters={activeFilters} />
-        <FactionFilter onToggle={onToggleFilter} activeFilters={activeFilters} />
-        <WorldSizeFilter />
-      </div>
+      <FilterHeader activeFilters={activeFilters} onClearAll={onClearAll} />
+      <ContentTypeFilter onToggle={onToggleFilter} activeFilters={activeFilters} />
+      <FactionFilter onToggle={onToggleFilter} activeFilters={activeFilters} />
+      <WorldSizeFilter />
     </aside>
   );
 }
 
 function FilterHeader({ activeFilters, onClearAll }: { activeFilters: string[]; onClearAll: () => void }) {
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between pb-6">
       <div className="flex items-center gap-2">
         <SlidersHorizontal className="w-5 h-5 text-accent-gold" />
         <h3 className="font-display font-semibold text-text-primary">
@@ -40,7 +38,7 @@ function FilterHeader({ activeFilters, onClearAll }: { activeFilters: string[]; 
       {activeFilters.length > 0 && (
         <button
           onClick={onClearAll}
-          className="text-xs text-text-muted hover:text-accent-gold transition-colors"
+          className="text-sm text-text-muted hover:text-accent-gold transition-colors"
         >
           Clear All
         </button>
@@ -58,11 +56,11 @@ function ContentTypeFilter({ onToggle, activeFilters }: { onToggle: (filter: str
   ];
 
   return (
-    <div>
-      <h4 className="text-sm font-medium text-text-secondary mb-3">
+    <div className="py-6">
+      <h4 className="text-sm font-medium text-text-secondary mb-4">
         Content Type
       </h4>
-      <div className="space-y-2">
+      <div className="space-y-3">
         {filters.map((filter) => (
           <FilterCheckbox
             key={filter.value}
@@ -87,11 +85,11 @@ function FactionFilter({ onToggle, activeFilters }: { onToggle: (filter: string)
   ];
 
   return (
-    <div>
-      <h4 className="text-sm font-medium text-text-secondary mb-3">
+    <div className="py-6">
+      <h4 className="text-sm font-medium text-text-secondary mb-4">
         Factions
       </h4>
-      <div className="space-y-2">
+      <div className="space-y-3">
         {filters.map((filter) => (
           <FactionCheckbox
             key={filter.value}
@@ -111,17 +109,17 @@ function WorldSizeFilter() {
   const sizes = ["Small (< 50 pins)", "Medium (50-200)", "Large (200+)"];
 
   return (
-    <div>
-      <h4 className="text-sm font-medium text-text-secondary mb-3">
+    <div className="py-6">
+      <h4 className="text-sm font-medium text-text-secondary mb-4">
         World Size
       </h4>
-      <div className="space-y-2">
+      <div className="space-y-3">
         {sizes.map((size) => (
           <label key={size} className="flex items-center gap-3 cursor-pointer group">
             <input
               type="radio"
               name="size"
-              className="w-4 h-4 border-border-subtle text-accent-gold focus:ring-accent-gold focus:ring-offset-0"
+              className="w-4 h-4 border-border-subtle text-accent-gold focus:ring-accent-gold focus:ring-offset-0 rounded-md"
             />
             <span className="text-sm text-text-secondary group-hover:text-text-primary transition-colors">
               {size}
@@ -140,7 +138,7 @@ function FilterCheckbox({ label, value, checked, onChange }: { label: string; va
         type="checkbox"
         checked={checked}
         onChange={onChange}
-        className="w-4 h-4 rounded-sm border-border-subtle text-accent-gold focus:ring-accent-gold focus:ring-offset-0"
+        className="w-4 h-4 rounded-md border-border-subtle text-accent-gold focus:ring-accent-gold focus:ring-offset-0"
       />
       <span className="text-sm text-text-secondary group-hover:text-text-primary transition-colors">
         {label}
@@ -156,9 +154,9 @@ function FactionCheckbox({ label, value, color, checked, onChange }: { label: st
         type="checkbox"
         checked={checked}
         onChange={onChange}
-        className="w-4 h-4 rounded-sm border-border-subtle text-accent-gold focus:ring-accent-gold focus:ring-offset-0"
+        className="w-4 h-4 rounded-md border-border-subtle text-accent-gold focus:ring-accent-gold focus:ring-offset-0"
       />
-      <div className={`w-3 h-3 rounded-sm ${color}`} />
+      <div className={`w-3 h-3 rounded-md ${color}`} />
       <span className="text-sm text-text-secondary group-hover:text-text-primary transition-colors">
         {label}
       </span>
