@@ -40,6 +40,7 @@ export function HeroSection() {
     <section className="relative min-h-screen flex items-center  px-6 bg-background-base ">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-250 h-150 bg-accent-gold/3 rounded-full blur-[150px]" />
+        <WordParticles />
       </div>
 
       <div className="relative w-full max-w-4/5 mx-auto">
@@ -51,7 +52,6 @@ export function HeroSection() {
               Build worlds
               <br />
               <span className="relative inline-block min-h-[2.3em]">
-                <WordParticles />
                 <span
                   className={`absolute left-0 top-0 text-accent-gold transition-all duration-500 ${
                     isAnimating ? "opacity-0 -translate-y-4" : "opacity-100 translate-y-0"

@@ -12,7 +12,6 @@ const navLinks = [
   { href: "/explore", label: "Explore" },
   { href: "/create", label: "Create World" },
   { href: "/library", label: "Library" },
-  { href: "/docs", label: "Docs" },
 ];
 
 export function NavigationBar() {

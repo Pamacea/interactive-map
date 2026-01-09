@@ -14,7 +14,7 @@ const particleColors = [
 export function WordParticles() {
   return (
     <>
-      {Array.from({ length: 50 }).map((_, i) => {
+      {Array.from({ length: 500 }).map((_, i) => {
         const color = particleColors[i % particleColors.length];
         const size = 1 + Math.random() * 2;
 
