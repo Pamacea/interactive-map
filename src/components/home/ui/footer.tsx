@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { MapPin } from "lucide-react";
 
 export function Footer() {
   return (
@@ -18,11 +17,8 @@ export function Footer() {
 function FooterLogo() {
   return (
     <div className="flex items-center gap-3">
-      <div className="w-10 h-10 bg-gradient-to-br from-accent-gold to-accent-gold-dark rounded-lg flex items-center justify-center">
-        <MapPin className="w-6 h-6 text-background-base" />
-      </div>
       <span className="text-xl font-display font-bold text-gradient tracking-wider">
-        REALM FORGE
+        GENESIS
       </span>
     </div>
   );
@@ -48,5 +44,5 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
 }
 
 function FooterCopyright() {
-  return <p className="text-sm text-text-muted">© 2026 Realm Forge. All rights reserved.</p>;
+  return <p className="text-sm text-text-muted">© 2026 Genesis. All rights reserved.</p>;
 }

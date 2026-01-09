@@ -32,7 +32,7 @@ export function WorldsGrid({ worlds, viewMode, onClearFilters }: WorldsGridProps
         : "flex flex-col gap-4"
     )}>
       {worlds.map((world) => (
-        <WorldCard key={world.id} {...world} />
+        <WorldCard key={world.id} {...world} viewMode={viewMode} />
       ))}
     </div>
   );

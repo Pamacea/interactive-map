@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, MapIcon } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
@@ -20,23 +20,17 @@ export function NavigationBar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background-base/95 backdrop-blur-sm border-b border-border-subtle">
+    <nav className="fixed top-0 left-0 right-0 z-50 py-2 bg-background-base/95 backdrop-blur-sm border-b border-b-accent-gold-dark">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative w-10 h-10">
-              <div className="absolute inset-0 bg-gradient-to-br from-accent-gold to-accent-gold-dark rounded-lg transform rotate-3 group-hover:rotate-6 transition-transform" />
-              <div className="absolute inset-0 bg-gradient-to-br from-accent-gold-light to-accent-gold rounded-lg flex items-center justify-center">
-                <MapIcon className="w-6 h-6 text-background-base" />
-              </div>
-            </div>
             <div className="flex flex-col">
-              <span className="text-xl font-display font-bold text-gradient tracking-wider">
-                REALM FORGE
+              <span className="text-xl font-display font-bold text-linear tracking-wider">
+                GENESIS
               </span>
               <span className="text-xxs text-text-muted uppercase tracking-widest">
-                World Builder
+                Atlas Builder
               </span>
             </div>
           </Link>

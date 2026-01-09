@@ -16,6 +16,7 @@ export interface WorldCardProps {
     image?: string;
   };
   isPublic?: boolean;
+  viewMode?: "grid" | "list";
   className?: string;
 }
 
@@ -29,6 +30,7 @@ export function WorldCard({
   loreCount,
   author,
   isPublic = true,
+  viewMode = "grid",
   className,
 }: WorldCardProps) {
   return (
@@ -44,16 +46,39 @@ export function WorldCard({
         "transition-all duration-300",
         "hover:bg-muted",
         "cursor-pointer",
+        viewMode === "list" && "flex flex-row",
         className
       )}
     >
-      <CoverImage coverImage={coverImage} title={title} isPublic={isPublic} />
-      <Content title={title} description={description} pinCount={pinCount} loreCount={loreCount} author={author} />
+      <CoverImage coverImage={coverImage} title={title} isPublic={isPublic} viewMode={viewMode} />
+      <Content title={title} description={description} pinCount={pinCount} loreCount={loreCount} author={author} viewMode={viewMode} />
     </Link>
   );
 }
 
-function CoverImage({ coverImage, title, isPublic }: { coverImage?: string; title: string; isPublic: boolean }) {
+function CoverImage({ coverImage, title, isPublic, viewMode }: { coverImage?: string; title: string; isPublic: boolean; viewMode?: "grid" | "list" }) {
+  if (viewMode === "list") {
+    return (
+      <div className="relative w-48 h-32 flex-shrink-0 overflow-hidden bg-gradient-to-br from-background-card to-background-elevated">
+        {coverImage ? (
+          <Image
+            src={coverImage}
+            alt={title}
+            fill
+            className="object-cover"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-background-card via-background-elevated to-background-card" />
+        )}
+        {!isPublic && (
+          <div className="absolute top-2 right-2 px-1.5 py-0.5 bg-background-base/90 backdrop-blur-md rounded text-xs border border-border-subtle">
+            <span className="text-[10px] font-medium text-text-muted">Private</span>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-background-card to-background-elevated">
       {coverImage ? (
@@ -77,13 +102,16 @@ function CoverImage({ coverImage, title, isPublic }: { coverImage?: string; titl
   );
 }
 
-function Content({ title, description, pinCount, loreCount, author }: Omit<WorldCardProps, "id" | "slug" | "coverImage" | "isPublic" | "className">) {
+function Content({ title, description, pinCount, loreCount, author, viewMode }: Omit<WorldCardProps, "id" | "slug" | "coverImage" | "isPublic" | "className" | "viewMode"> & { viewMode?: "grid" | "list" }) {
   return (
-    <div className="relative z-10 p-4 sm:p-6 space-y-4">
+    <div className={cn(
+      "relative z-10 p-4 sm:p-6 flex flex-col gap-4",
+      viewMode === "list" && "flex-1 justify-center"
+    )}>
       <Title title={title} />
-      <Description description={description} />
+      {viewMode === "grid" && <Description description={description} />}
       <Meta pinCount={pinCount} loreCount={loreCount} />
-      <Footer author={author} />
+      {viewMode === "grid" && <Footer author={author} />}
     </div>
   );
 }
