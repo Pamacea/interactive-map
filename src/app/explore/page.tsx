@@ -38,15 +38,15 @@ export default function ExplorePage() {
         <NavigationBar />
         <ExploreHeader onSearch={handleSearch} />
 
-        <main className="w-full px-4 py-8">
-          <div className="grid grid-cols-[280px_1fr] gap-6 lg:gap-8">
+        <main className="px-4 py-8">
+          <div className="max-w-4/5 mx-auto grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 lg:gap-8">
             <FilterSidebar
               showFilters={showFilters}
               activeFilters={activeFilters}
               onToggleFilter={toggleFilter}
               onClearAll={clearAllFilters}
             />
-            <div className="flex-1 space-y-6">
+            <div className="flex flex-col gap-6">
               <ResultsHeader
                 filteredCount={filteredWorlds.length}
                 viewMode={viewMode}

@@ -56,11 +56,11 @@ function ContentTypeFilter({ onToggle, activeFilters }: { onToggle: (filter: str
   ];
 
   return (
-    <div className="py-6">
-      <h4 className="text-sm font-medium text-text-secondary mb-4">
+    <div className="py-6 flex flex-col gap-4">
+      <h4 className="text-sm font-medium text-text-secondary">
         Content Type
       </h4>
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         {filters.map((filter) => (
           <FilterCheckbox
             key={filter.value}
@@ -85,11 +85,11 @@ function FactionFilter({ onToggle, activeFilters }: { onToggle: (filter: string)
   ];
 
   return (
-    <div className="py-6">
-      <h4 className="text-sm font-medium text-text-secondary mb-4">
+    <div className="py-6 flex flex-col gap-4">
+      <h4 className="text-sm font-medium text-text-secondary">
         Factions
       </h4>
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         {filters.map((filter) => (
           <FactionCheckbox
             key={filter.value}
@@ -109,11 +109,11 @@ function WorldSizeFilter() {
   const sizes = ["Small (< 50 pins)", "Medium (50-200)", "Large (200+)"];
 
   return (
-    <div className="py-6">
-      <h4 className="text-sm font-medium text-text-secondary mb-4">
+    <div className="py-6 flex flex-col gap-4">
+      <h4 className="text-sm font-medium text-text-secondary">
         World Size
       </h4>
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         {sizes.map((size) => (
           <label key={size} className="flex items-center gap-3 cursor-pointer group">
             <input

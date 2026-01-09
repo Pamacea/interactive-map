@@ -38,7 +38,7 @@ const featuredWorlds = [
 
 export function FeaturedWorldsSection() {
   return (
-    <section className="py-20 px-4">
+    <section className="py-20 px-4 max-w-2/3 mx-auto">
       <header className="flex flex-col sm:flex-row items-start justify-between gap-4 mb-8">
         <div className="text-center sm:text-left">
           <h2 className="text-3xl md:text-4xl font-display font-bold text-text-primary mb-2">
