@@ -17,7 +17,9 @@
       "Bash(npm run build:*)",
       "Bash(npm run db:generate:*)",
       "Bash(del:*)",
-      "Bash(npx prisma@7 generate:*)"
+      "Bash(npx prisma@7 generate:*)",
+      "Bash(npx next lint:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }

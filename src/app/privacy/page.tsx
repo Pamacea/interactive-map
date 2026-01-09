@@ -6,7 +6,7 @@ export default function PrivacyPage() {
     <>
       <NavigationBar />
       <main className="min-h-screen bg-background-base">
-        <div className="max-w-4xl mx-auto px-6 py-24">
+        <div className="mx-auto px-6 py-24">
           <div className="mb-12">
             <h1 className="text-5xl sm:text-6xl font-display font-semibold text-text-primary mb-6">
               Privacy Policy
