@@ -3,6 +3,7 @@
 import { ArrowRight, Map } from "lucide-react";
 import { MetallicButton } from "@/components/ui/metallic-button";
 import { FloatingCards } from "./floating-cards";
+import { WordParticles } from "./word-particle";
 import { useState, useEffect } from "react";
 
 const stats = [
@@ -30,7 +31,7 @@ export function HeroSection() {
         setCurrentWordIndex((prev) => (prev + 1) % rotatingWords.length);
         setIsAnimating(false);
       }, 500);
-    }, 3000);
+    }, 8000);
 
     return () => clearInterval(interval);
   }, []);
@@ -50,28 +51,7 @@ export function HeroSection() {
               Build worlds
               <br />
               <span className="relative inline-block min-h-[2.3em]">
-                {currentWordIndex !== 0 && (
-                  <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
-                    {Array.from({ length: 30 }).map((_, i) => {
-                      const weapons = ["⚔️", "🛡️", "🏹", "🗡️", "⚒️", "🔱", "🪓"];
-                      const weapon = weapons[i % weapons.length];
-                      return (
-                        <div
-                          key={i}
-                          className="absolute text-base"
-                          style={{
-                            left: `${Math.random() * 100}%`,
-                            top: `-20px`,
-                            animation: `fall ${2 + Math.random() * 2}s linear ${Math.random() * 2}s infinite`,
-                            opacity: 0.4 + Math.random() * 0.2
-                          }}
-                        >
-                          {weapon}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                <WordParticles />
                 <span
                   className={`absolute left-0 top-0 text-accent-gold transition-all duration-500 ${
                     isAnimating ? "opacity-0 -translate-y-4" : "opacity-100 translate-y-0"
