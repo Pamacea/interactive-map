@@ -49,12 +49,15 @@ export function HeroSection() {
             <h1 className="text-6xl sm:text-7xl lg:text-8xl font-display font-semibold tracking-tight text-text-primary leading-[1.05]">
               Build worlds
               <br />
-              <span
-                className={`text-accent-gold inline-block transition-all duration-500 ${
-                  isAnimating ? "opacity-0 -translate-y-4" : "opacity-100 translate-y-0"
-                }`}
-              >
-                {rotatingWords[currentWordIndex]}
+              <span className="relative inline-block h-[1.1em]">
+                <span
+                  className={`absolute left-0 top-0 text-accent-gold transition-all duration-500 ${
+                    isAnimating ? "opacity-0 -translate-y-4" : "opacity-100 translate-y-0"
+                  }`}
+                >
+                  {rotatingWords[currentWordIndex]}
+                </span>
+                <span className="invisible">{rotatingWords[currentWordIndex]}</span>
               </span>
             </h1>
 
