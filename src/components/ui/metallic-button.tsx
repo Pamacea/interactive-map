@@ -32,11 +32,7 @@ export function MetallicButton({
     bronze: "bg-gradient-to-r from-orange-700 via-amber-600 to-orange-700 text-black hover:from-orange-600 hover:via-amber-500 hover:to-orange-600 shadow-lg shadow-orange-600/25 hover:shadow-xl hover:shadow-orange-600/40",
   };
 
-  const radiusStyles = {
-    sm: "rounded-md",
-    md: "rounded-lg",
-    lg: "rounded-lg",
-  };
+
 
   return (
     <button
@@ -44,7 +40,6 @@ export function MetallicButton({
         baseStyles,
         sizeStyles[size],
         variantStyles[variant],
-        radiusStyles[size],
         "overflow-hidden",
         className
       )}

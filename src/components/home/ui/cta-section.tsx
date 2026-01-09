@@ -32,7 +32,7 @@ function CTADescription() {
 function CTAButtons() {
   return (
     <div className="flex flex-col sm:flex-row items-center gap-4">
-      <MetallicButton size="lg" variant="gold">
+      <MetallicButton size="lg" variant="gold" >
         Get Started Free
       </MetallicButton>
       <MetallicButton size="lg" variant="silver">
