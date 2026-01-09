@@ -39,56 +39,38 @@ const featuredWorlds = [
 export function FeaturedWorldsSection() {
   return (
     <section className="py-20 px-4">
-      <div className="max-w-7xl mx-auto">
-        <FeaturedWorldsHeader />
-        <FeaturedWorldsGrid />
-        <MobileViewAllButton />
+      <header className="flex flex-col sm:flex-row items-start justify-between gap-4 mb-8">
+        <div className="text-center sm:text-left">
+          <h2 className="text-3xl md:text-4xl font-display font-bold text-text-primary mb-2">
+            Featured <span className="text-accent-gold">Worlds</span>
+          </h2>
+          <p className="text-text-secondary">
+            Discover incredible worlds created by our community
+          </p>
+        </div>
+        <Link
+          href="/explore"
+          className="hidden sm:inline-flex items-center gap-2 text-accent-gold hover:text-accent-gold-light transition-colors font-display font-medium"
+        >
+          View All Worlds
+          <ArrowRight className="w-5 h-5" />
+        </Link>
+      </header>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {featuredWorlds.map((world) => (
+          <WorldCard key={world.id} {...world} />
+        ))}
+      </div>
+
+      <div className="mt-8 text-center sm:hidden">
+        <Link href="/explore">
+          <Button variant="outline" size="lg">
+            View All Worlds
+            <ArrowRight className="w-5 h-5 ml-2" />
+          </Button>
+        </Link>
       </div>
     </section>
-  );
-}
-
-function FeaturedWorldsHeader() {
-  return (
-    <div className="flex items-center justify-between mb-8">
-      <div>
-        <h2 className="text-3xl md:text-4xl font-display font-bold text-text-primary mb-2">
-          Featured <span className="text-accent-gold">Worlds</span>
-        </h2>
-        <p className="text-text-secondary">
-          Discover incredible worlds created by our community
-        </p>
-      </div>
-      <Link
-        href="/explore"
-        className="hidden sm:flex items-center gap-2 text-accent-gold hover:text-accent-gold-light transition-colors font-display font-medium"
-      >
-        View All Worlds
-        <ArrowRight className="w-5 h-5" />
-      </Link>
-    </div>
-  );
-}
-
-function FeaturedWorldsGrid() {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {featuredWorlds.map((world) => (
-        <WorldCard key={world.id} {...world} />
-      ))}
-    </div>
-  );
-}
-
-function MobileViewAllButton() {
-  return (
-    <div className="mt-8 text-center sm:hidden">
-      <Link href="/explore">
-        <Button variant="secondary" size="lg">
-          View All Worlds
-          <ArrowRight className="w-5 h-5 ml-2" />
-        </Button>
-      </Link>
-    </div>
   );
 }

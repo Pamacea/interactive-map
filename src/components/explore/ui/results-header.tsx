@@ -34,11 +34,11 @@ export function ResultsHeader({
 function ResultsCount({ count, activeFilters, onToggleFilter, onClearAll }: { count: number; activeFilters: string[]; onToggleFilter: (filter: string) => void; onClearAll: () => void }) {
   return (
     <div>
-      <p className="text-text-secondary">
+      <p className="text-base text-text-secondary">
         Showing <span className="font-semibold text-text-primary">{count}</span> worlds
       </p>
       {activeFilters.length > 0 && (
-        <div className="flex items-center gap-2 mt-2 flex-wrap">
+        <div className="flex items-center gap-2 mt-3 flex-wrap">
           {activeFilters.map((filter) => (
             <ActiveFilterBadge key={filter} filter={filter} onRemove={() => onToggleFilter(filter)} />
           ))}
@@ -52,7 +52,7 @@ function ActiveFilterBadge({ filter, onRemove }: { filter: string; onRemove: () 
   return (
     <button
       onClick={onRemove}
-      className="flex items-center gap-1 px-2 py-1 bg-accent-gold/10 border border-accent-gold/30 rounded-md text-xs text-accent-gold hover:bg-accent-gold/20 transition-colors"
+      className="flex items-center gap-1 px-3 py-1.5 bg-accent-gold/10 border border-accent-gold/30 rounded-lg text-sm text-accent-gold hover:bg-accent-gold/20 transition-colors"
     >
       {filter}
       <X className="w-3 h-3" />
@@ -62,7 +62,7 @@ function ActiveFilterBadge({ filter, onRemove }: { filter: string; onRemove: () 
 
 function Actions({ viewMode, showFilters, onViewModeChange, onToggleFilters }: { viewMode: "grid" | "list"; showFilters: boolean; onViewModeChange: (mode: "grid" | "list") => void; onToggleFilters: () => void }) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-3">
       <FilterToggleButton show={showFilters} onToggle={onToggleFilters} />
       <ViewModeToggle currentMode={viewMode} onModeChange={onViewModeChange} />
     </div>
@@ -76,7 +76,7 @@ function FilterToggleButton({ show, onToggle }: { show: boolean; onToggle: () =>
       size="sm"
       onClick={onToggle}
       className={cn(
-        "lg:hidden",
+        "lg:hidden rounded-md",
         show && "bg-accent-gold/10 text-accent-gold"
       )}
     >
@@ -87,7 +87,7 @@ function FilterToggleButton({ show, onToggle }: { show: boolean; onToggle: () =>
 
 function ViewModeToggle({ currentMode, onModeChange }: { currentMode: "grid" | "list"; onModeChange: (mode: "grid" | "list") => void }) {
   return (
-    <div className="flex items-center bg-background-card rounded-md border border-border-subtle">
+    <div className="flex items-center bg-background-card rounded-lg border border-border-subtle">
       <ViewModeButton mode="grid" currentMode={currentMode} onModeChange={onModeChange}>
         <Grid3X3 className="w-4 h-4" />
       </ViewModeButton>
@@ -104,9 +104,9 @@ function ViewModeButton({ mode, currentMode, onModeChange, children }: { mode: "
     <button
       onClick={() => onModeChange(mode)}
       className={cn(
-        "p-2 transition-colors",
+        "p-2 transition-colors first:rounded-l-lg last:rounded-r-lg",
         isActive
-          ? "text-accent-gold bg-background-card-hover"
+          ? "text-accent-gold bg-background-muted"
           : "text-text-muted hover:text-text-primary"
       )}
     >

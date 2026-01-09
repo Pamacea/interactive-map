@@ -28,15 +28,18 @@ export default function ExplorePage() {
   const filteredWorlds = filterWorlds({ worlds: allWorlds, query: filters.query });
 
   return (
-    <div className="min-h-screen bg-background-base">
-      <GridBackground />
-      <FloatingParticles />
-      <NavigationBar />
-      <ExploreHeader onSearch={handleSearch} />
+    <div className="min-h-screen bg-background-base relative">
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <GridBackground />
+        <FloatingParticles />
+      </div>
 
-      <section className="relative py-8 sm:py-12 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col lg:flex-row gap-6">
+      <div className="relative z-10 flex flex-col">
+        <NavigationBar />
+        <ExploreHeader onSearch={handleSearch} />
+
+        <main className="w-full px-4 py-8">
+          <div className="grid grid-cols-[280px_1fr] gap-6 lg:gap-8">
             <FilterSidebar
               showFilters={showFilters}
               activeFilters={activeFilters}
@@ -61,8 +64,8 @@ export default function ExplorePage() {
               />
             </div>
           </div>
-        </div>
-      </section>
+        </main>
+      </div>
     </div>
   );
 }

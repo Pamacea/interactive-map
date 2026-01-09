@@ -37,30 +37,19 @@ export function WorldCard({
       className={cn(
         "group relative",
         "bg-background-card/60 backdrop-blur-sm",
-        "rounded-sm",
+        "rounded-lg",
         "border border-border-subtle",
         "hover:border-accent-gold/40",
         "overflow-hidden",
         "transition-all duration-300",
-        "hover:shadow-2xl hover:shadow-accent-gold/10",
-        "hover:-translate-y-1",
+        "hover:bg-muted",
         "cursor-pointer",
         className
       )}
     >
-      <CardGlow />
       <CoverImage coverImage={coverImage} title={title} isPublic={isPublic} />
       <Content title={title} description={description} pinCount={pinCount} loreCount={loreCount} author={author} />
     </Link>
-  );
-}
-
-function CardGlow() {
-  return (
-    <>
-      <div className="absolute inset-0 bg-gradient-to-br from-accent-gold/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-      <div className="absolute -inset-0.5 bg-gradient-to-r from-accent-gold/20 via-transparent to-accent-gold/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm" />
-    </>
   );
 }
 
@@ -72,7 +61,7 @@ function CoverImage({ coverImage, title, isPublic }: { coverImage?: string; titl
           src={coverImage}
           alt={title}
           fill
-          className="object-cover group-hover:scale-105 transition-transform duration-700"
+          className="object-cover"
         />
       ) : (
         <div className="absolute inset-0 bg-gradient-to-br from-background-card via-background-elevated to-background-card" />
@@ -80,7 +69,7 @@ function CoverImage({ coverImage, title, isPublic }: { coverImage?: string; titl
       <div className="absolute inset-0 bg-gradient-to-t from-background-base via-background-base/80 to-transparent" />
 
       {!isPublic && (
-        <div className="absolute top-3 right-3 px-2 py-1 bg-background-base/90 backdrop-blur-md rounded-sm border border-border-subtle">
+        <div className="absolute top-3 right-3 px-2 py-1 bg-background-base/90 backdrop-blur-md rounded-md border border-border-subtle">
           <span className="text-xs font-medium text-text-muted">Private</span>
         </div>
       )}
@@ -90,7 +79,7 @@ function CoverImage({ coverImage, title, isPublic }: { coverImage?: string; titl
 
 function Content({ title, description, pinCount, loreCount, author }: Omit<WorldCardProps, "id" | "slug" | "coverImage" | "isPublic" | "className">) {
   return (
-    <div className="relative z-10 p-4 sm:p-6 space-y-3 sm:space-y-4">
+    <div className="relative z-10 p-4 sm:p-6 space-y-4">
       <Title title={title} />
       <Description description={description} />
       <Meta pinCount={pinCount} loreCount={loreCount} />
@@ -101,7 +90,7 @@ function Content({ title, description, pinCount, loreCount, author }: Omit<World
 
 function Title({ title }: { title: string }) {
   return (
-    <h3 className="text-lg sm:text-xl font-display font-semibold text-text-primary group-hover:text-accent-gold transition-colors line-clamp-1">
+    <h3 className="text-xl font-display font-semibold text-text-primary group-hover:text-accent-gold transition-colors line-clamp-1">
       {title}
     </h3>
   );
@@ -109,7 +98,7 @@ function Title({ title }: { title: string }) {
 
 function Description({ description }: { description: string }) {
   return (
-    <p className="text-sm text-text-secondary line-clamp-2 min-h-[2.5rem] leading-relaxed">
+    <p className="text-base text-text-secondary line-clamp-2 min-h-[2.5rem] leading-relaxed">
       {description}
     </p>
   );
@@ -117,14 +106,14 @@ function Description({ description }: { description: string }) {
 
 function Meta({ pinCount, loreCount }: { pinCount: number; loreCount: number }) {
   return (
-    <div className="flex items-center gap-3 text-xs text-text-muted">
+    <div className="flex items-center gap-3 text-sm text-text-muted">
       <div className="flex items-center gap-1.5">
-        <MapPin className="w-3.5 h-3.5" />
+        <MapPin className="w-4 h-4" />
         <span>{pinCount} pins</span>
       </div>
       <div className="w-px h-3 bg-border-subtle" />
       <div className="flex items-center gap-1.5">
-        <BookOpen className="w-3.5 h-3.5" />
+        <BookOpen className="w-4 h-4" />
         <span>{loreCount} lore</span>
       </div>
     </div>
@@ -133,9 +122,9 @@ function Meta({ pinCount, loreCount }: { pinCount: number; loreCount: number }) 
 
 function Footer({ author }: { author: { name: string } }) {
   return (
-    <div className="flex items-center justify-between pt-3 border-t border-border-subtle">
+    <div className="flex items-center justify-between pt-4 border-t border-border-subtle">
       <Author name={author.name} />
-      <ArrowRight className="w-4 h-4 text-text-muted group-hover:text-accent-gold group-hover:translate-x-1 transition-all" />
+      <ArrowRight className="w-4 h-4 text-text-muted group-hover:text-accent-gold transition-all" />
     </div>
   );
 }
@@ -144,14 +133,14 @@ function Author({ name }: { name: string }) {
   return (
     <div className="flex items-center gap-2">
       <Avatar name={name} />
-      <span className="text-xs text-text-secondary">{name}</span>
+      <span className="text-sm text-text-secondary">{name}</span>
     </div>
   );
 }
 
 function Avatar({ name }: { name: string }) {
   return (
-    <div className="w-6 h-6 rounded-sm bg-gradient-to-br from-accent-gold to-accent-gold-dark flex items-center justify-center text-xs font-bold text-background-base shadow-lg">
+    <div className="w-6 h-6 rounded-md bg-gradient-to-br from-accent-gold to-accent-gold-dark flex items-center justify-center text-xs font-bold text-background-base">
       {name.charAt(0).toUpperCase()}
     </div>
   );

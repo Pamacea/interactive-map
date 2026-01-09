@@ -18,7 +18,7 @@ export function MetallicButton({
   disabled,
   ...props
 }: MetallicButtonProps) {
-  const baseStyles = "relative inline-flex items-center justify-center font-display font-semibold tracking-wide transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed";
+  const baseStyles = "relative inline-flex items-center justify-center font-display font-semibold tracking-wide transition-all duration-225 disabled:opacity-50 disabled:cursor-not-allowed hover:translate-y-[-1px] active:translate-y-[0px] active:scale-[0.99]";
 
   const sizeStyles = {
     sm: "px-4 py-2 text-sm",
@@ -32,19 +32,26 @@ export function MetallicButton({
     bronze: "bg-gradient-to-r from-orange-700 via-amber-600 to-orange-700 text-black hover:from-orange-600 hover:via-amber-500 hover:to-orange-600 shadow-lg shadow-orange-600/25 hover:shadow-xl hover:shadow-orange-600/40",
   };
 
+  const radiusStyles = {
+    sm: "rounded-md",
+    md: "rounded-lg",
+    lg: "rounded-lg",
+  };
+
   return (
     <button
       className={cn(
         baseStyles,
         sizeStyles[size],
         variantStyles[variant],
-        "rounded-sm",
+        radiusStyles[size],
+        "overflow-hidden",
         className
       )}
       disabled={disabled || isLoading}
       {...props}
     >
-      <span className="absolute inset-0 rounded-sm bg-gradient-to-r from-white/20 via-white/5 to-white/20 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+      <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/40 to-white/0 opacity-0 hover:opacity-100 transition-opacity duration-225 pointer-events-none translate-x-[-100%] hover:translate-x-[100%] transition-transform duration-500" />
       <span className="relative z-10 flex items-center gap-2">
         {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
         {children}

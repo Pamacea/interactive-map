@@ -28,7 +28,7 @@ export function WorldsGrid({ worlds, viewMode, onClearFilters }: WorldsGridProps
   return (
     <div className={cn(
       viewMode === "grid"
-        ? "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6"
+        ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
         : "space-y-4"
     )}>
       {worlds.map((world) => (
@@ -51,7 +51,7 @@ function EmptyState({ onClearFilters }: { onClearFilters: () => void }) {
 
 function EmptyStateIcon() {
   return (
-    <div className="inline-flex items-center justify-center w-16 h-16 rounded-sm bg-gradient-to-br from-background-card to-background-elevated border border-border-subtle mb-6 shadow-lg">
+    <div className="inline-flex items-center justify-center w-16 h-16 rounded-lg bg-background-card border border-border-subtle mb-6">
       <Search className="w-8 h-8 text-text-muted" />
     </div>
   );
@@ -59,7 +59,7 @@ function EmptyStateIcon() {
 
 function EmptyStateTitle() {
   return (
-    <h3 className="text-xl font-display font-semibold text-text-primary mb-2">
+    <h3 className="text-4xl font-display font-semibold text-text-primary mb-4">
       No worlds found
     </h3>
   );
@@ -67,7 +67,7 @@ function EmptyStateTitle() {
 
 function EmptyStateDescription() {
   return (
-    <p className="text-text-secondary mb-6 max-w-md mx-auto">
+    <p className="text-base text-text-secondary mb-6">
       Try adjusting your search or filters to find what you're looking for.
     </p>
   );
