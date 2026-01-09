@@ -1,10 +1,10 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // ============================================
@@ -166,7 +166,6 @@ model LoreEntry {
   gameWorldId String
   gameWorld   GameWorld    @relation(fields: [gameWorldId], references: [id], onDelete: Cascade)
   gallery     GalleryItem[]
-  relatedPins Pin[]        @relation("PinLoreRelation")
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
