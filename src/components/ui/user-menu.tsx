@@ -2,10 +2,12 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { useSession, signOut } from "next-auth/react";
 import { User, Settings, LogOut, ChevronDown, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function UserMenu() {
+  const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -26,12 +28,17 @@ export function UserMenu() {
     };
   }, [isOpen]);
 
-  // TODO: Replace with actual user data from auth
-  const user = {
-    name: "Guest",
-    email: "guest@example.com",
-    image: null,
-  };
+  const user = session?.user;
+
+  if (!user) {
+    return (
+      <Link href="/auth/signin">
+        <button className="px-4 py-2 rounded-lg bg-accent-gold text-background-base font-medium hover:bg-accent-gold-dark transition-all duration-200">
+          Sign In
+        </button>
+      </Link>
+    );
+  }
 
   return (
     <div ref={menuRef} className="relative">
@@ -49,17 +56,17 @@ export function UserMenu() {
           {user.image ? (
             <img
               src={user.image}
-              alt={user.name}
+              alt={user.name || "User"}
               className="w-full h-full rounded-full object-cover"
             />
           ) : (
-            <span>{user.name.charAt(0).toUpperCase()}</span>
+            <span>{user.name?.charAt(0).toUpperCase() || "U"}</span>
           )}
         </div>
 
         {/* Name - hidden on small screens */}
         <span className="hidden sm:block text-sm font-medium text-text-primary">
-          {user.name}
+          {user.name || "User"}
         </span>
 
         {/* Chevron */}
@@ -85,7 +92,7 @@ export function UserMenu() {
           {/* User Info */}
           <div className="px-4 py-3 border-b border-border-subtle">
             <p className="text-sm font-display font-semibold text-text-primary">
-              {user.name}
+              {user.name || "User"}
             </p>
             <p className="text-xs text-text-muted truncate">{user.email}</p>
           </div>
@@ -128,8 +135,7 @@ export function UserMenu() {
             <button
               onClick={() => {
                 setIsOpen(false);
-                // TODO: Implement sign out
-                console.log("Sign out");
+                signOut({ callbackUrl: "/" });
               }}
               className="flex items-center gap-3 w-full px-4 py-2 text-sm text-status-error hover:text-status-error hover:bg-background-card-hover transition-colors"
             >
