@@ -35,8 +35,8 @@ const features = [
 
 export function FeaturesSection() {
   return (
-    <section className="relative py-20 sm:py-32 px-4 bg-gradient-to-b from-background-base to-background-elevated border-b-2 border-b-accent-gold">
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(212,175,55,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(212,175,55,0.02)_1px,transparent_1px)] bg-[length:100px_100px]" />
+    <section className="relative py-20 sm:py-32 px-4 bg-linear-to-b from-background-base to-background-elevated border-b-2 border-b-accent-gold">
+      <div className="absolute inset-0 bg-[linear-linear(rgba(212,175,55,0.02)_1px,transparent_1px),linear-linear(90deg,rgba(212,175,55,0.02)_1px,transparent_1px)] bg-size-[100px_100px]" />
       <div className="relative max-w-2/3 mx-auto flex flex-col items-center">
         <FeaturesHeader />
         <FeaturesGrid />
@@ -76,7 +76,7 @@ function FeaturesGrid() {
 function FeatureItem({ icon: Icon, title, description }: typeof features[0]) {
   return (
     <div className="flex items-start gap-6 py-8 hover:bg-muted/50 transition-colors duration-200 -mx-4 px-4 rounded-sm">
-      <div className="w-12 h-12 rounded-sm bg-gradient-to-br from-accent-gold/20 to-accent-gold/5 flex items-center justify-center flex-shrink-0">
+      <div className="w-12 h-12 rounded-sm bg-linear-to-br from-accent-gold/20 to-accent-gold/5 flex items-center justify-center shrink-0">
         <Icon className="w-6 h-6 text-accent-gold" />
       </div>
       <div className="flex-1 pt-1">
