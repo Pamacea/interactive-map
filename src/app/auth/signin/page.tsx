@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 export default function SignInPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background-base via-background-card to-background-elevated">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-background-base via-background-card to-background-elevated">
       <div className="max-w-2/3 mx-4">
         <div className="bg-background-card rounded-2xl border border-border-subtle p-8 shadow-lg">
           <div className="text-center mb-8">

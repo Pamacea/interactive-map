@@ -10,6 +10,7 @@ import { WorldsGrid } from "@/components/explore/ui/worlds-grid";
 import { useExploreFilters } from "@/components/explore/logic/use-explore-filters";
 import { getAllWorlds } from "@/components/explore/methods/get-all-worlds";
 import { filterWorlds } from "@/components/explore/methods/filter-worlds";
+import { Footer } from "@/components/home/ui/footer";
 
 export default function ExplorePage() {
   const {
@@ -65,6 +66,7 @@ export default function ExplorePage() {
             </div>
           </div>
         </main>
+          <Footer />
       </div>
     </div>
   );

@@ -19,7 +19,12 @@
       "Bash(del:*)",
       "Bash(npx prisma@7 generate:*)",
       "Bash(npx next lint:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "WebSearch",
+      "Bash(npm run db:push:*)",
+      "Bash(npx prisma db push:*)",
+      "Bash(npx tsx:*)",
+      "Bash(npx prisma:*)"
     ]
   }
 }
