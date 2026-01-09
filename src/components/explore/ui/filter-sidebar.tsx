@@ -13,12 +13,12 @@ export function FilterSidebar({ showFilters, activeFilters, onToggleFilter, onCl
     <aside
       className={cn(
         "lg:w-64 flex-shrink-0",
-        "bg-background-card rounded-lg border border-border-subtle",
+        "bg-background-card/80 backdrop-blur-md rounded-sm border border-border-subtle shadow-lg",
         "transition-all duration-300",
         !showFilters && "hidden lg:block"
       )}
     >
-      <div className="p-4 space-y-6">
+      <div className="p-4 sm:p-6 space-y-6">
         <FilterHeader activeFilters={activeFilters} onClearAll={onClearAll} />
         <ContentTypeFilter onToggle={onToggleFilter} activeFilters={activeFilters} />
         <FactionFilter onToggle={onToggleFilter} activeFilters={activeFilters} />
@@ -140,7 +140,7 @@ function FilterCheckbox({ label, value, checked, onChange }: { label: string; va
         type="checkbox"
         checked={checked}
         onChange={onChange}
-        className="w-4 h-4 rounded border-border-subtle text-accent-gold focus:ring-accent-gold focus:ring-offset-0"
+        className="w-4 h-4 rounded-sm border-border-subtle text-accent-gold focus:ring-accent-gold focus:ring-offset-0"
       />
       <span className="text-sm text-text-secondary group-hover:text-text-primary transition-colors">
         {label}
@@ -156,9 +156,9 @@ function FactionCheckbox({ label, value, color, checked, onChange }: { label: st
         type="checkbox"
         checked={checked}
         onChange={onChange}
-        className="w-4 h-4 rounded border-border-subtle text-accent-gold focus:ring-accent-gold focus:ring-offset-0"
+        className="w-4 h-4 rounded-sm border-border-subtle text-accent-gold focus:ring-accent-gold focus:ring-offset-0"
       />
-      <div className={`w-3 h-3 rounded-full ${color}`} />
+      <div className={`w-3 h-3 rounded-sm ${color}`} />
       <span className="text-sm text-text-secondary group-hover:text-text-primary transition-colors">
         {label}
       </span>
