@@ -58,9 +58,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button
         className={cn(buttonVariants({ variant, size, className }))}
-        style={{
-          focusVisibleRingColor: "var(--color-accent-gold)",
-        }}
         ref={ref}
         {...props}
       />
