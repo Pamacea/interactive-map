@@ -54,7 +54,7 @@ function FeaturesHeader() {
           Build
         </span>
       </h2>
-      <p className="text-base sm:text-lg text-text-secondary max-w-2xl mx-auto">
+      <p className="text-base sm:text-lg text-text-secondary mx-auto">
         Powerful tools for world builders, game masters, and fantasy creators.
       </p>
     </div>

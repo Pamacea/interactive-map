@@ -18,7 +18,7 @@ export function Footer() {
 function FooterLogo() {
   return (
     <div className="flex items-center gap-3">
-      <div className="w-10 h-10 bg-gradient-to-br from-accent-gold to-accent-gold-dark rounded-lg flex items-center justify-center">
+      <div className="w-10 h-10 bg-linear-to-br from-accent-gold to-accent-gold-dark rounded-lg flex items-center justify-center">
         <MapPin className="w-6 h-6 text-background-base" />
       </div>
       <span className="text-xl font-display font-bold text-gradient tracking-wider">

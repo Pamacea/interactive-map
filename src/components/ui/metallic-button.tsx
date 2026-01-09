@@ -38,13 +38,14 @@ export function MetallicButton({
         baseStyles,
         sizeStyles[size],
         variantStyles[variant],
+        "rounded-sm",
         className
       )}
       disabled={disabled || isLoading}
       {...props}
     >
-      <span className="absolute inset-0 rounded-sm bg-gradient-to-r from-white/30 via-white/10 to-white/30 opacity-0 hover:opacity-100 transition-opacity duration-300" />
-      <span className="relative flex items-center gap-2">
+      <span className="absolute inset-0 rounded-sm bg-gradient-to-r from-white/20 via-white/5 to-white/20 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+      <span className="relative z-10 flex items-center gap-2">
         {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
         {children}
       </span>

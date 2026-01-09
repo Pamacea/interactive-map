@@ -5,9 +5,8 @@ import { cn } from "@/lib/utils";
 export function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <HeroBackground />
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto text-center space-y-8 sm:space-y-12">
+      <div className="relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto text-center space-y-8 sm:space-y-12">
           <HeroBadge />
           <HeroTitle />
           <HeroDescription />
@@ -16,17 +15,6 @@ export function HeroSection() {
         </div>
       </div>
     </section>
-  );
-}
-
-function HeroBackground() {
-  return (
-    <>
-      <div className="absolute inset-0 bg-gradient-to-br from-background-base via-background-elevated to-background-base" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(212,175,55,0.1),transparent_50%)]" />
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent-gold/5 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent-gold/5 rounded-full blur-3xl animate-pulse delay-1000" />
-    </>
   );
 }
 
@@ -54,22 +42,33 @@ function HeroTitle() {
 
 function HeroDescription() {
   return (
-    <p className="text-base sm:text-lg md:text-xl text-text-secondary max-w-2xl mx-auto leading-relaxed px-4">
-      Build immersive interactive maps for your RPG campaigns, fantasy novels, and game worlds.
-      <span className="block mt-2 text-accent-gold/80">Inspired by the greatest fantasy realms.</span>
+    <p className="text-base sm:text-lg md:text-xl text-text-secondary mx-auto leading-relaxed px-4">
+      Build immersive interactive maps for your RPG campaigns, fantasy novels,
+      and game worlds.
+      <span className="block mt-2 text-accent-gold/80">
+        Inspired by the greatest fantasy realms.
+      </span>
     </p>
   );
 }
 
 function HeroCTA() {
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 px-4">
-      <MetallicButton variant="gold" size="lg" className="group w-full sm:w-auto">
+    <div className="flex flex-col sm:flex-row items-center justify-center gap-8 pt-4 px-4">
+      <MetallicButton
+        variant="gold"
+        size="lg"
+        className="group w-full sm:w-auto"
+      >
         <Sparkles className="w-5 h-5" />
         Create Your World
         <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
       </MetallicButton>
-      <MetallicButton variant="silver" size="lg" className="group w-full sm:w-auto">
+      <MetallicButton
+        variant="silver"
+        size="lg"
+        className="group w-full sm:w-auto"
+      >
         <Globe className="w-5 h-5" />
         Explore Worlds
         <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -80,11 +79,11 @@ function HeroCTA() {
 
 function HeroStats() {
   return (
-    <div className="grid grid-cols-3 gap-4 sm:gap-8 pt-8 sm:pt-12 px-4 max-w-2xl mx-auto">
+    <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8 pt-8 sm:pt-12 px-4">
       <StatItem value="10K+" label="Worlds Created" />
-      <div className="hidden sm:block w-px h-12 bg-border-subtle self-center" />
+      <div className="hidden sm:block w-px h-12 bg-border-subtle" />
       <StatItem value="50K+" label="Active Users" />
-      <div className="hidden sm:block w-px h-12 bg-border-subtle self-center" />
+      <div className="hidden sm:block w-px h-12 bg-border-subtle" />
       <StatItem value="1M+" label="Map Pins" />
     </div>
   );
