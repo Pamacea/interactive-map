@@ -1,0 +1,235 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// AUTHENTICATION
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  bio           String?   @db.Text
+  accounts      Account[]
+  sessions      Session[]
+  gameWorlds    GameWorld[]
+  pins          Pin[]
+  loreEntries   LoreEntry[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ============================================
+// GAME WORLDS
+// ============================================
+
+model GameWorld {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  description String?  @db.Text
+  coverImage  String?
+  isPublished Boolean  @default(false)
+  isPublic    Boolean  @default(true)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pins        Pin[]
+  layers      MapLayer[]
+  loreEntries LoreEntry[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([slug])
+  @@index([userId])
+}
+
+// ============================================
+// MAP LAYERS
+// ============================================
+
+model MapLayer {
+  id          String    @id @default(cuid())
+  name        String
+  description String?   @db.Text
+  isVisible   Boolean   @default(true)
+  opacity     Float     @default(1.0)
+  zIndex      Int       @default(0)
+  gameWorldId String
+  gameWorld   GameWorld @relation(fields: [gameWorldId], references: [id], onDelete: Cascade)
+  pins        Pin[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([gameWorldId])
+}
+
+// ============================================
+// PINS (Cities, Villages, POI, Characters)
+// ============================================
+
+enum PinType {
+  CITY
+  VILLAGE
+  POI
+  CHARACTER
+  DUNGEON
+  SHOP
+  QUEST
+  TREASURE
+  CUSTOM
+}
+
+model Pin {
+  id          String    @id @default(cuid())
+  title       String
+  description String?   @db.Text
+  pinType     PinType   @default(CUSTOM)
+  latitude    Float
+  longitude   Float
+  icon        String?
+  color       String    @default("#3b82f6")
+  size        Int       @default(32)
+  isVisible   Boolean   @default(true)
+  properties  Json?     // Custom properties for RPG data (level, faction, etc.)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gameWorldId String
+  gameWorld   GameWorld @relation(fields: [gameWorldId], references: [id], onDelete: Cascade)
+  layerId     String?
+  layer       MapLayer? @relation(fields: [layerId], references: [id], onDelete: SetNull)
+  gallery     GalleryItem[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([latitude, longitude])
+  @@index([gameWorldId])
+  @@index([userId])
+}
+
+// ============================================
+// LORE & KNOWLEDGE
+// ============================================
+
+model LoreEntry {
+  id          String       @id @default(cuid())
+  title       String
+  content     String       @db.Text
+  slug        String
+  category    LoreCategory @default(GENERAL)
+  isVisible   Boolean      @default(false)
+  isPublic    Boolean      @default(true)
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gameWorldId String
+  gameWorld   GameWorld    @relation(fields: [gameWorldId], references: [id], onDelete: Cascade)
+  gallery     GalleryItem[]
+  relatedPins Pin[]        @relation("PinLoreRelation")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@unique([gameWorldId, slug])
+  @@index([gameWorldId])
+  @@index([category])
+}
+
+enum LoreCategory {
+  GENERAL
+  HISTORY
+  GEOGRAPHY
+  CHARACTERS
+  FACTIONS
+  MAGIC
+  ITEMS
+  QUESTS
+  CUSTOM
+}
+
+// ============================================
+// GALLERY & MEDIA
+// ============================================
+
+model GalleryItem {
+  id          String     @id @default(cuid())
+  title       String
+  description String?    @db.Text
+  imageUrl    String
+  type        MediaType @default(IMAGE)
+  order       Int        @default(0)
+  pinId       String?
+  pin         Pin?       @relation(fields: [pinId], references: [id], onDelete: Cascade)
+  loreEntryId String?
+  loreEntry   LoreEntry? @relation(fields: [loreEntryId], references: [id], onDelete: Cascade)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([pinId])
+  @@index([loreEntryId])
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  AUDIO
+  DOCUMENT
+}
+
+// ============================================
+// CHARACTER-SPECIFIC DATA
+// ============================================
+
+// Extension for Pin when pinType = CHARACTER
+// Stored in Pin.properties as JSON, or use separate model
+// Example structure in properties:
+// {
+//   "character": {
+//     "level": 5,
+//     "faction": "Alliance",
+//     "class": "Warrior",
+//     "dialogue": ["Hello traveler!", "What brings you here?"],
+//     "quests": ["quest-id-1", "quest-id-2"],
+//     "shop": true
+//   }
+// }

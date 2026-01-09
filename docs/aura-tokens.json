@@ -1,0 +1,259 @@
+{
+  "colors": {
+    "semantic": {
+      "background": {
+        "base": "#0a0e13",
+        "elevated": "#141a1f",
+        "card": "#1a2228",
+        "cardHover": "#222b33",
+        "overlay": "rgba(10, 14, 19, 0.95)"
+      },
+      "border": {
+        "subtle": "rgba(255, 255, 255, 0.08)",
+        "default": "rgba(255, 255, 255, 0.12)",
+        "ornate": "rgba(212, 175, 55, 0.3)",
+        "glow": "rgba(212, 175, 55, 0.15)"
+      },
+      "text": {
+        "primary": "#e8e6e3",
+        "secondary": "#a8a49e",
+        "muted": "#6b6862",
+        "inverse": "#0a0e13"
+      },
+      "accent": {
+        "gold": "#d4af37",
+        "goldLight": "#f4d47c",
+        "goldDark": "#b8931f"
+      }
+    },
+    "pinTypes": {
+      "city": {
+        "primary": "#c9a227",
+        "glow": "rgba(201, 162, 39, 0.4)",
+        "icon": "🏰",
+        "label": "Golden City",
+        "description": "Major settlements and capitals"
+      },
+      "village": {
+        "primary": "#8b7355",
+        "glow": "rgba(139, 115, 85, 0.4)",
+        "icon": "🏘️",
+        "label": "Earthy Village",
+        "description": "Small towns and hamlets"
+      },
+      "poi": {
+        "primary": "#4a9eff",
+        "glow": "rgba(74, 158, 255, 0.4)",
+        "icon": "📍",
+        "label": "Azure Point",
+        "description": "Points of interest"
+      },
+      "character": {
+        "primary": "#9b59b6",
+        "glow": "rgba(155, 89, 182, 0.4)",
+        "icon": "👤",
+        "label": "Mystic Character",
+        "description": "NPCs and story characters"
+      },
+      "dungeon": {
+        "primary": "#e74c3c",
+        "glow": "rgba(231, 76, 60, 0.4)",
+        "icon": "⚔️",
+        "label": "Crimson Dungeon",
+        "description": "Dangerous areas and instances"
+      },
+      "shop": {
+        "primary": "#2ecc71",
+        "glow": "rgba(46, 204, 113, 0.4)",
+        "icon": "🛒",
+        "label": "Emerald Trade",
+        "description": "Merchants and services"
+      },
+      "quest": {
+        "primary": "#f39c12",
+        "glow": "rgba(243, 156, 18, 0.4)",
+        "icon": "❓",
+        "label": "Amber Quest",
+        "description": "Quest givers and objectives"
+      },
+      "treasure": {
+        "primary": "#1abc9c",
+        "glow": "rgba(26, 188, 156, 0.4)",
+        "icon": "💎",
+        "label": "Teal Treasure",
+        "description": "Loot and hidden items"
+      }
+    },
+    "factions": {
+      "light": {
+        "primary": "#64b5f6",
+        "glow": "rgba(100, 181, 246, 0.5)"
+      },
+      "dark": {
+        "primary": "#7b1fa2",
+        "glow": "rgba(123, 31, 162, 0.5)"
+      },
+      "nature": {
+        "primary": "#66bb6a",
+        "glow": "rgba(102, 187, 106, 0.5)"
+      },
+      "fire": {
+        "primary": "#ff6b35",
+        "glow": "rgba(255, 107, 53, 0.5)"
+      },
+      "ice": {
+        "primary": "#42a5f5",
+        "glow": "rgba(66, 165, 245, 0.5)"
+      }
+    },
+    "status": {
+      "success": "#2ecc71",
+      "warning": "#f39c12",
+      "error": "#e74c3c",
+      "info": "#3498db"
+    },
+    "rarity": {
+      "common": "#9e9e9e",
+      "uncommon": "#4caf50",
+      "rare": "#2196f3",
+      "epic": "#9b59b6",
+      "legendary": "#d4af37"
+    }
+  },
+  "typography": {
+    "fontFamilies": {
+      "display": {
+        "primary": "'Cinzel', 'Times New Roman', serif",
+        "fallback": "Georgia, serif"
+      },
+      "body": {
+        "primary": "'Inter', system-ui, -apple-system, sans-serif",
+        "fallback": "Segoe UI, sans-serif"
+      },
+      "mono": {
+        "primary": "'JetBrains Mono', 'Fira Code', monospace",
+        "fallback": "Consolas, monospace"
+      }
+    },
+    "sizes": {
+      "xxs": "0.625rem",
+      "xs": "0.75rem",
+      "sm": "0.875rem",
+      "base": "1rem",
+      "lg": "1.125rem",
+      "xl": "1.25rem",
+      "2xl": "1.5rem",
+      "3xl": "1.875rem",
+      "4xl": "2.25rem",
+      "5xl": "3rem",
+      "6xl": "3.75rem"
+    },
+    "weights": {
+      "light": 300,
+      "regular": 400,
+      "medium": 500,
+      "semibold": 600,
+      "bold": 700,
+      "extrabold": 800
+    },
+    "lineHeights": {
+      "tight": 1.25,
+      "normal": 1.5,
+      "relaxed": 1.75
+    },
+    "letterSpacing": {
+      "tight": "-0.025em",
+      "normal": "0",
+      "wide": "0.025em",
+      "wider": "0.05em",
+      "widest": "0.1em"
+    }
+  },
+  "spacing": {
+    "xs": "0.25rem",
+    "sm": "0.5rem",
+    "md": "1rem",
+    "lg": "1.5rem",
+    "xl": "2rem",
+    "2xl": "3rem",
+    "3xl": "4rem",
+    "4xl": "6rem",
+    "5xl": "8rem"
+  },
+  "borders": {
+    "radius": {
+      "none": "0",
+      "sm": "0.25rem",
+      "md": "0.5rem",
+      "lg": "0.75rem",
+      "xl": "1rem",
+      "full": "9999px"
+    },
+    "width": {
+      "hairline": "1px",
+      "thin": "2px",
+      "medium": "3px",
+      "thick": "4px",
+      "ornate": "4px"
+    }
+  },
+  "shadows": {
+    "sm": "0 1px 2px rgba(0, 0, 0, 0.5)",
+    "md": "0 4px 6px rgba(0, 0, 0, 0.4)",
+    "lg": "0 10px 15px rgba(0, 0, 0, 0.3)",
+    "xl": "0 20px 25px rgba(0, 0, 0, 0.25)",
+    "2xl": "0 25px 50px rgba(0, 0, 0, 0.5)",
+    "glow": {
+      "subtle": "0 0 10px rgba(212, 175, 55, 0.2)",
+      "medium": "0 0 20px rgba(212, 175, 55, 0.3)",
+      "strong": "0 0 30px rgba(212, 175, 55, 0.4)",
+      "pin": "0 0 15px var(--pin-glow)"
+    },
+    "inner": {
+      "subtle": "inset 0 2px 4px rgba(0, 0, 0, 0.3)",
+      "ornate": "inset 0 0 20px rgba(212, 175, 55, 0.1)"
+    }
+  },
+  "effects": {
+    "glow": {
+      "duration": "0.3s",
+      "easing": "ease-out"
+    },
+    "float": {
+      "duration": "3s",
+      "easing": "ease-in-out"
+    },
+    "pulse": {
+      "duration": "2s",
+      "easing": "ease-in-out"
+    },
+    "shimmer": {
+      "duration": "2.5s",
+      "easing": "linear"
+    }
+  },
+  "transitions": {
+    "fast": "150ms cubic-bezier(0.4, 0, 0.2, 1)",
+    "base": "200ms cubic-bezier(0.4, 0, 0.2, 1)",
+    "slow": "300ms cubic-bezier(0.4, 0, 0.2, 1)",
+    "slower": "500ms cubic-bezier(0.4, 0, 0.2, 1)"
+  },
+  "zIndex": {
+    "dropdown": 1000,
+    "sticky": 1020,
+    "fixed": 1030,
+    "modalBackdrop": 1040,
+    "modal": 1050,
+    "popover": 1060,
+    "tooltip": 1070,
+    "mapOverlay": 2000,
+    "pin": 3000
+  },
+  "breakpoints": {
+    "sm": "640px",
+    "md": "768px",
+    "lg": "1024px",
+    "xl": "1280px",
+    "2xl": "1536px"
+  }
+}
