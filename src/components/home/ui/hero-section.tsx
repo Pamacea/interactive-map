@@ -21,6 +21,7 @@ const rotatingWords = [
 export function HeroSection() {
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [hoveredStat, setHoveredStat] = useState<string | null>(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -73,13 +74,42 @@ export function HeroSection() {
             </div>
 
             <div className="flex items-center gap-16 pt-8 border-t-2 border-t-accent-gold-dark">
-              {stats.map((stat) => (
-                <div key={stat.label}>
-                  <div className="text-3xl font-display font-semibold text-text-primary">{stat.value}</div>
+              {stats.map((stat, index) => (
+                <div
+                  key={stat.label}
+                  className="group transition-all duration-300"
+                  style={{
+                    animation: `fadeInUp 0.6s ease-out ${index * 0.15}s both`
+                  }}
+                  onMouseEnter={() => setHoveredStat(stat.label)}
+                  onMouseLeave={() => setHoveredStat(null)}
+                >
+                  <div
+                    className={`text-3xl font-display font-semibold transition-all duration-300 ${
+                      hoveredStat === stat.label
+                        ? "text-accent-gold scale-110"
+                        : "text-text-primary"
+                    }`}
+                  >
+                    {stat.value}
+                  </div>
                   <div className="text-sm text-text-muted mt-1">{stat.label}</div>
                 </div>
               ))}
             </div>
+
+            <style jsx>{`
+              @keyframes fadeInUp {
+                from {
+                  opacity: 0;
+                  transform: translateY(20px);
+                }
+                to {
+                  opacity: 1;
+                  transform: translateY(0);
+                }
+              }
+            `}</style>
 
           </div>
 
