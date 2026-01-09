@@ -49,7 +49,29 @@ export function HeroSection() {
             <h1 className="text-6xl sm:text-7xl lg:text-8xl font-display font-semibold tracking-tight text-text-primary leading-[1.05]">
               Build worlds
               <br />
-              <span className="relative inline-block h-[1.1em]">
+              <span className="relative inline-block min-h-[2.3em]">
+                {currentWordIndex !== 0 && (
+                  <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
+                    {Array.from({ length: 30 }).map((_, i) => {
+                      const weapons = ["⚔️", "🛡️", "🏹", "🗡️", "⚒️", "🔱", "🪓"];
+                      const weapon = weapons[i % weapons.length];
+                      return (
+                        <div
+                          key={i}
+                          className="absolute text-base"
+                          style={{
+                            left: `${Math.random() * 100}%`,
+                            top: `-20px`,
+                            animation: `fall ${2 + Math.random() * 2}s linear ${Math.random() * 2}s infinite`,
+                            opacity: 0.4 + Math.random() * 0.2
+                          }}
+                        >
+                          {weapon}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
                 <span
                   className={`absolute left-0 top-0 text-accent-gold transition-all duration-500 ${
                     isAnimating ? "opacity-0 -translate-y-4" : "opacity-100 translate-y-0"
@@ -57,7 +79,7 @@ export function HeroSection() {
                 >
                   {rotatingWords[currentWordIndex]}
                 </span>
-                <span className="invisible">{rotatingWords[currentWordIndex]}</span>
+                <span className="invisible block">{rotatingWords[currentWordIndex]}</span>
               </span>
             </h1>
 
@@ -110,6 +132,11 @@ export function HeroSection() {
                 to {
                   opacity: 1;
                   transform: translateY(0);
+                }
+              }
+              @keyframes fall {
+                to {
+                  transform: translateY(150px);
                 }
               }
             `}</style>
