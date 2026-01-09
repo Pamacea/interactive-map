@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { User, Settings, LogOut, ChevronDown, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { MetallicButton } from "./metallic-button";
 
 export function UserMenu() {
   const { data: session } = useSession();
@@ -33,9 +34,9 @@ export function UserMenu() {
   if (!user) {
     return (
       <Link href="/auth/signin">
-        <button className="px-4 py-2 rounded-lg bg-accent-gold text-background-base font-medium hover:bg-accent-gold-dark transition-all duration-200">
+        <MetallicButton variant="bronze">
           Sign In
-        </button>
+        </MetallicButton>
       </Link>
     );
   }
@@ -45,10 +46,10 @@ export function UserMenu() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "flex items-center gap-2 px-3 py-2 rounded-md",
+          "flex items-center gap-2 px-3 py-2 rounded-sm",
           "transition-all duration-200",
           "hover:bg-background-card-hover",
-          isOpen && "bg-background-card shadow-glow-subtle"
+          isOpen && "bg-background-elevated shadow-glow-subtle"
         )}
       >
         {/* Avatar */}
@@ -82,9 +83,9 @@ export function UserMenu() {
       {isOpen && (
         <div
           className={cn(
-            "absolute right-0 mt-2 w-56",
+            "absolute right-0 mt-8 w-56",
             "bg-background-card",
-            "rounded-lg border border-border-ornate shadow-xl",
+            "rounded-sm border-2 border-border-ornate shadow-xl",
             "overflow-hidden",
             "animate-in fade-in slide-in-from-top-2 duration-200"
           )}

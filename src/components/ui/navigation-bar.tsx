@@ -9,9 +9,10 @@ import { Button } from "./button";
 import { UserMenu } from "./user-menu";
 
 const navLinks = [
-  { href: "/explore", label: "Explore" },
   { href: "/create", label: "Create World" },
+  { href: "/explore", label: "Explore" },
   { href: "/library", label: "Library" },
+  { href: "/tutorials", label: "Tutorials" },
 ];
 
 export function NavigationBar() {
