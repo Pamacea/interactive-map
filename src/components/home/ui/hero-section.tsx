@@ -3,6 +3,7 @@
 import { ArrowRight, Map } from "lucide-react";
 import { MetallicButton } from "@/components/ui/metallic-button";
 import { FloatingCards } from "./floating-cards";
+import { useState, useEffect } from "react";
 
 const stats = [
   { value: "10K+", label: "Worlds" },
@@ -10,7 +11,29 @@ const stats = [
   { value: "1M+", label: "Locations" }
 ];
 
+const rotatingWords = [
+  "worth exploring",
+  "that inspire",
+  "full of wonder",
+  "to remember"
+];
+
 export function HeroSection() {
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsAnimating(true);
+      setTimeout(() => {
+        setCurrentWordIndex((prev) => (prev + 1) % rotatingWords.length);
+        setIsAnimating(false);
+      }, 500);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <section className="relative min-h-screen flex items-center  px-6 bg-background-base ">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -25,7 +48,13 @@ export function HeroSection() {
             <h1 className="text-6xl sm:text-7xl lg:text-8xl font-display font-semibold tracking-tight text-text-primary leading-[1.05]">
               Build worlds
               <br />
-              <span className="text-accent-gold">worth exploring</span>
+              <span
+                className={`text-accent-gold inline-block transition-all duration-500 ${
+                  isAnimating ? "opacity-0 -translate-y-4" : "opacity-100 translate-y-0"
+                }`}
+              >
+                {rotatingWords[currentWordIndex]}
+              </span>
             </h1>
 
             <p className="text-xl text-text-secondary leading-relaxed">
