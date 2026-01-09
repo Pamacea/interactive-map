@@ -35,8 +35,9 @@ const features = [
 
 export function FeaturesSection() {
   return (
-    <section className="py-20 px-4 bg-background-elevated">
-      <div className="max-w-7xl mx-auto">
+    <section className="relative py-20 sm:py-32 px-4 bg-gradient-to-b from-background-base to-background-elevated">
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(212,175,55,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(212,175,55,0.02)_1px,transparent_1px)] bg-[length:100px_100px]" />
+      <div className="relative max-w-7xl mx-auto">
         <FeaturesHeader />
         <FeaturesGrid />
       </div>
@@ -46,11 +47,14 @@ export function FeaturesSection() {
 
 function FeaturesHeader() {
   return (
-    <div className="text-center mb-16">
-      <h2 className="text-4xl md:text-5xl font-display font-bold text-text-primary mb-4">
-        Everything You Need to <span className="text-accent-gold">Build</span>
+    <div className="text-center mb-12 sm:mb-16">
+      <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-text-primary mb-4">
+        Everything You Need to{" "}
+        <span className="bg-gradient-to-r from-accent-gold to-accent-gold-light bg-clip-text text-transparent">
+          Build
+        </span>
       </h2>
-      <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+      <p className="text-base sm:text-lg text-text-secondary max-w-2xl mx-auto">
         Powerful tools for world builders, game masters, and fantasy creators.
       </p>
     </div>
@@ -59,7 +63,7 @@ function FeaturesHeader() {
 
 function FeaturesGrid() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
       {features.map((feature, index) => (
         <FeatureCard key={index} {...feature} />
       ))}
@@ -69,16 +73,19 @@ function FeaturesGrid() {
 
 function FeatureCard({ icon: Icon, title, description }: typeof features[0]) {
   return (
-    <div className="group p-6 bg-background-card rounded-lg border border-border-subtle hover:border-accent-gold/30 transition-all duration-300 hover:shadow-glow-subtle">
-      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-accent-gold/20 to-accent-gold/5 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-        <Icon className="w-6 h-6 text-accent-gold" />
+    <div className="group relative p-6 bg-background-card/50 backdrop-blur-sm border border-border-subtle hover:border-accent-gold/30 transition-all duration-300 overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-accent-gold/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="relative z-10">
+        <div className="w-12 h-12 rounded-sm bg-gradient-to-br from-accent-gold/20 to-accent-gold/5 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+          <Icon className="w-6 h-6 text-accent-gold" />
+        </div>
+        <h3 className="text-lg sm:text-xl font-display font-semibold text-text-primary mb-2">
+          {title}
+        </h3>
+        <p className="text-sm sm:text-base text-text-secondary leading-relaxed">
+          {description}
+        </p>
       </div>
-      <h3 className="text-xl font-display font-semibold text-text-primary mb-2">
-        {title}
-      </h3>
-      <p className="text-text-secondary leading-relaxed">
-        {description}
-      </p>
     </div>
   );
 }

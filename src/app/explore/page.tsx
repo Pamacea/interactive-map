@@ -1,5 +1,7 @@
 "use client";
 
+import { GridBackground } from "@/components/ui/grid-background";
+import { FloatingParticles } from "@/components/ui/particles";
 import { NavigationBar } from "@/components/ui/navigation-bar";
 import { ExploreHeader } from "@/components/explore/ui/explore-header";
 import { FilterSidebar } from "@/components/explore/ui/filter-sidebar";
@@ -27,10 +29,12 @@ export default function ExplorePage() {
 
   return (
     <div className="min-h-screen bg-background-base">
+      <GridBackground />
+      <FloatingParticles />
       <NavigationBar />
       <ExploreHeader onSearch={handleSearch} />
 
-      <section className="py-8 px-4">
+      <section className="relative py-8 sm:py-12 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col lg:flex-row gap-6">
             <FilterSidebar

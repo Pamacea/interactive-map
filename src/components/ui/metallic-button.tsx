@@ -1,0 +1,53 @@
+import { ButtonHTMLAttributes, ReactNode } from "react";
+import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
+
+interface MetallicButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: "gold" | "silver" | "bronze";
+  size?: "sm" | "md" | "lg";
+  isLoading?: boolean;
+  children: ReactNode;
+}
+
+export function MetallicButton({
+  variant = "gold",
+  size = "md",
+  isLoading = false,
+  className,
+  children,
+  disabled,
+  ...props
+}: MetallicButtonProps) {
+  const baseStyles = "relative inline-flex items-center justify-center font-display font-semibold tracking-wide transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed";
+
+  const sizeStyles = {
+    sm: "px-4 py-2 text-sm",
+    md: "px-6 py-2.5 text-base",
+    lg: "px-8 py-3 text-lg",
+  };
+
+  const variantStyles = {
+    gold: "bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 text-black hover:from-amber-500 hover:via-yellow-400 hover:to-amber-500 shadow-lg shadow-amber-500/25 hover:shadow-xl hover:shadow-amber-500/40",
+    silver: "bg-gradient-to-r from-slate-400 via-gray-300 to-slate-400 text-black hover:from-slate-300 hover:via-gray-200 hover:to-slate-300 shadow-lg shadow-slate-400/25 hover:shadow-xl hover:shadow-slate-400/40",
+    bronze: "bg-gradient-to-r from-orange-700 via-amber-600 to-orange-700 text-black hover:from-orange-600 hover:via-amber-500 hover:to-orange-600 shadow-lg shadow-orange-600/25 hover:shadow-xl hover:shadow-orange-600/40",
+  };
+
+  return (
+    <button
+      className={cn(
+        baseStyles,
+        sizeStyles[size],
+        variantStyles[variant],
+        className
+      )}
+      disabled={disabled || isLoading}
+      {...props}
+    >
+      <span className="absolute inset-0 rounded-sm bg-gradient-to-r from-white/30 via-white/10 to-white/30 opacity-0 hover:opacity-100 transition-opacity duration-300" />
+      <span className="relative flex items-center gap-2">
+        {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+        {children}
+      </span>
+    </button>
+  );
+}

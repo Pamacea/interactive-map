@@ -1,6 +1,6 @@
 import { Search } from "lucide-react";
 import { WorldCard } from "@/components/ui/world-card";
-import { Button } from "@/components/ui/button";
+import { MetallicButton } from "@/components/ui/metallic-button";
 import { cn } from "@/lib/utils";
 
 interface World {
@@ -28,7 +28,7 @@ export function WorldsGrid({ worlds, viewMode, onClearFilters }: WorldsGridProps
   return (
     <div className={cn(
       viewMode === "grid"
-        ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+        ? "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6"
         : "space-y-4"
     )}>
       {worlds.map((world) => (
@@ -40,7 +40,7 @@ export function WorldsGrid({ worlds, viewMode, onClearFilters }: WorldsGridProps
 
 function EmptyState({ onClearFilters }: { onClearFilters: () => void }) {
   return (
-    <div className="text-center py-16">
+    <div className="text-center py-16 sm:py-24">
       <EmptyStateIcon />
       <EmptyStateTitle />
       <EmptyStateDescription />
@@ -51,7 +51,7 @@ function EmptyState({ onClearFilters }: { onClearFilters: () => void }) {
 
 function EmptyStateIcon() {
   return (
-    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-background-card border border-border-subtle mb-4">
+    <div className="inline-flex items-center justify-center w-16 h-16 rounded-sm bg-gradient-to-br from-background-card to-background-elevated border border-border-subtle mb-6 shadow-lg">
       <Search className="w-8 h-8 text-text-muted" />
     </div>
   );
@@ -67,7 +67,7 @@ function EmptyStateTitle() {
 
 function EmptyStateDescription() {
   return (
-    <p className="text-text-secondary mb-6">
+    <p className="text-text-secondary mb-6 max-w-md mx-auto">
       Try adjusting your search or filters to find what you're looking for.
     </p>
   );
@@ -75,8 +75,8 @@ function EmptyStateDescription() {
 
 function EmptyStateAction({ onClearFilters }: { onClearFilters: () => void }) {
   return (
-    <Button variant="secondary" onClick={onClearFilters}>
+    <MetallicButton variant="silver" size="md" onClick={onClearFilters}>
       Clear All Filters
-    </Button>
+    </MetallicButton>
   );
 }
