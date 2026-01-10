@@ -260,3 +260,14 @@ enum MediaType {
 //     "shop": true
 //   }
 // }
+
+model character {
+  id        String @id @default(cuid())
+  name      String
+  level     Int?
+  faction   String?
+  class     String?
+
+  dialogue  Json?  // Array of dialogue strings
+  quests    Json?  // Array of quest IDs
+}

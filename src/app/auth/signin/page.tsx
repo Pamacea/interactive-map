@@ -10,7 +10,7 @@ export default function SignInPage() {
         <div className="bg-background-card rounded-2xl border border-border-subtle p-8 shadow-lg">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-text-primary mb-2">
-              Realm Forge
+              GENESIS
             </h1>
             <p className="text-text-secondary">
               Sign in to craft your world
