@@ -1,13 +1,4 @@
-interface World {
-  id: string;
-  slug: string;
-  title: string;
-  description: string;
-  pinCount: number;
-  loreCount: number;
-  author: { name: string };
-  isPublic: boolean;
-}
+import type { World } from "./get-all-worlds";
 
 interface FilterWorldsParams {
   worlds: World[];
@@ -22,8 +13,8 @@ export function filterWorlds({ worlds, query }: FilterWorldsParams): World[] {
   return worlds.filter((world) => {
     return (
       world.title.toLowerCase().includes(searchLower) ||
-      world.description.toLowerCase().includes(searchLower) ||
-      world.author.name.toLowerCase().includes(searchLower)
+      (world.description?.toLowerCase().includes(searchLower) ?? false) ||
+      (world.author.name?.toLowerCase().includes(searchLower) ?? false)
     );
   });
 }

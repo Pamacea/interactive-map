@@ -2,7 +2,7 @@ import { MetallicButton } from "@/components/ui/metallic-button";
 
 export function CTASection() {
   return (
-    <section className="py-20 px-4 bg-linear-to-b from-background-elevated to-background-base border-t-2 border-t-accent-gold">
+    <section className="py-20 px-4 border-t-2 border-t-accent-gold">
       <div className="max-w-2/3 mx-auto flex flex-col text-center px-4 gap-8 items-center">
         <CTATitle />
         <CTADescription />
