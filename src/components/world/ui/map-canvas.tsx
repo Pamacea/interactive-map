@@ -9,7 +9,11 @@ interface Transform {
   translateY: number;
 }
 
-export function MapCanvas() {
+interface MapCanvasProps {
+  mapImage?: string | null;
+}
+
+export function MapCanvas({ mapImage }: MapCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [transform, setTransform] = useState<Transform>({
     scale: 1,
@@ -85,17 +89,25 @@ export function MapCanvas() {
           transition: isDragging ? "none" : "transform 0.1s ease-out",
         }}
       >
-        <svg className="w-full h-full" viewBox="0 0 1920 1080">
-          <defs>
-            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="1"/>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-          <circle cx="960" cy="540" r="100" fill="none" stroke="rgba(212, 175, 55, 0.3)" strokeWidth="2"/>
-          <circle cx="960" cy="540" r="200" fill="none" stroke="rgba(212, 175, 55, 0.2)" strokeWidth="1"/>
-          <circle cx="960" cy="540" r="300" fill="none" stroke="rgba(212, 175, 55, 0.1)" strokeWidth="1"/>
-        </svg>
+        {mapImage ? (
+          <img
+            src={mapImage}
+            alt="World map"
+            className="w-full h-full object-contain"
+          />
+        ) : (
+          <svg className="w-full h-full" viewBox="0 0 1920 1080">
+            <defs>
+              <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="1"/>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+            <circle cx="960" cy="540" r="100" fill="none" stroke="rgba(212, 175, 55, 0.3)" strokeWidth="2"/>
+            <circle cx="960" cy="540" r="200" fill="none" stroke="rgba(212, 175, 55, 0.2)" strokeWidth="1"/>
+            <circle cx="960" cy="540" r="300" fill="none" stroke="rgba(212, 175, 55, 0.1)" strokeWidth="1"/>
+          </svg>
+        )}
       </div>
 
       <ZoomControls

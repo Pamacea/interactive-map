@@ -2,17 +2,7 @@ import { Search } from "lucide-react";
 import { WorldCard } from "@/components/ui/world-card";
 import { MetallicButton } from "@/components/ui/metallic-button";
 import { cn } from "@/lib/utils";
-
-interface World {
-  id: string;
-  slug: string;
-  title: string;
-  description: string;
-  pinCount: number;
-  loreCount: number;
-  author: { name: string };
-  isPublic: boolean;
-}
+import type { World } from "@/components/explore/methods/get-all-worlds";
 
 interface WorldsGridProps {
   worlds: World[];

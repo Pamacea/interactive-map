@@ -5,15 +5,14 @@ import { cn } from "@/lib/utils";
 
 export interface WorldCardProps {
   id: string;
-  slug: string;
   title: string;
-  description: string;
-  coverImage?: string;
+  description: string | null;
+  map: string | null;
   pinCount: number;
   loreCount: number;
   author: {
-    name: string;
-    image?: string;
+    name: string | null;
+    image: string | null;
   };
   isPublic?: boolean;
   viewMode?: "grid" | "list";
@@ -22,10 +21,9 @@ export interface WorldCardProps {
 
 export function WorldCard({
   id,
-  slug,
   title,
   description,
-  coverImage,
+  map,
   pinCount,
   loreCount,
   author,
@@ -35,7 +33,7 @@ export function WorldCard({
 }: WorldCardProps) {
   return (
     <Link
-      href={`/world/${slug}`}
+      href={`/world/${id}`}
       className={cn(
         "group relative",
         "bg-background-card/60 backdrop-blur-sm",
@@ -50,19 +48,19 @@ export function WorldCard({
         className
       )}
     >
-      <CoverImage coverImage={coverImage} title={title} isPublic={isPublic} viewMode={viewMode} />
+      <CoverImage map={map} title={title} isPublic={isPublic} viewMode={viewMode} />
       <Content title={title} description={description} pinCount={pinCount} loreCount={loreCount} author={author} viewMode={viewMode} />
     </Link>
   );
 }
 
-function CoverImage({ coverImage, title, isPublic, viewMode }: { coverImage?: string; title: string; isPublic: boolean; viewMode?: "grid" | "list" }) {
+function CoverImage({ map, title, isPublic, viewMode }: { map?: string | null; title: string; isPublic: boolean; viewMode?: "grid" | "list" }) {
   if (viewMode === "list") {
     return (
       <div className="relative w-48 h-32 flex-shrink-0 overflow-hidden bg-gradient-to-br from-background-card to-background-elevated">
-        {coverImage ? (
+        {map ? (
           <Image
-            src={coverImage}
+            src={map}
             alt={title}
             fill
             className="object-cover"
@@ -81,9 +79,9 @@ function CoverImage({ coverImage, title, isPublic, viewMode }: { coverImage?: st
 
   return (
     <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-background-card to-background-elevated">
-      {coverImage ? (
+      {map ? (
         <Image
-          src={coverImage}
+          src={map}
           alt={title}
           fill
           className="object-cover"
@@ -102,7 +100,7 @@ function CoverImage({ coverImage, title, isPublic, viewMode }: { coverImage?: st
   );
 }
 
-function Content({ title, description, pinCount, loreCount, author, viewMode }: Omit<WorldCardProps, "id" | "slug" | "coverImage" | "isPublic" | "className" | "viewMode"> & { viewMode?: "grid" | "list" }) {
+function Content({ title, description, pinCount, loreCount, author, viewMode }: Omit<WorldCardProps, "id" | "map" | "isPublic" | "className" | "viewMode"> & { viewMode?: "grid" | "list" }) {
   return (
     <div className={cn(
       "relative z-10 p-4 sm:p-6 flex flex-col gap-4",
@@ -124,7 +122,9 @@ function Title({ title }: { title: string }) {
   );
 }
 
-function Description({ description }: { description: string }) {
+function Description({ description }: { description: string | null }) {
+  if (!description) return null;
+
   return (
     <p className="text-base text-text-secondary line-clamp-2 min-h-[2.5rem] leading-relaxed">
       {description}
@@ -148,7 +148,7 @@ function Meta({ pinCount, loreCount }: { pinCount: number; loreCount: number }) 
   );
 }
 
-function Footer({ author }: { author: { name: string } }) {
+function Footer({ author }: { author: { name: string | null; image?: string | null } }) {
   return (
     <div className="flex items-center justify-between pt-4 border-t border-border-subtle">
       <Author name={author.name} />
@@ -157,7 +157,9 @@ function Footer({ author }: { author: { name: string } }) {
   );
 }
 
-function Author({ name }: { name: string }) {
+function Author({ name }: { name: string | null }) {
+  if (!name) return null;
+
   return (
     <div className="flex items-center gap-2">
       <Avatar name={name} />
