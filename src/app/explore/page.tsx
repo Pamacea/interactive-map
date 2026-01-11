@@ -7,7 +7,7 @@ import { ResultsHeader } from "@/components/explore/ui/results-header";
 import { WorldsGrid } from "@/components/explore/ui/worlds-grid";
 import { Footer } from "@/components/home/ui/footer";
 import { ExploreClient } from "./explore-client";
-import { getAllWorlds } from "@/components/explore/methods/get-all-worlds";
+import { getAllWorlds } from "@/actions/worlds";
 
 export default async function ExplorePage() {
   const allWorlds = await getAllWorlds();

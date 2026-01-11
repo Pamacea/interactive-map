@@ -6,9 +6,9 @@ import { ResultsHeader } from "@/components/explore/ui/results-header";
 import { WorldsGrid } from "@/components/explore/ui/worlds-grid";
 import { useExploreFilters } from "@/components/explore/logic/use-explore-filters";
 import { filterWorlds } from "@/components/explore/methods/filter-worlds";
-import type { World } from "@/components/explore/methods/get-all-worlds";
+import type { GameWorld } from "@/types/world.type";
 
-export function ExploreClient({ initialWorlds }: { initialWorlds: World[] }) {
+export function ExploreClient({ initialWorlds }: { initialWorlds: GameWorld[] }) {
   const {
     filters,
     activeFilters,

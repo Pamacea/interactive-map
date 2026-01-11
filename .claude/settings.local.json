@@ -29,7 +29,12 @@
       "Bash(echo:*)",
       "mcp__web-reader__webReader",
       "Bash(tasklist:*)",
-      "Bash(GIT_TERMINAL_PROMPT=0 git commit:*)"
+      "Bash(GIT_TERMINAL_PROMPT=0 git commit:*)",
+      "Bash(timeout:*)",
+      "Bash(ping:*)",
+      "Bash(cmd /c \"git commit --no-verify -m \"\"feat: add world CRUD with component architecture\"\" && git log -1 --oneline\")",
+      "Bash(set:*)",
+      "Bash(git config:*)"
     ]
   }
 }
