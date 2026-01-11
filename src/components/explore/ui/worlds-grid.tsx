@@ -2,10 +2,10 @@ import { Search } from "lucide-react";
 import { WorldCard } from "@/components/ui/world-card";
 import { MetallicButton } from "@/components/ui/metallic-button";
 import { cn } from "@/lib/utils";
-import type { World } from "@/components/explore/methods/get-all-worlds";
+import type { GameWorld } from "@/types/world.type";
 
 interface WorldsGridProps {
-  worlds: World[];
+  worlds: GameWorld[];
   viewMode: "grid" | "list";
   onClearFilters: () => void;
 }

@@ -2,35 +2,21 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, MapPin, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-export interface WorldCardProps {
-  id: string;
-  title: string;
-  description: string | null;
-  map: string | null;
-  pinCount: number;
-  loreCount: number;
-  author: {
-    name: string | null;
-    image: string | null;
-  };
-  isPublic?: boolean;
-  viewMode?: "grid" | "list";
-  className?: string;
-}
+import type { WorldCardProps, WorldCardContentProps } from "@/types/components.type";
 
 export function WorldCard({
   id,
   title,
   description,
   map,
-  pinCount,
-  loreCount,
-  author,
+  _count,
+  user,
   isPublic = true,
   viewMode = "grid",
   className,
 }: WorldCardProps) {
+  const pinCount = _count?.pins ?? 0;
+  const loreCount = _count?.loreEntries ?? 0;
   return (
     <Link
       href={`/world/${id}`}
@@ -49,7 +35,7 @@ export function WorldCard({
       )}
     >
       <CoverImage map={map} title={title} isPublic={isPublic} viewMode={viewMode} />
-      <Content title={title} description={description} pinCount={pinCount} loreCount={loreCount} author={author} viewMode={viewMode} />
+      <Content title={title} description={description} pinCount={pinCount} loreCount={loreCount} author={user} viewMode={viewMode} />
     </Link>
   );
 }
@@ -100,7 +86,7 @@ function CoverImage({ map, title, isPublic, viewMode }: { map?: string | null; t
   );
 }
 
-function Content({ title, description, pinCount, loreCount, author, viewMode }: Omit<WorldCardProps, "id" | "map" | "isPublic" | "className" | "viewMode"> & { viewMode?: "grid" | "list" }) {
+function Content({ title, description, pinCount, loreCount, author, viewMode }: WorldCardContentProps) {
   return (
     <div className={cn(
       "relative z-10 p-4 sm:p-6 flex flex-col gap-4",

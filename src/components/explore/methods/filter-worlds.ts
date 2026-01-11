@@ -1,11 +1,11 @@
-import type { World } from "./get-all-worlds";
+import type { GameWorld } from "@/types/world.type";
 
 interface FilterWorldsParams {
-  worlds: World[];
+  worlds: GameWorld[];
   query: string;
 }
 
-export function filterWorlds({ worlds, query }: FilterWorldsParams): World[] {
+export function filterWorlds({ worlds, query }: FilterWorldsParams): GameWorld[] {
   if (!query) return worlds;
 
   const searchLower = query.toLowerCase();
@@ -14,7 +14,8 @@ export function filterWorlds({ worlds, query }: FilterWorldsParams): World[] {
     return (
       world.title.toLowerCase().includes(searchLower) ||
       (world.description?.toLowerCase().includes(searchLower) ?? false) ||
-      (world.author.name?.toLowerCase().includes(searchLower) ?? false)
+      (world.user.name?.toLowerCase().includes(searchLower) ?? false)
     );
   });
 }
+

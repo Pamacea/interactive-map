@@ -1,13 +1,16 @@
 "use client";
 
 import { SessionProvider } from "@/components/providers/session-provider";
+import { QueryProvider } from "@/components/providers/query-provider";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <SessionProvider>
-      <main className="w-full h-full min-h-screen">
-          {children}
-      </main>
+      <QueryProvider>
+        <main className="w-full h-full min-h-screen">
+            {children}
+        </main>
+      </QueryProvider>
     </SessionProvider>
   )
 }
