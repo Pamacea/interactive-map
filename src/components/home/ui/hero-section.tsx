@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { ArrowRight, Map } from "lucide-react";
 import { MetallicButton } from "@/components/ui/metallic-button";
 import { FloatingCards } from "./floating-cards";
@@ -68,14 +69,18 @@ export function HeroSection() {
             </p>
 
             <div className="flex items-center gap-4">
-              <MetallicButton variant="gold" size="lg">
-                Start Creating
-                <ArrowRight className="w-5 h-5" />
-              </MetallicButton>
-              <MetallicButton variant="silver" size="lg">
-                <Map className="w-5 h-5" />
-                Browse Maps
-              </MetallicButton>
+              <Link href="/create">
+                <MetallicButton variant="gold" size="lg">
+                  Start Creating
+                  <ArrowRight className="w-5 h-5" />
+                </MetallicButton>
+              </Link>
+              <Link href="/explore">
+                <MetallicButton variant="silver" size="lg">
+                  <Map className="w-5 h-5" />
+                  Browse Maps
+                </MetallicButton>
+              </Link>
             </div>
 
             <div className="flex items-center gap-16 pt-8 border-t-2 border-t-accent-gold-dark">

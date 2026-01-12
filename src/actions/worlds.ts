@@ -81,3 +81,60 @@ export async function getAllWorlds() {
 
   return worlds;
 }
+
+export async function getMyWorlds() {
+  const user = await prisma.user.findFirst();
+
+  if (!user) {
+    return [];
+  }
+
+  const worlds = await prisma.gameWorld.findMany({
+    where: {
+      OR: [
+        { userId: user.id },
+        {
+          members: {
+            some: {
+              userId: user.id,
+              permission: {
+                in: ["EDITOR", "OWNER"],
+              },
+            },
+          },
+        },
+      ],
+    },
+    include: {
+      user: {
+        select: {
+          name: true,
+          image: true,
+        },
+      },
+      _count: {
+        select: {
+          pins: true,
+          loreEntries: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return worlds;
+}
+
+export async function updateWorldTitle(id: string, title: string) {
+  const world = await prisma.gameWorld.update({
+    where: { id },
+    data: { title },
+  });
+
+  revalidatePath("/world/[id]");
+  revalidatePath("/worlds");
+
+  return world;
+}

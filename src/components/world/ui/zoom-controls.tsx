@@ -1,46 +1,54 @@
-import { Plus, Minus, RotateCcw } from "lucide-react";
+import { Plus, Minus, Maximize2 } from "lucide-react";
 
 interface ZoomControlsProps {
   scale: number;
+  mapScale: string;
   onZoomIn: () => void;
   onZoomOut: () => void;
   onReset: () => void;
 }
 
-export function ZoomControls({ scale, onZoomIn, onZoomOut, onReset }: ZoomControlsProps) {
+export function ZoomControls({ scale, mapScale, onZoomIn, onZoomOut, onReset }: ZoomControlsProps) {
   return (
-    <div className="absolute top-4 right-4 flex flex-col gap-2">
-      <div className="flex flex-col gap-1.5">
-        <div className="bg-gradient-to-br from-slate-700 via-slate-600 to-slate-700 rounded-lg border border-slate-500/30 p-1.5 shadow-xl">
-          <div className="flex flex-col gap-1">
-            <button
-              onClick={onZoomIn}
-              className="w-8 h-8 flex items-center justify-center text-text-secondary hover:text-accent-gold hover:bg-white/5 rounded transition-all"
-            >
-              <Plus className="w-4 h-4" />
-            </button>
-            <div className="h-px bg-slate-500/30" />
-            <button
-              onClick={onZoomOut}
-              className="w-8 h-8 flex items-center justify-center text-text-secondary hover:text-accent-gold hover:bg-white/5 rounded transition-all"
-            >
-              <Minus className="w-4 h-4" />
-            </button>
-            <div className="h-px bg-slate-500/30" />
-            <button
-              onClick={onReset}
-              className="w-8 h-8 flex items-center justify-center text-text-secondary hover:text-accent-gold hover:bg-white/5 rounded transition-all"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
+    <div className="absolute bottom-6 right-6 flex flex-col items-end gap-2">
+      <div className="bg-background-base/95 backdrop-blur-sm rounded-sm border border-border-subtle shadow-lg px-3 py-2 flex items-center gap-2">
+        <button
+          onClick={onZoomOut}
+          className="w-7 h-7 flex items-center justify-center text-text-secondary hover:text-accent-gold hover:bg-accent-gold/10 rounded-sm transition-all"
+          title="Zoom out"
+        >
+          <Minus className="w-3.5 h-3.5" />
+        </button>
 
-        <div className="bg-gradient-to-br from-slate-700 via-slate-600 to-slate-700 rounded-lg border border-slate-500/30 px-2.5 py-1.5 shadow-xl flex items-center justify-center">
-          <span className="text-xs font-display font-bold text-accent-gold tabular-nums">
-            {Math.round(scale * 100)}%
-          </span>
-        </div>
+        <div className="h-5 w-px bg-border-subtle" />
+
+        <span className="text-xs font-display font-semibold text-text-primary tabular-nums min-w-[3rem] text-center">
+          {Math.round(scale * 100)}%
+        </span>
+
+        <div className="h-5 w-px bg-border-subtle" />
+
+        <button
+          onClick={onZoomIn}
+          className="w-7 h-7 flex items-center justify-center text-text-secondary hover:text-accent-gold hover:bg-accent-gold/10 rounded-sm transition-all"
+          title="Zoom in"
+        >
+          <Plus className="w-3.5 h-3.5" />
+        </button>
+
+        <div className="h-5 w-px bg-border-subtle" />
+
+        <button
+          onClick={onReset}
+          className="w-7 h-7 flex items-center justify-center text-text-muted hover:text-accent-gold hover:bg-accent-gold/10 rounded-sm transition-all"
+          title="Reset view"
+        >
+          <Maximize2 className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+      <div className="bg-background-base/95 backdrop-blur-sm rounded-sm border border-border-subtle shadow-lg px-3 py-1.5">
+        <span className="text-xs font-display font-medium text-accent-gold">{mapScale}</span>
       </div>
     </div>
   );

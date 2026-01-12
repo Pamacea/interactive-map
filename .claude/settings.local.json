@@ -34,7 +34,21 @@
       "Bash(ping:*)",
       "Bash(cmd /c \"git commit --no-verify -m \"\"feat: add world CRUD with component architecture\"\" && git log -1 --oneline\")",
       "Bash(set:*)",
-      "Bash(git config:*)"
+      "Bash(git config:*)",
+      "Bash(bun:*)",
+      "Bash(where bun)",
+      "Bash(C:UsersYanisAppDataRoamingnpmbun.cmd C:UsersYanis.claudescriptsstatuslinesrcindex.ts)",
+      "mcp__zread__read_file",
+      "mcp__zread__get_repo_structure",
+      "Bash(cmd /c \"if not exist \"\"%USERPROFILE%\\\\.claude\\\\plugins\"\" mkdir \"\"%USERPROFILE%\\\\.claude\\\\plugins\"\"\")",
+      "Bash(cmd:*)",
+      "Bash(git clone:*)",
+      "Bash(git sparse-checkout:*)",
+      "Skill(ralph:ralph)",
+      "Bash(npm run typecheck:*)",
+      "Bash(npm run)",
+      "Bash(npx eslint:*)",
+      "Bash(node:*)"
     ]
   }
 }
