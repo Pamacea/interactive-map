@@ -1,19 +1,17 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Check, X } from "lucide-react";
-import { MetallicButton } from "@/components/ui/metallic-button";
+import { Check, X } from "lucide-react";
 import { updateWorldTitle } from "@/actions/worlds";
 
 interface SidebarHeaderProps {
   title: string;
   worldId: string;
   isCollapsed: boolean;
-  onToggle: () => void;
   onTitleUpdate?: (newTitle: string) => void;
 }
 
-export function SidebarHeader({ title, worldId, isCollapsed, onToggle, onTitleUpdate }: SidebarHeaderProps) {
+export function SidebarHeader({ title, worldId, isCollapsed, onTitleUpdate }: SidebarHeaderProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(title);
   const [isSaving, setIsSaving] = useState(false);
@@ -84,7 +82,7 @@ export function SidebarHeader({ title, worldId, isCollapsed, onToggle, onTitleUp
   };
 
   return (
-    <div className="flex items-center justify-between px-4 py-3 border-b border-border-subtle bg-background-elevated">
+    <div className="flex items-center justify-center px-4 py-3 border-b border-border-subtle bg-background-elevated">
       {!isCollapsed && (
         <div className="flex flex-col flex-1 min-w-0">
           {isEditing ? (
@@ -127,14 +125,6 @@ export function SidebarHeader({ title, worldId, isCollapsed, onToggle, onTitleUp
           <span className="text-xs text-text-muted mt-0.5 px-2">World Editor</span>
         </div>
       )}
-      <MetallicButton
-        variant="silver"
-        size="sm"
-        onClick={onToggle}
-        className="!p-2 shrink-0"
-      >
-        {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-      </MetallicButton>
     </div>
   );
 }

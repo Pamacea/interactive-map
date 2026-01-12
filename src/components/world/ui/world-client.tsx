@@ -13,7 +13,7 @@ interface WorldClientProps {
 }
 
 export function WorldClient({ world }: WorldClientProps) {
-  const { width, isCollapsed, isResizing, startResize, toggleCollapse } = useResizableSidebar();
+  const { width, isCollapsed, isResizing, startResize, toggleCollapse, sidebarRef } = useResizableSidebar();
   const setLayers = useMapStore((state) => state.setLayers);
 
   useEffect(() => {
@@ -35,6 +35,7 @@ export function WorldClient({ world }: WorldClientProps) {
       <WorldNavigation />
       <div className="flex h-[calc(100vh-3rem)]">
         <Sidebar
+          ref={sidebarRef}
           slug={world.title}
           worldId={world.id}
           width={width}
