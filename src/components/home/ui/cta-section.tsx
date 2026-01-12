@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { MetallicButton } from "@/components/ui/metallic-button";
 
 export function CTASection() {
@@ -32,12 +33,16 @@ function CTADescription() {
 function CTAButtons() {
   return (
     <div className="flex flex-col sm:flex-row items-center gap-4">
-      <MetallicButton size="lg" variant="gold" >
-        Get Started Free
-      </MetallicButton>
-      <MetallicButton size="lg" variant="silver">
-        View Documentation
-      </MetallicButton>
+      <Link href="/create">
+        <MetallicButton size="lg" variant="gold">
+          Get Started Free
+        </MetallicButton>
+      </Link>
+      <Link href="/docs">
+        <MetallicButton size="lg" variant="silver">
+          View Documentation
+        </MetallicButton>
+      </Link>
     </div>
   );
 }

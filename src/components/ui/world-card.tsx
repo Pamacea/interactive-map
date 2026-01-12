@@ -22,8 +22,9 @@ export function WorldCard({
       href={`/world/${id}`}
       className={cn(
         "group relative",
+        "w-full",
         "bg-background-card/60 backdrop-blur-sm",
-        "rounded-lg",
+        "rounded-sm",
         "border border-border-subtle",
         "hover:border-accent-gold/40",
         "overflow-hidden",

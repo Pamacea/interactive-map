@@ -1,0 +1,91 @@
+{
+  "project": "Realm Forge - UX Improvements",
+  "branchName": "feature/ux-improvements",
+  "description": "Improve layer delete UX with inline confirmation, redesign world rename inline UI, and fix scale dropdown functionality",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Implement inline delete confirmation for layers",
+      "description": "Replace the modal dialog for layer deletion with inline confirmation. When delete is clicked, hide other buttons and show 'Delete' and 'X' (cancel) buttons inline next to the layer name.",
+      "acceptanceCriteria": [
+        "Clicking trash icon hides other buttons (eye, lock, move up/down, opacity)",
+        "Shows 'Delete' button (red/danger color) and 'X' button (cancel) inline",
+        "Layer name remains visible during confirmation",
+        "Click 'X' cancels and restores original state",
+        "Click 'Delete' removes the layer from store",
+        "Cancel also happens on Escape key",
+        "Smooth transitions between states",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "agent": "smite-builder",
+      "tech": "nextjs",
+      "dependencies": [],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Redesign inline rename for world title in sidebar",
+      "description": "Completely redesign the inline rename UI for the world title in sidebar header. Make it more visually appealing and functional.",
+      "acceptanceCriteria": [
+        "Better visual feedback when editing (border, background color change)",
+        "Input field matches the design system (rounded-sm, proper spacing)",
+        "Clear save/Cancel indicators or auto-save on blur",
+        "Escape key cancels editing",
+        "Enter key saves changes",
+        "Visual distinction between view and edit modes",
+        "Smooth transition between modes",
+        "Matches fantasy RPG theme",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "agent": "smite-builder",
+      "tech": "nextjs",
+      "dependencies": [],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Fix scale dropdown not showing other values",
+      "description": "The scale dropdown in Properties Panel doesn't show other scale options when clicked. Fix the dropdown functionality to properly display and select all scale values.",
+      "acceptanceCriteria": [
+        "Dropdown opens when clicking the scale row",
+        "All three options are visible: 1:1000, 1:500, 1:100",
+        "Clicking an option selects it and closes dropdown",
+        "Selected option is highlighted (gold accent background)",
+        "Dropdown closes when clicking outside",
+        "Scale value updates correctly in the store",
+        "Visual feedback for selected state",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "agent": "smite-builder",
+      "tech": "nextjs",
+      "dependencies": [],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Test and validate all UX improvements",
+      "description": "Run quality gates and verify all UX improvements work correctly",
+      "acceptanceCriteria": [
+        "Inline delete for layers works smoothly",
+        "World rename has better visual design",
+        "Scale dropdown shows all options",
+        "All interactions feel smooth and responsive",
+        "Linting passes (npm run lint)",
+        "Typecheck passes (npx tsc)",
+        "Build succeeds (npm run build)"
+      ],
+      "priority": 2,
+      "agent": "smite-finalize",
+      "tech": "nextjs",
+      "dependencies": ["US-001", "US-002", "US-003"],
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

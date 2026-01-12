@@ -32,7 +32,7 @@ export default function SettingsPage() {
   return (
     <div className="h-screen flex flex-col bg-background-base">
       <NavigationBar />
-      <div className="flex-1 max-w-4xl mx-auto px-4 py-8">
+      <div className="flex-1 max-w-2/3 mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold text-text-primary mb-8">Settings</h1>
 
         <div className="grid md:grid-cols-2 gap-4">
