@@ -81,8 +81,14 @@ export function PinContextMenu({
 
   // Close on Escape key
   React.useEffect(() => {
+    console.log("📌 [PinContextMenu] Component mounting, coordinates:", {
+      position,
+      coordinates
+    });
+
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        console.log("📌 [PinContextMenu] Escape key pressed");
         onClose();
       }
     };
@@ -91,7 +97,7 @@ export function PinContextMenu({
     return () => {
       document.removeEventListener("keydown", handleEscape);
     };
-  }, [onClose]);
+  }, [onClose, position, coordinates]);
 
   // Prevent default context menu
   React.useEffect(() => {
@@ -122,6 +128,15 @@ export function PinContextMenu({
     const IconComponent = (LucideIcons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[iconName];
     return IconComponent ? IconComponent : LucideIcons.MapPin;
   };
+
+  // Log when menu content is about to render
+  React.useEffect(() => {
+    console.log("📌 [PinContextMenu] Rendering menu at:", {
+      x: adjustedPosition.x,
+      y: adjustedPosition.y,
+      hasMenu: !!menuRef.current,
+    });
+  }, [adjustedPosition]);
 
   const menuContent = (
     <div
