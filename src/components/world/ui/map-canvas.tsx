@@ -292,39 +292,29 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
     .filter((layer) => layer.visible)
     .sort((a, b) => a.zIndex - b.zIndex);
 
-  // Filter pins by layer visibility and pin.isVisible
-  const visiblePins = pins
-    .filter((pin) => {
-      // Check pin visibility
-      if (!pin.isVisible) {
-        console.log(`📌 [map-canvas] Pin "${pin.title}" filtered out: isVisible=false`);
+  // Filter pins by visibility only - trust the DB data
+  const visiblePins = pins.filter((pin) => {
+    // Check pin visibility from DB
+    if (!pin.isVisible) {
+      console.log(`📌 [map-canvas] Pin "${pin.title}" filtered out: isVisible=false`);
+      return false;
+    }
+
+    // Check layer visibility from DB (if layer assigned)
+    if (pin.layerId && pin.layer) {
+      if (!pin.layer.isVisible) {
+        console.log(`📌 [map-canvas] Pin "${pin.title}" filtered out: layer ${pin.layerId} not visible in DB`, {
+          pinLayerId: pin.layerId,
+          dbLayerVisible: pin.layer.isVisible,
+          pinLayer: pin.layer,
+        });
         return false;
       }
+    }
 
-      // Check layer visibility - pins without a layer are always visible
-      if (pin.layerId) {
-        // Pin has a layer assigned, check if that layer is visible
-        // First check the layer data from the database (pin.layer.isVisible)
-        // Then check the UI store layer state (layer.visible) for consistency
-        const dbLayerVisible = pin.layer?.isVisible ?? true; // Default to visible if no layer data
-        const uiLayer = layers.find((l) => l.id === pin.layerId);
-        const uiLayerVisible = uiLayer?.visible ?? true;
-
-        if (!dbLayerVisible || !uiLayerVisible) {
-          console.log(`📌 [map-canvas] Pin "${pin.title}" filtered out: layer ${pin.layerId} not visible`, {
-            pinLayerId: pin.layerId,
-            dbLayerVisible,
-            uiLayerVisible,
-            pinLayer: pin.layer,
-            uiLayer,
-            visibleLayerIds,
-          });
-          return false;
-        }
-      }
-
-      return true;
-    })
+    // Pin is visible
+    return true;
+  })
     .sort((a, b) => {
       // Sort by layer zIndex
       const aLayer = layers.find((l) => l.id === a.layerId);
