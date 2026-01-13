@@ -216,6 +216,7 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
 
   const handleSelectPinType = (pinType: string, lat: number, lng: number) => {
     console.log("📌 [handleSelectPinType] Called with:", { pinType, lat, lng });
+    console.log("📌 [handleSelectPinType] isCreatingPin BEFORE:", isCreatingPin);
 
     // Use flushSync to ensure all state updates happen synchronously
     flushSync(() => {
@@ -229,7 +230,10 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
       startCreating();
     });
 
+    console.log("📌 [handleSelectPinType] isCreatingPin AFTER startCreating:", isCreatingPin);
     console.log("📌 [handleSelectPinType] State updates completed");
+    console.log("📌 [handleSelectPinType] pendingPinCoords:", pendingPinCoords);
+    console.log("📌 [handleSelectPinType] selectedPinType:", selectedPinType);
   };
 
   const handleZoomIn = () => {
@@ -601,7 +605,7 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
       )}
 
       {/* Pin Create Form Modal */}
-      {isCreatingPin && pendingPinCoords && worldId && (
+      {pendingPinCoords && worldId && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto bg-background-card border border-border-ornate rounded-sm p-6 shadow-2xl">
             <div className="flex items-center justify-between mb-4">
