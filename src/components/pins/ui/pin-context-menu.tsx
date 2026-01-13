@@ -167,7 +167,10 @@ export function PinContextMenu({
           return (
             <button
               key={type}
-              onClick={() => handleSelectPinType(type as PinType)}
+              onClick={(e) => {
+                console.log("📌 [PIN BUTTON] CLICKED! Type:", type);
+                handleSelectPinType(type as PinType);
+              }}
               className={cn(
                 "w-full flex items-center gap-3 px-3 py-2 rounded-sm",
                 "text-left transition-all duration-150",
@@ -223,6 +226,6 @@ export function PinContextMenu({
     </div>
   );
 
-  // Render using Portal for proper z-index stacking
-  return createPortal(menuContent, document.body);
+  // Render normally (no portal) to test
+  return menuContent;
 }
