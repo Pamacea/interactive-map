@@ -1,6 +1,7 @@
 import { WorldClient } from "@/components/world/ui/world-client";
 import { getWorldById } from "@/actions/worlds";
 import { notFound } from "next/navigation";
+import { auth } from "@/lib/auth";
 
 export default async function WorldDetailPage({
   params,
@@ -9,6 +10,7 @@ export default async function WorldDetailPage({
 }) {
   const { id } = await params;
   const world = await getWorldById(id);
+  const session = await auth();
 
   if (!world) {
     notFound();
@@ -25,5 +27,5 @@ export default async function WorldDetailPage({
     mapLength: world.map?.length
   });
 
-  return <WorldClient world={world} />;
+  return <WorldClient world={world} isAuthenticated={!!session?.user} />;
 }
