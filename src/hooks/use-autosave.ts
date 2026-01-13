@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useDebounce } from "@/hooks/use-debounce";
-import { auth } from "@/lib/auth";
 
 export type AutosaveStatus = "idle" | "unsaved" | "saving" | "saved" | "error";
 
 export interface AutosaveOptions {
   delay?: number; // Default 3000ms
   enabled?: boolean;
+  isAuthenticated?: boolean; // Pass auth state from server component
   onError?: (error: Error) => void;
 }
 
@@ -16,30 +16,14 @@ export function useAutosave<T>(
   saveFn: (data: T) => Promise<void>,
   options: AutosaveOptions = {}
 ) {
-  const { delay = 3000, enabled = true, onError } = options;
+  const { delay = 3000, enabled = true, isAuthenticated = true, onError } = options;
 
   const [status, setStatus] = useState<AutosaveStatus>("idle");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const lastSavedData = useRef<T>(data);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Debounced data value
   const debouncedData = useDebounce(data, delay);
-
-  // Check authentication on mount
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const session = await auth();
-        setIsAuthenticated(!!session?.user);
-      } catch (error) {
-        console.error("[useAutosave] Auth check failed:", error);
-        setIsAuthenticated(false);
-      }
-    };
-
-    checkAuth();
-  }, []);
 
   // Compare data to detect real changes
   const hasDataChanged = useCallback(

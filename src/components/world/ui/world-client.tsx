@@ -13,9 +13,10 @@ import type { GameWorld } from "@/types/world.type";
 
 interface WorldClientProps {
   world: GameWorld;
+  isAuthenticated: boolean;
 }
 
-export function WorldClient({ world }: WorldClientProps) {
+export function WorldClient({ world, isAuthenticated }: WorldClientProps) {
   const { width, isCollapsed, isResizing, startResize, toggleCollapse, sidebarRef } = useResizableSidebar();
   const setLayers = useMapStore((state) => state.setLayers);
   const layers = useMapStore((state) => state.layers);
@@ -46,7 +47,7 @@ export function WorldClient({ world }: WorldClientProps) {
     scale,
   };
 
-  // Setup autosave
+  // Setup autosave with authentication state passed from server
   const { status } = useAutosave(
     `world-${world.id}`,
     worldState,
@@ -61,6 +62,7 @@ export function WorldClient({ world }: WorldClientProps) {
     {
       delay: 3000,
       enabled: true,
+      isAuthenticated, // Pass auth state from server component
       onError: (error) => {
         console.error("[WorldClient] Autosave error:", error);
       },
