@@ -1,12 +1,10 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { createPortal } from "react-dom";
+import { useState, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
 import {
   useGrid,
   useSnap,
-  useScale,
   useMapStore,
 } from "@/stores/map-store";
 import { useSelectedPin } from "@/stores/use-pins-store";
@@ -15,16 +13,12 @@ import { PinTypeEnum } from "@/types/pin.type";
 import { getPinTypeOptions } from "@/constants/pin-types";
 import * as PinIcons from "lucide-react";
 
-const SCALE_OPTIONS = ["1:1000", "1:500", "1:100"] as const;
-
 export function PropertiesPanel() {
   // Global map properties
   const grid = useGrid();
   const snap = useSnap();
-  const scale = useScale();
   const setGrid = useMapStore((state) => state.setGrid);
   const setSnap = useMapStore((state) => state.setSnap);
-  const setScale = useMapStore((state) => state.setScale);
 
   // Pin properties
   const selectedPin = useSelectedPin();
@@ -69,48 +63,6 @@ export function PropertiesPanel() {
   const getPinIcon = (iconName: string) => {
     const IconComponent = (PinIcons as any)[iconName];
     return IconComponent ? IconComponent : PinIcons.MapPin;
-  };
-
-  const [scaleDropdownOpen, setScaleDropdownOpen] = useState(false);
-  const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; width: number } | null>(null);
-  const triggerRef = useRef<HTMLDivElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        triggerRef.current &&
-        !dropdownRef.current.contains(event.target as Node) &&
-        !triggerRef.current.contains(event.target as Node)
-      ) {
-        setScaleDropdownOpen(false);
-        setDropdownPosition(null);
-      }
-    };
-
-    if (scaleDropdownOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [scaleDropdownOpen]);
-
-  const handleToggleDropdown = () => {
-    if (!scaleDropdownOpen && triggerRef.current) {
-      const rect = triggerRef.current.getBoundingClientRect();
-      setDropdownPosition({
-        top: rect.bottom + 4,
-        left: rect.left,
-        width: rect.width,
-      });
-    }
-    setScaleDropdownOpen(!scaleDropdownOpen);
-    if (scaleDropdownOpen) {
-      setDropdownPosition(null);
-    }
   };
 
   const pinTypeOptions = getPinTypeOptions();
@@ -295,59 +247,6 @@ export function PropertiesPanel() {
           <div className={`flex items-center justify-between px-3 py-2 rounded-sm bg-background-elevated transition-colors ${snap ? "border border-accent-gold/30" : "border border-border-subtle"}`}>
             <span className="text-sm text-text-secondary">Snap</span>
             <Switch checked={snap} onCheckedChange={setSnap} />
-          </div>
-
-          <div className="relative" ref={triggerRef}>
-            <div
-              className="flex items-center justify-between px-3 py-2 rounded-sm bg-background-elevated cursor-pointer hover:bg-background-elevated/80 transition-colors border border-border-subtle"
-              onClick={handleToggleDropdown}
-            >
-              <span className="text-sm text-text-secondary">Scale</span>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-display font-medium text-accent-gold">{scale}</span>
-                <svg
-                  className={`w-4 h-4 text-text-muted transition-transform ${scaleDropdownOpen ? "rotate-180" : ""}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-            </div>
-
-            {scaleDropdownOpen &&
-              dropdownPosition &&
-              createPortal(
-                <div
-                  ref={dropdownRef}
-                  className="fixed bg-background-elevated border border-border-subtle rounded-sm overflow-hidden shadow-lg z-[9999]"
-                  style={{
-                    top: `${dropdownPosition.top}px`,
-                    left: `${dropdownPosition.left}px`,
-                    width: `${dropdownPosition.width}px`,
-                  }}
-                >
-                  {SCALE_OPTIONS.map((option) => (
-                    <button
-                      key={option}
-                      onClick={() => {
-                        setScale(option);
-                        setScaleDropdownOpen(false);
-                        setDropdownPosition(null);
-                      }}
-                      className={`w-full px-3 py-2 text-left text-xs font-display transition-colors ${
-                        scale === option
-                          ? "bg-accent-gold/20 text-accent-gold font-medium"
-                          : "text-text-secondary hover:bg-background-elevated/80"
-                      }`}
-                    >
-                      {option}
-                    </button>
-                  ))}
-                </div>,
-                document.body
-              )}
           </div>
         </div>
       </section>

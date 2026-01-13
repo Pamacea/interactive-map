@@ -45,29 +45,21 @@ export function PinMarker({ pin, mapWidth, mapHeight, transform, onPinClick }: P
     : null;
   const isLayerLocked = layer?.locked ?? false;
 
-  // Check visibility
-  const isVisible = pin.isVisible && (!pin.layerId || pin.layer?.isVisible);
-
-  // Check if layer is visible
-  const layerVisible = pin.layerId
+  // Visibility is already filtered at the map-canvas level
+  // No need to re-filter here, but we keep the check for safety during drag operations
+  const dbLayerVisible = pin.layer?.isVisible ?? true;
+  const uiLayerVisible = pin.layerId
     ? layers.some((layer) => layer.id === pin.layerId && layer.visible)
     : true;
 
-  console.log(`📌 [pin-marker] Rendering pin "${pin.title}"`, {
-    id: pin.id,
-    isVisible,
-    layerVisible,
-    pin: {
-      isVisible: pin.isVisible,
-      layerId: pin.layerId,
-      layerIsVisible: pin.layer?.isVisible,
-    },
-  });
+  const isVisible = pin.isVisible && dbLayerVisible && uiLayerVisible;
 
-  if (!isVisible || !layerVisible) {
+  if (!isVisible) {
     console.log(`📌 [pin-marker] Skipping pin "${pin.title}" - not visible`, {
-      isVisible,
-      layerVisible,
+      pinIsVisible: pin.isVisible,
+      dbLayerVisible,
+      uiLayerVisible,
+      pinLayerId: pin.layerId,
     });
     return null;
   }
