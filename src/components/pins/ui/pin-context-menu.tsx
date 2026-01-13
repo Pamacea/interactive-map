@@ -107,14 +107,14 @@ export function PinContextMenu({
 
   // Handle pin type selection
   const handleSelectPinType = (pinType: PinType) => {
-    console.log("📌 [PinContextMenu] handleSelectPinType called with:", {
-      pinType,
-      coordinates,
-      lat: coordinates.lat,
-      lng: coordinates.lng,
-    });
+    console.log("📌 [PinContextMenu] ========== BUTTON CLICKED ==========");
+    console.log("📌 [PinContextMenu] Button clicked! Pin type:", pinType);
+    console.log("📌 [PinContextMenu] Coordinates:", { lat: coordinates.lat, lng: coordinates.lng });
+    console.log("📌 [PinContextMenu] About to call onSelectPinType callback");
     onSelectPinType(pinType, coordinates.lat, coordinates.lng);
+    console.log("📌 [PinContextMenu] onSelectPinType callback CALLED");
     onClose();
+    console.log("📌 [PinContextMenu] ========== END ==========");
   };
 
   // Get Lucide icon component by name
