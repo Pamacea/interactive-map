@@ -304,11 +304,19 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
       // Check layer visibility - pins without a layer are always visible
       if (pin.layerId) {
         // Pin has a layer assigned, check if that layer is visible
-        const layer = layers.find((l) => l.id === pin.layerId);
-        if (!layer || !layer.visible) {
+        // First check the layer data from the database (pin.layer.isVisible)
+        // Then check the UI store layer state (layer.visible) for consistency
+        const dbLayerVisible = pin.layer?.isVisible ?? true; // Default to visible if no layer data
+        const uiLayer = layers.find((l) => l.id === pin.layerId);
+        const uiLayerVisible = uiLayer?.visible ?? true;
+
+        if (!dbLayerVisible || !uiLayerVisible) {
           console.log(`📌 [map-canvas] Pin "${pin.title}" filtered out: layer ${pin.layerId} not visible`, {
             pinLayerId: pin.layerId,
-            layer,
+            dbLayerVisible,
+            uiLayerVisible,
+            pinLayer: pin.layer,
+            uiLayer,
             visibleLayerIds,
           });
           return false;
@@ -583,7 +591,6 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
 
       <ZoomControls
         scale={transform.scale}
-        mapScale={scale}
         onZoomIn={handleZoomIn}
         onZoomOut={handleZoomOut}
         onReset={handleReset}
