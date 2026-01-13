@@ -71,6 +71,7 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
   const [pendingPinCoords, setPendingPinCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null);
   const [isMouseInCanvas, setIsMouseInCanvas] = useState(false);
+  const [showCreateForm, setShowCreateForm] = useState(false);
   const [contextMenu, setContextMenu] = useState<{
     position: { x: number; y: number };
     coordinates: { lat: number; lng: number };
@@ -215,6 +216,7 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
   };
 
   const handleSelectPinType = (pinType: string, lat: number, lng: number) => {
+    console.log("📌 [handleSelectPinType] ========== START ==========");
     console.log("📌 [handleSelectPinType] Called with:", { pinType, lat, lng });
     console.log("📌 [handleSelectPinType] isCreatingPin BEFORE:", isCreatingPin);
 
@@ -228,12 +230,16 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
 
       // Then activate pin creation mode
       startCreating();
+
+      // Force show form
+      setShowCreateForm(true);
     });
 
     console.log("📌 [handleSelectPinType] isCreatingPin AFTER startCreating:", isCreatingPin);
-    console.log("📌 [handleSelectPinType] State updates completed");
+    console.log("📌 [handleSelectPinType] showCreateForm:", showCreateForm);
     console.log("📌 [handleSelectPinType] pendingPinCoords:", pendingPinCoords);
     console.log("📌 [handleSelectPinType] selectedPinType:", selectedPinType);
+    console.log("📌 [handleSelectPinType] ========== END ==========");
   };
 
   const handleZoomIn = () => {
@@ -605,7 +611,7 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
       )}
 
       {/* Pin Create Form Modal */}
-      {pendingPinCoords && worldId && (
+      {(showCreateForm || (pendingPinCoords && worldId)) && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto bg-background-card border border-border-ornate rounded-sm p-6 shadow-2xl">
             <div className="flex items-center justify-between mb-4">
@@ -620,9 +626,9 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
               </button>
             </div>
             <PinCreateForm
-              worldId={worldId}
-              initialLat={pendingPinCoords.lat}
-              initialLng={pendingPinCoords.lng}
+              worldId={worldId || ""}
+              initialLat={pendingPinCoords?.lat ?? 0}
+              initialLng={pendingPinCoords?.lng ?? 0}
               initialLayerId={selectedLayerId || undefined}
               initialPinType={selectedPinType || undefined}
               layers={layers}
