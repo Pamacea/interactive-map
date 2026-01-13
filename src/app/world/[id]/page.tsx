@@ -14,5 +14,16 @@ export default async function WorldDetailPage({
     notFound();
   }
 
+  // DEBUG: Log world data from database
+  console.log("[DEBUG Page] World fetched from DB:", {
+    worldId: world.id,
+    worldTitle: world.title,
+    mapValue: world.map,
+    mapType: typeof world.map,
+    isMapNull: world.map === null,
+    isMapUndefined: world.map === undefined,
+    mapLength: world.map?.length
+  });
+
   return <WorldClient world={world} />;
 }

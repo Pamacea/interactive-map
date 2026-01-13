@@ -1,8 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { Pin } from "@prisma/client";
+import { PinTypeEnum } from "@/types/pin.type";
 import { ZoomControls } from "./zoom-controls";
-import { useGrid, useSnap, useScale, useLayers } from "@/stores/map-store";
+import { useGrid, useSnap, useScale, useLayers, useVisibleLayerIds, useSelectedLayerId } from "@/stores/map-store";
+import { usePins } from "@/components/pins/logic/use-pins";
+import { useSelectedPin, useIsCreatingPin, usePinsStore } from "@/stores/use-pins-store";
+import { PinMarker } from "@/components/pins/ui/pin-marker";
+import { PinPopup } from "@/components/pins/ui/pin-popup";
+import { PinCreateForm } from "@/components/pins/ui/pin-create-form";
+import { PinContextMenu } from "@/components/pins/ui/pin-context-menu";
+import { flushSync } from "react-dom";
 
 interface Transform {
   scale: number;
@@ -12,6 +21,7 @@ interface Transform {
 
 interface MapCanvasProps {
   mapImage?: string | null;
+  worldId?: string;
 }
 
 const GRID_SIZE = 40;
@@ -20,13 +30,34 @@ function snapToGrid(value: number, gridSize: number): number {
   return Math.round(value / gridSize) * gridSize;
 }
 
-export function MapCanvas({ mapImage }: MapCanvasProps) {
+export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const grid = useGrid();
   const snap = useSnap();
   const scale = useScale();
   const layers = useLayers();
+  const visibleLayerIds = useVisibleLayerIds();
+
+  // DEBUG: Log what MapCanvas receives
+  console.log("[DEBUG MapCanvas] Props received:", {
+    mapImage,
+    mapImageType: typeof mapImage,
+    isMapNull: mapImage === null,
+    isMapUndefined: mapImage === undefined,
+    worldId
+  });
+
+  // Pin integration
+  const { pins } = usePins(worldId || "");
+  const selectedPin = useSelectedPin();
+  const isCreatingPin = useIsCreatingPin();
+  const selectPin = usePinsStore((state) => state.selectPin);
+  const clearSelection = usePinsStore((state) => state.clearSelection);
+  const stopCreating = usePinsStore((state) => state.stopCreating);
+  const startCreating = usePinsStore((state) => state.startCreating);
+  const selectedLayerId = useSelectedLayerId();
+
   const [transform, setTransform] = useState<Transform>({
     scale: 1,
     translateX: 0,
@@ -37,6 +68,14 @@ export function MapCanvas({ mapImage }: MapCanvasProps) {
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
+  const [pendingPinCoords, setPendingPinCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null);
+  const [isMouseInCanvas, setIsMouseInCanvas] = useState(false);
+  const [contextMenu, setContextMenu] = useState<{
+    position: { x: number; y: number };
+    coordinates: { lat: number; lng: number };
+  } | null>(null);
+  const [selectedPinType, setSelectedPinType] = useState<PinTypeEnum | null>(null);
 
   const getGridSize = (): number => {
     const scaleRatio = parseInt(scale.split(":")[1]);
@@ -44,21 +83,52 @@ export function MapCanvas({ mapImage }: MapCanvasProps) {
   };
 
   const handleClick = (e: React.MouseEvent) => {
-    if (e.button === 0 && !isDragging && snap) {
+    // Close context menu on left click
+    if (contextMenu) {
+      setContextMenu(null);
+      return;
+    }
+
+    if (e.button === 0 && !isDragging) {
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) return;
 
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
 
-      const gridSize = getGridSize();
-      const snappedX = snapToGrid(x, gridSize);
-      const snappedY = snapToGrid(y, gridSize);
+      // Handle pin creation mode
+      if (isCreatingPin && worldId) {
+        // Convert screen coordinates to map coordinates (0-1 range)
+        const mapWidth = imageDimensions.width || 1920;
+        const mapHeight = imageDimensions.height || 1080;
+
+        // Account for transform
+        const adjustedX = (x - transform.translateX) / transform.scale;
+        const adjustedY = (y - transform.translateY) / transform.scale;
+
+        // Convert to latitude/longitude (0-1 range)
+        const lng = adjustedX / mapWidth;
+        const lat = adjustedY / mapHeight;
+
+        setPendingPinCoords({ lat, lng });
+        return;
+      }
+
+      // Handle grid snapping
+      if (snap) {
+        const gridSize = getGridSize();
+        const snappedX = snapToGrid(x, gridSize);
+        const snappedY = snapToGrid(y, gridSize);
+      }
     }
   };
 
   const handleWheel = (e: React.WheelEvent) => {
     e.preventDefault();
+    // Close context menu on zoom
+    if (contextMenu) {
+      setContextMenu(null);
+    }
     const delta = e.deltaY > 0 ? 0.9 : 1.1;
     const newScale = Math.min(Math.max(transform.scale * delta, 0.1), 5);
 
@@ -70,6 +140,10 @@ export function MapCanvas({ mapImage }: MapCanvasProps) {
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (e.button === 0) {
+      // Close context menu on drag start
+      if (contextMenu) {
+        setContextMenu(null);
+      }
       setIsDragging(true);
       setDragStart({ x: e.clientX - transform.translateX, y: e.clientY - transform.translateY });
     }
@@ -83,6 +157,17 @@ export function MapCanvas({ mapImage }: MapCanvasProps) {
         translateY: e.clientY - dragStart.y,
       }));
     }
+
+    // Track mouse position for ghost pin when in create mode
+    if (isCreatingPin && !isDragging) {
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (rect) {
+        setMousePosition({
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top,
+        });
+      }
+    }
   };
 
   const handleMouseUp = () => {
@@ -91,6 +176,60 @@ export function MapCanvas({ mapImage }: MapCanvasProps) {
 
   const handleMouseLeave = () => {
     setIsDragging(false);
+    setIsMouseInCanvas(false);
+    setMousePosition(null);
+  };
+
+  const handleMouseEnter = () => {
+    setIsMouseInCanvas(true);
+  };
+
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    // Get screen coordinates
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Convert to map coordinates (0-1 range)
+    const mapWidth = imageDimensions.width || 1920;
+    const mapHeight = imageDimensions.height || 1080;
+
+    const adjustedX = (x - transform.translateX) / transform.scale;
+    const adjustedY = (y - transform.translateY) / transform.scale;
+
+    const lng = adjustedX / mapWidth;
+    const lat = adjustedY / mapHeight;
+
+    setContextMenu({
+      position: { x: e.clientX, y: e.clientY },
+      coordinates: { lat, lng }
+    });
+  };
+
+  const closeContextMenu = () => {
+    setContextMenu(null);
+  };
+
+  const handleSelectPinType = (pinType: string, lat: number, lng: number) => {
+    console.log("📌 [handleSelectPinType] Called with:", { pinType, lat, lng });
+
+    // Use flushSync to ensure all state updates happen synchronously
+    flushSync(() => {
+      closeContextMenu();
+
+      // Set local state first
+      setSelectedPinType(pinType as PinTypeEnum);
+      setPendingPinCoords({ lat, lng });
+
+      // Then activate pin creation mode
+      startCreating();
+    });
+
+    console.log("📌 [handleSelectPinType] State updates completed");
   };
 
   const handleZoomIn = () => {
@@ -106,42 +245,162 @@ export function MapCanvas({ mapImage }: MapCanvasProps) {
   };
 
   const handleImageLoad = useCallback(() => {
+    console.log("[DEBUG MapCanvas] Image loaded successfully!");
     setImageLoaded(true);
     setImageError(false);
     if (imageRef.current) {
-      setImageDimensions({
+      const dimensions = {
         width: imageRef.current.naturalWidth,
         height: imageRef.current.naturalHeight,
-      });
+      };
+      console.log("[DEBUG MapCanvas] Image dimensions:", dimensions);
+      setImageDimensions(dimensions);
     }
   }, []);
 
-  const handleImageError = useCallback(() => {
+  const handleImageError = useCallback((e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    console.error("[DEBUG MapCanvas] Image failed to load!", {
+      src: (e.target as HTMLImageElement).src,
+      naturalWidth: (e.target as HTMLImageElement).naturalWidth,
+      complete: (e.target as HTMLImageElement).complete
+    });
     setImageError(true);
     setImageLoaded(false);
   }, []);
 
   useEffect(() => {
+    console.log("[DEBUG MapCanvas] mapImage changed, resetting load state", {
+      mapImage,
+      imageLoaded,
+      imageError
+    });
     setImageLoaded(false);
     setImageError(false);
   }, [mapImage]);
 
   const shouldShowGrid = !mapImage || imageError || !imageLoaded;
 
+  console.log("[DEBUG MapCanvas] Render state:", {
+    shouldShowGrid,
+    mapImage,
+    imageError,
+    imageLoaded,
+    imageDimensions
+  });
+
   const visibleLayers = layers
     .filter((layer) => layer.visible)
     .sort((a, b) => a.zIndex - b.zIndex);
 
+  // Filter pins by layer visibility and pin.isVisible
+  const visiblePins = pins
+    .filter((pin) => {
+      // Check pin visibility
+      if (!pin.isVisible) {
+        console.log(`📌 [map-canvas] Pin "${pin.title}" filtered out: isVisible=false`);
+        return false;
+      }
+
+      // Check layer visibility - pins without a layer are always visible
+      if (pin.layerId) {
+        // Pin has a layer assigned, check if that layer is visible
+        const layer = layers.find((l) => l.id === pin.layerId);
+        if (!layer || !layer.visible) {
+          console.log(`📌 [map-canvas] Pin "${pin.title}" filtered out: layer ${pin.layerId} not visible`, {
+            pinLayerId: pin.layerId,
+            layer,
+            visibleLayerIds,
+          });
+          return false;
+        }
+      }
+
+      return true;
+    })
+    .sort((a, b) => {
+      // Sort by layer zIndex
+      const aLayer = layers.find((l) => l.id === a.layerId);
+      const bLayer = layers.find((l) => l.id === b.layerId);
+      const aZIndex = aLayer?.zIndex ?? 0;
+      const bZIndex = bLayer?.zIndex ?? 0;
+      return aZIndex - bZIndex;
+    });
+
+  console.log("📌 [map-canvas] Pin filtering:", {
+    totalPins: pins.length,
+    visiblePins: visiblePins.length,
+    visibleLayerIds,
+    layers: layers.map(l => ({ id: l.id, name: l.name, visible: l.visible })),
+  });
+
+  const handlePinClick = (pin: Pin) => {
+    selectPin(pin.id);
+  };
+
+  const handlePopupClose = () => {
+    clearSelection();
+  };
+
+  const handleCreateFormClose = () => {
+    stopCreating();
+    setPendingPinCoords(null);
+    setSelectedPinType(null);
+  };
+
+  const handleCreateFormSuccess = () => {
+    stopCreating();
+    setPendingPinCoords(null);
+    setSelectedPinType(null);
+  };
+
+  const handleToggleCreatePin = () => {
+    if (isCreatingPin) {
+      stopCreating();
+      setPendingPinCoords(null);
+      setMousePosition(null);
+      setSelectedPinType(null);
+    } else {
+      selectPin(null); // Clear selection when starting to create
+      startCreating();
+    }
+  };
+
+  // Handle Escape key to cancel pin placement or close context menu
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        if (contextMenu) {
+          setContextMenu(null);
+        } else if (isCreatingPin) {
+          stopCreating();
+          setPendingPinCoords(null);
+          setMousePosition(null);
+          setSelectedPinType(null);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isCreatingPin, stopCreating, contextMenu]);
+
+  // Update cursor style based on mode
+  const cursorStyle = isCreatingPin ? "crosshair" : "grab";
+
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden cursor-grab active:cursor-grabbing"
+      className={`relative w-full h-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden ${
+        isCreatingPin && !contextMenu ? "cursor-crosshair ring-2 ring-accent-gold/50 ring-inset" : contextMenu ? "cursor-default" : "cursor-grab active:cursor-grabbing"
+      }`}
       onWheel={handleWheel}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseLeave}
+      onMouseEnter={handleMouseEnter}
       onClick={handleClick}
+      onContextMenu={handleContextMenu}
     >
       <div
         className="absolute top-0 left-0 flex items-center justify-center"
@@ -185,6 +444,101 @@ export function MapCanvas({ mapImage }: MapCanvasProps) {
                 </defs>
                 <rect width="100%" height="100%" fill="url(#grid-overlay)" />
               </svg>
+            )}
+
+            {/* Render PinMarkers */}
+            {(() => {
+              console.log("📌 [map-canvas] About to render PinMarkers:", {
+                count: visiblePins.length,
+                pins: visiblePins.map(p => ({
+                  id: p.id,
+                  title: p.title,
+                  x: p.longitude * (imageDimensions.width || 1920),
+                  y: p.latitude * (imageDimensions.height || 1080),
+                }))
+              });
+              return visiblePins.map((pin) => {
+                // Transform pin to match PinMarker expectations
+                const pinWithLayer = {
+                  ...pin,
+                  layer: pin.layer ? {
+                    id: pin.layer.id,
+                    isVisible: pin.layer.isVisible,
+                    zIndex: pin.layer.zIndex,
+                  } : null,
+                };
+                console.log(`📌 [map-canvas] Rendering PinMarker for "${pin.title}"`, {
+                  id: pin.id,
+                  latitude: pin.latitude,
+                  longitude: pin.longitude,
+                  mapWidth: imageDimensions.width || 1920,
+                  mapHeight: imageDimensions.height || 1080,
+                });
+                return (
+                  <PinMarker
+                    key={pin.id}
+                    pin={pinWithLayer}
+                    mapWidth={imageDimensions.width || 1920}
+                    mapHeight={imageDimensions.height || 1080}
+                    transform={transform}
+                    onPinClick={handlePinClick}
+                  />
+                );
+              });
+            })()}
+
+            {/* Ghost pin indicator when creating */}
+            {isCreatingPin && isMouseInCanvas && mousePosition && !pendingPinCoords && (
+              <div
+                className="absolute pointer-events-none opacity-50"
+                style={{
+                  left: `${mousePosition.x}px`,
+                  top: `${mousePosition.y}px`,
+                  transform: "translate(-50%, -50%)",
+                  zIndex: 1000,
+                }}
+              >
+                <div
+                  className="flex items-center justify-center transition-all duration-150"
+                  style={{
+                    width: `${32 * transform.scale}px`,
+                    height: `${32 * transform.scale}px`,
+                    backgroundColor: "rgba(212, 175, 55, 0.5)",
+                    borderRadius: "var(--radius-sm)",
+                    boxShadow: "0 4px 12px rgba(212, 175, 55, 0.4)",
+                  }}
+                >
+                  <svg
+                    width={16 * transform.scale}
+                    height={16 * transform.scale}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                  </svg>
+                </div>
+              </div>
+            )}
+
+            {/* PinPopup for selected pin */}
+            {selectedPin && (
+              <div
+                className="absolute z-50"
+                style={{
+                  left: `${selectedPin.longitude * (imageDimensions.width || 1920) * transform.scale + transform.translateX}px`,
+                  top: `${selectedPin.latitude * (imageDimensions.height || 1080) * transform.scale + transform.translateY}px`,
+                }}
+              >
+                <PinPopup
+                  pin={selectedPin}
+                  onClose={handlePopupClose}
+                  position={{ x: 0, y: 0 }}
+                />
+              </div>
             )}
           </div>
         ) : (
@@ -234,6 +588,59 @@ export function MapCanvas({ mapImage }: MapCanvasProps) {
         onZoomOut={handleZoomOut}
         onReset={handleReset}
       />
+
+      {/* Placement mode indicator */}
+      {isCreatingPin && !contextMenu && (
+        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-40 bg-accent-gold/20 border border-accent-gold/50 px-4 py-2 rounded-sm backdrop-blur-sm animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="flex items-center gap-2">
+            <svg className="w-4 h-4 text-accent-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+            </svg>
+            <span className="text-sm font-medium text-accent-gold">
+              Click on map to place pin • Right-click for options
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Pin Create Form Modal */}
+      {isCreatingPin && pendingPinCoords && worldId && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto bg-background-card border border-border-ornate rounded-sm p-6 shadow-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-text-primary">Create Pin</h2>
+              <button
+                onClick={handleCreateFormClose}
+                className="text-text-secondary hover:text-text-primary transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <PinCreateForm
+              worldId={worldId}
+              initialLat={pendingPinCoords.lat}
+              initialLng={pendingPinCoords.lng}
+              initialLayerId={selectedLayerId || undefined}
+              initialPinType={selectedPinType || undefined}
+              layers={layers}
+              onSuccess={handleCreateFormSuccess}
+              onClose={handleCreateFormClose}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Context Menu */}
+      {contextMenu && worldId && (
+        <PinContextMenu
+          position={contextMenu.position}
+          coordinates={contextMenu.coordinates}
+          onClose={closeContextMenu}
+          onSelectPinType={handleSelectPinType}
+        />
+      )}
     </div>
   );
 }

@@ -49,7 +49,10 @@
       "Bash(npm run)",
       "Bash(npx eslint:*)",
       "Bash(node:*)",
-      "Bash(./node_modules/.bin/next:*)"
+      "Bash(./node_modules/.bin/next:*)",
+      "Bash(tree:*)",
+      "Bash(npm run type-check:*)",
+      "Bash(taskkill:*)"
     ]
   }
 }
