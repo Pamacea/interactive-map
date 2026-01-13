@@ -1,94 +1,57 @@
 {
-  "project": "Realm Forge - Bug Fixes and UI Adjustments",
-  "branchName": "feature/bug-fixes-ui-adjustments",
-  "description": "Fix CSS disappearing bug, align toggle with resize handle, and make zoom buttons smaller",
+  "project": "Realm Forge - Project Documentation",
+  "branchName": "docs/project-documentation",
+  "description": "Explore entire codebase and create comprehensive CLAUDE.md with project principles, structure, and features",
   "userStories": [
     {
       "id": "US-001",
-      "title": "Fix CSS disappearing bug on page load",
-      "description": "Critical bug: CSS appears on page load then disappears, causing borders and styles to vanish. Need to investigate and fix the root cause of CSS not persisting after initial render.",
+      "title": "Explore project architecture and structure",
+      "description": "Deep exploration of the entire codebase to understand the project architecture, file organization, component structure, data flow, and key patterns used",
       "acceptanceCriteria": [
-        "CSS persists correctly after page load",
-        "Borders remain visible",
-        "All styles (colors, spacing, typography) stay applied",
-        "No flash of unstyled content",
-        "No styles disappearing after hydration",
-        "Check for CSS-in-JS conflicts",
-        "Check for Next.js hydration issues",
-        "Check for race conditions in style loading",
-        "All components render with correct styles",
-        "Typecheck passes"
+        "Map all major directories and their purposes",
+        "Identify key architectural patterns",
+        "Document component hierarchy",
+        "Understand data flow and state management",
+        "Identify all features and their locations",
+        "Document database schema and relationships",
+        "Map API routes and server actions",
+        "Document authentication flow",
+        "Identify third-party integrations",
+        "Create exploration report"
+      ],
+      "priority": 1,
+      "agent": "smite-explorer",
+      "tech": "nextjs",
+      "dependencies": [],
+      "passes": false,
+      "notes": "Use explore agent for thorough codebase analysis"
+    },
+    {
+      "id": "US-002",
+      "title": "Create comprehensive CLAUDE.md documentation",
+      "description": "Create a detailed CLAUDE.md file at project root with comprehensive context about project principles, structure, features, architecture patterns, and development guidelines",
+      "acceptanceCriteria": [
+        "Document project purpose and vision",
+        "Detail tech stack and versions",
+        "Explain architectural principles",
+        "Document project structure (directories, files)",
+        "List all features with descriptions",
+        "Document component architecture patterns",
+        "Explain state management approach",
+        "Document database schema",
+        "Include coding standards and conventions",
+        "Add development workflow guidelines",
+        "Document deployment process",
+        "Include environment setup instructions",
+        "Add troubleshooting common issues",
+        "Keep under 300 lines if possible (concise but complete)"
       ],
       "priority": 1,
       "agent": "smite-builder",
       "tech": "nextjs",
-      "dependencies": [],
+      "dependencies": ["US-001"],
       "passes": false,
-      "notes": "This is a critical bug that needs immediate investigation"
-    },
-    {
-      "id": "US-002",
-      "title": "Align toggle button with resize handle",
-      "description": "The toggle button should be aligned/stuck together with the resize handle on the right edge of the sidebar. Currently they may be at different vertical positions or not visually connected.",
-      "acceptanceCriteria": [
-        "Toggle button positioned adjacent to resize handle",
-        "Both buttons aligned on same vertical axis or visually grouped",
-        "Small gap (4-8px) between toggle and resize handle",
-        "Visual harmony between the two controls",
-        "Both buttons have similar size/styling",
-        "Proper z-index layering",
-        "No overlap with sidebar content",
-        "Typecheck passes"
-      ],
-      "priority": 2,
-      "agent": "smite-builder",
-      "tech": "nextjs",
-      "dependencies": [],
-      "passes": false,
-      "notes": ""
-    },
-    {
-      "id": "US-003",
-      "title": "Make zoom buttons smaller and more compact",
-      "description": "The zoom control buttons are too large and take up too much space. Make them smaller and more compact while maintaining usability.",
-      "acceptanceCriteria": [
-        "Zoom buttons reduced in size (smaller padding, smaller icons)",
-        "Compact layout for zoom controls",
-        "Maintain clickable hit target (minimum 32px)",
-        "Icons scaled down appropriately",
-        "Spacing reduced between buttons",
-        "Overall footprint reduced",
-        "Still easy to click and use",
-        "Matches design system",
-        "Typecheck passes"
-      ],
-      "priority": 2,
-      "agent": "smite-builder",
-      "tech": "nextjs",
-      "dependencies": [],
-      "passes": false,
-      "notes": ""
-    },
-    {
-      "id": "US-004",
-      "title": "Test and validate all fixes",
-      "description": "Run quality gates and verify all bug fixes and UI adjustments work correctly",
-      "acceptanceCriteria": [
-        "CSS persists correctly after page load",
-        "Toggle button aligned with resize handle",
-        "Zoom buttons are smaller and compact",
-        "No visual regressions",
-        "All interactions work smoothly",
-        "Linting passes (npm run lint)",
-        "Typecheck passes (npx tsc)",
-        "Build succeeds (npm run build)"
-      ],
-      "priority": 3,
-      "agent": "smite-finalize",
-      "tech": "nextjs",
-      "dependencies": ["US-001", "US002", "US-003"],
-      "passes": false,
-      "notes": ""
+      "notes": "Use exploration findings to create comprehensive documentation"
     }
   ]
 }
