@@ -1,12 +1,16 @@
 "use client";
 
 import { useState, ForwardedRef, forwardRef } from "react";
-import { Layers, Settings2, ChevronRight, ChevronLeft } from "lucide-react";
+import { Layers, Settings2, ChevronRight, ChevronLeft, MapPin } from "lucide-react";
 import { LayersPanel } from "./layers-panel";
 import { PropertiesPanel } from "./properties-panel";
 import { SidebarHeader } from "./sidebar-header";
 import { ResizeHandle } from "./resize-handle";
 import { CollapsibleSection } from "./collapsible-section";
+import { PinList } from "@/components/pins/ui/pin-list";
+import { PinActionDropdown } from "@/components/pins/ui/pin-action-dropdown";
+import { useSelectedLayerId } from "@/stores/map-store";
+import { usePinsStore } from "@/stores/use-pins-store";
 import type { MapLayer } from "@/types/world.type";
 
 interface SidebarProps {
@@ -18,21 +22,37 @@ interface SidebarProps {
   onToggle: () => void;
   onResizeStart: (e: React.MouseEvent) => void;
   worldLayers?: MapLayer[];
+  showPinsSection?: boolean;
 }
 
 export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(
-  ({ slug, worldId, width, isCollapsed, isResizing, onToggle, onResizeStart, worldLayers }, ref) => {
+  ({ slug, worldId, width, isCollapsed, isResizing, onToggle, onResizeStart, worldLayers, showPinsSection = false }, ref) => {
     const [layersOpen, setLayersOpen] = useState(true);
     const [propertiesOpen, setPropertiesOpen] = useState(true);
+    const [pinsOpen, setPinsOpen] = useState(true);
     const title = slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
-    const handleIconClick = (section: "layers" | "properties") => {
+    const selectedLayerId = useSelectedLayerId();
+    const startCreating = usePinsStore((state) => state.startCreating);
+    const isCreating = usePinsStore((state) => state.isCreating);
+
+    const handleTogglePlaceMode = () => {
+      startCreating();
+    };
+
+    const handleIconClick = (section: "layers" | "properties" | "pins") => {
       if (section === "layers") {
         setLayersOpen(true);
         setPropertiesOpen(false);
-      } else {
+        setPinsOpen(false);
+      } else if (section === "properties") {
         setLayersOpen(false);
         setPropertiesOpen(true);
+        setPinsOpen(false);
+      } else if (section === "pins") {
+        setLayersOpen(false);
+        setPropertiesOpen(false);
+        setPinsOpen(true);
       }
       onToggle();
     };
@@ -69,6 +89,19 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(
               </span>
             </button>
 
+            {showPinsSection && selectedLayerId && (
+              <button
+                onClick={() => handleIconClick("pins")}
+                className="relative w-12 h-12 rounded-sm flex items-center justify-center transition-all duration-200 group text-text-muted hover:text-accent-gold hover:bg-background-elevated"
+                title="Pins"
+              >
+                <MapPin className="w-5 h-5" />
+                <span className="absolute left-full ml-3 px-2 py-1 text-sm font-medium bg-background-elevated border border-border-subtle text-text-primary rounded-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50 shadow-lg">
+                  Pins
+                </span>
+              </button>
+            )}
+
             <button
               onClick={() => handleIconClick("properties")}
               className="relative w-12 h-12 rounded-sm flex items-center justify-center transition-all duration-200 group text-text-muted hover:text-accent-gold hover:bg-background-elevated"
@@ -85,6 +118,21 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(
             <CollapsibleSection title="Layers" isOpen={layersOpen} onToggle={() => setLayersOpen(!layersOpen)}>
               <LayersPanel worldLayers={worldLayers} />
             </CollapsibleSection>
+
+            {showPinsSection && selectedLayerId && (
+              <CollapsibleSection title="Pins" isOpen={pinsOpen} onToggle={() => setPinsOpen(!pinsOpen)}>
+                <div className="space-y-3">
+                  <PinActionDropdown
+                    worldId={worldId}
+                    onAddPin={startCreating}
+                    onTogglePlaceMode={handleTogglePlaceMode}
+                    isPlacingMode={isCreating}
+                    isLayerSelected={!!selectedLayerId}
+                  />
+                  <PinList worldId={worldId} />
+                </div>
+              </CollapsibleSection>
+            )}
 
             <CollapsibleSection title="Properties" isOpen={propertiesOpen} onToggle={() => setPropertiesOpen(!propertiesOpen)}>
               <PropertiesPanel />

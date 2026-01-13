@@ -1,8 +1,8 @@
-# Realm Forge - Interactive Map Platform
+# Genesis - Interactive Map Platform
 
 ## Project Overview
 
-Realm Forge is a web-based platform for creating and sharing interactive fantasy world maps. Users can build rich maps with custom pins, lore entries, image galleries, and collaborative layers. Built for writers, DMs, and worldbuilders to bring their fictional realms to life.
+Genesis is a web-based platform for creating and sharing interactive fantasy world maps. Users can build rich maps with custom pins, lore entries, image galleries, and collaborative layers. Built for writers, DMs, and worldbuilders to bring their fictional realms to life.
 
 **Tech Stack**: Next.js 16 (App Router), TypeScript 5.9, Tailwind CSS 4, Prisma ORM, NextAuth.js, MapLibre GL, Zustand, TanStack Query.
 
