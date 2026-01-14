@@ -136,7 +136,6 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
 
   // Calculate layer scale
   const layerScale = baseMapLayer?.scale ?? 1;
-  console.log("🔍 Layer scale:", layerScale);
 
   // Cursor style
   return (

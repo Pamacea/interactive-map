@@ -44,25 +44,21 @@ export function useAutosave<T>(
   // Manual save function
   const saveNow = useCallback(async () => {
     if (!enabled || !isAuthenticated) {
-      console.log("[useAutosave] Save skipped - not enabled or not authenticated");
       return;
     }
 
     clearSaveTimeout();
 
     if (!hasDataChanged(data, lastSavedData.current)) {
-      console.log("[useAutosave] No changes detected, skipping save");
       return;
     }
 
-    console.log("[useAutosave] Manual save triggered for:", key);
     setStatus("saving");
 
     try {
       await saveFn(data);
       lastSavedData.current = data;
       setStatus("saved");
-      console.log("[useAutosave] Save successful for:", key);
 
       // Reset to "idle" or "unsaved" after 2 seconds
       setTimeout(() => {
@@ -86,8 +82,6 @@ export function useAutosave<T>(
       return;
     }
 
-    console.log("[useAutosave] Data changed for:", key, "- scheduling save");
-
     // Mark as unsaved
     setStatus("unsaved");
 
@@ -96,14 +90,12 @@ export function useAutosave<T>(
 
     // Schedule save after delay
     saveTimeoutRef.current = setTimeout(async () => {
-      console.log("[useAutosave] Autosave triggered for:", key);
       setStatus("saving");
 
       try {
         await saveFn(debouncedData);
         lastSavedData.current = debouncedData;
         setStatus("saved");
-        console.log("[useAutosave] Autosave successful for:", key);
 
         // Reset to "idle" after 2 seconds
         setTimeout(() => {

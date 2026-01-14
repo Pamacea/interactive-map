@@ -12,7 +12,7 @@ import { PinList } from "@/components/pins/ui/pin-list";
 import { PinActionDropdown } from "@/components/pins/ui/pin-action-dropdown";
 import { useSelectedLayerId } from "@/stores/map-store";
 import { usePinsStore } from "@/stores/use-pins-store";
-import type { MapLayer } from "@/types/world.type";
+import type { OptimizedWorldLayer } from "@/types/world.type";
 
 interface SidebarProps {
   slug: string;
@@ -22,7 +22,7 @@ interface SidebarProps {
   isResizing: boolean;
   onToggle: () => void;
   onResizeStart: (e: React.MouseEvent) => void;
-  worldLayers?: MapLayer[];
+  worldLayers?: OptimizedWorldLayer[];
   showPinsSection?: boolean;
   mapImage?: string | null;
 }

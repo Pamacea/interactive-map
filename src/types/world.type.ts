@@ -103,6 +103,33 @@ export const GameWorldSchema = z.object({
     .optional(),
 });
 
+// Optimized world type for initial page load (excludes pins and loreEntries)
+export const OptimizedWorldLayerSchema = z.object({
+  id: z.string().cuid(),
+  name: z.string(),
+  description: z.string().nullable(),
+  isVisible: z.boolean(),
+  opacity: z.number(),
+  zIndex: z.number(),
+});
+
+export const OptimizedWorldSchema = z.object({
+  id: z.string().cuid(),
+  title: z.string(),
+  description: z.string().nullable(),
+  map: z.string().nullable(),
+  isPublished: z.boolean(),
+  isPublic: z.boolean(),
+  userId: z.string().cuid(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  user: z.object({
+    name: z.string().nullable(),
+    image: z.string().nullable(),
+  }),
+  layers: z.array(OptimizedWorldLayerSchema),
+});
+
 export const GameWorldInputSchema = GameWorldSchema.pick({
   title: true,
   description: true,
@@ -118,3 +145,5 @@ export type WorldMember = z.infer<typeof WorldMemberSchema>;
 export type Permission = z.infer<typeof PermissionEnum>;
 export type PinType = z.infer<typeof PinTypeEnum>;
 export type LoreCategory = z.infer<typeof LoreCategoryEnum>;
+export type OptimizedWorld = z.infer<typeof OptimizedWorldSchema>;
+export type OptimizedWorldLayer = z.infer<typeof OptimizedWorldLayerSchema>;

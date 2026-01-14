@@ -1,31 +1,34 @@
+"use client";
+
+import { useWorld } from "@/components/world/logic/use-world-initialization";
 import { WorldClient } from "@/components/world/ui/world-client";
-import { getWorldById } from "@/actions/worlds";
-import { notFound } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { WorldSkeleton } from "@/components/world/ui/world-skeleton";
+import { useSession } from "next-auth/react";
+import { useParams } from "next/navigation";
 
-export default async function WorldDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-  const world = await getWorldById(id);
-  const session = await auth();
+export default function WorldDetailPage() {
+  const params = useParams();
+  const worldId = params.id as string;
 
-  if (!world) {
-    notFound();
+  const { data: world, isLoading, error } = useWorld(worldId);
+  const { data: session } = useSession();
+
+  if (error) {
+    return (
+      <div className="h-screen bg-background-base flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-text-primary mb-2">
+            Error loading world
+          </h2>
+          <p className="text-text-secondary">{error.message}</p>
+        </div>
+      </div>
+    );
   }
 
-  // DEBUG: Log world data from database
-  console.log("[DEBUG Page] World fetched from DB:", {
-    worldId: world.id,
-    worldTitle: world.title,
-    mapValue: world.map,
-    mapType: typeof world.map,
-    isMapNull: world.map === null,
-    isMapUndefined: world.map === undefined,
-    mapLength: world.map?.length
-  });
+  if (isLoading || !world) {
+    return <WorldSkeleton />;
+  }
 
   return <WorldClient world={world} isAuthenticated={!!session?.user} />;
 }

@@ -18,25 +18,20 @@ import type { Pin, PinCreateInput, PinUpdateInput } from "@/types/pin.type";
  * @throws Error if user not found or validation fails
  */
 export async function createPin(data: PinCreateInput) {
-  console.log("📌 [createPin] Starting pin creation...");
-  console.log("📌 [createPin] Raw input data:", JSON.stringify(data, null, 2));
-
   // Validate input with Zod
   let validated;
   try {
     validated = CreatePinSchema.parse(data);
-    console.log("📌 [createPin] Validation passed:", JSON.stringify(validated, null, 2));
   } catch (error) {
-    console.error("📌 [createPin] Validation FAILED:", error);
+    console.error("[createPin] Validation failed:", error);
     throw error;
   }
 
   // Get current user from session
-  console.log("📌 [createPin] Fetching current user from session...");
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    console.error("📌 [createPin] No authenticated user session!");
+    console.error("[createPin] No authenticated user session");
     throw new Error("Not authenticated");
   }
 
@@ -45,25 +40,21 @@ export async function createPin(data: PinCreateInput) {
   });
 
   if (!user) {
-    console.error("📌 [createPin] User not found in database!");
+    console.error("[createPin] User not found in database");
     throw new Error("User not found");
   }
-  console.log("📌 [createPin] Authenticated user:", { id: user.id, name: user.name, email: user.email });
 
   // Verify user has access to the world
-  console.log("📌 [createPin] Checking world access for worldId:", validated.gameWorldId);
   const world = await prisma.gameWorld.findUnique({
     where: { id: validated.gameWorldId },
   });
 
   if (!world) {
-    console.error("📌 [createPin] World not found!");
+    console.error("[createPin] World not found");
     throw new Error("World not found");
   }
-  console.log("📌 [createPin] World found:", { id: world.id, title: world.title, userId: world.userId });
 
   if (world.userId !== user.id) {
-    console.log("📌 [createPin] User is not owner, checking member permissions...");
     // Check if user is a member with editor permissions
     const member = await prisma.worldMember.findFirst({
       where: {
@@ -74,49 +65,24 @@ export async function createPin(data: PinCreateInput) {
     });
 
     if (!member) {
-      console.error("📌 [createPin] Unauthorized - no editor permissions");
+      console.error("[createPin] Unauthorized - no editor permissions");
       throw new Error("Unauthorized: You don't have permission to add pins to this world");
     }
-    console.log("📌 [createPin] Member has permission:", member.permission);
-  } else {
-    console.log("📌 [createPin] User is world owner");
   }
 
   // If layerId provided, verify layer belongs to the world
   if (validated.layerId) {
-    console.log("📌 [createPin] Validating layerId:", validated.layerId);
     const layer = await prisma.mapLayer.findUnique({
       where: { id: validated.layerId },
     });
 
     if (!layer || layer.gameWorldId !== validated.gameWorldId) {
-      console.error("📌 [createPin] Invalid layer - does not belong to this world");
+      console.error("[createPin] Invalid layer - does not belong to this world");
       throw new Error("Invalid layer: Layer does not belong to this world");
     }
-    console.log("📌 [createPin] Layer validated:", { id: layer.id, name: layer.name });
-  } else {
-    console.log("📌 [createPin] No layerId provided");
   }
 
   // Create pin
-  console.log("📌 [createPin] Creating pin in database...");
-  console.log("📌 [createPin] Pin data to be inserted:", {
-    title: validated.title,
-    description: validated.description,
-    pinType: validated.pinType,
-    latitude: validated.latitude,
-    longitude: validated.longitude,
-    icon: validated.icon,
-    color: validated.color,
-    size: validated.size,
-    opacity: validated.opacity ?? 1.0,
-    isVisible: validated.isVisible ?? true,
-    properties: validated.properties,
-    userId: user.id,
-    gameWorldId: validated.gameWorldId,
-    layerId: validated.layerId,
-  });
-
   let pin;
   try {
     pin = await prisma.pin.create({
@@ -137,23 +103,14 @@ export async function createPin(data: PinCreateInput) {
         layerId: validated.layerId,
       },
     });
-    console.log("📌 [createPin] Pin created successfully!");
-    console.log("📌 [createPin] Created pin:", {
-      id: pin.id,
-      title: pin.title,
-      latitude: pin.latitude,
-      longitude: pin.longitude,
-      isVisible: pin.isVisible,
-    });
   } catch (error) {
-    console.error("📌 [createPin] Database write FAILED:", error);
+    console.error("[createPin] Database write failed:", error);
     throw error;
   }
 
   // Note: No revalidatePath needed - TanStack Query manages client cache via optimistic updates
   // The cache is already updated by onSuccess in use-pins.ts
 
-  console.log("📌 [createPin] Pin creation complete, returning:", { pinId: pin.id });
   return { pinId: pin.id, pin };
 }
 
@@ -207,11 +164,8 @@ export async function getPinsByWorld(filters: {
   layerIds?: string[];
   showVisibleOnly?: boolean;
 }) {
-  console.log("📌 [getPinsByWorld] Fetching pins with filters:", JSON.stringify(filters, null, 2));
-
   // Validate filters
   const validated = PinFiltersSchema.parse(filters);
-  console.log("📌 [getPinsByWorld] Validated filters:", JSON.stringify(validated, null, 2));
 
   // Build where clause
   const where: any = {
@@ -221,22 +175,17 @@ export async function getPinsByWorld(filters: {
   // Filter by visibility
   if (validated.showVisibleOnly) {
     where.isVisible = true;
-    console.log("📌 [getPinsByWorld] Filtering for visible pins only");
   }
 
   // Filter by pin types
   if (validated.pinTypes && validated.pinTypes.length > 0) {
     where.pinType = { in: validated.pinTypes };
-    console.log("📌 [getPinsByWorld] Filtering by pin types:", validated.pinTypes);
   }
 
   // Filter by layers
   if (validated.layerIds && validated.layerIds.length > 0) {
     where.layerId = { in: validated.layerIds };
-    console.log("📌 [getPinsByWorld] Filtering by layers:", validated.layerIds);
   }
-
-  console.log("📌 [getPinsByWorld] Prisma where clause:", JSON.stringify(where, null, 2));
 
   const pins = await prisma.pin.findMany({
     where,
@@ -262,18 +211,6 @@ export async function getPinsByWorld(filters: {
     orderBy: {
       createdAt: "desc",
     },
-  });
-
-  console.log("📌 [getPinsByWorld] Found pins:", {
-    count: pins.length,
-    pins: pins.map(p => ({
-      id: p.id,
-      title: p.title,
-      isVisible: p.isVisible,
-      layerId: p.layerId,
-      lat: p.latitude,
-      lng: p.longitude,
-    }))
   });
 
   return pins;
@@ -494,8 +431,6 @@ export async function togglePinVisibility(id: string) {
  * @returns Updated pin
  */
 export async function updatePinPosition(pinId: string, latitude: number, longitude: number) {
-  console.log("📌 [updatePinPosition] Updating pin position:", { pinId, latitude, longitude });
-
   // Validate coordinates are in valid range
   if (latitude < 0 || latitude > 1 || longitude < 0 || longitude > 1) {
     throw new Error("Invalid coordinates: must be between 0 and 1");
@@ -544,12 +479,6 @@ export async function updatePinPosition(pinId: string, latitude: number, longitu
     },
   });
 
-  console.log("📌 [updatePinPosition] Pin position updated:", {
-    pinId,
-    oldPosition: { lat: pin.latitude, lng: pin.longitude },
-    newPosition: { lat: updated.latitude, lng: updated.longitude },
-  });
-
   // CRITICAL FIX: No revalidatePath here!
   // The Zustand store is updated optimistically in pin-marker.tsx BEFORE this server call
   // Calling revalidatePath would cause TanStack Query to refetch, creating a race condition
@@ -565,13 +494,11 @@ export async function updatePinPosition(pinId: string, latitude: number, longitu
  * @returns Updated pin with new icon path
  */
 export async function uploadPinIcon(pinId: string, formData: FormData) {
-  console.log("📌 [uploadPinIcon] Starting icon upload for pin:", pinId);
-
   // Get authenticated user from session
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    console.error("📌 [uploadPinIcon] No authenticated user session!");
+    console.error("[uploadPinIcon] No authenticated user session");
     throw new Error("Not authenticated");
   }
 
@@ -580,15 +507,9 @@ export async function uploadPinIcon(pinId: string, formData: FormData) {
   });
 
   if (!user) {
-    console.error("📌 [uploadPinIcon] User not found in database!");
+    console.error("[uploadPinIcon] User not found in database");
     throw new Error("User not found");
   }
-
-  console.log("📌 [uploadPinIcon] Authenticated user:", {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-  });
 
   // Check if pin exists and user has permission
   const pin = await prisma.pin.findUnique({
@@ -599,7 +520,7 @@ export async function uploadPinIcon(pinId: string, formData: FormData) {
   });
 
   if (!pin) {
-    console.error("📌 [uploadPinIcon] Pin not found!");
+    console.error("[uploadPinIcon] Pin not found");
     throw new Error("Pin not found");
   }
 
@@ -614,7 +535,7 @@ export async function uploadPinIcon(pinId: string, formData: FormData) {
     });
 
     if (!member) {
-      console.error("📌 [uploadPinIcon] Unauthorized - no editor permissions");
+      console.error("[uploadPinIcon] Unauthorized - no editor permissions");
       throw new Error(
         "Unauthorized: You don't have permission to edit this pin"
       );
@@ -625,15 +546,9 @@ export async function uploadPinIcon(pinId: string, formData: FormData) {
   const file = formData.get("file") as File;
 
   if (!file) {
-    console.error("📌 [uploadPinIcon] No file provided in formData");
+    console.error("[uploadPinIcon] No file provided in formData");
     throw new Error("No file provided");
   }
-
-  console.log("📌 [uploadPinIcon] File received:", {
-    name: file.name,
-    type: file.type,
-    size: file.size,
-  });
 
   // Validate file type
   const validTypes = ["image/svg+xml", "image/png", "image/webp"];
@@ -666,28 +581,17 @@ export async function uploadPinIcon(pinId: string, formData: FormData) {
   const fileName = `${timestamp}-${randomId}-${sanitizedName}`;
   const filePath = path.join(uploadsDir, fileName);
 
-  console.log("📌 [uploadPinIcon] Saving file:", {
-    fileName,
-    filePath,
-  });
-
   try {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     await writeFile(filePath, buffer);
 
     const iconPath = `/uploads/pins/icons/${fileName}`;
-    console.log("📌 [uploadPinIcon] File saved successfully:", iconPath);
 
     // Update pin with new icon path
     const updatedPin = await prisma.pin.update({
       where: { id: pinId },
       data: { icon: iconPath },
-    });
-
-    console.log("📌 [uploadPinIcon] Pin updated:", {
-      pinId: updatedPin.id,
-      newIconPath: updatedPin.icon,
     });
 
     // Revalidate the world page
@@ -699,7 +603,7 @@ export async function uploadPinIcon(pinId: string, formData: FormData) {
       pin: updatedPin,
     };
   } catch (error) {
-    console.error("📌 [uploadPinIcon] Failed to save file:", error);
+    console.error("[uploadPinIcon] Failed to save file:", error);
     throw new Error("Failed to save icon image");
   }
 }

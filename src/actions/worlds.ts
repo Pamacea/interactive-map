@@ -7,6 +7,7 @@ import path from "path";
 import { existsSync } from "fs";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import type { OptimizedWorld } from "@/types/world.type";
 
 export async function createWorld(data: {
   title: string;
@@ -14,21 +15,10 @@ export async function createWorld(data: {
   isPublic: boolean;
   map?: File;
 }) {
-  console.log("🚀 createWorld received data:", {
-    title: data.title,
-    description: data.description.substring(0, 50) + "...",
-    isPublic: data.isPublic,
-    hasMap: !!data.map,
-    mapName: data.map?.name,
-    mapSize: data.map?.size,
-    mapType: data.map?.type,
-  });
-
   // Get authenticated user from session
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    console.log("❌ No authenticated user session!");
     throw new Error("Not authenticated");
   }
 
@@ -37,18 +27,13 @@ export async function createWorld(data: {
   });
 
   if (!user) {
-    console.log("❌ User not found in database!");
     throw new Error("User not found");
   }
-
-  console.log("✅ Authenticated user:", { id: user.id, name: user.name, email: user.email });
 
   let mapPath: string | undefined;
 
   // Handle map image upload
   if (data.map) {
-    console.log("📤 Processing map file...");
-
     const bytes = await data.map.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
@@ -58,30 +43,20 @@ export async function createWorld(data: {
     const fileName = `${timestamp}-${data.map.name}`;
     const uploadsDir = path.join(process.cwd(), "public", "uploads");
 
-    console.log("🔧 File details:", {
-      fileName,
-      fileExtension,
-      uploadsDir,
-      fileSize: buffer.length,
-    });
-
     // Ensure uploads directory exists
     if (!existsSync(uploadsDir)) {
-      console.log("📁 Creating uploads directory...");
       await writeFile(path.join(uploadsDir, ".gitkeep"), "");
     }
 
     const filePath = path.join(uploadsDir, fileName);
 
     try {
-      console.log("💾 Writing file to:", filePath);
       await writeFile(filePath, buffer);
 
       // Store the relative path in database
       mapPath = `/uploads/${fileName}`;
-      console.log("✅ File saved with path:", mapPath);
     } catch (error) {
-      console.error("❌ Failed to save file:", error);
+      console.error("[createWorld] Failed to save file:", error);
       throw new Error("Failed to save map image");
     }
   }
@@ -97,22 +72,25 @@ export async function createWorld(data: {
     },
   });
 
-  console.log("✅ World created:", {
-    worldId: world.id,
-    mapPath: world.map,
-    hasMap: !!world.map,
-  });
-
   revalidatePath("/explore");
   revalidatePath("/worlds");
 
   return { worldId: world.id };
 }
 
-export async function getWorldById(id: string) {
+export async function getWorldById(id: string): Promise<OptimizedWorld | null> {
   const world = await prisma.gameWorld.findUnique({
     where: { id },
-    include: {
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      map: true,
+      isPublished: true,
+      isPublic: true,
+      userId: true,
+      createdAt: true,
+      updatedAt: true,
       user: {
         select: {
           name: true,
@@ -120,18 +98,26 @@ export async function getWorldById(id: string) {
         },
       },
       layers: {
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          isVisible: true,
+          opacity: true,
+          zIndex: true,
+        },
         orderBy: { zIndex: "asc" },
       },
-      pins: {
-        where: { isVisible: true },
-      },
-      loreEntries: {
-        where: { isVisible: true },
-      },
+      // REMOVED: pins (fetched via usePins hook for better performance)
+      // REMOVED: loreEntries (not needed for initial load)
     },
   });
 
-  return world;
+  if (!world) {
+    return null;
+  }
+
+  return world as OptimizedWorld;
 }
 
 export async function getAllWorlds() {
@@ -251,17 +237,11 @@ export async function updateWorldState(
     pinCount?: number; // Track pin count to trigger autosave on pin changes
   }
 ) {
-  console.log("[updateWorldState] Updating world state for:", worldId, {
-    hasLayers: !!state.layers,
-    layerCount: state.layers?.length,
-    pinCount: state.pinCount,
-  });
-
   // Get authenticated user from session
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    console.error("[updateWorldState] No authenticated user session!");
+    console.error("[updateWorldState] No authenticated user session");
     throw new Error("Not authenticated");
   }
 
@@ -270,11 +250,9 @@ export async function updateWorldState(
   });
 
   if (!user) {
-    console.error("[updateWorldState] User not found in database!");
+    console.error("[updateWorldState] User not found in database");
     throw new Error("User not found");
   }
-
-  console.log("[updateWorldState] Authenticated user:", { id: user.id, name: user.name, email: user.email });
 
   // Check if world exists and user has permission
   const world = await prisma.gameWorld.findUnique({
@@ -302,8 +280,6 @@ export async function updateWorldState(
 
   // Update layers if provided
   if (state.layers) {
-    console.log("[updateWorldState] Updating layers:", state.layers.length);
-
     // Process each layer: create or update
     for (const layer of state.layers) {
       // Check if layer exists
@@ -347,8 +323,6 @@ export async function updateWorldState(
   // (createPin, updatePin, deletePin in actions/pins.ts)
   // We don't save pinCount to the database - it's just for change detection
 
-  console.log("[updateWorldState] World state updated successfully");
-
   // Return updated world with layers
   const updatedWorld = await prisma.gameWorld.findUnique({
     where: { id: worldId },
@@ -373,13 +347,11 @@ export async function updateWorldState(
  * @throws Error if user not authorized, file invalid, or upload fails
  */
 export async function uploadWorldMap(worldId: string, formData: FormData) {
-  console.log("[uploadWorldMap] Starting map upload for world:", worldId);
-
   // Get authenticated user from session
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    console.error("[uploadWorldMap] No authenticated user session!");
+    console.error("[uploadWorldMap] No authenticated user session");
     throw new Error("Not authenticated");
   }
 
@@ -388,11 +360,9 @@ export async function uploadWorldMap(worldId: string, formData: FormData) {
   });
 
   if (!user) {
-    console.error("[uploadWorldMap] User not found in database!");
+    console.error("[uploadWorldMap] User not found in database");
     throw new Error("User not found");
   }
-
-  console.log("[uploadWorldMap] Authenticated user:", { id: user.id, name: user.name, email: user.email });
 
   // Check if world exists and user has permission
   const world = await prisma.gameWorld.findUnique({
@@ -426,12 +396,6 @@ export async function uploadWorldMap(worldId: string, formData: FormData) {
     throw new Error("No file provided");
   }
 
-  console.log("[uploadWorldMap] File received:", {
-    name: file.name,
-    type: file.type,
-    size: file.size,
-  });
-
   // Validate file type
   const validTypes = ["image/webp", "image/png", "image/jpeg", "image/jpg"];
   if (!validTypes.includes(file.type)) {
@@ -450,14 +414,8 @@ export async function uploadWorldMap(worldId: string, formData: FormData) {
   const fileName = `${timestamp}-${sanitizedFileName}`;
   const uploadsDir = path.join(process.cwd(), "public", "uploads");
 
-  console.log("[uploadWorldMap] Saving file:", {
-    fileName,
-    uploadsDir,
-  });
-
   // Ensure uploads directory exists
   if (!existsSync(uploadsDir)) {
-    console.log("[uploadWorldMap] Creating uploads directory...");
     await writeFile(path.join(uploadsDir, ".gitkeep"), "");
   }
 
@@ -469,17 +427,11 @@ export async function uploadWorldMap(worldId: string, formData: FormData) {
     await writeFile(filePath, buffer);
 
     const mapPath = `/uploads/${fileName}`;
-    console.log("[uploadWorldMap] File saved successfully:", mapPath);
 
     // Update database with new map path
     const updatedWorld = await prisma.gameWorld.update({
       where: { id: worldId },
       data: { map: mapPath },
-    });
-
-    console.log("[uploadWorldMap] Database updated:", {
-      worldId: updatedWorld.id,
-      newMapPath: updatedWorld.map,
     });
 
     // Revalidate the world page to refresh server component

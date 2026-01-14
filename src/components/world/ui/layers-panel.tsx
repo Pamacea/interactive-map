@@ -7,11 +7,11 @@ import { AddLayerDialog } from "./add-layer-dialog";
 import { LayerItem } from "./layer-item";
 import { BaseMapLayerItem } from "./base-map-layer-item";
 import { UploadMapDialog } from "./upload-map-dialog";
-import type { MapLayer } from "@/types/world.type";
+import type { OptimizedWorldLayer } from "@/types/world.type";
 
 interface LayersPanelProps {
   worldId?: string;
-  worldLayers?: MapLayer[];
+  worldLayers?: OptimizedWorldLayer[];
   mapImage?: string | null;
 }
 

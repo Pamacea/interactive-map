@@ -90,11 +90,6 @@ export function PinMarker({ pin, mapWidth, mapHeight, imageDimensions, transform
   const shouldRender = (isDragging || isHovered || isPinSelected) ||
                        (withinZoomRange && currentSize >= MIN_VISIBLE_SIZE);
 
-  // Debug logging when pin is hidden by zoom range
-  if (!withinZoomRange && !isDragging && !isHovered && !isPinSelected) {
-    console.log(`📌 Pin "${pin.title}" hidden: zoom ${Math.round(zoomPercentage)}% not in range ${pin.minZoom ?? 0}-${pin.maxZoom ?? 200}%`);
-  }
-
   if (!shouldRender) {
     return null;
   }

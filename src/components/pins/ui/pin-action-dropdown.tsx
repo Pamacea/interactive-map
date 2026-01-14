@@ -61,13 +61,11 @@ export function PinActionDropdown({
   const handleImportCSV = () => {
     setIsOpen(false);
     // TODO: Implement CSV import functionality
-    console.log("Import from CSV - Coming soon");
   };
 
   const handleDuplicateExisting = () => {
     setIsOpen(false);
     // TODO: Implement duplicate existing functionality
-    console.log("Duplicate Existing - Coming soon");
   };
 
   return (

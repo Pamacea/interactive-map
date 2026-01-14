@@ -109,7 +109,7 @@ export function useMapInteractions(options: UseMapInteractionsOptions) {
 
   const handleSelectPinType = useCallback((pinType: string, lat: number, lng: number) => {
     if (!worldId) {
-      console.error("📌 [handleSelectPinType] No worldId provided");
+      console.error("[handleSelectPinType] No worldId provided");
       return;
     }
 
