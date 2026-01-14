@@ -158,7 +158,10 @@ model Pin {
   icon        String?
   color       String    @default("#3b82f6")
   size        Int       @default(32)
+  opacity     Float     @default(1.0)
   isVisible   Boolean   @default(true)
+  minZoom     Int       @default(0)
+  maxZoom     Int       @default(200)
   properties  Json?     // Custom properties for RPG data (level, faction, etc.)
   userId      String
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)

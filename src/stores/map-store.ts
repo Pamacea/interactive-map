@@ -12,6 +12,10 @@ interface Layer {
   opacity: number;
   zIndex: number;
   locked: boolean;
+  isBaseMap?: boolean; // Special flag for base map layer
+  scale: number; // Visual scale of layer content (0.5 - 2.0)
+  offsetX: number; // Pixel offset from top-left (X axis)
+  offsetY: number; // Pixel offset from top-left (Y axis)
 }
 
 interface MapState {
@@ -24,6 +28,7 @@ interface MapState {
   // Computed values (memoized to prevent infinite loops)
   visibleLayerIds: string[];
   activeLayerIds: string[];
+  baseMapVisible: boolean;
 
   // Layer actions
   setGrid: (value: boolean) => void;
@@ -37,10 +42,15 @@ interface MapState {
   toggleLayerLock: (layerId: string) => void;
   updateLayerOpacity: (layerId: string, opacity: number) => void;
   updateLayerZIndex: (layerId: string, zIndex: number) => void;
+  updateLayerScale: (layerId: string, scale: number) => void;
+  updateLayerPosition: (layerId: string, offsetX: number, offsetY: number) => void;
   addLayer: (layer: Omit<Layer, "id">) => void;
   removeLayer: (layerId: string) => void;
   moveLayerUp: (layerId: string) => void;
   moveLayerDown: (layerId: string) => void;
+
+  // Base map layer actions
+  toggleBaseMapVisibility: () => void;
 
   reset: () => void;
 }
@@ -49,10 +59,24 @@ const initialState = {
   grid: false,
   snap: false,
   scale: "1:1000" as ScaleOption,
-  layers: [] as Layer[],
+  layers: [
+    {
+      id: "base-map",
+      name: "Base Map",
+      visible: true,
+      opacity: 1,
+      zIndex: 0,
+      locked: true,
+      isBaseMap: true,
+      scale: 1.0,
+      offsetX: 0,
+      offsetY: 0,
+    },
+  ] as Layer[],
   selectedLayerId: null as string | null,
-  visibleLayerIds: [] as string[],
+  visibleLayerIds: ["base-map"],
   activeLayerIds: [] as string[],
+  baseMapVisible: true,
 };
 
 export const useMapStore = create<MapState>()(
@@ -74,6 +98,8 @@ export const useMapStore = create<MapState>()(
           const newActiveLayerIds = layers
             .filter((l) => !l.locked)
             .map((l) => l.id);
+          const baseMapLayer = layers.find((l) => l.isBaseMap);
+          const newBaseMapVisible = baseMapLayer?.visible ?? true;
 
           console.log("📌 [map-store] setLayers called:", {
             layersCount: layers.length,
@@ -81,12 +107,14 @@ export const useMapStore = create<MapState>()(
             activeLayersCount: newActiveLayerIds.length,
             layers: layers.map(l => ({ id: l.id, name: l.name, visible: l.visible })),
             visibleLayerIds: newVisibleLayerIds,
+            baseMapVisible: newBaseMapVisible,
           });
 
           return {
             layers,
             visibleLayerIds: newVisibleLayerIds,
             activeLayerIds: newActiveLayerIds,
+            baseMapVisible: newBaseMapVisible,
           };
         }),
 
@@ -100,9 +128,12 @@ export const useMapStore = create<MapState>()(
           const newVisibleLayerIds = newLayers
             .filter((layer) => layer.visible)
             .map((layer) => layer.id);
+          const baseMapLayer = newLayers.find((l) => l.isBaseMap);
+          const newBaseMapVisible = baseMapLayer?.visible ?? true;
           return {
             layers: newLayers,
             visibleLayerIds: newVisibleLayerIds,
+            baseMapVisible: newBaseMapVisible,
           };
         }),
 
@@ -134,9 +165,32 @@ export const useMapStore = create<MapState>()(
           ),
         })),
 
+      updateLayerScale: (layerId, scale) =>
+        set((state) => ({
+          layers: state.layers.map((layer) =>
+            layer.id === layerId ? { ...layer, scale } : layer
+          ),
+        })),
+
+      updateLayerPosition: (layerId, offsetX, offsetY) =>
+        set((state) => {
+          // Prevent moving base map layer
+          const layer = state.layers.find((l) => l.id === layerId);
+          if (layer?.isBaseMap) {
+            console.warn("Cannot move base map layer");
+            return state;
+          }
+
+          return {
+            layers: state.layers.map((l) =>
+              l.id === layerId ? { ...l, offsetX, offsetY } : l
+            ),
+          };
+        }),
+
       addLayer: (layer) =>
         set((state) => {
-          const newLayer = { ...layer, id: crypto.randomUUID() };
+          const newLayer = { ...layer, id: crypto.randomUUID(), offsetX: 0, offsetY: 0 };
           const newLayers = [...state.layers, newLayer];
           const newVisibleLayerIds = newLayers
             .filter((l) => l.visible)
@@ -214,6 +268,26 @@ export const useMapStore = create<MapState>()(
           };
         }),
 
+      toggleBaseMapVisibility: () =>
+        set((state) => {
+          const baseMapLayer = state.layers.find((l) => l.isBaseMap);
+          if (!baseMapLayer) return state;
+
+          const newLayers = state.layers.map((layer) =>
+            layer.isBaseMap ? { ...layer, visible: !layer.visible } : layer
+          );
+          const newVisibleLayerIds = newLayers
+            .filter((l) => l.visible)
+            .map((l) => l.id);
+          const newBaseMapVisible = !baseMapLayer.visible;
+
+          return {
+            layers: newLayers,
+            visibleLayerIds: newVisibleLayerIds,
+            baseMapVisible: newBaseMapVisible,
+          };
+        }),
+
       reset: () => set(initialState),
     }),
     {
@@ -233,3 +307,10 @@ export const useVisibleLayerIds = () =>
   useMapStore((state) => state.visibleLayerIds);
 export const useActiveLayerIds = () =>
   useMapStore((state) => state.activeLayerIds);
+export const useBaseMapVisible = () =>
+  useMapStore((state) => state.baseMapVisible);
+export const useLayerPosition = (layerId: string) =>
+  useMapStore((state) => {
+    const layer = state.layers.find((l) => l.id === layerId);
+    return { offsetX: layer?.offsetX ?? 0, offsetY: layer?.offsetY ?? 0 };
+  });

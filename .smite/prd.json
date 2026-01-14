@@ -1,145 +1,224 @@
 {
-  "project": "Genesis-Refactor",
-  "branchName": "refactor/codebase-cleanup",
-  "description": "Complete codebase audit, bug fixes, and refactoring of all components >100 lines",
+  "project": "Interactive Map - Pin Positioning & Properties Enhancement",
+  "branchName": "fix/pin-positioning-and-properties",
+  "description": "Fix pin drag-and-drop positioning bug and enhance pin properties UI with size, color, icon management, and zoom-based visibility controls",
+
   "userStories": [
     {
       "id": "US-001",
-      "title": "Audit complet de la codebase",
-      "description": "Explorer l'intégralité du code source pour identifier tous les composants, fichiers et structures. Trouver tous les composants de plus de 100 lignes.",
+      "title": "Fix Pin Drag-and-Drop Positioning Bug",
+      "description": "Pins currently teleport back to their original position after being dragged and dropped. This is caused by the component re-rendering with stale data from the server before the local state update is applied. Need to ensure proper optimistic updates and prevent race conditions between local store updates and server responses.",
       "acceptanceCriteria": [
-        "Liste complète de tous les composants avec leur nombre de lignes",
-        "Identification des composants >100 lignes",
-        "Arborescence complète de la codebase générée",
-        "Rapport d'audit créé dans .smite/audit-report.md"
+        "User can drag a pin to a new position",
+        "On mouse up, pin stays at the new position (no teleporting)",
+        "New position is saved to database successfully",
+        "Optimistic UI update prevents visual flickering",
+        "Position persists after page refresh",
+        "Console logs confirm successful database update",
+        "No race conditions between local state and server response"
       ],
       "priority": 1,
-      "agent": "smite-explorer",
+      "agent": "smite-constructor",
       "tech": "nextjs",
       "dependencies": [],
       "passes": false,
-      "notes": "Utiliser Glob et Read pour scanner tous les fichiers .tsx et .ts"
+      "notes": "Issue: Pin position updates in database (confirmed by console logs) but component re-renders with old position. Root cause: TanStack Query cache invalidation triggers refetch before Zustand store updates are applied. Solution: Ensure Zustand update happens immediately, disable cache refetch during optimistic update, or use mutation cache update instead of invalidation."
     },
     {
       "id": "US-002",
-      "title": "Analyse critique et identification des problèmes",
-      "description": "Analyser chaque composant >100 lignes pour identifier : violations des principes CLAUDE.md, code smells, problèmes d'architecture, anti-patterns, violations SOLID",
+      "title": "Display Pin Properties in Sidebar When Selected",
+      "description": "When a pin is selected, the sidebar's 'Pin Properties' section should display comprehensive pin settings including: title, description, type, coordinates (read-only), and NEW: size, color, icon, opacity, visibility, and zoom range. Currently the section exists but doesn't show all available properties from the database schema.",
       "acceptanceCriteria": [
-        "Rapport détaillé des problèmes par composant",
-        "Priorisation des problèmes (critique/mineur)",
-        "Identification des bugs potentiels",
-        "Recommandations de refactorisation"
+        "Clicking a pin opens it in the sidebar properties panel",
+        "All pin fields from database are editable: title, description, type",
+        "Size control shows current value (10-100px) with live preview",
+        "Color picker shows current color, allows selection",
+        "Opacity slider shows current opacity (0-100%)",
+        "Visibility toggle shows current state",
+        "Coordinates display current lat/lng (read-only)",
+        "Changes apply immediately with optimistic UI updates",
+        "Form validation prevents invalid values",
+        "Success toast shows after saving"
       ],
-      "priority": 2,
-      "agent": "smite-gatekeeper",
+      "priority": 1,
+      "agent": "smite-constructor",
       "tech": "nextjs",
       "dependencies": ["US-001"],
       "passes": false,
-      "notes": "Vérifier : ui/logic/methods pattern, state management, type safety, Tailwind conventions"
+      "notes": "PinPropertiesSection component already exists at src/components/world/ui/pin-properties-section.tsx. Need to verify all fields are properly wired to the form state and updatePin action. Check use-properties-panel.ts for form state management."
     },
     {
       "id": "US-003",
-      "title": "Bug hunting complet",
-      "description": "Chercher systématiquement les bugs : memory leaks, race conditions, erreurs de logique, props non typées, effets mal configurés, états non gérés",
+      "title": "Add Icon Selection Dropdown with Predefined Icons",
+      "description": "Add an icon selection dropdown to the pin properties panel. The dropdown should show a curated list of icons (MapPin, Castle, Sword, Treasure, Scroll, etc.) with visual previews. Users can select from the predefined list or choose 'Custom' to upload their own.",
       "acceptanceCriteria": [
-        "Liste des bugs identifiés avec localisation",
-        "Classification par sévérité",
-        "Tests de reproduction si applicable",
-        "Document de bugs créé"
+        "Icon dropdown shows list of 20+ predefined icons",
+        "Each icon option shows visual preview + label",
+        "Dropdown is searchable/filterable",
+        "Selected icon is highlighted",
+        "Selecting icon updates pin immediately with optimistic UI",
+        "Icons are sourced from lucide-react",
+        "Icon list is centralized in constants file",
+        "Custom option opens file upload dialog"
       ],
-      "priority": 3,
-      "agent": "smite-debug",
+      "priority": 2,
+      "agent": "smite-constructor",
       "tech": "nextjs",
-      "dependencies": ["US-001"],
+      "dependencies": ["US-002"],
       "passes": false,
-      "notes": "Focus sur : useEffect hooks, event listeners, async operations, state updates"
+      "notes": "Create constants/pin-icons.ts with icon definitions. Use lucide-react icons. Add Select component from shadcn/ui. Icon preview should render in dropdown options."
     },
     {
       "id": "US-004",
-      "title": "Refactorisation des composants World",
-      "description": "Refactoriser tous les composants world/ >100 lignes selon les principes : séparation ui/logic/methods, max 70 lignes, extraction de hooks, typage strict",
+      "title": "Add Custom Icon Upload (SVG, PNG, WEBP)",
+      "description": "Allow users to upload custom icons for pins. Supports SVG (vector), PNG, and WEBP formats. Uploads are stored in /public/uploads/pins/icons/. File size limit: 500KB. Images are automatically optimized/resized to max 64x64px.",
       "acceptanceCriteria": [
-        "Tous les composants <70 lignes",
-        "Pattern ui/logic/methods respecté",
-        "Hooks personnalisés créés pour la logique complexe",
-        "Type-check passe sans erreurs",
-        "Tests fonctionnels validés"
+        "Upload button in icon dropdown when 'Custom' is selected",
+        "File picker accepts .svg, .png, .webp",
+        "Client-side validation: file size < 500KB, dimensions check",
+        "Uploaded files are saved to /public/uploads/pins/icons/{uuid}.{ext}",
+        "Filenames are sanitized and UUID-based to prevent conflicts",
+        "After upload, icon preview updates immediately",
+        "Database stores icon file path (relative URL)",
+        "Error handling for invalid files/too large",
+        "Loading state during upload",
+        "Option to reset to default icon"
       ],
-      "priority": 4,
-      "agent": "smite-surgeon",
-      "tech": "nextjs",
-      "dependencies": ["US-001", "US-002", "US-003"],
-      "passes": true,
-      "notes": "✅ COMPLÉTÉ - map-canvas.tsx (527→234), world-client.tsx (113→80), layers-panel.tsx (278→83), properties-panel.tsx (256→67)"
-    },
-    {
-      "id": "US-005",
-      "title": "Refactorisation des composants Pins",
-      "description": "Refactoriser tous les composants pins/ >100 lignes selon les principes architecturaux du projet",
-      "acceptanceCriteria": [
-        "Composants <70 lignes",
-        "Séparation ui/logic/methods",
-        "State management optimisé",
-        "Build réussi"
-      ],
-      "priority": 5,
-      "agent": "smite-surgeon",
-      "tech": "nextjs",
-      "dependencies": ["US-001", "US-002", "US-003"],
-      "passes": true,
-      "notes": "✅ COMPLÉTÉ - pin-create-form.tsx (495→129), pin-edit-form.tsx (404→167), pin-context-menu.tsx (232→75), pin-popup.tsx (245→82)"
-    },
-    {
-      "id": "US-006",
-      "title": "Refactorisation des autres composants",
-      "description": "Refactoriser tous les autres composants identifiés >100 lignes (worlds, auth, etc.)",
-      "acceptanceCriteria": [
-        "Tous les composants <70 lignes",
-        "Code organisé et lisible",
-        "Pattern respecté",
-        "Lint validé"
-      ],
-      "priority": 6,
-      "agent": "smite-surgeon",
-      "tech": "nextjs",
-      "dependencies": ["US-001", "US-002", "US-003"],
-      "passes": true,
-      "notes": "✅ COMPLÉTÉ - Tous les composants >100 lignes ont été refactorisés en 3 phases"
-    },
-    {
-      "id": "US-007",
-      "title": "Correction des bugs identifiés",
-      "description": "Corriger tous les bugs identifiés lors du bug hunting, avec tests de validation",
-      "acceptanceCriteria": [
-        "Tous les bugs corrigés",
-        "Tests de régression passent",
-        "Pas de nouveaux bugs introduits",
-        "Code review validée"
-      ],
-      "priority": 7,
+      "priority": 2,
       "agent": "smite-constructor",
       "tech": "nextjs",
       "dependencies": ["US-003"],
-      "passes": true,
-      "notes": "✅ COMPLÉTÉ - Memory leaks corrigés, race conditions résolues, console.log supprimés"
+      "passes": false,
+      "notes": "Need server action for file upload. Use formidable or next-native-upload. Store file path in Pin.icon field. Update Prisma schema if needed to store full URL. Consider CDN for production."
+    },
+    {
+      "id": "US-005",
+      "title": "Add Zoom-Based Visibility Range Controls",
+      "description": "Add minZoom and maxZoom controls to pin properties. Pins can be configured to only show within specific zoom ranges. For example: show city names at 50-100% zoom, hide them at 0-30% zoom. Prevents visual clutter at low zoom levels.",
+      "acceptanceCriteria": [
+        "Min zoom slider: 0% to 200% (default: 0%)",
+        "Max zoom slider: 0% to 200% (default: 200%)",
+        "Visual preview: 'This pin will be visible at X% to Y% zoom'",
+        "Real-time validation: minZoom cannot exceed maxZoom",
+        "Current zoom level indicator on map",
+        "Pin visibility updates in real-time as zoom changes",
+        "Pins outside zoom range don't render (performance optimization)",
+        "Zoom range persists in database",
+        "Reset button for default range (0-200%)"
+      ],
+      "priority": 2,
+      "agent": "smite-constructor",
+      "tech": "nextjs",
+      "dependencies": ["US-002"],
+      "passes": false,
+      "notes": "Need to add minZoom and maxZoom fields to Prisma Pin model. Add migration. Update pin-marker.tsx to check zoom range before rendering. Store zoom values as percentages (0-200). Map transform.scale to zoom percentage."
+    },
+    {
+      "id": "US-006",
+      "title": "Update Prisma Schema for Zoom and Icon Fields",
+      "description": "Update the Pin model in schema.prisma to add minZoom and maxZoom fields. Ensure icon field can store custom file paths. Run migration to update database.",
+      "acceptanceCriteria": [
+        "Pin model has minZoom: Int @default(0) field",
+        "Pin model has maxZoom: Int @default(200) field",
+        "icon field type is String (can store file path or lucide icon name)",
+        "Migration created: npx prisma migrate dev --name add_pin_zoom_fields",
+        "Migration runs successfully",
+        "Prisma client regenerated: npx prisma generate",
+        "Typescript types updated with new fields",
+        "Existing pins have default values populated"
+      ],
+      "priority": 1,
+      "agent": "smite-constructor",
+      "tech": "prisma",
+      "dependencies": [],
+      "passes": false,
+      "notes": "Run migration before implementing UI controls. Make sure to update Zod schemas in pin-schemas.ts to include new fields with validation (minZoom < maxZoom, both 0-200)."
+    },
+    {
+      "id": "US-007",
+      "title": "Update Zod Schemas for New Pin Fields",
+      "description": "Update pin-schemas.ts to include minZoom, maxZoom, and icon field validations. Ensure create/update operations accept new fields with proper validation rules.",
+      "acceptanceCriteria": [
+        "CreatePinSchema includes minZoom (default: 0, min: 0, max: 200)",
+        "CreatePinSchema includes maxZoom (default: 200, min: 0, max: 200)",
+        "Custom refinement: minZoom < maxZoom",
+        "Icon field accepts string (lucide name or file path)",
+        "UpdatePinSchema includes optional minZoom, maxZoom, icon",
+        "Type inference works correctly for forms",
+        "Validation errors are user-friendly"
+      ],
+      "priority": 1,
+      "agent": "smite-constructor",
+      "tech": "typescript",
+      "dependencies": ["US-006"],
+      "passes": false,
+      "notes": "Use z.refine for cross-field validation (minZoom < maxZoom). Add helpful error messages: 'Min zoom must be less than max zoom'."
     },
     {
       "id": "US-008",
-      "title": "Finalisation et validation",
-      "description": "Validation finale de l'ensemble des refactorisations : type-check, lint, build, tests manuels",
+      "title": "Enhance PinMarker Component with Zoom Visibility Logic",
+      "description": "Update pin-marker.tsx to check zoom range before rendering. Pins should only render when current zoom level is within their minZoom-maxZoom range. This prevents rendering pins that would be too small or cluttered.",
       "acceptanceCriteria": [
-        "Type-check réussi (0 erreurs)",
-        "Lint validé",
-        "Build réussi",
-        "Tests fonctionnels passent",
-        "Document de synthèse créé"
+        "PinMarker reads minZoom and maxZoom from pin props",
+        "Current zoom level calculated from transform.scale",
+        "Pin returns null if zoom < minZoom or zoom > maxZoom",
+        "Exception: Always render if dragging or hovered",
+        "Console log: 'Pin [title] hidden: zoom 50% not in range 100-200%'",
+        "Performance: Early return prevents unnecessary calculations",
+        "Selected pins ignore zoom range (user can still edit)",
+        "Zoom range indicator in tooltip when hovered"
       ],
-      "priority": 8,
-      "agent": "smite-gatekeeper",
+      "priority": 2,
+      "agent": "smite-constructor",
       "tech": "nextjs",
-      "dependencies": ["US-004", "US-005", "US-006", "US-007"],
-      "passes": true,
-      "notes": "✅ COMPLÉTÉ - Type-check: 0 erreurs, Build: succès, Rapports: .smite/phase3-report.md créé"
+      "dependencies": ["US-006", "US-007"],
+      "passes": false,
+      "notes": "Calculate zoom percentage: (transform.scale * 100). Add to existing visibility check at line 75. Combine with MIN_VISIBLE_SIZE check using AND condition."
+    },
+    {
+      "id": "US-009",
+      "title": "Implement Server Action for Icon Upload",
+      "description": "Create uploadPinIcon server action that handles file uploads, validates format/size, saves to disk, and returns the file path. Includes proper error handling and security checks.",
+      "acceptanceCriteria": [
+        "Server action: uploadPinIcon(file: File, pinId: string)",
+        "Validates file type: 'image/svg+xml', 'image/png', 'image/webp'",
+        "Validates file size: max 500KB",
+        "Sanitizes filename, replaces with UUID",
+        "Saves to /public/uploads/pins/icons/{uuid}.{ext}",
+        "Returns relative path: '/uploads/pins/icons/{uuid}.{ext}'",
+        "Error handling: 'Invalid file type', 'File too large', 'Upload failed'",
+        "Auth check: user must own pin or have editor permission",
+        "Optimize image: resize to max 64x64 if PNG/WEBP",
+        "Returns success: { success: true, path: string }"
+      ],
+      "priority": 2,
+      "agent": "smite-constructor",
+      "tech": "nextjs",
+      "dependencies": ["US-004"],
+      "passes": false,
+      "notes": "Use formidable or native Next.js file handling. For image optimization, consider sharp library. Ensure public/uploads directory exists or create it. Add .gitkeep to track directory."
+    },
+    {
+      "id": "US-010",
+      "title": "Add Loading States and Error Handling",
+      "description": "Add loading indicators and error handling for all pin property updates. Show toast notifications for success/error states. Handle edge cases like network failures, validation errors, and concurrent edits.",
+      "acceptanceCriteria": [
+        "Spinner shows in submit button during update",
+        "Input fields disabled during update",
+        "Error toast: 'Failed to update pin: [error message]'",
+        "Success toast: 'Pin updated successfully'",
+        "Form state resets on error to last known good value",
+        "Optimistic update: UI changes immediately, reverts on error",
+        "Conflict detection: 'Pin was modified by another user'",
+        "Retry button on error (non-destructive)",
+        "Loading state for icon upload with progress bar"
+      ],
+      "priority": 3,
+      "agent": "smite-constructor",
+      "tech": "nextjs",
+      "dependencies": ["US-002", "US-004", "US-009"],
+      "passes": false,
+      "notes": "Use sonner or react-hot-toast for notifications. Implement proper error boundaries. Handle optimistic updates rollback in mutation onError callback."
     }
   ]
 }

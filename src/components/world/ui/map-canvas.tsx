@@ -4,7 +4,7 @@ import { useCallback, useRef } from "react";
 import type { Pin } from "@prisma/client";
 import { PinTypeEnum, type Pin as CustomPin } from "@/types/pin.type";
 import { ZoomControls } from "./zoom-controls";
-import { useGrid, useScale, useLayers, useSelectedLayerId } from "@/stores/map-store";
+import { useGrid, useScale, useLayers, useSelectedLayerId, useBaseMapVisible, useMapStore } from "@/stores/map-store";
 import { usePins } from "@/components/pins/logic/use-pins";
 import { useSelectedPin, useIsCreatingPin, usePinsStore } from "@/stores/use-pins-store";
 import { PinContextMenu } from "@/components/pins/ui/pin-context-menu";
@@ -33,6 +33,8 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
   const scale = useScale();
   const layers = useLayers();
   const selectedLayerId = useSelectedLayerId();
+  const baseMapVisible = useBaseMapVisible();
+  const baseMapLayer = useMapStore((state) => state.layers.find(l => l.isBaseMap));
 
   // Pin integration
   const { pins, createPin } = usePins(worldId || "");
@@ -48,12 +50,9 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
     transform,
     isDragging,
     handleMouseDown,
-    handleMouseMove,
-    handleMouseUp,
-    handleMouseLeave,
     reset: resetTransform,
     setTransform,
-  } = useMapPan();
+  } = useMapPan({ isCreatingPin });
 
   // Map zoom
   const { handleWheel, handleZoomIn, handleZoomOut } = useMapZoom(
@@ -135,28 +134,23 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
     .filter((layer) => layer.visible)
     .sort((a, b) => a.zIndex - b.zIndex);
 
-  // Cursor style
-  const cursorStyle = isCreatingPin
-    ? "crosshair"
-    : contextMenu
-      ? "default"
-      : "grab";
+  // Calculate layer scale
+  const layerScale = baseMapLayer?.scale ?? 1;
+  console.log("🔍 Layer scale:", layerScale);
 
+  // Cursor style
   return (
     <div
       ref={containerRef}
       className={`relative w-full h-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden ${
         isCreatingPin && !contextMenu
           ? "cursor-crosshair ring-2 ring-accent-gold/50 ring-inset"
-          : contextMenu
-            ? "cursor-default"
-            : "cursor-grab active:cursor-grabbing"
+          : isDragging
+            ? "cursor-grabbing"
+            : "cursor-grab"
       }`}
       onWheel={handleWheel}
       onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseLeave}
       onClick={handleClick}
       onContextMenu={handleContextMenu}
     >
@@ -172,33 +166,66 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
       >
         {mapImage && !imageError ? (
           <>
-            <MapImage
-              imageRef={imageRef}
-              mapImage={mapImage}
-              imageDimensions={imageDimensions}
-              showGrid={grid && imageLoaded}
-              gridSize={getGridSize()}
-              onLoad={handleImageLoad}
-              onError={handleImageError}
-            >
-              {/* Render Pins */}
-              <PinsRenderer
-                pins={visiblePins}
+            {baseMapVisible && (
+              <MapImage
+                imageRef={imageRef}
+                mapImage={mapImage}
                 imageDimensions={imageDimensions}
-                transform={transform}
-                onPinClick={handlePinClick}
-              />
-
-              {/* Selected Pin Popup */}
-              {selectedPin && (
-                <SelectedPinPopup
-                  selectedPin={selectedPin}
+                showGrid={grid && imageLoaded}
+                gridSize={getGridSize()}
+                layerScale={layerScale}
+                onLoad={handleImageLoad}
+                onError={handleImageError}
+              >
+                {/* Render Pins */}
+                <PinsRenderer
+                  pins={visiblePins}
                   imageDimensions={imageDimensions}
                   transform={transform}
-                  onClose={handlePopupClose}
+                  onPinClick={handlePinClick}
                 />
-              )}
-            </MapImage>
+
+                {/* Selected Pin Popup */}
+                {selectedPin && (
+                  <SelectedPinPopup
+                    selectedPin={selectedPin}
+                    imageDimensions={imageDimensions}
+                    transform={transform}
+                    onClose={handlePopupClose}
+                  />
+                )}
+              </MapImage>
+            )}
+
+            {/* When base map is hidden, render pins on a transparent container */}
+            {!baseMapVisible && imageDimensions && (
+              <div
+                ref={imageRef}
+                style={{
+                  width: imageDimensions.width * layerScale,
+                  height: imageDimensions.height * layerScale,
+                  position: 'relative',
+                }}
+              >
+                {/* Render Pins */}
+                <PinsRenderer
+                  pins={visiblePins}
+                  imageDimensions={imageDimensions}
+                  transform={transform}
+                  onPinClick={handlePinClick}
+                />
+
+                {/* Selected Pin Popup */}
+                {selectedPin && (
+                  <SelectedPinPopup
+                    selectedPin={selectedPin}
+                    imageDimensions={imageDimensions}
+                    transform={transform}
+                    onClose={handlePopupClose}
+                  />
+                )}
+              </div>
+            )}
 
             {/* Layers Indicator */}
             <MapLayersIndicator layers={visibleLayers} />

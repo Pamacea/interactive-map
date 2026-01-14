@@ -55,7 +55,18 @@
       "Bash(taskkill:*)",
       "Bash(git checkout:*)",
       "Bash(if not exist \".smite\" mkdir \".smite\")",
-      "Bash(npx ralph execute:*)"
+      "Bash(npx ralph execute:*)",
+      "Bash(where ralph)",
+      "Bash(exit_code=$?)",
+      "Bash(if:*)",
+      "Bash(then echo \"TypeScript compilation successful\")",
+      "Bash(else echo \"TypeScript compilation failed with exit code $exit_code\")",
+      "Bash(fi:*)",
+      "Bash(pnpm list:*)",
+      "Bash(pnpm run build)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(pnpm build)"
     ]
-  }
+  },
+  "outputStyle": "default"
 }
