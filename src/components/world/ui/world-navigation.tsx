@@ -4,8 +4,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronLeft, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AutosaveIndicator } from "./autosave-indicator";
+import { type AutosaveStatus } from "@/hooks/use-autosave";
 
-export function WorldNavigation() {
+interface WorldNavigationProps {
+  worldTitle?: string;
+  autosaveStatus?: AutosaveStatus;
+}
+
+export function WorldNavigation({ worldTitle, autosaveStatus }: WorldNavigationProps) {
   const pathname = usePathname();
 
   return (
@@ -33,6 +40,17 @@ export function WorldNavigation() {
             <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent-gold shadow-glow-medium" />
           )}
         </Link>
+
+        <div className="flex items-center gap-2">
+          {worldTitle && (
+            <span className="text-sm font-display font-medium text-text-primary">
+              {worldTitle}
+            </span>
+          )}
+          {autosaveStatus && (
+            <AutosaveIndicator status={autosaveStatus} />
+          )}
+        </div>
 
         <span className="text-base font-display font-bold text-linear tracking-wider">
           GENESIS

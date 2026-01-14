@@ -26,15 +26,20 @@ export function HeroSection() {
   const [hoveredStat, setHoveredStat] = useState<string | null>(null);
 
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
     const interval = setInterval(() => {
       setIsAnimating(true);
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         setCurrentWordIndex((prev) => (prev + 1) % rotatingWords.length);
         setIsAnimating(false);
       }, 500);
     }, 8000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeoutId); // ✅ Clean up nested timeout
+    };
   }, []);
 
   return (
