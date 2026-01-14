@@ -2,6 +2,7 @@ import { useEffect, useMemo } from "react";
 import { useMapStore } from "@/stores/map-store";
 import { useQuery } from "@tanstack/react-query";
 import { getWorldById } from "@/actions/worlds";
+import { CACHE_TIMES } from "@/components/providers/query-provider";
 import type { OptimizedWorldLayer } from "@/types/world.type";
 import type { OptimizedWorld } from "@/types/world.type";
 
@@ -47,9 +48,11 @@ export function useWorld(worldId: string) {
   return useQuery<OptimizedWorld | null>({
     queryKey: ["world", worldId],
     queryFn: () => getWorldById(worldId),
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    // World metadata rarely changes - use longer cache time
+    staleTime: CACHE_TIMES.WORLD, // 5 minutes
     refetchOnMount: false,
     refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
     retry: 1,
   });
 }

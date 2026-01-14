@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createPin, updatePin, deletePin, getPinsByWorld } from "@/actions/pins";
+import { CACHE_TIMES } from "@/components/providers/query-provider";
 import type {
   Pin,
   PinCreateInput,
@@ -39,10 +40,14 @@ export function usePins(worldId: string) {
       return result;
     },
     enabled: !!worldId,
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    refetchOnMount: false, // CRITICAL FIX: Don't refetch on mount to prevent race conditions
-    refetchOnWindowFocus: false, // Don't refetch on window focus
-    refetchOnReconnect: false, // Don't refetch on reconnect
+    // Pins change frequently (users add/edit pins) - use shorter cache time
+    staleTime: CACHE_TIMES.PINS, // 1 minute
+    // Prevent duplicate fetches on mount/remount
+    refetchOnMount: false,
+    // Better UX: don't refetch when user returns to tab
+    refetchOnWindowFocus: false,
+    // Don't refetch automatically on reconnect
+    refetchOnReconnect: false,
   });
 
   // Mutation: Create pin with optimistic update
@@ -229,6 +234,10 @@ export function useFilteredPins(filters: PinFilters) {
     queryKey: ["pins", "filtered", filters],
     queryFn: () => getPinsByWorld(filters),
     enabled: !!filters.gameWorldId,
-    staleTime: 1000 * 60 * 5,
+    // Pins change frequently (users add/edit pins)
+    staleTime: CACHE_TIMES.PINS, // 1 minute
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 }

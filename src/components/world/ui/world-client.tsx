@@ -1,9 +1,12 @@
 "use client";
 
+import { Suspense } from "react";
 import { MapCanvas } from "@/components/world/ui/map-canvas";
 import { Sidebar } from "@/components/world/ui/sidebar";
 import { WorldNavigation } from "@/components/world/ui/world-navigation";
 import { AutosaveIndicator } from "@/components/world/ui/autosave-indicator";
+import { SidebarSkeleton } from "@/components/world/ui/sidebar-skeleton";
+import { MapSkeleton } from "@/components/world/ui/map-skeleton";
 import { useResizableSidebar } from "@/components/world/logic/use-resizable-sidebar";
 import { useWorldInitialization } from "@/components/world/logic/use-world-initialization";
 import { useAutosavePreparation } from "@/components/world/logic/use-autosave-preparation";
@@ -58,21 +61,25 @@ export function WorldClient({ world, isAuthenticated }: WorldClientProps) {
     <div className="h-screen bg-background-base flex flex-col">
       <WorldNavigation />
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar
-          ref={sidebarRef}
-          slug={world.title}
-          worldId={world.id}
-          width={width}
-          isCollapsed={isCollapsed}
-          isResizing={isResizing}
-          onToggle={toggleCollapse}
-          onResizeStart={startResize}
-          worldLayers={world.layers}
-          showPinsSection={hasLayers}
-          mapImage={world.map}
-        />
+        <Suspense fallback={<SidebarSkeleton />}>
+          <Sidebar
+            ref={sidebarRef}
+            slug={world.title}
+            worldId={world.id}
+            width={width}
+            isCollapsed={isCollapsed}
+            isResizing={isResizing}
+            onToggle={toggleCollapse}
+            onResizeStart={startResize}
+            worldLayers={world.layers}
+            showPinsSection={hasLayers}
+            mapImage={world.map}
+          />
+        </Suspense>
         <main className="flex-1 relative flex flex-col">
-          <MapCanvas mapImage={world.map} worldId={world.id} />
+          <Suspense fallback={<MapSkeleton />}>
+            <MapCanvas mapImage={world.map} worldId={world.id} />
+          </Suspense>
           <AutosaveIndicator status={status} />
         </main>
       </div>
