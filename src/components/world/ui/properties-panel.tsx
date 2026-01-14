@@ -15,7 +15,7 @@ export function PropertiesPanel() {
   const setGrid = useMapStore((state) => state.setGrid);
   const setSnap = useMapStore((state) => state.setSnap);
 
-  const { selectedPin, formState, isUpdating, handleUpdatePin } =
+  const { selectedPin, formState, isUpdating, error, handleUpdatePin, handleIconUpload, retryUpdate } =
     usePropertiesPanel();
 
   return (
@@ -25,7 +25,10 @@ export function PropertiesPanel() {
           pin={selectedPin}
           formState={formState}
           isUpdating={isUpdating}
+          error={error}
           onUpdate={handleUpdatePin}
+          onIconUpload={handleIconUpload}
+          onRetry={retryUpdate}
         />
       ) : (
         <section className="space-y-3">
