@@ -52,6 +52,9 @@ export function usePins(worldId: string) {
     },
     enabled: !!worldId,
     staleTime: 1000 * 60 * 5, // 5 minutes
+    refetchOnMount: false, // CRITICAL FIX: Don't refetch on mount to prevent race conditions
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnReconnect: false, // Don't refetch on reconnect
   });
 
   // Debug: Log pins state changes
@@ -87,6 +90,7 @@ export function usePins(worldId: string) {
         icon: newPin.icon || null,
         color: newPin.color || "#3b82f6",
         size: newPin.size || 32,
+        opacity: newPin.opacity || 1.0,
         isVisible: newPin.isVisible ?? true,
         properties: newPin.properties || null,
         userId: "current-user",
@@ -128,11 +132,8 @@ export function usePins(worldId: string) {
       }
     },
 
-    onSettled: () => {
-      console.log("📌 [use-pins] onSettled - Invalidating queries to refetch");
-      // Refetch to ensure consistency
-      queryClient.invalidateQueries({ queryKey: ["pins", worldId] });
-    },
+    // Note: No onSettled refetch needed since onSuccess handles cache update
+    // Optimistic update + onSuccess replacement keeps cache in sync without refetching
   });
 
   // Mutation: Update pin with optimistic update
@@ -166,10 +167,8 @@ export function usePins(worldId: string) {
       }
     },
 
-    onSettled: () => {
-      // Refetch to ensure consistency
-      queryClient.invalidateQueries({ queryKey: ["pins", worldId] });
-    },
+    // Note: No onSettled refetch needed - optimistic update is enough
+    // If server update fails, onError will rollback
   });
 
   // Mutation: Delete pin with optimistic update
@@ -199,10 +198,7 @@ export function usePins(worldId: string) {
       }
     },
 
-    onSettled: () => {
-      // Refetch to ensure consistency
-      queryClient.invalidateQueries({ queryKey: ["pins", worldId] });
-    },
+    // Note: No onSettled refetch needed - optimistic update is enough
   });
 
   // Mutation: Select pin (UI state only, no server action)

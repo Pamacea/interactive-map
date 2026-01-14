@@ -22,8 +22,11 @@ export const SelectedPinPopup: FC<SelectedPinPopupProps> = ({
     <div
       className="absolute z-50"
       style={{
-        left: `${selectedPin.longitude * width * transform.scale + transform.translateX}px`,
-        top: `${selectedPin.latitude * height * transform.scale + transform.translateY}px`,
+        // Position is percentage-based (0-100% of ORIGINAL image dimensions)
+        // The transform.translateX/Y handles panning
+        // We DON'T multiply by transform.scale here because the parent MapImage already handles layer scale
+        left: `${selectedPin.longitude * width + transform.translateX}px`,
+        top: `${selectedPin.latitude * height + transform.translateY}px`,
       }}
     >
       <PinPopup pin={selectedPin} onClose={onClose} position={{ x: 0, y: 0 }} />

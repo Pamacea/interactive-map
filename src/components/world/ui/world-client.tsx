@@ -69,6 +69,7 @@ export function WorldClient({ world, isAuthenticated }: WorldClientProps) {
           onResizeStart={startResize}
           worldLayers={world.layers}
           showPinsSection={hasLayers}
+          mapImage={world.map}
         />
         <main className="flex-1 relative flex flex-col">
           <MapCanvas mapImage={world.map} worldId={world.id} />

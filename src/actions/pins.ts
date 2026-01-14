@@ -109,6 +109,7 @@ export async function createPin(data: PinCreateInput) {
     icon: validated.icon,
     color: validated.color,
     size: validated.size,
+    opacity: validated.opacity ?? 1.0,
     isVisible: validated.isVisible ?? true,
     properties: validated.properties,
     userId: user.id,
@@ -128,6 +129,7 @@ export async function createPin(data: PinCreateInput) {
         icon: validated.icon,
         color: validated.color,
         size: validated.size,
+        opacity: validated.opacity ?? 1.0,
         isVisible: validated.isVisible ?? true,
         properties: validated.properties,
         userId: user.id,
@@ -148,10 +150,8 @@ export async function createPin(data: PinCreateInput) {
     throw error;
   }
 
-  // Revalidate cache
-  console.log("📌 [createPin] Revalidating paths...");
-  revalidatePath(`/worlds/${validated.gameWorldId}`);
-  revalidatePath("/worlds");
+  // Note: No revalidatePath needed - TanStack Query manages client cache via optimistic updates
+  // The cache is already updated by onSuccess in use-pins.ts
 
   console.log("📌 [createPin] Pin creation complete, returning:", { pinId: pin.id });
   return { pinId: pin.id, pin };
@@ -289,8 +289,16 @@ export async function updatePin(data: PinUpdateInput) {
   // Validate input with Zod
   const validated = UpdatePinSchema.parse(data);
 
-  // Get current user
-  const user = await prisma.user.findFirst();
+  // Get authenticated user from session
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    throw new Error("Not authenticated");
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+  });
 
   if (!user) {
     throw new Error("User not found");
@@ -348,6 +356,7 @@ export async function updatePin(data: PinUpdateInput) {
   if (validated.icon !== undefined) updateData.icon = validated.icon;
   if (validated.color !== undefined) updateData.color = validated.color;
   if (validated.size !== undefined) updateData.size = validated.size;
+  if (validated.opacity !== undefined) updateData.opacity = validated.opacity;
   if (validated.isVisible !== undefined) updateData.isVisible = validated.isVisible;
   if (validated.properties !== undefined) updateData.properties = validated.properties;
   if (validated.layerId !== undefined) updateData.layerId = validated.layerId;
@@ -358,9 +367,7 @@ export async function updatePin(data: PinUpdateInput) {
     data: updateData,
   });
 
-  // Revalidate cache
-  revalidatePath(`/worlds/${existingPin.gameWorldId}`);
-  revalidatePath("/worlds");
+  // Note: No revalidatePath needed - TanStack Query manages client cache via optimistic updates
 
   return pin;
 }
@@ -372,8 +379,16 @@ export async function updatePin(data: PinUpdateInput) {
  * @throws Error if user not authorized or pin not found
  */
 export async function deletePin(id: string) {
-  // Get current user
-  const user = await prisma.user.findFirst();
+  // Get authenticated user from session
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    throw new Error("Not authenticated");
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+  });
 
   if (!user) {
     throw new Error("User not found");
@@ -408,9 +423,7 @@ export async function deletePin(id: string) {
     where: { id },
   });
 
-  // Revalidate cache
-  revalidatePath(`/worlds/${pin.gameWorldId}`);
-  revalidatePath("/worlds");
+  // Note: No revalidatePath needed - TanStack Query manages client cache via optimistic updates
 
   return { pinId: id };
 }
@@ -422,7 +435,16 @@ export async function deletePin(id: string) {
  * @returns Updated pin
  */
 export async function togglePinVisibility(id: string) {
-  const user = await prisma.user.findFirst();
+  // Get authenticated user from session
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    throw new Error("Not authenticated");
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+  });
 
   if (!user) {
     throw new Error("User not found");
@@ -457,9 +479,8 @@ export async function togglePinVisibility(id: string) {
     data: { isVisible: !pin.isVisible },
   });
 
-  // Revalidate cache
+  // Note: If this action is used directly (not through updatePin), consider cache invalidation
   revalidatePath(`/worlds/${pin.gameWorldId}`);
-  revalidatePath("/worlds");
 
   return updated;
 }
@@ -529,9 +550,10 @@ export async function updatePinPosition(pinId: string, latitude: number, longitu
     newPosition: { lat: updated.latitude, lng: updated.longitude },
   });
 
-  // Revalidate cache
-  revalidatePath(`/worlds/${pin.gameWorldId}`);
-  revalidatePath("/worlds");
+  // CRITICAL FIX: No revalidatePath here!
+  // The Zustand store is updated optimistically in pin-marker.tsx BEFORE this server call
+  // Calling revalidatePath would cause TanStack Query to refetch, creating a race condition
+  // where stale data overwrites the new position before the UI updates
 
   return updated;
 }
@@ -547,7 +569,16 @@ export async function batchUpdatePinPositions(updates: Array<{
   latitude: number;
   longitude: number;
 }>) {
-  const user = await prisma.user.findFirst();
+  // Get authenticated user from session
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    throw new Error("Not authenticated");
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+  });
 
   if (!user) {
     throw new Error("User not found");
@@ -600,11 +631,10 @@ export async function batchUpdatePinPositions(updates: Array<{
     )
   );
 
-  // Revalidate cache for all affected worlds
+  // Revalidate only the affected world paths
   for (const worldId of worldIds) {
     revalidatePath(`/worlds/${worldId}`);
   }
-  revalidatePath("/worlds");
 
   return updatedPins;
 }

@@ -18,6 +18,9 @@ export function useWorldInitialization(worldLayers: MapLayer[] | null) {
         locked: false,
         opacity: layer.opacity,
         zIndex: layer.zIndex,
+        scale: 1.0,
+        offsetX: 0,
+        offsetY: 0,
       }));
       setLayers(uiLayers);
     }

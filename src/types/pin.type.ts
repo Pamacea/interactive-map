@@ -80,6 +80,7 @@ export interface Pin {
   icon: string | null;
   color: string;
   size: number;
+  opacity: number;
   isVisible: boolean;
   properties: unknown | null; // Custom RPG data (level, faction, etc.)
   userId: string;
@@ -102,6 +103,7 @@ export interface PinCreateInput {
   icon?: string;
   color?: string;
   size?: number;
+  opacity?: number;
   isVisible?: boolean;
   properties?: unknown;
   gameWorldId: string;
@@ -122,6 +124,7 @@ export interface PinUpdateInput {
   icon?: string;
   color?: string;
   size?: number;
+  opacity?: number;
   isVisible?: boolean;
   properties?: unknown;
   layerId?: string | null;
