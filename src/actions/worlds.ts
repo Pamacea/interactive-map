@@ -225,9 +225,14 @@ export async function updateWorldState(
     grid?: boolean;
     snap?: boolean;
     scale?: string;
+    pinCount?: number; // Track pin count to trigger autosave on pin changes
   }
 ) {
-  console.log("[updateWorldState] Updating world state for:", worldId);
+  console.log("[updateWorldState] Updating world state for:", worldId, {
+    hasLayers: !!state.layers,
+    layerCount: state.layers?.length,
+    pinCount: state.pinCount,
+  });
 
   // Get current user from session
   const user = await prisma.user.findFirst();
@@ -301,6 +306,11 @@ export async function updateWorldState(
   // Note: grid, snap, scale are UI-only state stored in Zustand
   // They don't need to be persisted to the database unless you want to
   // remember them across sessions. If so, add them to GameWorld schema.
+
+  // Note: pinCount is used to trigger autosave when pins are added/edited/deleted
+  // The pins themselves are managed independently via their own Server Actions
+  // (createPin, updatePin, deletePin in actions/pins.ts)
+  // We don't save pinCount to the database - it's just for change detection
 
   // Revalidate cache
   revalidatePath(`/worlds/${worldId}`);

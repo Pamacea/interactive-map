@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect } from "react";
 import { MapCanvas } from "@/components/world/ui/map-canvas";
 import { Sidebar } from "@/components/world/ui/sidebar";
 import { WorldNavigation } from "@/components/world/ui/world-navigation";
 import { AutosaveIndicator } from "@/components/world/ui/autosave-indicator";
 import { useResizableSidebar } from "@/components/world/logic/use-resizable-sidebar";
-import { useMapStore } from "@/stores/map-store";
+import { useWorldInitialization } from "@/components/world/logic/use-world-initialization";
+import { useAutosavePreparation } from "@/components/world/logic/use-autosave-preparation";
 import { useAutosave } from "@/hooks/use-autosave";
 import { updateWorldState } from "@/actions/worlds";
+import { usePins } from "@/components/pins/logic/use-pins";
 import type { GameWorld } from "@/types/world.type";
 
 interface WorldClientProps {
@@ -17,37 +18,19 @@ interface WorldClientProps {
 }
 
 export function WorldClient({ world, isAuthenticated }: WorldClientProps) {
-  const { width, isCollapsed, isResizing, startResize, toggleCollapse, sidebarRef } = useResizableSidebar();
-  const setLayers = useMapStore((state) => state.setLayers);
-  const layers = useMapStore((state) => state.layers);
-  const grid = useMapStore((state) => state.grid);
-  const snap = useMapStore((state) => state.snap);
-  const scale = useMapStore((state) => state.scale);
+  // Initialize layers from world data (handle undefined from Prisma)
+  useWorldInitialization(world.layers ?? null);
 
-  // Initialize layers from world data
-  useEffect(() => {
-    if (world.layers && world.layers.length > 0) {
-      const mappedLayers = world.layers.map((layer) => ({
-        id: layer.id,
-        name: layer.name,
-        visible: layer.isVisible,
-        locked: false,
-        opacity: layer.opacity,
-        zIndex: layer.zIndex,
-      }));
-      setLayers(mappedLayers);
-    }
-  }, [world.layers, setLayers]);
+  // Sidebar state
+  const { width, isCollapsed, isResizing, startResize, toggleCollapse, sidebarRef } = useResizableSidebar();
+
+  // Get pins data for autosave tracking
+  const { pins } = usePins(world.id);
 
   // Prepare world state for autosave
-  const worldState = {
-    layers,
-    grid,
-    snap,
-    scale,
-  };
+  const worldState = useAutosavePreparation(pins.length);
 
-  // Setup autosave with authentication state passed from server
+  // Setup autosave with authentication state
   const { status } = useAutosave(
     `world-${world.id}`,
     worldState,
@@ -62,22 +45,14 @@ export function WorldClient({ world, isAuthenticated }: WorldClientProps) {
     {
       delay: 3000,
       enabled: true,
-      isAuthenticated, // Pass auth state from server component
+      isAuthenticated,
       onError: (error) => {
         console.error("[WorldClient] Autosave error:", error);
       },
     }
   );
 
-  // DEBUG: Log what WorldClient receives
-  console.log("[DEBUG WorldClient] Component props:", {
-    worldId: world.id,
-    worldTitle: world.title,
-    mapImageProp: world.map,
-    mapImageType: typeof world.map,
-    isMapNull: world.map === null,
-    isMapUndefined: world.map === undefined
-  });
+  const hasLayers = !!world.layers && world.layers.length > 0;
 
   return (
     <div className="h-screen bg-background-base flex flex-col">
@@ -93,9 +68,8 @@ export function WorldClient({ world, isAuthenticated }: WorldClientProps) {
           onToggle={toggleCollapse}
           onResizeStart={startResize}
           worldLayers={world.layers}
-          showPinsSection={!!world.layers && world.layers.length > 0}
+          showPinsSection={hasLayers}
         />
-
         <main className="flex-1 relative flex flex-col">
           <MapCanvas mapImage={world.map} worldId={world.id} />
           <AutosaveIndicator status={status} />

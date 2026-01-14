@@ -52,7 +52,10 @@
       "Bash(./node_modules/.bin/next:*)",
       "Bash(tree:*)",
       "Bash(npm run type-check:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(git checkout:*)",
+      "Bash(if not exist \".smite\" mkdir \".smite\")",
+      "Bash(npx ralph execute:*)"
     ]
   }
 }

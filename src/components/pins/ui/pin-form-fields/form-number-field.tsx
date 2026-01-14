@@ -1,0 +1,42 @@
+import { FC } from "react";
+
+export interface FormNumberFieldProps {
+  label: string;
+  value: number;
+  onChange: (value: number) => void;
+  error?: string;
+  min?: number;
+  max?: number;
+  step?: number;
+  disabled?: boolean;
+}
+
+export const FormNumberField: FC<FormNumberFieldProps> = ({
+  label,
+  value,
+  onChange,
+  error,
+  min,
+  max,
+  step = "any",
+  disabled = false,
+}) => {
+  return (
+    <div className="grid gap-2">
+      <label className="text-sm font-medium leading-none">{label}</label>
+      <input
+        type="number"
+        value={value}
+        onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+        min={min}
+        max={max}
+        step={step}
+        disabled={disabled}
+        className={`h-10 rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
+          error ? "border-red-500" : "border-slate-200"
+        }`}
+      />
+      {error && <p className="text-xs text-red-500">{error}</p>}
+    </div>
+  );
+};
