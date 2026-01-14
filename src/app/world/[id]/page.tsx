@@ -1,34 +1,24 @@
-"use client";
-
-import { useWorldWithData } from "@/components/world/logic/use-world-initialization";
 import { WorldClient } from "@/components/world/ui/world-client";
-import { WorldSkeleton } from "@/components/world/ui/world-skeleton";
-import { useSession } from "next-auth/react";
-import { useParams } from "next/navigation";
+import { getWorldWithData } from "@/actions/worlds";
+import { auth } from "@/lib/auth";
+import { notFound } from "next/navigation";
 import type { Pin } from "@/types/pin.type";
 
-export default function WorldDetailPage() {
-  const params = useParams();
-  const worldId = params.id as string;
+export default async function WorldDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
 
-  const { data: world, isLoading, error } = useWorldWithData(worldId);
-  const { data: session } = useSession();
+  // Fetch everything server-side in ONE query
+  const [world, session] = await Promise.all([
+    getWorldWithData(id),
+    auth(),
+  ]);
 
-  if (error) {
-    return (
-      <div className="h-screen bg-background-base flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold text-text-primary mb-2">
-            Error loading world
-          </h2>
-          <p className="text-text-secondary">{error.message}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (isLoading || !world) {
-    return <WorldSkeleton />;
+  if (!world) {
+    notFound();
   }
 
   return (
