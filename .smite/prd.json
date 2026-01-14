@@ -1,224 +1,162 @@
 {
-  "project": "Interactive Map - Pin Positioning & Properties Enhancement",
-  "branchName": "fix/pin-positioning-and-properties",
-  "description": "Fix pin drag-and-drop positioning bug and enhance pin properties UI with size, color, icon management, and zoom-based visibility controls",
+  "project": "Interactive Map - Server Component Performance Optimization",
+  "branchName": "optimize/server-component-performance",
+  "description": "Optimize Server Components to achieve <20ms compile + render times (currently 1516ms). Use TanStack Query for all data fetching, eliminate blocking awaits, and implement proper client/server separation.",
 
   "userStories": [
     {
-      "id": "US-001",
-      "title": "Fix Pin Drag-and-Drop Positioning Bug",
-      "description": "Pins currently teleport back to their original position after being dragged and dropped. This is caused by the component re-rendering with stale data from the server before the local state update is applied. Need to ensure proper optimistic updates and prevent race conditions between local store updates and server responses.",
+      "id": "US-PERF-001",
+      "title": "Convert Server Component to Client Component with TanStack Query",
+      "description": "The main performance bottleneck is src/app/world/[id]/page.tsx which is a Server Component doing synchronous database awaits. This blocks the entire page render. Convert to Client Component using TanStack Query for non-blocking data fetching.",
       "acceptanceCriteria": [
-        "User can drag a pin to a new position",
-        "On mouse up, pin stays at the new position (no teleporting)",
-        "New position is saved to database successfully",
-        "Optimistic UI update prevents visual flickering",
-        "Position persists after page refresh",
-        "Console logs confirm successful database update",
-        "No race conditions between local state and server response"
+        "Page component is now a Client Component ('use client' directive)",
+        "World data fetched via TanStack Query useQuery (non-blocking)",
+        "Initial render shows loading skeleton immediately",
+        "Data loads asynchronously without blocking render",
+        "Compile time < 10ms",
+        "Render time < 10ms",
+        "Total page load < 20ms",
+        "Debug console logs removed"
       ],
       "priority": 1,
       "agent": "smite-constructor",
       "tech": "nextjs",
       "dependencies": [],
       "passes": false,
-      "notes": "Issue: Pin position updates in database (confirmed by console logs) but component re-renders with old position. Root cause: TanStack Query cache invalidation triggers refetch before Zustand store updates are applied. Solution: Ensure Zustand update happens immediately, disable cache refetch during optimistic update, or use mutation cache update instead of invalidation."
+      "notes": "Current problem: await getWorldById() and await auth() block rendering for 1516ms. Solution: Use useQuery for world data, useSession for auth, render skeleton immediately."
     },
     {
-      "id": "US-002",
-      "title": "Display Pin Properties in Sidebar When Selected",
-      "description": "When a pin is selected, the sidebar's 'Pin Properties' section should display comprehensive pin settings including: title, description, type, coordinates (read-only), and NEW: size, color, icon, opacity, visibility, and zoom range. Currently the section exists but doesn't show all available properties from the database schema.",
+      "id": "US-PERF-002",
+      "title": "Optimize getWorldById Server Action",
+      "description": "The getWorldById function fetches too much data (user, layers, pins, loreEntries) even though not all is needed initially. Implement selective loading and consider caching.",
       "acceptanceCriteria": [
-        "Clicking a pin opens it in the sidebar properties panel",
-        "All pin fields from database are editable: title, description, type",
-        "Size control shows current value (10-100px) with live preview",
-        "Color picker shows current color, allows selection",
-        "Opacity slider shows current opacity (0-100%)",
-        "Visibility toggle shows current state",
-        "Coordinates display current lat/lng (read-only)",
-        "Changes apply immediately with optimistic UI updates",
-        "Form validation prevents invalid values",
-        "Success toast shows after saving"
-      ],
-      "priority": 1,
-      "agent": "smite-constructor",
-      "tech": "nextjs",
-      "dependencies": ["US-001"],
-      "passes": false,
-      "notes": "PinPropertiesSection component already exists at src/components/world/ui/pin-properties-section.tsx. Need to verify all fields are properly wired to the form state and updatePin action. Check use-properties-panel.ts for form state management."
-    },
-    {
-      "id": "US-003",
-      "title": "Add Icon Selection Dropdown with Predefined Icons",
-      "description": "Add an icon selection dropdown to the pin properties panel. The dropdown should show a curated list of icons (MapPin, Castle, Sword, Treasure, Scroll, etc.) with visual previews. Users can select from the predefined list or choose 'Custom' to upload their own.",
-      "acceptanceCriteria": [
-        "Icon dropdown shows list of 20+ predefined icons",
-        "Each icon option shows visual preview + label",
-        "Dropdown is searchable/filterable",
-        "Selected icon is highlighted",
-        "Selecting icon updates pin immediately with optimistic UI",
-        "Icons are sourced from lucide-react",
-        "Icon list is centralized in constants file",
-        "Custom option opens file upload dialog"
+        "Create getWorldByIdMinimal that fetches only essential fields (id, title, map)",
+        "Pins fetched separately via usePins hook (already implemented)",
+        "Layers fetched separately (already in world.layers)",
+        "Consider adding Prisma query caching",
+        "Add select for only needed fields (avoid fetching unused data)",
+        "Server action response time < 50ms"
       ],
       "priority": 2,
-      "agent": "smite-constructor",
-      "tech": "nextjs",
-      "dependencies": ["US-002"],
-      "passes": false,
-      "notes": "Create constants/pin-icons.ts with icon definitions. Use lucide-react icons. Add Select component from shadcn/ui. Icon preview should render in dropdown options."
-    },
-    {
-      "id": "US-004",
-      "title": "Add Custom Icon Upload (SVG, PNG, WEBP)",
-      "description": "Allow users to upload custom icons for pins. Supports SVG (vector), PNG, and WEBP formats. Uploads are stored in /public/uploads/pins/icons/. File size limit: 500KB. Images are automatically optimized/resized to max 64x64px.",
-      "acceptanceCriteria": [
-        "Upload button in icon dropdown when 'Custom' is selected",
-        "File picker accepts .svg, .png, .webp",
-        "Client-side validation: file size < 500KB, dimensions check",
-        "Uploaded files are saved to /public/uploads/pins/icons/{uuid}.{ext}",
-        "Filenames are sanitized and UUID-based to prevent conflicts",
-        "After upload, icon preview updates immediately",
-        "Database stores icon file path (relative URL)",
-        "Error handling for invalid files/too large",
-        "Loading state during upload",
-        "Option to reset to default icon"
-      ],
-      "priority": 2,
-      "agent": "smite-constructor",
-      "tech": "nextjs",
-      "dependencies": ["US-003"],
-      "passes": false,
-      "notes": "Need server action for file upload. Use formidable or next-native-upload. Store file path in Pin.icon field. Update Prisma schema if needed to store full URL. Consider CDN for production."
-    },
-    {
-      "id": "US-005",
-      "title": "Add Zoom-Based Visibility Range Controls",
-      "description": "Add minZoom and maxZoom controls to pin properties. Pins can be configured to only show within specific zoom ranges. For example: show city names at 50-100% zoom, hide them at 0-30% zoom. Prevents visual clutter at low zoom levels.",
-      "acceptanceCriteria": [
-        "Min zoom slider: 0% to 200% (default: 0%)",
-        "Max zoom slider: 0% to 200% (default: 200%)",
-        "Visual preview: 'This pin will be visible at X% to Y% zoom'",
-        "Real-time validation: minZoom cannot exceed maxZoom",
-        "Current zoom level indicator on map",
-        "Pin visibility updates in real-time as zoom changes",
-        "Pins outside zoom range don't render (performance optimization)",
-        "Zoom range persists in database",
-        "Reset button for default range (0-200%)"
-      ],
-      "priority": 2,
-      "agent": "smite-constructor",
-      "tech": "nextjs",
-      "dependencies": ["US-002"],
-      "passes": false,
-      "notes": "Need to add minZoom and maxZoom fields to Prisma Pin model. Add migration. Update pin-marker.tsx to check zoom range before rendering. Store zoom values as percentages (0-200). Map transform.scale to zoom percentage."
-    },
-    {
-      "id": "US-006",
-      "title": "Update Prisma Schema for Zoom and Icon Fields",
-      "description": "Update the Pin model in schema.prisma to add minZoom and maxZoom fields. Ensure icon field can store custom file paths. Run migration to update database.",
-      "acceptanceCriteria": [
-        "Pin model has minZoom: Int @default(0) field",
-        "Pin model has maxZoom: Int @default(200) field",
-        "icon field type is String (can store file path or lucide icon name)",
-        "Migration created: npx prisma migrate dev --name add_pin_zoom_fields",
-        "Migration runs successfully",
-        "Prisma client regenerated: npx prisma generate",
-        "Typescript types updated with new fields",
-        "Existing pins have default values populated"
-      ],
-      "priority": 1,
       "agent": "smite-constructor",
       "tech": "prisma",
       "dependencies": [],
       "passes": false,
-      "notes": "Run migration before implementing UI controls. Make sure to update Zod schemas in pin-schemas.ts to include new fields with validation (minZoom < maxZoom, both 0-200)."
+      "notes": "getWorldById includes pins and loreEntries but these should be fetched via TanStack Query in client components. Only fetch world metadata + layers in server action."
     },
     {
-      "id": "US-007",
-      "title": "Update Zod Schemas for New Pin Fields",
-      "description": "Update pin-schemas.ts to include minZoom, maxZoom, and icon field validations. Ensure create/update operations accept new fields with proper validation rules.",
+      "id": "US-PERF-003",
+      "title": "Implement React Query DevTools for Performance Monitoring",
+      "description": "Add React Query DevTools in development to monitor query performance, identify slow queries, and track cache hits/misses.",
       "acceptanceCriteria": [
-        "CreatePinSchema includes minZoom (default: 0, min: 0, max: 200)",
-        "CreatePinSchema includes maxZoom (default: 200, min: 0, max: 200)",
-        "Custom refinement: minZoom < maxZoom",
-        "Icon field accepts string (lucide name or file path)",
-        "UpdatePinSchema includes optional minZoom, maxZoom, icon",
-        "Type inference works correctly for forms",
-        "Validation errors are user-friendly"
-      ],
-      "priority": 1,
-      "agent": "smite-constructor",
-      "tech": "typescript",
-      "dependencies": ["US-006"],
-      "passes": false,
-      "notes": "Use z.refine for cross-field validation (minZoom < maxZoom). Add helpful error messages: 'Min zoom must be less than max zoom'."
-    },
-    {
-      "id": "US-008",
-      "title": "Enhance PinMarker Component with Zoom Visibility Logic",
-      "description": "Update pin-marker.tsx to check zoom range before rendering. Pins should only render when current zoom level is within their minZoom-maxZoom range. This prevents rendering pins that would be too small or cluttered.",
-      "acceptanceCriteria": [
-        "PinMarker reads minZoom and maxZoom from pin props",
-        "Current zoom level calculated from transform.scale",
-        "Pin returns null if zoom < minZoom or zoom > maxZoom",
-        "Exception: Always render if dragging or hovered",
-        "Console log: 'Pin [title] hidden: zoom 50% not in range 100-200%'",
-        "Performance: Early return prevents unnecessary calculations",
-        "Selected pins ignore zoom range (user can still edit)",
-        "Zoom range indicator in tooltip when hovered"
-      ],
-      "priority": 2,
-      "agent": "smite-constructor",
-      "tech": "nextjs",
-      "dependencies": ["US-006", "US-007"],
-      "passes": false,
-      "notes": "Calculate zoom percentage: (transform.scale * 100). Add to existing visibility check at line 75. Combine with MIN_VISIBLE_SIZE check using AND condition."
-    },
-    {
-      "id": "US-009",
-      "title": "Implement Server Action for Icon Upload",
-      "description": "Create uploadPinIcon server action that handles file uploads, validates format/size, saves to disk, and returns the file path. Includes proper error handling and security checks.",
-      "acceptanceCriteria": [
-        "Server action: uploadPinIcon(file: File, pinId: string)",
-        "Validates file type: 'image/svg+xml', 'image/png', 'image/webp'",
-        "Validates file size: max 500KB",
-        "Sanitizes filename, replaces with UUID",
-        "Saves to /public/uploads/pins/icons/{uuid}.{ext}",
-        "Returns relative path: '/uploads/pins/icons/{uuid}.{ext}'",
-        "Error handling: 'Invalid file type', 'File too large', 'Upload failed'",
-        "Auth check: user must own pin or have editor permission",
-        "Optimize image: resize to max 64x64 if PNG/WEBP",
-        "Returns success: { success: true, path: string }"
-      ],
-      "priority": 2,
-      "agent": "smite-constructor",
-      "tech": "nextjs",
-      "dependencies": ["US-004"],
-      "passes": false,
-      "notes": "Use formidable or native Next.js file handling. For image optimization, consider sharp library. Ensure public/uploads directory exists or create it. Add .gitkeep to track directory."
-    },
-    {
-      "id": "US-010",
-      "title": "Add Loading States and Error Handling",
-      "description": "Add loading indicators and error handling for all pin property updates. Show toast notifications for success/error states. Handle edge cases like network failures, validation errors, and concurrent edits.",
-      "acceptanceCriteria": [
-        "Spinner shows in submit button during update",
-        "Input fields disabled during update",
-        "Error toast: 'Failed to update pin: [error message]'",
-        "Success toast: 'Pin updated successfully'",
-        "Form state resets on error to last known good value",
-        "Optimistic update: UI changes immediately, reverts on error",
-        "Conflict detection: 'Pin was modified by another user'",
-        "Retry button on error (non-destructive)",
-        "Loading state for icon upload with progress bar"
+        "ReactQueryDevtools component added to app layout",
+        "Only renders in development (NODE_ENV === 'development')",
+        "Shows all active queries",
+        "Displays query timings (fetch, stale, cache)",
+        "Helps identify performance bottlenecks",
+        "DevTools toggle button visible in corner"
       ],
       "priority": 3,
       "agent": "smite-constructor",
       "tech": "nextjs",
-      "dependencies": ["US-002", "US-004", "US-009"],
+      "dependencies": ["US-PERF-001"],
       "passes": false,
-      "notes": "Use sonner or react-hot-toast for notifications. Implement proper error boundaries. Handle optimistic updates rollback in mutation onError callback."
+      "notes": "Install @tanstack/react-query-devtools if not already installed. Add to src/app/layout.tsx or src/components/providers.tsx"
+    },
+    {
+      "id": "US-PERF-004",
+      "title": "Add Loading Skeletons for Better UX",
+      "description": "While data loads via TanStack Query, show loading skeletons instead of blank screen. This improves perceived performance even if actual load time is similar.",
+      "acceptanceCriteria": [
+        "Create WorldSkeleton component",
+        "Shows skeleton UI while world data loads",
+        "Skeleton mimics actual layout (sidebar, map area)",
+        "Smooth fade-in when data loads",
+        "Error boundary with retry if query fails",
+        "Loading indicator for pins, layers"
+      ],
+      "priority": 2,
+      "agent": "smite-constructor",
+      "tech": "nextjs",
+      "dependencies": ["US-PERF-001"],
+      "passes": false,
+      "notes": "Use shadcn/ui Skeleton component or build custom. Should match WorldClient layout structure."
+    },
+    {
+      "id": "US-PERF-005",
+      "title": "Remove Debug Console Logs",
+      "description": "The debug console.log in page.tsx adds unnecessary overhead. Remove all debug logs from production code.",
+      "acceptanceCriteria": [
+        "Remove console.log from src/app/world/[id]/page.tsx",
+        "Search codebase for other debug console.logs",
+        "Remove or wrap in if (process.env.NODE_ENV === 'development')",
+        "No console.logs in production build",
+        "Performance improvement: ~5-10ms"
+      ],
+      "priority": 3,
+      "agent": "smite-surgeon",
+      "tech": "typescript",
+      "dependencies": [],
+      "passes": false,
+      "notes": "Use grep to find all console.log statements. Keep error/warning logs, remove debug logs."
+    },
+    {
+      "id": "US-PERF-006",
+      "title": "Optimize useWorldInitialization Hook",
+      "description": "The useWorldInitialization hook transforms DB layer data to UI format on every render. Memoize the transformation to prevent unnecessary recalculations.",
+      "acceptanceCriteria": [
+        "useMemo for layer transformation",
+        "Only recalculates when worldLayers change",
+        "Prevents unnecessary setLayers calls",
+        "Reduces re-renders in child components",
+        "Benchmark shows improvement in React DevTools Profiler"
+      ],
+      "priority": 2,
+      "agent": "smite-surgeon",
+      "tech": "nextjs",
+      "dependencies": [],
+      "passes": false,
+      "notes": "Add useMemo around the map transformation. Dependency array: [worldLayers]."
+    },
+    {
+      "id": "US-PERF-007",
+      "title": "Implement Suspense Boundaries for Progressive Loading",
+      "description": "Wrap heavy components in React Suspense boundaries to load them progressively. This allows the page to render incrementally instead of waiting for all data.",
+      "acceptanceCriteria": [
+        "Sidebar wrapped in Suspense with fallback",
+        "MapCanvas wrapped in Suspense with fallback",
+        "Pins data loaded separately via Suspense",
+        "Page renders shell immediately",
+        "Each section loads as data becomes available",
+        "Waterfall loading reduced",
+        "Time to First Byte (TTFB) < 100ms"
+      ],
+      "priority": 3,
+      "agent": "smite-constructor",
+      "tech": "nextjs",
+      "dependencies": ["US-PERF-001", "US-PERF-004"],
+      "passes": false,
+      "notes": "Next.js 13+ App Router supports Suspense. Use Suspense boundaries in WorldClient component."
+    },
+    {
+      "id": "US-PERF-008",
+      "title": "Add Query Caching and Stale-Time Configuration",
+      "description": "Configure proper staleTime and cacheTime for TanStack Query to minimize unnecessary refetches. Use stale data while revalidating in background.",
+      "acceptanceCriteria": [
+        "World query: staleTime 5 minutes (world metadata rarely changes)",
+        "Pins query: staleTime 1 minute",
+        "Layers query: staleTime 2 minutes",
+        "RefetchOnWindowFocus: false for world/layers",
+        "RefetchOnMount: false for cached data",
+        "Cache keys properly typed",
+        "QueryClient configured with defaults"
+      ],
+      "priority": 2,
+      "agent": "smite-constructor",
+      "tech": "nextjs",
+      "dependencies": ["US-PERF-001"],
+      "passes": false,
+      "notes": "Configure in usePins and create useWorld hook. Add QueryClientProvider with proper defaults in app layout."
     }
   ]
 }

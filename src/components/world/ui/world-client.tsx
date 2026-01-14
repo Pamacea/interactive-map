@@ -10,10 +10,10 @@ import { useAutosavePreparation } from "@/components/world/logic/use-autosave-pr
 import { useAutosave } from "@/hooks/use-autosave";
 import { updateWorldState } from "@/actions/worlds";
 import { usePins } from "@/components/pins/logic/use-pins";
-import type { GameWorld } from "@/types/world.type";
+import type { OptimizedWorld } from "@/types/world.type";
 
 interface WorldClientProps {
-  world: GameWorld;
+  world: OptimizedWorld;
   isAuthenticated: boolean;
 }
 

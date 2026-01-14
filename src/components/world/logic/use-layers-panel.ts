@@ -1,11 +1,11 @@
 import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useMapStore } from "@/stores/map-store";
-import type { MapLayer } from "@/types/world.type";
+import type { OptimizedWorldLayer } from "@/types/world.type";
 
 interface UseLayersPanelProps {
   worldId?: string;
-  worldLayers?: MapLayer[];
+  worldLayers?: OptimizedWorldLayer[];
 }
 
 interface AddLayerData {

@@ -36,18 +36,6 @@ export function usePins(worldId: string) {
         gameWorldId: worldId,
         showVisibleOnly: false,
       });
-      console.log("📌 [use-pins] Fetched pins from DB:", {
-        worldId,
-        count: result.length,
-        pins: result.map(p => ({
-          id: p.id,
-          title: p.title,
-          isVisible: p.isVisible,
-          layerId: p.layerId,
-          lat: p.latitude,
-          lng: p.longitude,
-        }))
-      });
       return result;
     },
     enabled: !!worldId,
@@ -57,27 +45,16 @@ export function usePins(worldId: string) {
     refetchOnReconnect: false, // Don't refetch on reconnect
   });
 
-  // Debug: Log pins state changes
-  console.log("📌 [use-pins] Pins state:", {
-    worldId,
-    count: pins.length,
-    isLoading,
-    error: error?.message,
-  });
-
   // Mutation: Create pin with optimistic update
   const createMutation = useMutation({
     mutationFn: (data: PinCreateInput) => createPin(data),
 
     onMutate: async (newPin) => {
-      console.log("📌 [use-pins] onMutate - Starting optimistic update", newPin);
-
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: ["pins", worldId] });
 
       // Snapshot previous value
       const previousPins = queryClient.getQueryData<Pin[]>(["pins", worldId]);
-      console.log("📌 [use-pins] onMutate - Previous pins:", previousPins?.length);
 
       // Optimistically update to the new value
       const optimisticPin: Pin = {
@@ -102,7 +79,6 @@ export function usePins(worldId: string) {
 
       queryClient.setQueryData<Pin[]>(["pins", worldId], (old = []) => {
         const updated = [optimisticPin, ...old];
-        console.log("📌 [use-pins] onMutate - Optimistically added pin. New count:", updated.length);
         return updated;
       });
 
@@ -111,7 +87,7 @@ export function usePins(worldId: string) {
     },
 
     onError: (err, newPin, context) => {
-      console.error("📌 [use-pins] onError - Mutation failed:", err);
+      console.error("[use-pins] Mutation failed:", err);
       // Rollback to previous value on error
       if (context?.previousPins) {
         queryClient.setQueryData(["pins", worldId], context.previousPins);
@@ -119,14 +95,12 @@ export function usePins(worldId: string) {
     },
 
     onSuccess: (result, variables, context) => {
-      console.log("📌 [use-pins] onSuccess - Pin created on server:", result);
       // Replace optimistic pin with real server data
       if (context?.optimisticPin && result.pin) {
         queryClient.setQueryData<Pin[]>(["pins", worldId], (old = []) => {
           const updated = old.map((pin) =>
             pin.id === context.optimisticPin.id ? (result.pin as Pin) : pin
           );
-          console.log("📌 [use-pins] onSuccess - Replaced optimistic pin with real data. Count:", updated.length);
           return updated;
         });
       }

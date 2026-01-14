@@ -101,15 +101,6 @@ export const useMapStore = create<MapState>()(
           const baseMapLayer = layers.find((l) => l.isBaseMap);
           const newBaseMapVisible = baseMapLayer?.visible ?? true;
 
-          console.log("📌 [map-store] setLayers called:", {
-            layersCount: layers.length,
-            visibleLayersCount: newVisibleLayerIds.length,
-            activeLayersCount: newActiveLayerIds.length,
-            layers: layers.map(l => ({ id: l.id, name: l.name, visible: l.visible })),
-            visibleLayerIds: newVisibleLayerIds,
-            baseMapVisible: newBaseMapVisible,
-          });
-
           return {
             layers,
             visibleLayerIds: newVisibleLayerIds,
