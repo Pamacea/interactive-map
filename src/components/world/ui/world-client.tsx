@@ -12,23 +12,21 @@ import { useWorldInitialization } from "@/components/world/logic/use-world-initi
 import { useAutosavePreparation } from "@/components/world/logic/use-autosave-preparation";
 import { useAutosave } from "@/hooks/use-autosave";
 import { updateWorldState } from "@/actions/worlds";
-import { usePins } from "@/components/pins/logic/use-pins";
 import type { OptimizedWorld } from "@/types/world.type";
+import type { Pin } from "@/types/pin.type";
 
 interface WorldClientProps {
   world: OptimizedWorld;
+  pins: Pin[];
   isAuthenticated: boolean;
 }
 
-export function WorldClient({ world, isAuthenticated }: WorldClientProps) {
+export function WorldClient({ world, pins, isAuthenticated }: WorldClientProps) {
   // Initialize layers from world data (handle undefined from Prisma)
   useWorldInitialization(world.layers ?? null);
 
   // Sidebar state
   const { width, isCollapsed, isResizing, startResize, toggleCollapse, sidebarRef } = useResizableSidebar();
-
-  // Get pins data for autosave tracking
-  const { pins } = usePins(world.id);
 
   // Prepare world state for autosave
   const worldState = useAutosavePreparation(pins.length);
@@ -56,6 +54,7 @@ export function WorldClient({ world, isAuthenticated }: WorldClientProps) {
   );
 
   const hasLayers = !!world.layers && world.layers.length > 0;
+  const hasPins = pins.length > 0;
 
   return (
     <div className="h-screen bg-background-base flex flex-col">
@@ -74,6 +73,7 @@ export function WorldClient({ world, isAuthenticated }: WorldClientProps) {
             worldLayers={world.layers}
             showPinsSection={hasLayers}
             mapImage={world.map}
+            initialPins={pins}
           />
         </Suspense>
         <main className="flex-1 relative flex flex-col">
