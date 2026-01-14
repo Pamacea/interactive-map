@@ -82,6 +82,8 @@ export interface Pin {
   size: number;
   opacity: number;
   isVisible: boolean;
+  minZoom: number;
+  maxZoom: number;
   properties: unknown | null; // Custom RPG data (level, faction, etc.)
   userId: string;
   gameWorldId: string;

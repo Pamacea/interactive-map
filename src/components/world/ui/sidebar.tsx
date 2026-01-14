@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, ForwardedRef, forwardRef } from "react";
+import { useState, ForwardedRef, forwardRef, useEffect } from "react";
 import { Layers, Settings2, ChevronRight, ChevronLeft, MapPin, Filter } from "lucide-react";
 import { LayersPanel } from "./layers-panel";
 import { PropertiesPanel } from "./properties-panel";
@@ -13,6 +13,7 @@ import { PinActionDropdown } from "@/components/pins/ui/pin-action-dropdown";
 import { useSelectedLayerId } from "@/stores/map-store";
 import { usePinsStore } from "@/stores/use-pins-store";
 import type { OptimizedWorldLayer } from "@/types/world.type";
+import type { Pin } from "@/types/pin.type";
 
 interface SidebarProps {
   slug: string;
@@ -25,10 +26,11 @@ interface SidebarProps {
   worldLayers?: OptimizedWorldLayer[];
   showPinsSection?: boolean;
   mapImage?: string | null;
+  initialPins?: Pin[];
 }
 
 export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(
-  ({ slug, worldId, width, isCollapsed, isResizing, onToggle, onResizeStart, worldLayers, showPinsSection = false, mapImage }, ref) => {
+  ({ slug, worldId, width, isCollapsed, isResizing, onToggle, onResizeStart, worldLayers, showPinsSection = false, mapImage, initialPins = [] }, ref) => {
     const [layersOpen, setLayersOpen] = useState(true);
     const [filtersOpen, setFiltersOpen] = useState(false);
     const [propertiesOpen, setPropertiesOpen] = useState(true);
@@ -38,6 +40,14 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(
     const selectedLayerId = useSelectedLayerId();
     const startCreating = usePinsStore((state) => state.startCreating);
     const isCreating = usePinsStore((state) => state.isCreating);
+    const setPins = usePinsStore((state) => state.setPins);
+
+    // Initialize pins store with initialPins from props
+    useEffect(() => {
+      if (initialPins && initialPins.length > 0) {
+        setPins(initialPins as any);
+      }
+    }, [initialPins, setPins]);
 
     const handleTogglePlaceMode = () => {
       startCreating();

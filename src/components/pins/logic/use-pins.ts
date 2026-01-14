@@ -74,6 +74,8 @@ export function usePins(worldId: string) {
         size: newPin.size || 32,
         opacity: newPin.opacity || 1.0,
         isVisible: newPin.isVisible ?? true,
+        minZoom: 0,
+        maxZoom: 200,
         properties: newPin.properties || null,
         userId: "current-user",
         gameWorldId: newPin.gameWorldId,
