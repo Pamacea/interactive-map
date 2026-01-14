@@ -52,7 +52,12 @@ export function PinMarker({ pin, mapWidth, mapHeight, imageDimensions, transform
 
   // Get custom icon if set, otherwise use pin type default
   const iconName = pin.icon || pinConfig.icon;
-  const IconComponent = (LucideIcons as any)[iconName] || LucideIcons.MapPin;
+
+  // Check if icon is a custom uploaded image (starts with /)
+  const isCustomImage = iconName?.startsWith("/");
+
+  // Get Lucide icon component for non-custom icons
+  const IconComponent = isCustomImage ? null : (LucideIcons as any)[iconName] || LucideIcons.MapPin;
 
   // Check if layer is locked
   const layer = pin.layerId
@@ -298,11 +303,11 @@ export function PinMarker({ pin, mapWidth, mapHeight, imageDimensions, transform
         />
       )}
       <div
-        className="flex items-center justify-center transition-all duration-150"
+        className="flex items-center justify-center transition-all duration-150 overflow-hidden"
         style={{
           width: `${finalSize}px`,
           height: `${finalSize}px`,
-          backgroundColor: pin.color,
+          backgroundColor: isCustomImage ? "transparent" : pin.color,
           borderRadius: "var(--radius-sm)",
           opacity: pin.opacity,
           boxShadow: isDragging
@@ -315,11 +320,20 @@ export function PinMarker({ pin, mapWidth, mapHeight, imageDimensions, transform
           transform: isDragging ? "scale(1.2)" : isPinSelected ? "scale(1.05)" : isHovered ? "scale(1.1)" : "scale(1)",
         }}
       >
-        <IconComponent
-          width={iconSize}
-          height={iconSize}
-          style={{ color: "white", opacity: 0.9 }}
-        />
+        {isCustomImage ? (
+          <img
+            src={iconName}
+            alt={pin.title}
+            className="w-full h-full object-contain"
+            style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.3))" }}
+          />
+        ) : (
+          <IconComponent
+            width={iconSize}
+            height={iconSize}
+            style={{ color: "white", opacity: 0.9 }}
+          />
+        )}
       </div>
     </div>
   );

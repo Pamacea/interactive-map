@@ -1,6 +1,7 @@
 import { getPinTypeOptions } from "@/constants/pin-types";
 import { PIN_ICONS, getIconByName, getUniqueCategories } from "@/constants/pin-icons";
 import { Switch } from "@/components/ui/switch";
+import { IconUploadDialog } from "./icon-upload-dialog";
 import * as PinIcons from "lucide-react";
 import type { Pin } from "@prisma/client";
 import { useState } from "react";
@@ -20,18 +21,25 @@ interface PinPropertiesSectionProps {
     maxZoom: number;
   };
   isUpdating: boolean;
+  error?: string | null;
   onUpdate: <K extends keyof Pin>(field: K, value: Pin[K]) => void;
+  onIconUpload?: (file: File) => Promise<void>;
+  onRetry?: () => void;
 }
 
 export function PinPropertiesSection({
   pin,
   formState,
   isUpdating,
+  error,
   onUpdate,
+  onIconUpload,
+  onRetry,
 }: PinPropertiesSectionProps) {
   const pinTypeOptions = getPinTypeOptions();
   const [iconSearchTerm, setIconSearchTerm] = useState("");
   const [showIconDropdown, setShowIconDropdown] = useState(false);
+  const [showUploadDialog, setShowUploadDialog] = useState(false);
 
   const iconCategories = getUniqueCategories();
 
@@ -39,6 +47,9 @@ export function PinPropertiesSection({
     const IconComponent = (PinIcons as any)[iconName];
     return IconComponent ? IconComponent : PinIcons.MapPin;
   };
+
+  // Check if icon is a custom uploaded image
+  const isCustomImage = formState.icon?.startsWith("/");
 
   const filteredIcons = PIN_ICONS.filter((icon) => {
     const matchesSearch =
@@ -55,6 +66,36 @@ export function PinPropertiesSection({
 
   return (
     <section className="space-y-3">
+      {/* Error Display */}
+      {error && (
+        <div className="px-3 py-2 rounded-sm bg-rose-950/30 border border-rose-700/50">
+          <div className="flex items-start gap-2">
+            <PinIcons.AlertCircle className="w-4 h-4 text-rose-400 mt-0.5 flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-xs text-rose-300">{error}</p>
+            </div>
+            {onRetry && (
+              <button
+                onClick={onRetry}
+                className="text-xs text-rose-300 hover:text-rose-200 underline flex-shrink-0"
+              >
+                Retry
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Loading Indicator */}
+      {isUpdating && !error && (
+        <div className="px-3 py-2 rounded-sm bg-blue-950/30 border border-blue-700/50">
+          <div className="flex items-center gap-2">
+            <PinIcons.Loader2 className="w-4 h-4 text-blue-400 animate-spin" />
+            <p className="text-xs text-blue-300">Updating pin...</p>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center gap-2 px-3 py-2 rounded-sm bg-background-elevated border border-accent-gold/30">
         <CurrentPinTypeIcon className="w-4 h-4 text-accent-gold" />
         <span className="text-xs font-display font-medium text-accent-gold uppercase tracking-wider">
@@ -140,10 +181,20 @@ export function PinPropertiesSection({
               disabled={isUpdating}
               className="w-full flex items-center gap-2 px-2 py-1.5 rounded bg-background-base border border-border-subtle hover:border-accent-gold/50 transition-colors disabled:opacity-50"
             >
-              <CurrentIconComponent className="w-4 h-4 text-accent-gold" />
+              {isCustomImage ? (
+                <img
+                  src={formState.icon!}
+                  alt="Custom icon"
+                  className="w-4 h-4 object-contain"
+                />
+              ) : (
+                <CurrentIconComponent className="w-4 h-4 text-accent-gold" />
+              )}
               <span className="text-sm text-text-primary flex-1 text-left">
-                {PIN_ICONS.find((i) => i.name === formState.icon)?.label ||
-                  "Default Icon"}
+                {isCustomImage
+                  ? "Custom Icon"
+                  : PIN_ICONS.find((i) => i.name === formState.icon)?.label ||
+                    "Default Icon"}
               </span>
               <PinIcons.ChevronDown
                 className={`w-4 h-4 text-text-muted transition-transform ${
@@ -222,17 +273,19 @@ export function PinPropertiesSection({
                   )}
                 </div>
 
-                {/* Custom Upload Option (Placeholder) */}
+                {/* Custom Upload Option */}
                 <div className="border-t border-border-subtle p-1">
                   <button
                     type="button"
-                    disabled
-                    className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-sm text-text-muted hover:bg-background-base disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="Custom icon upload coming soon"
+                    onClick={() => {
+                      setShowUploadDialog(true);
+                      setShowIconDropdown(false);
+                    }}
+                    disabled={isUpdating || !onIconUpload}
+                    className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-sm text-text-secondary hover:bg-background-base hover:text-text-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     <PinIcons.Upload className="w-4 h-4" />
                     <span className="flex-1 text-left">Upload Custom...</span>
-                    <span className="text-xs text-text-muted">(Soon)</span>
                   </button>
                 </div>
               </div>
@@ -434,6 +487,16 @@ export function PinPropertiesSection({
           </div>
         </div>
       </div>
+
+      {/* Icon Upload Dialog */}
+      {onIconUpload && (
+        <IconUploadDialog
+          isOpen={showUploadDialog}
+          onClose={() => setShowUploadDialog(false)}
+          onUpload={onIconUpload}
+          pinId={pin.id}
+        />
+      )}
     </section>
   );
 }

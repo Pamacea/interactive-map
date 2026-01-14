@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSelectedPin, useUpdatePin } from "@/stores/use-pins-store";
-import { updatePin } from "@/actions/pins";
+import { updatePin, uploadPinIcon } from "@/actions/pins";
 import { useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 import type { Pin } from "@prisma/client";
 
 interface PinFormState {
@@ -21,6 +22,7 @@ export function usePropertiesPanel() {
   const selectedPin = useSelectedPin();
   const updatePinInStore = useUpdatePin();
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
 
   const [formState, setFormState] = useState<PinFormState>({
     title: "",
@@ -35,6 +37,8 @@ export function usePropertiesPanel() {
     maxZoom: 200,
   });
   const [isUpdating, setIsUpdating] = useState(false);
+  const [lastKnownGoodState, setLastKnownGoodState] = useState<PinFormState | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Update form when pin selection changes
   useEffect(() => {
@@ -60,7 +64,11 @@ export function usePropertiesPanel() {
       if (!selectedPin || isUpdating) return;
 
       setIsUpdating(true);
+      setError(null);
       const previousValue = formState[field as keyof PinFormState];
+
+      // Save last known good state before update
+      setLastKnownGoodState(formState);
 
       try {
         // Optimistic update: Update local form state immediately
@@ -86,26 +94,100 @@ export function usePropertiesPanel() {
           [field]: value,
         });
 
-        console.log("✅ Pin property updated:", { field, value });
-      } catch (error) {
-        console.error("❌ Failed to update pin:", error);
+        // Clear last known good state on success
+        setLastKnownGoodState(null);
+        showToast("Pin updated successfully", "success");
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : "Failed to update pin";
+
+        // Check for concurrent edit conflict
+        if (errorMessage.includes("concurrent") || errorMessage.includes("conflict")) {
+          showToast("This pin was modified by another user. Please refresh.", "error");
+        } else {
+          showToast(`Failed to update pin: ${errorMessage}`, "error");
+        }
+
+        setError(errorMessage);
 
         // Rollback: Revert all updates on error
         setFormState((prev) => ({ ...prev, [field]: previousValue }));
         updatePinInStore(selectedPin.id, { [field]: previousValue } as Partial<Pin>);
 
-        // Note: TanStack Query cache will auto-refetch on error
+        // Also rollback to last known good state if available
+        if (lastKnownGoodState) {
+          setFormState(lastKnownGoodState);
+          updatePinInStore(selectedPin.id, lastKnownGoodState as Partial<Pin>);
+        }
+
+        // Invalidate queries to refetch from server
+        queryClient.invalidateQueries({ queryKey: ["pins", selectedPin.gameWorldId] });
       } finally {
         setIsUpdating(false);
       }
     },
-    [selectedPin, isUpdating, formState, updatePinInStore, queryClient]
+    [selectedPin, isUpdating, formState, updatePinInStore, queryClient, showToast, lastKnownGoodState]
   );
+
+  // Handle custom icon upload
+  const handleIconUpload = useCallback(
+    async (file: File) => {
+      if (!selectedPin) throw new Error("No pin selected");
+
+      setIsUpdating(true);
+      setError(null);
+
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const result = await uploadPinIcon(selectedPin.id, formData);
+
+        // Update local state
+        setFormState((prev) => ({ ...prev, icon: result.pin.icon }));
+
+        // Update Zustand store
+        updatePinInStore(selectedPin.id, { icon: result.pin.icon });
+
+        // Update TanStack Query cache
+        queryClient.setQueryData<Pin[]>(
+          ["pins", selectedPin.gameWorldId],
+          (old = []) =>
+            old.map((pin) =>
+              pin.id === selectedPin.id
+                ? { ...pin, icon: result.pin.icon, updatedAt: new Date() }
+                : pin
+            )
+        );
+
+        showToast("Icon uploaded successfully", "success");
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : "Failed to upload icon";
+        showToast(`Failed to upload icon: ${errorMessage}`, "error");
+        setError(errorMessage);
+        throw err;
+      } finally {
+        setIsUpdating(false);
+      }
+    },
+    [selectedPin, updatePinInStore, queryClient, showToast]
+  );
+
+  // Retry failed update
+  const retryUpdate = useCallback(() => {
+    if (error && lastKnownGoodState) {
+      setError(null);
+      // Trigger a refetch to get the latest state from server
+      queryClient.invalidateQueries({ queryKey: ["pins", selectedPin?.gameWorldId] });
+    }
+  }, [error, lastKnownGoodState, selectedPin, queryClient]);
 
   return {
     selectedPin,
     formState,
     isUpdating,
+    error,
     handleUpdatePin,
+    handleIconUpload,
+    retryUpdate,
   };
 }

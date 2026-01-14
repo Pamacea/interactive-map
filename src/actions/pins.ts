@@ -559,6 +559,152 @@ export async function updatePinPosition(pinId: string, latitude: number, longitu
 }
 
 /**
+ * Upload a custom icon for a pin
+ * @param pinId - Pin ID to update
+ * @param formData - FormData containing the icon file
+ * @returns Updated pin with new icon path
+ */
+export async function uploadPinIcon(pinId: string, formData: FormData) {
+  console.log("📌 [uploadPinIcon] Starting icon upload for pin:", pinId);
+
+  // Get authenticated user from session
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    console.error("📌 [uploadPinIcon] No authenticated user session!");
+    throw new Error("Not authenticated");
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+  });
+
+  if (!user) {
+    console.error("📌 [uploadPinIcon] User not found in database!");
+    throw new Error("User not found");
+  }
+
+  console.log("📌 [uploadPinIcon] Authenticated user:", {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+  });
+
+  // Check if pin exists and user has permission
+  const pin = await prisma.pin.findUnique({
+    where: { id: pinId },
+    include: {
+      gameWorld: true,
+    },
+  });
+
+  if (!pin) {
+    console.error("📌 [uploadPinIcon] Pin not found!");
+    throw new Error("Pin not found");
+  }
+
+  // Check ownership or editor permission
+  if (pin.userId !== user.id) {
+    const member = await prisma.worldMember.findFirst({
+      where: {
+        gameWorldId: pin.gameWorldId,
+        userId: user.id,
+        permission: { in: ["EDITOR", "OWNER"] },
+      },
+    });
+
+    if (!member) {
+      console.error("📌 [uploadPinIcon] Unauthorized - no editor permissions");
+      throw new Error(
+        "Unauthorized: You don't have permission to edit this pin"
+      );
+    }
+  }
+
+  // Get file from formData
+  const file = formData.get("file") as File;
+
+  if (!file) {
+    console.error("📌 [uploadPinIcon] No file provided in formData");
+    throw new Error("No file provided");
+  }
+
+  console.log("📌 [uploadPinIcon] File received:", {
+    name: file.name,
+    type: file.type,
+    size: file.size,
+  });
+
+  // Validate file type
+  const validTypes = ["image/svg+xml", "image/png", "image/webp"];
+  if (!validTypes.includes(file.type)) {
+    throw new Error("Invalid file type. Please upload an SVG, PNG, or WEBP image.");
+  }
+
+  // Validate file size (max 500KB)
+  const maxSize = 500 * 1024; // 500KB
+  if (file.size > maxSize) {
+    throw new Error("File size must be less than 500KB");
+  }
+
+  // Create pins/icons directory if it doesn't exist
+  const { writeFile, mkdir } = require("fs/promises");
+  const path = require("path");
+  const uploadsDir = path.join(process.cwd(), "public", "uploads", "pins", "icons");
+
+  try {
+    await mkdir(uploadsDir, { recursive: true });
+  } catch (error) {
+    // Directory might already exist, ignore error
+  }
+
+  // Generate unique filename with UUID
+  const timestamp = Date.now();
+  const randomId = Math.random().toString(36).substring(2, 15);
+  const ext = path.extname(file.name);
+  const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+  const fileName = `${timestamp}-${randomId}-${sanitizedName}`;
+  const filePath = path.join(uploadsDir, fileName);
+
+  console.log("📌 [uploadPinIcon] Saving file:", {
+    fileName,
+    filePath,
+  });
+
+  try {
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    await writeFile(filePath, buffer);
+
+    const iconPath = `/uploads/pins/icons/${fileName}`;
+    console.log("📌 [uploadPinIcon] File saved successfully:", iconPath);
+
+    // Update pin with new icon path
+    const updatedPin = await prisma.pin.update({
+      where: { id: pinId },
+      data: { icon: iconPath },
+    });
+
+    console.log("📌 [uploadPinIcon] Pin updated:", {
+      pinId: updatedPin.id,
+      newIconPath: updatedPin.icon,
+    });
+
+    // Revalidate the world page
+    revalidatePath(`/world/${pin.gameWorldId}`);
+
+    return {
+      success: true,
+      iconUrl: iconPath,
+      pin: updatedPin,
+    };
+  } catch (error) {
+    console.error("📌 [uploadPinIcon] Failed to save file:", error);
+    throw new Error("Failed to save icon image");
+  }
+}
+
+/**
  * Batch update pin positions
  * For dragging multiple pins at once
  * @param updates - Array of { id, latitude, longitude }
