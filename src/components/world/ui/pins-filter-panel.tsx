@@ -1,17 +1,16 @@
 "use client";
 
 import { Filter, Eye, EyeOff } from "lucide-react";
-import { usePinFilters, useToggleFilter, useShowAllTypes, useHideAllTypes } from "@/stores/pin-filters-store";
+import { usePinTypeFilters, useTogglePinTypeFilter, useShowAllPinTypes, useHideAllPinTypes } from "@/stores/use-pins-store";
 import { PinTypeEnum } from "@/types/pin.type";
 import { pinTypeConfig } from "@/constants/pin-types";
-import { PinType } from "@/constants/pin-types";
 import * as PinIcons from "lucide-react";
 
 export function PinsFilterPanel() {
-  const filters = usePinFilters();
-  const toggleFilter = useToggleFilter();
-  const showAllTypes = useShowAllTypes();
-  const hideAllTypes = useHideAllTypes();
+  const filters = usePinTypeFilters();
+  const toggleFilter = useTogglePinTypeFilter();
+  const showAllTypes = useShowAllPinTypes();
+  const hideAllTypes = useHideAllPinTypes();
 
   const getPinIcon = (iconName: string) => {
     const IconComponent = (PinIcons as any)[iconName];

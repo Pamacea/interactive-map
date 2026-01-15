@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import type { Pin, PinType } from "@prisma/client";
 import { createPin as createPinAction, deletePin as deletePinAction, updatePin as updatePinAction } from "@/actions/pins";
-import { PinTypeEnum } from "@/types/pin.type";
 
 // UI State for pin interactions
 export interface PinUIState {
@@ -12,10 +11,10 @@ export interface PinUIState {
   hoverPinId: string | null;
 }
 
-// Filter state for pins - using Record<PinTypeEnum, boolean> approach
+// Filter state for pins
 export interface PinFilters {
   searchTerm: string;
-  pinTypeFilters: Record<PinTypeEnum, boolean>;
+  pinTypes: PinType[];
   layerIds: string[];
   showVisibleOnly: boolean;
 }
@@ -55,16 +54,13 @@ interface PinsStore extends PinUIState, PinFilters, PinDataState {
 
   // Filter actions
   setSearchTerm: (term: string) => void;
-  setPinTypeFilter: (pinType: PinTypeEnum, value: boolean) => void;
-  togglePinTypeFilter: (pinType: PinTypeEnum) => void;
-  showAllPinTypes: () => void;
-  hideAllPinTypes: () => void;
+  setPinTypes: (types: PinType[]) => void;
+  togglePinType: (type: PinType) => void;
   setLayerIds: (layerIds: string[]) => void;
   toggleLayerId: (layerId: string) => void;
   toggleShowVisibleOnly: () => void;
   resetFilters: () => void;
   applyFilters: () => void;
-  getVisiblePinTypes: () => PinTypeEnum[];
 
   // Loading and error state
   setLoading: (isLoading: boolean) => void;
@@ -73,19 +69,6 @@ interface PinsStore extends PinUIState, PinFilters, PinDataState {
   // Reset all
   reset: () => void;
 }
-
-// Helper function to create default pin type filters
-const createDefaultPinTypeFilters = (): Record<PinTypeEnum, boolean> => ({
-  [PinTypeEnum.CITY]: true,
-  [PinTypeEnum.VILLAGE]: true,
-  [PinTypeEnum.POI]: true,
-  [PinTypeEnum.CHARACTER]: true,
-  [PinTypeEnum.DUNGEON]: true,
-  [PinTypeEnum.SHOP]: true,
-  [PinTypeEnum.QUEST]: true,
-  [PinTypeEnum.TREASURE]: true,
-  [PinTypeEnum.CUSTOM]: true,
-});
 
 const initialState: PinUIState & PinFilters & PinDataState = {
   // UI State
@@ -96,7 +79,7 @@ const initialState: PinUIState & PinFilters & PinDataState = {
 
   // Filters
   searchTerm: "",
-  pinTypeFilters: createDefaultPinTypeFilters(),
+  pinTypes: [],
   layerIds: [],
   showVisibleOnly: false,
 
@@ -111,7 +94,7 @@ const initialState: PinUIState & PinFilters & PinDataState = {
 const filterPins = (
   pins: Pin[],
   searchTerm: string,
-  pinTypeFilters: Record<PinTypeEnum, boolean>,
+  pinTypes: PinType[],
   layerIds: string[],
   showVisibleOnly: boolean
 ): Pin[] => {
@@ -121,8 +104,8 @@ const filterPins = (
       return false;
     }
 
-    // Pin type filter - check if type is explicitly set to false
-    if (pinTypeFilters[pin.pinType as PinTypeEnum] === false) {
+    // Pin type filter
+    if (pinTypes.length > 0 && !pinTypes.includes(pin.pinType)) {
       return false;
     }
 
@@ -169,7 +152,7 @@ export const usePinsStore = create<PinsStore>()(
           const filtered = filterPins(
             pins,
             state.searchTerm,
-            state.pinTypeFilters,
+            state.pinTypes,
             state.layerIds,
             state.showVisibleOnly
           );
@@ -182,7 +165,7 @@ export const usePinsStore = create<PinsStore>()(
             const filtered = filterPins(
               newPins,
               state.searchTerm,
-              state.pinTypeFilters,
+              state.pinTypes,
               state.layerIds,
               state.showVisibleOnly
             );
@@ -198,7 +181,7 @@ export const usePinsStore = create<PinsStore>()(
             const filtered = filterPins(
               newPins,
               state.searchTerm,
-              state.pinTypeFilters,
+              state.pinTypes,
               state.layerIds,
               state.showVisibleOnly
             );
@@ -212,7 +195,7 @@ export const usePinsStore = create<PinsStore>()(
             const filtered = filterPins(
               newPins,
               state.searchTerm,
-              state.pinTypeFilters,
+              state.pinTypes,
               state.layerIds,
               state.showVisibleOnly
             );
@@ -233,71 +216,38 @@ export const usePinsStore = create<PinsStore>()(
             const filtered = filterPins(
               state.pins,
               term,
-              state.pinTypeFilters,
+              state.pinTypes,
               state.layerIds,
               state.showVisibleOnly
             );
             return { searchTerm: term, filteredPins: filtered };
           }),
 
-        setPinTypeFilter: (pinType, value) =>
+        setPinTypes: (types) =>
           set((state) => {
-            const newFilters = {
-              ...state.pinTypeFilters,
-              [pinType]: value,
-            };
             const filtered = filterPins(
               state.pins,
               state.searchTerm,
-              newFilters,
+              types,
               state.layerIds,
               state.showVisibleOnly
             );
-            return { pinTypeFilters: newFilters, filteredPins: filtered };
+            return { pinTypes: types, filteredPins: filtered };
           }),
 
-        togglePinTypeFilter: (pinType) =>
+        togglePinType: (type) =>
           set((state) => {
-            const newFilters = {
-              ...state.pinTypeFilters,
-              [pinType]: !state.pinTypeFilters[pinType],
-            };
+            const newTypes = state.pinTypes.includes(type)
+              ? state.pinTypes.filter((t) => t !== type)
+              : [...state.pinTypes, type];
             const filtered = filterPins(
               state.pins,
               state.searchTerm,
-              newFilters,
+              newTypes,
               state.layerIds,
               state.showVisibleOnly
             );
-            return { pinTypeFilters: newFilters, filteredPins: filtered };
-          }),
-
-        showAllPinTypes: () =>
-          set((state) => {
-            const newFilters = createDefaultPinTypeFilters();
-            const filtered = filterPins(
-              state.pins,
-              state.searchTerm,
-              newFilters,
-              state.layerIds,
-              state.showVisibleOnly
-            );
-            return { pinTypeFilters: newFilters, filteredPins: filtered };
-          }),
-
-        hideAllPinTypes: () =>
-          set((state) => {
-            const newFilters = Object.fromEntries(
-              Object.entries(createDefaultPinTypeFilters()).map(([key]) => [key, false])
-            ) as Record<PinTypeEnum, boolean>;
-            const filtered = filterPins(
-              state.pins,
-              state.searchTerm,
-              newFilters,
-              state.layerIds,
-              state.showVisibleOnly
-            );
-            return { pinTypeFilters: newFilters, filteredPins: filtered };
+            return { pinTypes: newTypes, filteredPins: filtered };
           }),
 
         setLayerIds: (layerIds) =>
@@ -305,7 +255,7 @@ export const usePinsStore = create<PinsStore>()(
             const filtered = filterPins(
               state.pins,
               state.searchTerm,
-              state.pinTypeFilters,
+              state.pinTypes,
               layerIds,
               state.showVisibleOnly
             );
@@ -320,7 +270,7 @@ export const usePinsStore = create<PinsStore>()(
             const filtered = filterPins(
               state.pins,
               state.searchTerm,
-              state.pinTypeFilters,
+              state.pinTypes,
               newLayerIds,
               state.showVisibleOnly
             );
@@ -333,7 +283,7 @@ export const usePinsStore = create<PinsStore>()(
             const filtered = filterPins(
               state.pins,
               state.searchTerm,
-              state.pinTypeFilters,
+              state.pinTypes,
               state.layerIds,
               newShowVisibleOnly
             );
@@ -342,11 +292,10 @@ export const usePinsStore = create<PinsStore>()(
 
         resetFilters: () =>
           set((state) => {
-            const newFilters = createDefaultPinTypeFilters();
-            const filtered = filterPins(state.pins, "", newFilters, [], false);
+            const filtered = filterPins(state.pins, "", [], [], false);
             return {
               searchTerm: "",
-              pinTypeFilters: newFilters,
+              pinTypes: [],
               layerIds: [],
               showVisibleOnly: false,
               filteredPins: filtered,
@@ -358,19 +307,12 @@ export const usePinsStore = create<PinsStore>()(
             const filtered = filterPins(
               state.pins,
               state.searchTerm,
-              state.pinTypeFilters,
+              state.pinTypes,
               state.layerIds,
               state.showVisibleOnly
             );
             return { filteredPins: filtered };
           }),
-
-        getVisiblePinTypes: () => {
-          const state = get();
-          return Object.entries(state.pinTypeFilters)
-            .filter(([, visible]) => visible)
-            .map(([type]) => type as PinTypeEnum);
-        },
 
         // Loading and error actions
         setLoading: (isLoading) => set({ isLoading }),
@@ -459,7 +401,7 @@ export const usePinsStore = create<PinsStore>()(
           isCreating: state.isCreating,
           isEditing: state.isEditing,
           searchTerm: state.searchTerm,
-          pinTypeFilters: state.pinTypeFilters,
+          pinTypes: state.pinTypes,
           layerIds: state.layerIds,
           showVisibleOnly: state.showVisibleOnly,
         }),
@@ -495,24 +437,10 @@ export const useSelectedPin = () =>
 export const usePinFilters = () =>
   usePinsStore((state) => ({
     searchTerm: state.searchTerm,
-    pinTypeFilters: state.pinTypeFilters,
+    pinTypes: state.pinTypes,
     layerIds: state.layerIds,
     showVisibleOnly: state.showVisibleOnly,
   }));
-
-export const usePinTypeFilters = () =>
-  usePinsStore((state) => state.pinTypeFilters);
-
-export const useVisiblePinTypes = () =>
-  usePinsStore((state) => {
-    return Object.entries(state.pinTypeFilters)
-      .filter(([, visible]) => visible)
-      .map(([type]) => type as PinTypeEnum);
-  });
-
-export const useSearchTerm = () => usePinsStore((state) => state.searchTerm);
-export const useLayerIds = () => usePinsStore((state) => state.layerIds);
-export const useShowVisibleOnly = () => usePinsStore((state) => state.showVisibleOnly);
 
 // Loading state selectors
 export const usePinsLoading = () => usePinsStore((state) => state.isLoading);
@@ -542,27 +470,11 @@ export const useStartEditing = () => usePinsStore((state) => state.startEditing)
 export const useStopEditing = () => usePinsStore((state) => state.stopEditing);
 export const useSetHoverPin = () => usePinsStore((state) => state.setHoverPin);
 
-// Filter action hooks
 export const useSetSearchTerm = () => usePinsStore((state) => state.setSearchTerm);
-export const useSetPinTypeFilter = () => usePinsStore((state) => state.setPinTypeFilter);
-export const useTogglePinTypeFilter = () => usePinsStore((state) => state.togglePinTypeFilter);
-export const useShowAllPinTypes = () => usePinsStore((state) => state.showAllPinTypes);
-export const useHideAllPinTypes = () => usePinsStore((state) => state.hideAllPinTypes);
+export const useSetPinTypes = () => usePinsStore((state) => state.setPinTypes);
+export const useTogglePinType = () => usePinsStore((state) => state.togglePinType);
 export const useSetLayerIds = () => usePinsStore((state) => state.setLayerIds);
 export const useToggleLayerId = () => usePinsStore((state) => state.toggleLayerId);
 export const useToggleShowVisibleOnly = () => usePinsStore((state) => state.toggleShowVisibleOnly);
 export const useResetFilters = () => usePinsStore((state) => state.resetFilters);
 export const useApplyFilters = () => usePinsStore((state) => state.applyFilters);
-export const useGetVisiblePinTypes = () => usePinsStore((state) => state.getVisiblePinTypes);
-
-// Convenience hook to check if a specific pin type is visible
-export const useIsPinTypeVisible = (pinType: PinTypeEnum): boolean => {
-  const pinTypeFilters = usePinTypeFilters();
-  return pinTypeFilters[pinType] ?? true;
-};
-
-// Convenience hook to check if all pin types are visible
-export const useShowAllPinTypesValue = (): boolean => {
-  const pinTypeFilters = usePinTypeFilters();
-  return Object.values(pinTypeFilters).every((value) => value === true);
-};

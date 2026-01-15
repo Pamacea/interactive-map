@@ -3,4 +3,3 @@
  */
 
 export * from "./pin-schemas";
-export * from "./use-pins";

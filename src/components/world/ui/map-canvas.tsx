@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useEffect } from "react";
 import type { Pin } from "@prisma/client";
 import { PinTypeEnum, type Pin as CustomPin } from "@/types/pin.type";
 import { ZoomControls } from "./zoom-controls";
@@ -26,6 +26,10 @@ import { PlacementIndicator } from "./placement-indicator";
 import { SelectedPinPopup } from "./selected-pin-popup";
 
 const GRID_SIZE = 40;
+const MIN_ZOOM = 0.1;
+const MAX_ZOOM = 5.0;
+const ZOOM_WHEEL_FACTOR_IN = 1.1;
+const ZOOM_WHEEL_FACTOR_OUT = 0.9;
 
 export interface MapCanvasProps {
   mapImage?: string | null;
@@ -60,11 +64,38 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
     setTransform,
   } = useMapPan({ isCreatingPin });
 
-  // Map zoom
-  const { handleWheel, handleZoomIn, handleZoomOut } = useMapZoom(
+  // Map zoom (buttons only - wheel is handled via non-passive listener below)
+  const { handleZoomIn, handleZoomOut } = useMapZoom(
     transform,
     setTransform
   );
+
+  // Set up non-passive wheel event listener to prevent default scroll behavior
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleWheelNonPassive = (e: WheelEvent) => {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? ZOOM_WHEEL_FACTOR_OUT : ZOOM_WHEEL_FACTOR_IN;
+      const newScale = Math.min(
+        Math.max(transform.scale * delta, MIN_ZOOM),
+        MAX_ZOOM
+      );
+
+      setTransform((prev) => ({
+        ...prev,
+        scale: newScale,
+      }));
+    };
+
+    // Add non-passive event listener
+    container.addEventListener('wheel', handleWheelNonPassive, { passive: false });
+
+    return () => {
+      container.removeEventListener('wheel', handleWheelNonPassive);
+    };
+  }, [transform.scale, setTransform]);
 
   // Map image handling
   const {
@@ -154,7 +185,6 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
             ? "cursor-grabbing"
             : "cursor-grab"
       }`}
-      onWheel={handleWheel}
       onMouseDown={handleMouseDown}
       onClick={handleClick}
       onContextMenu={handleContextMenu}
