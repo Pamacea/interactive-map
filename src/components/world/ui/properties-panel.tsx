@@ -8,6 +8,8 @@ import {
 import { PinPropertiesSection } from "./pin-properties-section";
 import { MapPropertiesSection } from "./map-properties-section";
 import { usePropertiesPanel } from "../logic/use-properties-panel";
+import { eventManager } from "@/lib/event-manager";
+import { useEffect } from "react";
 
 export function PropertiesPanel() {
   const grid = useGrid();
@@ -17,6 +19,14 @@ export function PropertiesPanel() {
 
   const { selectedPin, formState, isUpdating, error, handleUpdatePin, handleIconUpload, retryUpdate } =
     usePropertiesPanel();
+
+  // Capture sidebar events when pin is selected
+  useEffect(() => {
+    if (selectedPin) {
+      const release = eventManager.capture("sidebar");
+      return () => release();
+    }
+  }, [selectedPin]);
 
   return (
     <div className="space-y-4">

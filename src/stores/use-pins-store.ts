@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import type { Pin, PinType } from "@prisma/client";
+import { createPin as createPinAction, deletePin as deletePinAction, updatePin as updatePinAction } from "@/actions/pins";
 
 // UI State for pin interactions
 export interface PinUIState {
@@ -40,11 +41,16 @@ interface PinsStore extends PinUIState, PinFilters, PinDataState {
   // Hover state
   setHoverPin: (pinId: string | null) => void;
 
-  // Pin CRUD operations
+  // Pin CRUD operations (local state)
   setPins: (pins: Pin[]) => void;
   addPin: (pin: Pin) => void;
   updatePin: (pinId: string, updates: Partial<Pin>) => void;
   deletePin: (pinId: string) => void;
+
+  // Pin CRUD operations (server sync with optimistic updates)
+  createPin: (data: Parameters<typeof createPinAction>[0]) => Promise<void>;
+  deletePinServer: (pinId: string) => Promise<void>;
+  updatePinServer: (data: Parameters<typeof updatePinAction>[0]) => Promise<void>;
 
   // Filter actions
   setSearchTerm: (term: string) => void;
@@ -315,6 +321,77 @@ export const usePinsStore = create<PinsStore>()(
 
         // Reset all
         reset: () => set(initialState),
+
+        // Server sync methods with optimistic updates
+        createPin: async (data) => {
+          try {
+            // Optimistic update - add pin with temporary ID
+            const tempId = `temp-${Date.now()}`;
+            const optimisticPin: Pin = {
+              ...data,
+              id: tempId,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              isVisible: data.isVisible ?? true,
+              opacity: data.opacity ?? 1,
+              size: data.size ?? 32,
+              minZoom: 0,
+              maxZoom: 200,
+            } as Pin;
+
+            get().addPin(optimisticPin);
+
+            // Server call
+            const result = await createPinAction(data);
+
+            // Replace optimistic pin with real one
+            set((state) => ({
+              pins: state.pins.map((p) =>
+                p.id === tempId ? { ...result.pin, gameWorldId: data.gameWorldId } : p
+              ),
+              filteredPins: state.filteredPins.map((p) =>
+                p.id === tempId ? { ...result.pin, gameWorldId: data.gameWorldId } : p
+              ),
+            }));
+          } catch (error) {
+            console.error("[PinsStore] Failed to create pin:", error);
+            get().setError(error instanceof Error ? error.message : "Failed to create pin");
+            throw error;
+          }
+        },
+
+        deletePinServer: async (pinId) => {
+          try {
+            // Optimistic update - remove from store
+            const pinToDelete = get().pins.find((p) => p.id === pinId);
+            if (!pinToDelete) {
+              throw new Error("Pin not found");
+            }
+
+            get().deletePin(pinId);
+
+            // Server call
+            await deletePinAction(pinId);
+          } catch (error) {
+            console.error("[PinsStore] Failed to delete pin:", error);
+            get().setError(error instanceof Error ? error.message : "Failed to delete pin");
+            throw error;
+          }
+        },
+
+        updatePinServer: async (data) => {
+          try {
+            // Optimistic update - update in store
+            get().updatePin(data.id, data as Partial<Pin>);
+
+            // Server call
+            await updatePinAction(data);
+          } catch (error) {
+            console.error("[PinsStore] Failed to update pin:", error);
+            get().setError(error instanceof Error ? error.message : "Failed to update pin");
+            throw error;
+          }
+        },
       }),
       {
         name: "pins-storage",
@@ -379,6 +456,11 @@ export const useSetPins = () => usePinsStore((state) => state.setPins);
 export const useAddPin = () => usePinsStore((state) => state.addPin);
 export const useUpdatePin = () => usePinsStore((state) => state.updatePin);
 export const useDeletePin = () => usePinsStore((state) => state.deletePin);
+
+// Server sync hooks
+export const useCreatePin = () => usePinsStore((state) => state.createPin);
+export const useDeletePinServer = () => usePinsStore((state) => state.deletePinServer);
+export const useUpdatePinServer = () => usePinsStore((state) => state.updatePinServer);
 
 export const useSelectPin = () => usePinsStore((state) => state.selectPin);
 export const useClearSelection = () => usePinsStore((state) => state.clearSelection);

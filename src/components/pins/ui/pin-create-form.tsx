@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { X } from "lucide-react";
-import { usePins } from "../logic/use-pins";
+import { useCreatePin } from "@/stores/use-pins-store";
 import { usePinForm } from "../logic/use-pin-form";
 import { PinForm } from "./pin-form";
 import { useToast } from "@/hooks/use-toast";
@@ -47,7 +47,8 @@ export function PinCreateForm({
     },
   });
 
-  const { createPin, isCreating } = usePins(worldId);
+  const createPinMutation = useCreatePin();
+  const [isCreating, setIsCreating] = useState(false);
 
   // Auto-focus title field when form opens
   useEffect(() => {
@@ -63,23 +64,21 @@ export function PinCreateForm({
       return;
     }
 
+    setIsCreating(true);
+
     try {
       const data = form.getSubmitData();
-      createPin(data as any, {
-        onSuccess: () => {
-          showToast("Pin created successfully!", "success");
-          onSuccess?.();
-        },
-        onError: (error: Error) => {
-          showToast(error.message || "Failed to create pin", "error");
-        },
-      });
+      await createPinMutation(data as any);
+      showToast("Pin created successfully!", "success");
+      onSuccess?.();
     } catch (error) {
       if (error instanceof Error) {
         showToast(error.message, "error");
       } else {
         showToast("An unexpected error occurred", "error");
       }
+    } finally {
+      setIsCreating(false);
     }
   };
 

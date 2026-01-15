@@ -5,8 +5,13 @@ import type { Pin } from "@prisma/client";
 import { PinTypeEnum, type Pin as CustomPin } from "@/types/pin.type";
 import { ZoomControls } from "./zoom-controls";
 import { useGrid, useScale, useLayers, useSelectedLayerId, useBaseMapVisible, useMapStore } from "@/stores/map-store";
-import { usePins } from "@/components/pins/logic/use-pins";
-import { useSelectedPin, useIsCreatingPin, usePinsStore } from "@/stores/use-pins-store";
+import {
+  usePins,
+  useCreatePin,
+  useSelectedPin,
+  useIsCreatingPin,
+  usePinsStore,
+} from "@/stores/use-pins-store";
 import { PinContextMenu } from "@/components/pins/ui/pin-context-menu";
 import { useMapPan } from "../logic/use-map-pan";
 import { useMapZoom } from "../logic/use-map-zoom";
@@ -36,8 +41,9 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
   const baseMapVisible = useBaseMapVisible();
   const baseMapLayer = useMapStore((state) => state.layers.find(l => l.isBaseMap));
 
-  // Pin integration
-  const { pins, createPin } = usePins(worldId || "");
+  // Pin integration - use Zustand store as single source of truth
+  const pins = usePins();
+  const createPin = useCreatePin();
   const selectedPin = useSelectedPin();
   const isCreatingPin = useIsCreatingPin();
   const selectPin = usePinsStore((state) => state.selectPin);
