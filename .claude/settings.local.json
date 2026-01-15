@@ -75,7 +75,8 @@
       "Bash(pnpm test:*)",
       "Bash(pnpm test:coverage:*)",
       "Bash(pnpm vitest:*)",
-      "Bash(npm run test:coverage:*)"
+      "Bash(npm run test:coverage:*)",
+      "Bash(find:*)"
     ]
   },
   "hooks": {},

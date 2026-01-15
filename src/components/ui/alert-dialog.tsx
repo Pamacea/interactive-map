@@ -82,7 +82,8 @@ const AlertDialogContent = ({
           }
         }}
         className={cn(
-          "relative bg-background-card border-2 border-accent-gold rounded-sm shadow-2xl p-6 w-full max-w-md sm:max-w-lg z-[100] animate-in fade-in zoom-in-95",
+          "relative rounded-sm shadow-2xl p-6 w-full max-w-md sm:max-w-lg z-[100] animate-in fade-in zoom-in-95",
+          "bg-[var(--color-background-card)] border-2 border-[var(--color-accent-gold)]",
           className
         )}
         onClick={(e) => e.stopPropagation()}
@@ -123,7 +124,7 @@ const AlertDialogTitle = ({
   ...props
 }: React.HTMLAttributes<HTMLHeadingElement>) => (
   <h2
-    className={cn("text-lg font-semibold text-text-primary", className)}
+    className={cn("text-lg font-semibold text-[var(--color-text-primary)]", className)}
     {...props}
   />
 )
@@ -133,7 +134,7 @@ const AlertDialogDescription = ({
   ...props
 }: React.HTMLAttributes<HTMLParagraphElement>) => (
   <p
-    className={cn("text-sm text-text-secondary", className)}
+    className={cn("text-sm text-[var(--color-text-secondary)]", className)}
     {...props}
   />
 )
@@ -144,8 +145,8 @@ const AlertDialogAction = ({
 }: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
   <button
     className={cn(
-      "inline-flex items-center justify-center rounded-sm px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-accent-gold/50",
-      "bg-accent-gold text-background-base hover:bg-accent-gold/90",
+      "inline-flex items-center justify-center rounded-sm px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-gold)]/50",
+      "bg-[var(--color-accent-gold)] text-[var(--color-background-base)] hover:bg-[var(--color-accent-gold)]/90",
       "disabled:opacity-50 disabled:cursor-not-allowed",
       className
     )}
@@ -159,8 +160,8 @@ const AlertDialogCancel = ({
 }: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
   <button
     className={cn(
-      "inline-flex items-center justify-center rounded-sm px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-accent-gold/50",
-      "bg-background-muted text-text-primary hover:bg-background-muted/80",
+      "inline-flex items-center justify-center rounded-sm px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-gold)]/50",
+      "bg-[var(--color-background-elevated)] text-[var(--color-text-primary)] hover:bg-[var(--color-background-elevated)]/80",
       "disabled:opacity-50 disabled:cursor-not-allowed",
       className
     )}
