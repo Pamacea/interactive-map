@@ -2,7 +2,7 @@ import type { FC } from "react";
 import React from "react";
 
 export interface MapImageProps {
-  imageRef: React.RefObject<HTMLImageElement | null>;
+  imageRef: React.RefObject<HTMLImageElement | HTMLDivElement | null>;
   mapImage: string;
   imageDimensions: { width: number; height: number };
   showGrid: boolean;
@@ -39,7 +39,7 @@ export const MapImage: FC<MapImageProps> = ({
       }}
     >
       <img
-        ref={imageRef}
+        ref={imageRef as any}
         src={mapImage}
         alt="World map"
         className="max-w-none"

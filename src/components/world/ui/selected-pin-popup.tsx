@@ -8,15 +8,11 @@ import type { PinWithLayer } from "../logic/use-pins-filtering";
 export interface SelectedPinPopupProps {
   selectedPin: PinWithLayer;
   onClose: () => void;
-  imageDimensions: { width: number; height: number };
-  transform: { translateX: number; translateY: number; scale: number };
 }
 
 export const SelectedPinPopup: FC<SelectedPinPopupProps> = ({
   selectedPin,
   onClose,
-  imageDimensions,
-  transform,
 }) => {
   const deletePinServer = usePinsStore((state) => state.deletePinServer);
 
@@ -35,22 +31,13 @@ export const SelectedPinPopup: FC<SelectedPinPopupProps> = ({
     // This callback is for any additional handling if needed
   };
 
-  // Calculate screen position from pin coordinates (percentage)
-  // Taking into account pan (translateX/Y) and zoom (scale)
-  const pinX = selectedPin.longitude * imageDimensions.width;
-  const pinY = selectedPin.latitude * imageDimensions.height;
-
-  // Apply transformations: (pinCoord * scale) + translate
-  const screenX = pinX * transform.scale + transform.translateX;
-  const screenY = pinY * transform.scale + transform.translateY;
-
   return (
     <div
-      className="fixed z-50"
+      className="absolute z-50"
       style={{
-        // Position at the calculated screen coordinates
-        left: `${screenX}px`,
-        top: `${screenY}px`,
+        // Position using percentage like pins - follows parent transform automatically
+        left: `${selectedPin.longitude * 100}%`,
+        top: `${selectedPin.latitude * 100}%`,
         // Center horizontally and position 24px above the pin
         transform: "translateX(-50%) translateY(-100%) translateY(-24px)",
       }}

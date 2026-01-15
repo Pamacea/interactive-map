@@ -140,7 +140,7 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
               <MapPinsWrapper
                 baseMapVisible={baseMapVisible}
                 visiblePins={visiblePins}
-                selectedPin={selectedPin}
+                selectedPin={selectedPin ?? null}
                 imageDimensions={imageDimensions}
                 layerScale={layerScale}
                 mapImage={mapImage!}
@@ -158,7 +158,7 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
                 <MapPinsWrapper
                   baseMapVisible={false}
                   visiblePins={visiblePins}
-                  selectedPin={selectedPin}
+                  selectedPin={selectedPin ?? null}
                   imageDimensions={imageDimensions}
                   layerScale={layerScale}
                   mapImage={mapImage!}
