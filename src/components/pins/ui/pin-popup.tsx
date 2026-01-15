@@ -7,6 +7,7 @@ import { PopupHeader } from "./popup-header";
 import { PopupContent } from "./popup-content";
 import { PopupActions } from "./popup-actions";
 import { PopupArrow } from "./popup-arrow";
+import { eventManager, stopPropagation } from "@/lib/event-manager";
 
 interface PinPopupProps {
   pin: Pin;
@@ -26,6 +27,12 @@ export function PinPopup({
   position,
 }: PinPopupProps) {
   const popupRef = React.useRef<HTMLDivElement>(null);
+
+  // Capture events when popup is mounted
+  React.useEffect(() => {
+    const release = eventManager.capture("pin-popup");
+    return () => release();
+  }, []);
 
   // Close popup on click outside
   React.useEffect(() => {
@@ -72,6 +79,9 @@ export function PinPopup({
         top: position?.y ?? 0,
         transform: "translate(-50%, -100%) translateY(-16px)",
       }}
+      onClick={stopPropagation}
+      onMouseDown={stopPropagation}
+      onMouseUp={stopPropagation}
     >
       <PopupHeader pin={pin} onClose={onClose} />
       <PopupContent pin={pin} />

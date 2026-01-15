@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSelectedPin, useUpdatePin } from "@/stores/use-pins-store";
 import { updatePin, uploadPinIcon } from "@/actions/pins";
-import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import type { Pin } from "@prisma/client";
 
@@ -21,7 +20,6 @@ interface PinFormState {
 export function usePropertiesPanel() {
   const selectedPin = useSelectedPin();
   const updatePinInStore = useUpdatePin();
-  const queryClient = useQueryClient();
   const { showToast } = useToast();
 
   const [formState, setFormState] = useState<PinFormState>({
@@ -77,18 +75,7 @@ export function usePropertiesPanel() {
         // Optimistic update: Update Zustand store immediately
         updatePinInStore(selectedPin.id, { [field]: value } as Partial<Pin>);
 
-        // Optimistic update: Update TanStack Query cache
-        queryClient.setQueryData<Pin[]>(
-          ["pins", selectedPin.gameWorldId],
-          (old = []) =>
-            old.map((pin) =>
-              pin.id === selectedPin.id
-                ? { ...pin, [field]: value, updatedAt: new Date() }
-                : pin
-            )
-        );
-
-        // Persist to database
+        // Persist to database (fire-and-forget since Zustand is source of truth)
         await updatePin({
           id: selectedPin.id,
           [field]: value,
@@ -118,14 +105,11 @@ export function usePropertiesPanel() {
           setFormState(lastKnownGoodState);
           updatePinInStore(selectedPin.id, lastKnownGoodState as Partial<Pin>);
         }
-
-        // Invalidate queries to refetch from server
-        queryClient.invalidateQueries({ queryKey: ["pins", selectedPin.gameWorldId] });
       } finally {
         setIsUpdating(false);
       }
     },
-    [selectedPin, isUpdating, formState, updatePinInStore, queryClient, showToast, lastKnownGoodState]
+    [selectedPin, isUpdating, formState, updatePinInStore, showToast, lastKnownGoodState]
   );
 
   // Handle custom icon upload
@@ -145,19 +129,8 @@ export function usePropertiesPanel() {
         // Update local state
         setFormState((prev) => ({ ...prev, icon: result.pin.icon }));
 
-        // Update Zustand store
+        // Update Zustand store (source of truth)
         updatePinInStore(selectedPin.id, { icon: result.pin.icon });
-
-        // Update TanStack Query cache
-        queryClient.setQueryData<Pin[]>(
-          ["pins", selectedPin.gameWorldId],
-          (old = []) =>
-            old.map((pin) =>
-              pin.id === selectedPin.id
-                ? { ...pin, icon: result.pin.icon, updatedAt: new Date() }
-                : pin
-            )
-        );
 
         showToast("Icon uploaded successfully", "success");
       } catch (err) {
@@ -169,17 +142,17 @@ export function usePropertiesPanel() {
         setIsUpdating(false);
       }
     },
-    [selectedPin, updatePinInStore, queryClient, showToast]
+    [selectedPin, updatePinInStore, showToast]
   );
 
   // Retry failed update
   const retryUpdate = useCallback(() => {
     if (error && lastKnownGoodState) {
       setError(null);
-      // Trigger a refetch to get the latest state from server
-      queryClient.invalidateQueries({ queryKey: ["pins", selectedPin?.gameWorldId] });
+      // Trigger a refetch by re-fetching from server action
+      // Note: This will be handled by calling component
     }
-  }, [error, lastKnownGoodState, selectedPin, queryClient]);
+  }, [error, lastKnownGoodState]);
 
   return {
     selectedPin,

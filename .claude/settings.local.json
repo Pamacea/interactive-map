@@ -68,8 +68,21 @@
       "Bash(pnpm build)",
       "Bash(pnpm lint:*)",
       "Bash(pnpm run typecheck:*)",
-      "Bash(pnpm exec tsc:*)"
+      "Bash(pnpm exec tsc:*)",
+      "Bash(.claude/scripts/ralph-loop-setup.sh:*)"
     ]
   },
-  "outputStyle": "default"
+  "outputStyle": "default",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/stop-hook.sh"
+          }
+        ]
+      }
+    ]
+  }
 }

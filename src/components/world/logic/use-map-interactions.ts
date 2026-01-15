@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Pin } from "@prisma/client";
 import { PinTypeEnum } from "@/types/pin.type";
+import { eventManager } from "@/lib/event-manager";
 
 export interface ContextMenuState {
   position: { x: number; y: number };
@@ -54,6 +55,11 @@ export function useMapInteractions(options: UseMapInteractionsOptions) {
   }, []);
 
   const handleClick = useCallback((e: React.MouseEvent) => {
+    // Don't handle click if event was captured by another element
+    if (eventManager.isCaptured()) {
+      return;
+    }
+
     // Close context menu on left click
     if (contextMenu) {
       setContextMenu(null);

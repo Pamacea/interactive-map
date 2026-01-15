@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useMapStore } from "@/stores/map-store";
 import { usePinsStore } from "@/stores/use-pins-store";
 import { getPinTypeConfig, type PinType } from "@/constants/pin-types";
 import { getIconByName } from "@/constants/pin-icons";
 import * as LucideIcons from "lucide-react";
 import { updatePinPosition } from "@/actions/pins";
+import { eventManager } from "@/lib/event-manager";
 import type { Pin } from "@prisma/client";
 
 interface PinMarkerProps {
@@ -47,6 +48,14 @@ export function PinMarker({ pin, mapWidth, mapHeight, imageDimensions, transform
   const hasMovedDuringDragRef = useRef(false);
 
   const isPinSelected = selectedPinId === pin.id;
+
+  // Capture events when pin is hovered or selected
+  useEffect(() => {
+    if (isHovered || isPinSelected) {
+      const release = eventManager.capture("pin-marker");
+      return () => release();
+    }
+  }, [isHovered, isPinSelected]);
 
   const pinConfig = getPinTypeConfig(pin.pinType as PinType);
 
