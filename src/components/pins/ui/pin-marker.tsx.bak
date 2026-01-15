@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect, memo } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useMapStore } from "@/stores/map-store";
 import { usePinsStore } from "@/stores/use-pins-store";
 import { getPinTypeConfig, type PinType } from "@/constants/pin-types";
 import { getIconByName } from "@/constants/pin-icons";
-import * as LucideIcons from "lucide-react";
 import { updatePinPosition } from "@/actions/pins";
-import { eventManager } from "@/lib/event-manager";
+import { PinIcon } from "./pin-icon";
+import { usePinEvents } from "../logic/use-pin-events";
 import type { Pin } from "@prisma/client";
 
 interface PinMarkerProps {
@@ -30,31 +30,12 @@ interface PinMarkerProps {
 }
 
 export function PinMarker({ pin, mapWidth, mapHeight, imageDimensions, transform, onPinClick }: PinMarkerProps) {
-  // CRITICAL: Early returns BEFORE any hooks to maintain consistent hook order
-  // Single source of truth for visibility - already filtered at map-canvas level
-  const isVisible = pin.isVisible;
-
-  // ZOOM-BASED VISIBILITY: Hide pins that are too small to be useful
-  const MIN_VISIBLE_SIZE = 6; // Minimum 6px to be visible/clickable
-  const currentSize = pin.size * transform.scale;
-
-  // ZOOM RANGE VISIBILITY: Check if current zoom is within pin's min/max zoom range
-  const zoomPercentage = transform.scale * 100;
-  const withinZoomRange = zoomPercentage >= (pin.minZoom ?? 0) &&
-                          zoomPercentage <= (pin.maxZoom ?? 200);
-
-  // We need to check rendering conditions BEFORE hooks, but we need isDragging/isHovered state
-  // Solution: Always call hooks, use CSS to hide when not visible/rendered
-  // This maintains consistent hook order while achieving the same visual result
-
-  const [isHovered, setIsHovered] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [dragPosition, setDragPosition] = useState<{ x: number; y: number } | null>(null);
   const [hasMovedDuringDrag, setHasMovedDuringDrag] = useState(false);
 
   const layers = useMapStore((state) => state.layers);
   const selectPin = usePinsStore((state) => state.selectPin);
-  const setHoverPin = usePinsStore((state) => state.setHoverPin);
   const updatePin = usePinsStore((state) => state.updatePin);
   const selectedPinId = usePinsStore((state) => state.selectedPinId);
 
@@ -66,23 +47,12 @@ export function PinMarker({ pin, mapWidth, mapHeight, imageDimensions, transform
 
   const isPinSelected = selectedPinId === pin.id;
 
-  // Capture events when pin is hovered or selected
-  useEffect(() => {
-    if (isHovered || isPinSelected) {
-      const release = eventManager.capture("pin-marker");
-      return () => release();
-    }
-  }, [isHovered, isPinSelected]);
-
-  // Now we can compute visibility conditions with hook state
-  const shouldRender = isVisible &&
-    ((isDragging || isHovered || isPinSelected) ||
-     (withinZoomRange && currentSize >= MIN_VISIBLE_SIZE));
-
-  // Early return AFTER all hooks (safe now)
-  if (!shouldRender) {
-    return null;
-  }
+  // Event handling: hover state and event capture
+  const { isHovered, handleMouseEnter, handleMouseLeave } = usePinEvents({
+    pinId: pin.id,
+    isDragging,
+    isPinSelected,
+  });
 
   const pinConfig = getPinTypeConfig(pin.pinType as PinType);
 
@@ -91,9 +61,6 @@ export function PinMarker({ pin, mapWidth, mapHeight, imageDimensions, transform
 
   // Check if icon is a custom uploaded image (starts with /)
   const isCustomImage = iconName?.startsWith("/");
-
-  // Get Lucide icon component for non-custom icons
-  const IconComponent = isCustomImage ? null : (LucideIcons as any)[iconName] || LucideIcons.MapPin;
 
   // Check if layer is locked
   const layer = pin.layerId
@@ -104,6 +71,31 @@ export function PinMarker({ pin, mapWidth, mapHeight, imageDimensions, transform
   // Get layer offset for position calculation
   const layerOffsetX = layer?.offsetX ?? 0;
   const layerOffsetY = layer?.offsetY ?? 0;
+
+  // Single source of truth for visibility - already filtered at map-canvas level
+  const isVisible = pin.isVisible;
+
+  if (!isVisible) {
+    return null;
+  }
+
+  // ZOOM-BASED VISIBILITY: Hide pins that are too small to be useful
+  const MIN_VISIBLE_SIZE = 6; // Minimum 6px to be visible/clickable
+  const currentSize = pin.size * transform.scale;
+
+  // ZOOM RANGE VISIBILITY: Check if current zoom is within pin's min/max zoom range
+  const zoomPercentage = transform.scale * 100;
+  const withinZoomRange = zoomPercentage >= (pin.minZoom ?? 0) &&
+                          zoomPercentage <= (pin.maxZoom ?? 200);
+
+  // Always render if dragging, hovered, or selected (user needs to edit it)
+  // Otherwise check both zoom range and minimum size
+  const shouldRender = (isDragging || isHovered || isPinSelected) ||
+                       (withinZoomRange && currentSize >= MIN_VISIBLE_SIZE);
+
+  if (!shouldRender) {
+    return null;
+  }
 
   // Use original image dimensions if provided (from MapImage), otherwise use fallback
   const actualWidth = imageDimensions?.width ?? mapWidth;
@@ -254,16 +246,6 @@ export function PinMarker({ pin, mapWidth, mapHeight, imageDimensions, transform
     onPinClick?.(pin);
   };
 
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-    setHoverPin(pin.id);
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    setHoverPin(null);
-  };
-
   // Ensure pins always render above the map image (z-index: 0)
   // Base z-index of 10 ensures pins are above the image but below UI overlays (z-index: 50+)
   const baseZIndex = 10;
@@ -326,106 +308,14 @@ export function PinMarker({ pin, mapWidth, mapHeight, imageDimensions, transform
           transform: isDragging ? "scale(1.2)" : isPinSelected ? "scale(1.05)" : isHovered ? "scale(1.1)" : "scale(1)",
         }}
       >
-        {isCustomImage ? (
-          <img
-            src={iconName}
-            alt={pin.title}
-            className="w-full h-full object-contain"
-            style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.3))" }}
-          />
-        ) : (
-          <IconComponent
-            width={iconSize}
-            height={iconSize}
-            style={{ color: "white", opacity: 0.9 }}
-          />
-        )}
+        <PinIcon
+          iconName={iconName}
+          color="white"
+          size={iconSize}
+          opacity={0.9}
+          alt={pin.title}
+        />
       </div>
     </div>
   );
 }
-
-/**
- * MemoizedPinMarker - Performance-optimized pin marker with custom comparison
- *
- * PERFORMANCE STRATEGY:
- * ====================
- *
- * CRITICAL PROPS (trigger re-render):
- * - pin.id: Unique identifier - if changed, this is a different pin
- * - pin.isVisible: Visibility toggle - directly affects rendering
- * - pin.size: Affects visual size calculation
- * - pin.color: Affects visual appearance
- * - pin.icon: Affects which icon is displayed
- * - pin.latitude / pin.longitude: Position changes (drag operations)
- * - pin.layerId: Layer assignment affects z-index and offsets
- * - pin.opacity: Visual transparency
- * - pin.minZoom / pin.maxZoom: Zoom-based visibility
- * - transform.scale: Affects size and zoom-based visibility
- * - transform.translateX: Affects position when panning
- * - transform.translateY: Affects position when panning
- *
- * EXCLUDED PROPS (intentionally ignored):
- * - pin.title: Only used for alt text - doesn't affect rendering
- * - pin.description: Not used in marker rendering
- * - pin.createdAt / pin.updatedAt: Metadata only
- * - pin.worldId: Not used in rendering
- * - pin.userId: Not used in rendering
- * - layer properties: Computed from mapStore, not props
- * - imageDimensions: Cached in parent, rarely changes
- * - mapWidth / mapHeight: Only used for position calc, derived from imageDimensions
- *
- * WHY THIS MATTERS:
- * ================
- * Without memoization, EVERY pin re-renders on EVERY transform change (pan/zoom).
- * With 100 pins and 60fps, that's 6000 renders/second = major lag.
- *
- * With memoization, only pins affected by the change re-render:
- * - Pan/zoom: All pins re-render (transform changes) - EXPECTED
- * - Title edit: Only edited pin re-renders - OPTIMIZED
- * - Visibility toggle: Only toggled pin re-renders - OPTIMIZED
- * - Selection: Only selected pin updates - OPTIMIZED
- *
- * TESTING:
- * ========
- * 1. Open React DevTools Profiler
- * 2. Start profiling
- * 3. Pan/zoom map - expect all pins to re-render (transform change)
- * 4. Edit pin title - expect ONLY that pin to re-render
- * 5. Toggle pin visibility - expect ONLY that pin to re-render
- * 6. Select different pin - expect minimal re-renders
- *
- * EXPECTED PERFORMANCE:
- * ====================
- * - 60fps during pan/zoom with 100+ pins
- * - <16ms render time per frame
- * - No cascade re-renders on unrelated prop changes
- */
-export const MemoizedPinMarker = memo(PinMarker, (prevProps, nextProps) => {
-  // Compare critical props that affect rendering
-  return (
-    // Identity check - different pin entirely
-    prevProps.pin.id === nextProps.pin.id &&
-    // Visibility - directly affects whether we render
-    prevProps.pin.isVisible === nextProps.pin.isVisible &&
-    // Visual properties that affect appearance
-    prevProps.pin.size === nextProps.pin.size &&
-    prevProps.pin.color === nextProps.pin.color &&
-    prevProps.pin.icon === nextProps.pin.icon &&
-    prevProps.pin.opacity === nextProps.pin.opacity &&
-    // Position - affects where the pin is rendered
-    prevProps.pin.latitude === nextProps.pin.latitude &&
-    prevProps.pin.longitude === nextProps.pin.longitude &&
-    // Zoom range - affects visibility at different zoom levels
-    prevProps.pin.minZoom === nextProps.pin.minZoom &&
-    prevProps.pin.maxZoom === nextProps.pin.maxZoom &&
-    // Layer assignment - affects z-index and offsets
-    prevProps.pin.layerId === nextProps.pin.layerId &&
-    // Transform - affects size, position, and visibility
-    prevProps.transform.scale === nextProps.transform.scale &&
-    prevProps.transform.translateX === nextProps.transform.translateX &&
-    prevProps.transform.translateY === nextProps.transform.translateY
-  );
-});
-
-MemoizedPinMarker.displayName = "MemoizedPinMarker";

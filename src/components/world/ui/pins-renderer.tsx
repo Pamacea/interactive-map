@@ -1,6 +1,6 @@
 import { FC, memo } from "react";
 import type { Pin } from "@prisma/client";
-import { PinMarker } from "@/components/pins/ui/pin-marker";
+import { MemoizedPinMarker } from "@/components/pins/ui/pin-marker";
 import type { Transform } from "../logic/use-map-pan";
 import type { PinWithLayer } from "../logic/use-pins-filtering";
 
@@ -17,7 +17,7 @@ export const PinsRenderer: FC<PinsRendererProps> = memo(
       <>
         {pins.map((pin) => {
           return (
-            <PinMarker
+            <MemoizedPinMarker
               key={pin.id}
               pin={pin}
               mapWidth={imageDimensions.width}

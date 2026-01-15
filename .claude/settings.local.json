@@ -69,20 +69,15 @@
       "Bash(pnpm lint:*)",
       "Bash(pnpm run typecheck:*)",
       "Bash(pnpm exec tsc:*)",
-      "Bash(.claude/scripts/ralph-loop-setup.sh:*)"
+      "Bash(.claude/scripts/ralph-loop-setup.sh:*)",
+      "Bash(git stash:*)",
+      "Bash(pnpm add -D:*)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm test:coverage:*)",
+      "Bash(pnpm vitest:*)",
+      "Bash(npm run test:coverage:*)"
     ]
   },
-  "outputStyle": "default",
-  "hooks": {
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/stop-hook.sh"
-          }
-        ]
-      }
-    ]
-  }
+  "hooks": {},
+  "outputStyle": "default"
 }

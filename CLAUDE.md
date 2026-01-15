@@ -65,23 +65,55 @@ src/
 │   ├── ui/                       # Shadcn components (button, card, etc.)
 │   ├── auth/                     # Auth feature components
 │   ├── worlds/                   # Worlds feature components
+│   ├── pins/                     # Pins feature (FULLY IMPLEMENTED)
+│   │   ├── ui/                   # Pin UI components
+│   │   │   ├── pin-marker.tsx    # Main pin marker (176 lines, 48% reduced)
+│   │   │   ├── pin-icon.tsx      # Icon renderer (Lucide/custom)
+│   │   │   ├── pin-selection-ring.tsx  # Selection indicator
+│   │   │   ├── pin-popup.tsx     # Pin popup/card
+│   │   │   ├── pin-form.tsx      # Create/edit form
+│   │   │   └── ...               # Other pin UI components
+│   │   ├── logic/                # Pin business logic
+│   │   │   ├── use-pin-drag.ts   # Drag-and-drop hook
+│   │   │   ├── use-pin-position.ts  # Position calculation
+│   │   │   ├── use-pin-events.ts # Event handling
+│   │   │   ├── use-pin-form.ts   # Form state management
+│   │   │   └── __tests__/        # Unit tests (64 tests, 98.92% coverage)
+│   │   ├── utils/                # Pin utilities
+│   │   │   ├── pin-icons.ts      # Icon constants
+│   │   │   └── pin-popup-utils.ts # Popup helpers
+│   │   └── logic/                # Shared pin logic
 │   └── world/                    # World editor feature
 │       ├── ui/                   # Editor UI (map, sidebar, controls)
 │       ├── logic/                # Editor state, hooks
+│       │   ├── use-pins-filtering.ts  # Pin filtering logic
+│       │   └── use-pin-filters.ts     # Filter state management
 │       └── methods/              # Map actions, layer operations
 │
 ├── actions/                      # Server Actions (database writes)
 │   ├── auth.ts                   # Auth operations
-│   └── worlds.ts                 # World CRUD operations
+│   ├── worlds.ts                 # World CRUD operations
+│   └── pins.ts                   # Pin CRUD operations
+│
+├── hooks/                        # Global custom hooks
+│   ├── use-debounce.ts           # Debounce utility
+│   ├── use-toast.tsx             # Toast notifications
+│   └── use-autosave.ts           # Autosave functionality
 │
 ├── lib/                          # Core utilities
 │   ├── auth.ts                   # NextAuth config
 │   ├── db.ts                     # Prisma client
 │   ├── utils.ts                  # Helper functions
-│   └── valid-data.ts             # Data validation utilities
+│   ├── valid-data.ts             # Data validation utilities
+│   └── event-manager.ts          # Event capture/propagation control
 │
 ├── store/                        # Zustand stores
-│   └── use-sidebar.ts            # Sidebar state
+│   ├── use-sidebar.ts            # Sidebar state
+│   └── use-pins-store.ts         # Pins state + filters (569 lines)
+│
+├── constants/                    # App constants
+│   ├── pin-types.ts              # Pin type definitions
+│   └── pin-icons.ts              # Pin icon mappings
 │
 └── types/                        # TypeScript types (if Prisma not enough)
 
@@ -95,7 +127,41 @@ prisma/
 
 **Key Relations**: User → World (1:N), World → Pin/Lore/Layer (1:N).
 
-**Ready for UI**: Pin, LoreEntry, ImageGallery (schema exists, no components yet).
+### Pin Feature Architecture (FULLY IMPLEMENTED)
+
+The pin feature demonstrates the **ui/logic/methods** pattern in action:
+
+**UI Components** (`components/pins/ui/`):
+- `pin-marker.tsx`: Main marker component with drag, click, hover (176 lines)
+- `pin-icon.tsx`: Reusable icon renderer (Lucide or custom images)
+- `pin-selection-ring.tsx`: Animated selection indicator
+- `pin-popup.tsx`: Popup card showing pin details
+- `pin-form.tsx`: Create/edit form with validation
+
+**Logic Hooks** (`components/pins/logic/`):
+- `use-pin-drag.ts`: Drag-and-drop with optimistic updates (235 lines)
+- `use-pin-position.ts`: Coordinate conversion and layer offsets (93 lines)
+- `use-pin-events.ts`: Hover state and event capture (81 lines)
+- `use-pin-form.ts`: Form state and validation
+
+**State Management** (`store/use-pins-store.ts`):
+- UI state (selection, hover, creating/editing modes)
+- Pin data (list, filtered list)
+- Filter state (type, search, layers)
+- CRUD operations with optimistic updates
+- Server sync via Server Actions
+
+**Performance Optimizations**:
+- `MemoizedPinMarker`: Custom memoization prevents unnecessary re-renders
+- Only re-renders on critical prop changes (position, visibility, size)
+- Zoom-based visibility culling (hides pins when < 6px)
+- Layer-aware z-index sorting
+- Optimistic updates with Zustand → async DB sync
+
+**Test Coverage**: 64 unit tests, 98.92% coverage
+- `use-pin-drag.test.ts`: 18 tests
+- `use-pin-events.test.ts`: 16 tests
+- `use-pin-position.test.ts`: 30 tests
 
 ---
 
@@ -109,9 +175,18 @@ prisma/
 - **Layers System**: Add, remove, toggle layers (stored in DB)
 - **Responsive UI**: Mobile-friendly design with Tailwind CSS
 
+### Fully Implemented
+
+- **Pins**: Complete marker system with drag-and-drop, layers support, filtering, and CRUD operations
+  - Interactive drag-and-drop with optimistic updates
+  - Layer support with visibility and lock controls
+  - Advanced filtering by type, search term, and visibility
+  - Zoom-based visibility and size constraints
+  - Custom icons (Lucide or uploaded images)
+  - 98.92% test coverage (64 unit tests)
+
 ### Partial (Schema Ready, UI Missing)
 
-- **Pins**: Mark locations on map with titles, descriptions
 - **Lore Entries**: Rich text content linked to map locations
 - **Image Gallery**: Upload and organize images per world
 

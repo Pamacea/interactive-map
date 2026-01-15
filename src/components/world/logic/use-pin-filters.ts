@@ -1,5 +1,12 @@
 import { useCallback } from "react";
-import { usePinFiltersStore, usePinFilterActions, useVisiblePinTypes } from "@/stores/pin-filters-store";
+import {
+  usePinTypeFilters,
+  useTogglePinTypeFilter,
+  useShowAllPinTypes,
+  useHideAllPinTypes,
+  useVisiblePinTypes,
+  useShowAllPinTypesValue,
+} from "@/stores/use-pins-store";
 import type { PinTypeEnum } from "@/types/pin.type";
 
 /**
@@ -20,13 +27,29 @@ import type { PinTypeEnum } from "@/types/pin.type";
  * ```
  */
 export function usePinFilters() {
-  const filters = usePinFiltersStore((state) => state.filters);
-  const showAll = usePinFiltersStore((state) => state.showAll);
-  const actions = usePinFilterActions();
+  const filters = usePinTypeFilters();
+  const showAll = useShowAllPinTypesValue();
+  const toggleFilter = useTogglePinTypeFilter();
+  const showAllTypes = useShowAllPinTypes();
+  const hideAllTypes = useHideAllPinTypes();
   const visibleTypes = useVisiblePinTypes();
 
+  const isTypeVisible = (pinType: PinTypeEnum): boolean => {
+    return filters[pinType] ?? true;
+  };
+
   return {
-    ...actions,
+    toggleFilter,
+    setFilter: (pinType: PinTypeEnum, value: boolean) => {
+      // This is handled by toggle, but we could add setPinTypeFilter if needed
+      if (value !== filters[pinType]) {
+        toggleFilter(pinType);
+      }
+    },
+    showAllTypes,
+    hideAllTypes,
+    resetFilters: showAllTypes, // Reset = show all
+    isTypeVisible,
     filters,
     showAll,
     visibleTypes,
@@ -42,8 +65,8 @@ export function usePinFilters() {
  * ```
  */
 export function useIsPinTypeVisible(pinType: PinTypeEnum): boolean {
-  const isTypeVisible = usePinFiltersStore((state) => state.isTypeVisible);
-  return isTypeVisible(pinType);
+  const filters = usePinTypeFilters();
+  return filters[pinType] ?? true;
 }
 
 /**
@@ -85,6 +108,6 @@ export function useVisiblePinTypesCount(): number {
  * ```
  */
 export function useHasActiveFilters(): boolean {
-  const showAll = usePinFiltersStore((state) => state.showAll);
+  const showAll = useShowAllPinTypesValue();
   return !showAll;
 }
