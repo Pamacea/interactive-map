@@ -114,7 +114,7 @@ export function PinCreateForm({
       <PinForm
         formData={form.formData}
         errors={form.errors}
-        onUpdateField={form.updateField}
+        onUpdateField={form.updateField as any}
         layers={layers}
         mode="create"
         showLayer={layers.length > 0}

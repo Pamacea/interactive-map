@@ -1,13 +1,11 @@
 "use client";
 
 import { FC } from "react";
-import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { PinFormData } from "../logic/use-pin-form";
+import type { PinFormData } from "../../logic/use-pin-form";
+import { FormTextField, FormTextAreaField, FormNumberField } from "./form-fields";
+import { FormActions } from "./form-actions";
 import {
-  FormTextField,
-  FormTextAreaField,
-  FormNumberField,
   FormPinTypeSelector,
   FormColorPicker,
   FormSizeSlider,
@@ -20,7 +18,7 @@ import {
 export interface PinFormProps {
   formData: PinFormData;
   errors: Record<string, string>;
-  onUpdateField: (field: keyof PinFormData, value: string | number | boolean) => void;
+  onUpdateField: (field: string | number | symbol, value: string | number | boolean) => void;
   layers: Array<{ id: string; name: string }>;
   mode: "create" | "edit";
   showLayer?: boolean;
@@ -97,31 +95,29 @@ export const PinForm: FC<PinFormProps> = ({
         />
       </div>
 
-      {/* Color */}
-      <FormColorPicker
-        label="Color"
-        value={formData.color}
-        onChange={(value) => onUpdateField("color", value)}
-        error={errors.color}
-      />
-
-      {/* Size */}
-      <FormSizeSlider
-        label="Size"
-        value={formData.size}
-        onChange={(value) => onUpdateField("size", value)}
-        error={errors.size}
-        min={16}
-        max={mode === "create" ? 64 : 128}
-      />
-
-      {/* Icon */}
-      <FormIconSelect
-        label="Icon"
-        value={formData.icon}
-        onChange={(value) => onUpdateField("icon", value)}
-        error={errors.icon}
-      />
+      {/* Color, Size, Icon */}
+      <div className="grid grid-cols-3 gap-4">
+        <FormColorPicker
+          label="Color"
+          value={formData.color}
+          onChange={(value) => onUpdateField("color", value)}
+          error={errors.color}
+        />
+        <FormSizeSlider
+          label="Size"
+          value={formData.size}
+          onChange={(value) => onUpdateField("size", value)}
+          error={errors.size}
+          min={16}
+          max={mode === "create" ? 64 : 128}
+        />
+        <FormIconSelect
+          label="Icon"
+          value={formData.icon}
+          onChange={(value) => onUpdateField("icon", value)}
+          error={errors.icon}
+        />
+      </div>
 
       {/* Visibility */}
       <FormVisibilityToggle
@@ -151,46 +147,12 @@ export const PinForm: FC<PinFormProps> = ({
       />
 
       {/* Actions */}
-      <div className="flex items-center gap-3 pt-4">
-        <Button
-          type="submit"
-          disabled={isSubmitting}
-          className="flex-1"
-        >
-          {isSubmitting
-            ? mode === "create"
-              ? "Creating..."
-              : "Updating..."
-            : mode === "create"
-              ? "Create Pin"
-              : "Update Pin"
-          }
-        </Button>
-
-        {onCancel && (
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={onCancel}
-            disabled={isSubmitting}
-          >
-            Cancel
-          </Button>
-        )}
-
-        {mode === "edit" && onDelete && (
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={onDelete}
-            disabled={isSubmitting}
-            className="ml-auto bg-red-600 hover:bg-red-700 text-white"
-          >
-            <X className="w-4 h-4 mr-2" />
-            Delete
-          </Button>
-        )}
-      </div>
+      <FormActions
+        mode={mode}
+        isSubmitting={isSubmitting}
+        onCancel={onCancel}
+        onDelete={onDelete}
+      />
     </form>
   );
 };

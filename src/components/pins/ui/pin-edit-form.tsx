@@ -159,7 +159,7 @@ export function PinEditForm({
       <PinForm
         formData={form.formData}
         errors={form.errors}
-        onUpdateField={form.updateField}
+        onUpdateField={form.updateField as any}
         layers={layers}
         mode="edit"
         showLayer={layers.length > 0}
