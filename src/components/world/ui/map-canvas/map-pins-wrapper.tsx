@@ -14,7 +14,7 @@ interface MapPinsWrapperProps {
   layerScale: number;
   mapImage: string;
   transform: { translateX: number; translateY: number; scale: number };
-  imageRef: React.RefObject<HTMLDivElement>;
+  imageRef: React.RefObject<HTMLImageElement | HTMLDivElement | null>;
   onPinClick: (pin: PinWithLayer) => void;
   onPopupClose: () => void;
   onImageLoad: () => void;
@@ -54,8 +54,6 @@ export function MapPinsWrapper({
     <SelectedPinPopup
       selectedPin={selectedPin}
       onClose={onPopupClose}
-      imageDimensions={imageDimensions}
-      transform={transform}
     />
   ) : null;
 

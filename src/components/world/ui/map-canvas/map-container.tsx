@@ -6,9 +6,9 @@ interface MapContainerProps {
   isCreatingPin: boolean;
   isDragging: boolean;
   showContextMenu: boolean;
-  onMouseDown: () => void;
-  onClick: () => void;
-  onContextMenu: () => void;
+  onMouseDown: (e: React.MouseEvent<HTMLDivElement>) => void;
+  onClick: (e: React.MouseEvent<HTMLDivElement>) => void;
+  onContextMenu: (e: React.MouseEvent<HTMLDivElement>) => void;
   children: ReactNode;
 }
 
