@@ -220,11 +220,13 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
                   onPinClick={handlePinClick}
                 />
 
-                {/* Selected Pin Popup */}
+                {/* Selected Pin Popup - inside MapImage to have access to image dimensions */}
                 {selectedPin && (
                   <SelectedPinPopup
                     selectedPin={selectedPin}
                     onClose={handlePopupClose}
+                    imageDimensions={imageDimensions}
+                    transform={transform}
                   />
                 )}
               </MapImage>
@@ -247,15 +249,16 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
                   transform={transform}
                   onPinClick={handlePinClick}
                 />
-
-                {/* Selected Pin Popup */}
-                {selectedPin && (
-                  <SelectedPinPopup
-                    selectedPin={selectedPin}
-                    onClose={handlePopupClose}
-                  />
-                )}
               </div>
+            )}
+
+            {selectedPin && imageDimensions && (
+              <SelectedPinPopup
+                selectedPin={selectedPin}
+                onClose={handlePopupClose}
+                imageDimensions={imageDimensions}
+                transform={transform}
+              />
             )}
 
             {/* Layers Indicator */}

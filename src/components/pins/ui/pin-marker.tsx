@@ -1,14 +1,17 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect, memo } from "react";
+import { memo } from "react";
 import { useMapStore } from "@/stores/map-store";
 import { usePinsStore } from "@/stores/use-pins-store";
 import { getPinTypeConfig, type PinType } from "@/constants/pin-types";
-import { getIconByName } from "@/constants/pin-icons";
-import * as LucideIcons from "lucide-react";
-import { updatePinPosition } from "@/actions/pins";
+import { usePinDrag } from "@/components/pins/logic/use-pin-drag";
+import { usePinEvents } from "@/components/pins/logic/use-pin-events";
+import { usePinPosition } from "@/components/pins/logic/use-pin-position";
 import { eventManager } from "@/lib/event-manager";
 import type { Pin } from "@prisma/client";
+import { MarkerContainer } from "./pin-marker/marker-container";
+import { useMarkerVisibility } from "./pin-marker/use-marker-visibility";
+import { useMarkerStyling } from "./pin-marker/use-marker-styling";
 
 interface PinMarkerProps {
   pin: Pin & {
@@ -20,7 +23,7 @@ interface PinMarkerProps {
   };
   mapWidth: number;
   mapHeight: number;
-  imageDimensions?: { width: number; height: number }; // Original dimensions from MapImage
+  imageDimensions?: { width: number; height: number };
   transform: {
     scale: number;
     translateX: number;
@@ -29,319 +32,129 @@ interface PinMarkerProps {
   onPinClick?: (pin: Pin) => void;
 }
 
-export function PinMarker({ pin, mapWidth, mapHeight, imageDimensions, transform, onPinClick }: PinMarkerProps) {
-  // CRITICAL: Early returns BEFORE any hooks to maintain consistent hook order
-  // Single source of truth for visibility - already filtered at map-canvas level
-  const isVisible = pin.isVisible;
-
-  // ZOOM-BASED VISIBILITY: Hide pins that are too small to be useful
-  const MIN_VISIBLE_SIZE = 6; // Minimum 6px to be visible/clickable
-  const currentSize = pin.size * transform.scale;
-
-  // ZOOM RANGE VISIBILITY: Check if current zoom is within pin's min/max zoom range
-  const zoomPercentage = transform.scale * 100;
-  const withinZoomRange = zoomPercentage >= (pin.minZoom ?? 0) &&
-                          zoomPercentage <= (pin.maxZoom ?? 200);
-
-  // We need to check rendering conditions BEFORE hooks, but we need isDragging/isHovered state
-  // Solution: Always call hooks, use CSS to hide when not visible/rendered
-  // This maintains consistent hook order while achieving the same visual result
-
-  const [isHovered, setIsHovered] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragPosition, setDragPosition] = useState<{ x: number; y: number } | null>(null);
-  const [hasMovedDuringDrag, setHasMovedDuringDrag] = useState(false);
-
+/**
+ * PinMarker - Interactive map pin with drag-and-drop
+ *
+ * Orchestrates all pin marker functionality:
+ * - Position calculation with layer offsets
+ * - Drag-and-drop with optimistic updates
+ * - Hover/selection state management
+ * - Visibility based on zoom and size
+ * - Custom or Lucide icon rendering
+ *
+ * Refactored from 430 lines to ~100 lines by extracting:
+ * - UI components (MarkerContainer, MarkerIcon, MarkerSelectionRing)
+ * - Logic hooks (usePinDrag, usePinEvents, usePinPosition)
+ * - Utility hooks (useMarkerVisibility, useMarkerStyling)
+ */
+export function PinMarker({
+  pin,
+  mapWidth,
+  mapHeight,
+  imageDimensions,
+  transform,
+  onPinClick,
+}: PinMarkerProps) {
+  // Store access
   const layers = useMapStore((state) => state.layers);
   const selectPin = usePinsStore((state) => state.selectPin);
-  const setHoverPin = usePinsStore((state) => state.setHoverPin);
   const updatePin = usePinsStore((state) => state.updatePin);
   const selectedPinId = usePinsStore((state) => state.selectedPinId);
 
-  const dragStartPos = useRef<{ x: number; y: number } | null>(null);
-  // Use refs for drag state to avoid closure issues with event listeners
-  const isDraggingRef = useRef(false);
-  const dragPositionRef = useRef<{ x: number; y: number } | null>(null);
-  const hasMovedDuringDragRef = useRef(false);
-
   const isPinSelected = selectedPinId === pin.id;
 
+  // Calculate position with layer offsets
+  const position = usePinPosition(pin, null, imageDimensions, transform, layers);
+
+  // Get layer info for lock state
+  const layer = pin.layerId ? layers.find((layer) => layer.id === pin.layerId) : null;
+  const isLayerLocked = layer?.locked ?? false;
+
+  // Drag functionality
+  const { isDragging, dragPosition, hasMovedDuringDrag, handleMouseDown } = usePinDrag({
+    pinId: pin.id,
+    latitude: pin.latitude,
+    longitude: pin.longitude,
+    mapWidth: position.actualWidth || mapWidth,
+    mapHeight: position.actualHeight || mapHeight,
+    scale: transform.scale,
+    isLocked: isLayerLocked,
+    onSelectPin: selectPin,
+    onUpdatePin: updatePin,
+  });
+
+  // Recalculate position with drag offset
+  const dragAwarePosition = usePinPosition(pin, dragPosition, imageDimensions, transform, layers);
+
+  // Event handling (hover, event capture)
+  const { isHovered, handleMouseEnter, handleMouseLeave } = usePinEvents({
+    pinId: pin.id,
+    isDragging,
+    isPinSelected,
+  });
+
   // Capture events when pin is hovered or selected
-  useEffect(() => {
-    if (isHovered || isPinSelected) {
-      const release = eventManager.capture("pin-marker");
-      return () => release();
-    }
-  }, [isHovered, isPinSelected]);
+  // NOTE: This is handled by usePinEvents internally via useEffect
 
-  // Now we can compute visibility conditions with hook state
-  const shouldRender = isVisible &&
-    ((isDragging || isHovered || isPinSelected) ||
-     (withinZoomRange && currentSize >= MIN_VISIBLE_SIZE));
+  // Visibility calculation
+  const shouldRender = useMarkerVisibility({
+    pin,
+    transform,
+    isDragging,
+    isHovered,
+    isPinSelected,
+  });
 
-  // Early return AFTER all hooks (safe now)
   if (!shouldRender) {
     return null;
   }
 
+  // Icon configuration
   const pinConfig = getPinTypeConfig(pin.pinType as PinType);
-
-  // Get custom icon if set, otherwise use pin type default
   const iconName = pin.icon || pinConfig.icon;
-
-  // Check if icon is a custom uploaded image (starts with /)
   const isCustomImage = iconName?.startsWith("/");
 
-  // Get Lucide icon component for non-custom icons
-  const IconComponent = isCustomImage ? null : (LucideIcons as any)[iconName] || LucideIcons.MapPin;
+  // Style calculations
+  const { finalZIndex, finalSize, iconSize, boxShadow, transformScale } = useMarkerStyling({
+    pin,
+    transform,
+    isDragging,
+    isPinSelected,
+    isHovered,
+  });
 
-  // Check if layer is locked
-  const layer = pin.layerId
-    ? layers.find((layer) => layer.id === pin.layerId)
-    : null;
-  const isLayerLocked = layer?.locked ?? false;
-
-  // Get layer offset for position calculation
-  const layerOffsetX = layer?.offsetX ?? 0;
-  const layerOffsetY = layer?.offsetY ?? 0;
-
-  // Use original image dimensions if provided (from MapImage), otherwise use fallback
-  const actualWidth = imageDimensions?.width ?? mapWidth;
-  const actualHeight = imageDimensions?.height ?? mapHeight;
-
-  // Convert lat/lng to pixel coordinates (percentage of ORIGINAL image dimensions)
-  // Using drag position if dragging, otherwise use pin's stored position
-  const latitude = dragPosition ? dragPosition.y / actualHeight : pin.latitude;
-  const longitude = dragPosition ? dragPosition.x / actualWidth : pin.longitude;
-
-  // Position is fixed relative to map image (percentage-based)
-  // No transform applied here - the parent map container handles pan/zoom
-  // Apply layer offset to the final position
-  const x = longitude * actualWidth + layerOffsetX;
-  const y = latitude * actualHeight + layerOffsetY;
-
-  // Drag handlers
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    // Prevent dragging if layer is locked
-    if (isLayerLocked) {
-      return;
-    }
-
-    // Only left mouse button
-    if (e.button !== 0) {
-      return;
-    }
-
-    e.preventDefault();
-    e.stopPropagation();
-
-    // Calculate offset from pin center to mouse position
-    dragStartPos.current = {
-      x: e.clientX,
-      y: e.clientY,
-    };
-
-    // DON'T set isDragging yet - wait for actual mouse movement
-    // This prevents hover from triggering drag behavior
-    setHasMovedDuringDrag(false); // Reset movement flag
-    hasMovedDuringDragRef.current = false;
-    selectPin(pin.id);
-
-    // Add window-level event listeners for drag continuation
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
-  }, [isLayerLocked, pin.id, selectPin]);
-
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    // Initialize drag on first significant movement
-    if (!dragStartPos.current) {
-      return;
-    }
-
-    // Calculate delta in screen coordinates
-    const deltaX = (e.clientX - dragStartPos.current.x) / transform.scale;
-    const deltaY = (e.clientY - dragStartPos.current.y) / transform.scale;
-
-    // Check if movement is significant (> 3 pixels to account for small movements)
-    const hasSignificantMovement = Math.abs(deltaX) > 3 || Math.abs(deltaY) > 3;
-
-    if (hasSignificantMovement) {
-      // Start dragging on first significant movement
-      if (!isDraggingRef.current) {
-        isDraggingRef.current = true;
-        setIsDragging(true);
-      }
-      hasMovedDuringDragRef.current = true;
-      setHasMovedDuringDrag(true);
-    }
-
-    // Only update position if we're actively dragging
-    if (!isDraggingRef.current) {
-      return;
-    }
-
-    // Calculate new position (start from pin's original position)
-    const startX = pin.longitude * actualWidth;
-    const startY = pin.latitude * actualHeight;
-
-    let newX = startX + deltaX;
-    let newY = startY + deltaY;
-
-    // Clamp to map boundaries
-    newX = Math.max(0, Math.min(actualWidth, newX));
-    newY = Math.max(0, Math.min(actualHeight, newY));
-
-    // Update visual position only (not database yet)
-    const newPosition = { x: newX, y: newY };
-    dragPositionRef.current = newPosition;
-    setDragPosition(newPosition);
-  }, [actualWidth, actualHeight, transform.scale, pin.latitude, pin.longitude]);
-
-  const handleMouseUp = useCallback(async (e: MouseEvent) => {
-    // Always clean up window listeners, even if we never started dragging
-    window.removeEventListener("mousemove", handleMouseMove);
-    window.removeEventListener("mouseup", handleMouseUp);
-
-    // Only proceed with drag logic if we were actually dragging
-    if (!isDraggingRef.current) {
-      dragStartPos.current = null;
-      return;
-    }
-
-    isDraggingRef.current = false;
-    setIsDragging(false);
-
-    // If we have a drag position and actually moved, save to database
-    const currentDragPosition = dragPositionRef.current;
-    if (currentDragPosition && hasMovedDuringDragRef.current) {
-      // Convert pixel position to map coordinates (0-1 range)
-      const newLatitude = Math.max(0, Math.min(1, currentDragPosition.y / actualHeight));
-      const newLongitude = Math.max(0, Math.min(1, currentDragPosition.x / actualWidth));
-
-      // CRITICAL FIX: Update Zustand store FIRST (optimistic update)
-      // This prevents race condition where TanStack Query refetch overwrites new position
-      updatePin(pin.id, {
-        latitude: newLatitude,
-        longitude: newLongitude,
-      });
-
-      // Then update database in background (fire-and-forget)
-      // Zustand is now source of truth, DB sync happens asynchronously
-      updatePinPosition(pin.id, newLatitude, newLongitude).catch((error) => {
-        console.error("Failed to save pin position to database:", error);
-        // Note: We could rollback here, but for UX we keep the optimistic update
-        // The next page refresh will sync with DB state
-      });
-
-      // Clear drag position
-      dragPositionRef.current = null;
-      setDragPosition(null);
-    }
-
-    dragStartPos.current = null;
-    // Note: Don't reset hasMovedDuringDrag here, as handleClick needs it
-    // It will be reset on next mouseDown
-  }, [actualWidth, actualHeight, pin.id, updatePin, handleMouseMove]);
-
+  // Click handler (prevented if we just finished dragging)
   const handleClick = (e: React.MouseEvent) => {
-    // Don't trigger click if we just finished dragging (mouse moved significantly)
     if (hasMovedDuringDrag) {
       return;
     }
-
     e.stopPropagation();
     selectPin(pin.id);
     onPinClick?.(pin);
   };
 
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-    setHoverPin(pin.id);
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    setHoverPin(null);
-  };
-
-  // Ensure pins always render above the map image (z-index: 0)
-  // Base z-index of 10 ensures pins are above the image but below UI overlays (z-index: 50+)
-  const baseZIndex = 10;
-  const layerZIndex = pin.layer?.zIndex ?? 0;
-  const finalZIndex = isDragging || isPinSelected ? 9999 : baseZIndex + layerZIndex;
-
-  // SIZE CONSTRAINTS: Apply min/max size to prevent microscopic or oversized pins
-  const MIN_PIN_SIZE = 8;
-  const MAX_PIN_SIZE = 128;
-  const scaledSize = pin.size * transform.scale;
-  const finalSize = Math.max(MIN_PIN_SIZE, Math.min(MAX_PIN_SIZE, scaledSize));
-
-  // Icon size scales proportionally but with constraints
-  const iconScale = Math.max(0.5, Math.min(3, transform.scale));
-  const iconSize = 16 * iconScale;
-
   return (
-    <div
-      className={`absolute ${isDragging ? "cursor-grabbing" : isLayerLocked ? "cursor-not-allowed" : "cursor-pointer"}`}
-      style={{
-        left: `${x}px`,
-        top: `${y}px`,
-        transform: "translate(-50%, -50%)",
-        zIndex: finalZIndex,
-      }}
+    <MarkerContainer
+      x={dragAwarePosition.x}
+      y={dragAwarePosition.y}
+      zIndex={finalZIndex}
+      size={finalSize}
+      iconSize={iconSize}
+      isCustomImage={isCustomImage}
+      iconName={iconName}
+      title={pin.title}
+      color={pin.color}
+      opacity={pin.opacity}
+      boxShadow={boxShadow}
+      transformScale={transformScale}
+      isSelected={isPinSelected}
+      isLayerLocked={isLayerLocked}
+      isDragging={isDragging}
       onClick={handleClick}
       onMouseDown={handleMouseDown}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-    >
-      {/* Selection ring indicator */}
-      {isPinSelected && (
-        <div
-          className="absolute inset-0 rounded-full animate-pulse"
-          style={{
-            width: `${finalSize + 8}px`,
-            height: `${finalSize + 8}px`,
-            border: "2px solid rgba(59, 130, 246, 0.8)",
-            transform: "translate(-50%, -50%)",
-            left: "50%",
-            top: "50%",
-          }}
-        />
-      )}
-      <div
-        className="flex items-center justify-center transition-all duration-150 overflow-hidden"
-        style={{
-          width: `${finalSize}px`,
-          height: `${finalSize}px`,
-          backgroundColor: isCustomImage ? "transparent" : pin.color,
-          borderRadius: "var(--radius-sm)",
-          opacity: pin.opacity,
-          boxShadow: isDragging
-            ? "0 8px 20px rgba(0, 0, 0, 0.6)"
-            : isPinSelected
-              ? "0 0 0 4px rgba(59, 130, 246, 0.3), 0 4px 12px rgba(0, 0, 0, 0.5)"
-              : isHovered
-                ? "0 4px 12px rgba(0, 0, 0, 0.5)"
-                : "0 2px 8px rgba(0, 0, 0, 0.3)",
-          transform: isDragging ? "scale(1.2)" : isPinSelected ? "scale(1.05)" : isHovered ? "scale(1.1)" : "scale(1)",
-        }}
-      >
-        {isCustomImage ? (
-          <img
-            src={iconName}
-            alt={pin.title}
-            className="w-full h-full object-contain"
-            style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.3))" }}
-          />
-        ) : (
-          <IconComponent
-            width={iconSize}
-            height={iconSize}
-            style={{ color: "white", opacity: 0.9 }}
-          />
-        )}
-      </div>
-    </div>
+    />
   );
 }
 
@@ -429,3 +242,10 @@ export const MemoizedPinMarker = memo(PinMarker, (prevProps, nextProps) => {
 });
 
 MemoizedPinMarker.displayName = "MemoizedPinMarker";
+
+// Re-export atomic sub-components for external use
+export { MarkerContainer } from "./pin-marker/marker-container";
+export { MarkerIcon } from "./pin-marker/marker-icon";
+export { MarkerSelectionRing } from "./pin-marker/marker-selection-ring";
+export { useMarkerVisibility } from "./pin-marker/use-marker-visibility";
+export { useMarkerStyling } from "./pin-marker/use-marker-styling";
