@@ -55,7 +55,34 @@
       "Bash(taskkill:*)",
       "Bash(git checkout:*)",
       "Bash(if not exist \".smite\" mkdir \".smite\")",
-      "Bash(npx ralph execute:*)"
+      "Bash(npx ralph execute:*)",
+      "Bash(where ralph)",
+      "Bash(exit_code=$?)",
+      "Bash(if:*)",
+      "Bash(then echo \"TypeScript compilation successful\")",
+      "Bash(else echo \"TypeScript compilation failed with exit code $exit_code\")",
+      "Bash(fi:*)",
+      "Bash(pnpm list:*)",
+      "Bash(pnpm run build)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(pnpm build)",
+      "Bash(pnpm lint:*)",
+      "Bash(pnpm run typecheck:*)",
+      "Bash(pnpm exec tsc:*)",
+      "Bash(.claude/scripts/ralph-loop-setup.sh:*)",
+      "Bash(git stash:*)",
+      "Bash(pnpm add -D:*)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm test:coverage:*)",
+      "Bash(pnpm vitest:*)",
+      "Bash(npm run test:coverage:*)",
+      "Bash(find:*)",
+      "Bash(git reset:*)",
+      "Bash(git log:*)",
+      "Bash(pnpm tsc:*)",
+      "Bash(wc:*)"
     ]
-  }
+  },
+  "hooks": {},
+  "outputStyle": "default"
 }

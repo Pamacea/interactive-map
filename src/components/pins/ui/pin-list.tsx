@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { MapPin, Badge } from "lucide-react";
 import { usePinsStore } from "@/stores/use-pins-store";
 import { useSelectedLayerId } from "@/stores/map-store";
-import { usePins } from "@/components/pins/logic/use-pins";
 import { pinTypeConfig, PinType } from "@/constants/pin-types";
 import type { Pin } from "@prisma/client";
 import * as LucideIcons from "lucide-react";
@@ -14,23 +13,12 @@ interface PinListProps {
 }
 
 export function PinList({ worldId }: PinListProps) {
-  // Fetch pins from server
-  const { pins: serverPins, isLoading } = usePins(worldId);
-
-  // Sync server pins to Zustand store
-  const setPins = usePinsStore((state) => state.setPins);
+  // Use Zustand store directly - already synced by WorldClient
   const pins = usePinsStore((state) => state.pins);
   const selectedPinId = usePinsStore((state) => state.selectedPinId);
   const selectedLayerId = useSelectedLayerId();
 
   const selectPin = usePinsStore((state) => state.selectPin);
-
-  // Sync server pins to store when data changes
-  useEffect(() => {
-    if (serverPins && serverPins.length >= 0) {
-      setPins(serverPins);
-    }
-  }, [serverPins, setPins]);
 
   // Filter state
   const [selectedType, setSelectedType] = useState<PinType | "ALL">("ALL");
@@ -109,11 +97,7 @@ export function PinList({ worldId }: PinListProps) {
       </div>
 
       {/* Pin List */}
-      {isLoading ? (
-        <div className="px-4 py-8 text-center">
-          <p className="text-sm text-text-muted">Loading pins...</p>
-        </div>
-      ) : filteredPins.length === 0 ? (
+      {filteredPins.length === 0 ? (
         <div className="px-4 py-8 text-center">
           <MapPin className="w-8 h-8 mx-auto mb-2 text-text-muted" />
           <p className="text-sm text-text-muted">No pins found</p>

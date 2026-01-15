@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { X } from "lucide-react";
-import { usePins } from "../logic/use-pins";
+import { useUpdatePinServer, useDeletePinServer } from "@/stores/use-pins-store";
 import { usePinForm } from "../logic/use-pin-form";
 import { PinForm } from "./pin-form";
 import { useToast } from "@/hooks/use-toast";
@@ -48,7 +48,10 @@ export function PinEditForm({
     },
   });
 
-  const { updatePin, deletePin, isUpdating, isDeleting } = usePins(pin.gameWorldId);
+  const updatePinMutation = useUpdatePinServer();
+  const deletePinMutation = useDeletePinServer();
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,37 +60,40 @@ export function PinEditForm({
       return;
     }
 
+    setIsUpdating(true);
+
     try {
       const data = form.getSubmitData();
-      updatePin(data as any, {
-        onSuccess: () => {
-          showToast("Pin updated successfully!", "success");
-          onSuccess?.();
-        },
-        onError: (error: Error) => {
-          showToast(error.message || "Failed to update pin", "error");
-        },
-      });
+      await updatePinMutation(data as any);
+      showToast("Pin updated successfully!", "success");
+      onSuccess?.();
     } catch (error) {
       if (error instanceof Error) {
         showToast(error.message, "error");
       } else {
         showToast("An unexpected error occurred", "error");
       }
+    } finally {
+      setIsUpdating(false);
     }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (showDeleteConfirm) {
-      deletePin(pin.id, {
-        onSuccess: () => {
-          showToast("Pin deleted successfully!", "success");
-          onSuccess?.();
-        },
-        onError: (error: Error) => {
-          showToast(error.message || "Failed to delete pin", "error");
-        },
-      });
+      setIsDeleting(true);
+      try {
+        await deletePinMutation(pin.id);
+        showToast("Pin deleted successfully!", "success");
+        onSuccess?.();
+      } catch (error) {
+        if (error instanceof Error) {
+          showToast(error.message, "error");
+        } else {
+          showToast("An unexpected error occurred", "error");
+        }
+      } finally {
+        setIsDeleting(false);
+      }
     } else {
       setShowDeleteConfirm(true);
     }
@@ -153,7 +159,7 @@ export function PinEditForm({
       <PinForm
         formData={form.formData}
         errors={form.errors}
-        onUpdateField={form.updateField}
+        onUpdateField={form.updateField as any}
         layers={layers}
         mode="edit"
         showLayer={layers.length > 0}

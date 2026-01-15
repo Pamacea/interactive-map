@@ -1,7 +1,22 @@
-import { getPinTypeOptions } from "@/constants/pin-types";
-import { Switch } from "@/components/ui/switch";
-import * as PinIcons from "lucide-react";
+import { IconUploadDialog } from "./icon-upload-dialog";
 import type { Pin } from "@prisma/client";
+import { useState } from "react";
+import {
+  ErrorAlert,
+  UpdatingIndicator,
+  SectionHeader,
+  TitleInput,
+  DescriptionTextarea,
+  PinTypeSelect,
+  IconSelector,
+  SizeSlider,
+  ColorPicker,
+  OpacitySlider,
+  ZoomRangeSection,
+  VisibilityToggle,
+  CoordinatesDisplay,
+} from "./pin-properties";
+import { usePinPropertiesForm } from "../logic/use-pin-properties-form";
 
 interface PinPropertiesSectionProps {
   pin: Pin;
@@ -9,162 +24,127 @@ interface PinPropertiesSectionProps {
     title: string;
     description: string;
     pinType: Pin["pinType"];
+    icon: string | null;
     size: number;
     color: string;
+    opacity: number;
     isVisible: boolean;
+    minZoom: number;
+    maxZoom: number;
   };
   isUpdating: boolean;
+  error?: string | null;
   onUpdate: <K extends keyof Pin>(field: K, value: Pin[K]) => void;
+  onIconUpload?: (file: File) => Promise<void>;
+  onRetry?: () => void;
 }
 
 export function PinPropertiesSection({
   pin,
   formState,
   isUpdating,
+  error,
   onUpdate,
+  onIconUpload,
+  onRetry,
 }: PinPropertiesSectionProps) {
-  const pinTypeOptions = getPinTypeOptions();
+  const [showUploadDialog, setShowUploadDialog] = useState(false);
 
-  const getPinIcon = (iconName: string) => {
-    const IconComponent = (PinIcons as any)[iconName];
-    return IconComponent ? IconComponent : PinIcons.MapPin;
-  };
-
-  const CurrentPinTypeIcon = getPinIcon(
-    pinTypeOptions.find((opt) => opt.value === pin.pinType)?.icon || "MapPin"
-  );
+  const {
+    localTitle,
+    localDescription,
+    handleTitleUpdate,
+    handleDescriptionUpdate,
+    resetZoom,
+  } = usePinPropertiesForm({ formState });
 
   return (
     <section className="space-y-3">
-      <div className="flex items-center gap-2 px-3 py-2 rounded-sm bg-background-elevated border border-accent-gold/30">
-        <CurrentPinTypeIcon className="w-4 h-4 text-accent-gold" />
-        <span className="text-xs font-display font-medium text-accent-gold uppercase tracking-wider">
-          Pin Properties
-        </span>
-      </div>
+      {error && <ErrorAlert error={error} onRetry={onRetry} />}
+
+      {isUpdating && !error && <UpdatingIndicator />}
+
+      <SectionHeader pinType={pin.pinType} />
 
       <div className="space-y-3">
-        {/* Title Input */}
-        <div className="px-3 py-2 rounded-sm bg-background-elevated border border-border-subtle">
-          <label className="block text-xs text-text-muted mb-1.5">
-            Title
-          </label>
-          <input
-            type="text"
-            value={formState.title}
-            onChange={(e) => onUpdate("title", e.target.value)}
-            disabled={isUpdating}
-            className="w-full bg-transparent text-sm text-text-primary placeholder:text-text-muted/50 focus:outline-none disabled:opacity-50"
-            placeholder="Enter pin title..."
-          />
-        </div>
+        <TitleInput
+          value={localTitle}
+          externalValue={formState.title}
+          disabled={isUpdating}
+          onUpdate={(value) => onUpdate("title", value)}
+          onChange={handleTitleUpdate}
+        />
 
-        {/* Description Textarea */}
-        <div className="px-3 py-2 rounded-sm bg-background-elevated border border-border-subtle">
-          <label className="block text-xs text-text-muted mb-1.5">
-            Description
-          </label>
-          <textarea
-            value={formState.description}
-            onChange={(e) => onUpdate("description", e.target.value)}
-            disabled={isUpdating}
-            rows={3}
-            className="w-full bg-transparent text-sm text-text-primary placeholder:text-text-muted/50 focus:outline-none resize-none disabled:opacity-50"
-            placeholder="Enter pin description..."
-          />
-        </div>
+        <DescriptionTextarea
+          value={localDescription}
+          externalValue={formState.description}
+          disabled={isUpdating}
+          onUpdate={(value) => onUpdate("description", value)}
+          onChange={handleDescriptionUpdate}
+        />
 
-        {/* Pin Type Dropdown */}
-        <div className="px-3 py-2 rounded-sm bg-background-elevated border border-border-subtle">
-          <label className="block text-xs text-text-muted mb-1.5">
-            Pin Type
-          </label>
-          <select
-            value={formState.pinType}
-            onChange={(e) => onUpdate("pinType", e.target.value as Pin["pinType"])}
-            disabled={isUpdating}
-            className="w-full bg-transparent text-sm text-text-primary focus:outline-none disabled:opacity-50"
-          >
-            {pinTypeOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        <PinTypeSelect
+          value={formState.pinType}
+          disabled={isUpdating}
+          onUpdate={(value) => onUpdate("pinType", value)}
+        />
 
-        {/* Size Slider */}
-        <div className="px-3 py-2 rounded-sm bg-background-elevated border border-border-subtle">
-          <div className="flex items-center justify-between mb-1.5">
-            <label className="text-xs text-text-muted">Size</label>
-            <span className="text-xs font-display font-medium text-accent-gold">
-              {formState.size}px
-            </span>
-          </div>
-          <input
-            type="range"
-            min="10"
-            max="100"
-            value={formState.size}
-            onChange={(e) => onUpdate("size", parseInt(e.target.value))}
-            disabled={isUpdating}
-            className="w-full h-1.5 bg-background-base rounded-lg appearance-none cursor-pointer accent-accent-gold disabled:opacity-50"
-          />
-        </div>
+        <IconSelector
+          currentIcon={formState.icon}
+          isUpdating={isUpdating}
+          onIconSelect={(iconName) => onUpdate("icon", iconName)}
+          onUploadClick={() => setShowUploadDialog(true)}
+          canUpload={!!onIconUpload}
+        />
 
-        {/* Color Picker */}
-        <div className="px-3 py-2 rounded-sm bg-background-elevated border border-border-subtle">
-          <div className="flex items-center justify-between">
-            <label className="text-xs text-text-muted">Color</label>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-mono text-text-secondary">
-                {formState.color}
-              </span>
-              <input
-                type="color"
-                value={formState.color}
-                onChange={(e) => onUpdate("color", e.target.value)}
-                disabled={isUpdating}
-                className="w-8 h-8 rounded cursor-pointer border-0 bg-transparent disabled:opacity-50"
-              />
-            </div>
-          </div>
-        </div>
+        <SizeSlider
+          value={formState.size}
+          disabled={isUpdating}
+          onUpdate={(value) => onUpdate("size", value)}
+        />
 
-        {/* Visibility Toggle */}
-        <div
-          className={`flex items-center justify-between px-3 py-2 rounded-sm bg-background-elevated transition-colors ${
-            isUpdating ? "opacity-50" : ""
-          } border border-border-subtle`}
-        >
-          <span className="text-sm text-text-secondary">Visible</span>
-          <Switch
-            checked={formState.isVisible}
-            onCheckedChange={(checked) => onUpdate("isVisible", checked)}
-          />
-        </div>
+        <ColorPicker
+          value={formState.color}
+          disabled={isUpdating}
+          onUpdate={(value) => onUpdate("color", value)}
+        />
 
-        {/* Coordinates Display (Readonly) */}
-        <div className="px-3 py-2 rounded-sm bg-background-elevated border border-border-subtle">
-          <label className="block text-xs text-text-muted mb-1.5">
-            Coordinates
-          </label>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="bg-background-base rounded px-2 py-1.5">
-              <span className="text-xs text-text-muted block">Lat</span>
-              <span className="text-xs font-mono text-accent-gold">
-                {pin.latitude.toFixed(4)}
-              </span>
-            </div>
-            <div className="bg-background-base rounded px-2 py-1.5">
-              <span className="text-xs text-text-muted block">Lng</span>
-              <span className="text-xs font-mono text-accent-gold">
-                {pin.longitude.toFixed(4)}
-              </span>
-            </div>
-          </div>
-        </div>
+        <OpacitySlider
+          value={formState.opacity}
+          disabled={isUpdating}
+          onUpdate={(value) => onUpdate("opacity", value)}
+        />
+
+        <ZoomRangeSection
+          minZoom={formState.minZoom}
+          maxZoom={formState.maxZoom}
+          disabled={isUpdating}
+          onUpdateMinZoom={(value) => onUpdate("minZoom", value)}
+          onUpdateMaxZoom={(value) => onUpdate("maxZoom", value)}
+          onReset={() => {
+            const defaults = resetZoom();
+            onUpdate("minZoom", defaults.minZoom);
+            onUpdate("maxZoom", defaults.maxZoom);
+          }}
+        />
+
+        <VisibilityToggle
+          isVisible={formState.isVisible}
+          disabled={isUpdating}
+          onUpdate={(value) => onUpdate("isVisible", value)}
+        />
+
+        <CoordinatesDisplay pin={pin} />
       </div>
+
+      {onIconUpload && (
+        <IconUploadDialog
+          isOpen={showUploadDialog}
+          onClose={() => setShowUploadDialog(false)}
+          onUpload={onIconUpload}
+          pinId={pin.id}
+        />
+      )}
     </section>
   );
 }

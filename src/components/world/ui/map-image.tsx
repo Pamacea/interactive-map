@@ -1,11 +1,13 @@
 import type { FC } from "react";
+import React from "react";
 
 export interface MapImageProps {
-  imageRef: React.RefObject<HTMLImageElement | null>;
+  imageRef: React.RefObject<HTMLImageElement | HTMLDivElement | null>;
   mapImage: string;
   imageDimensions: { width: number; height: number };
   showGrid: boolean;
   gridSize: number;
+  layerScale?: number; // Scale factor for layer content (0.5 - 2.0)
   onLoad: () => void;
   onError: () => void;
   children?: React.ReactNode;
@@ -17,22 +19,33 @@ export const MapImage: FC<MapImageProps> = ({
   imageDimensions,
   showGrid,
   gridSize,
+  layerScale = 1,
   onLoad,
   onError,
   children,
 }) => {
   const { width, height } = imageDimensions;
 
+  // Apply layer scale to dimensions instead of CSS transform
+  const scaledWidth = width * layerScale;
+  const scaledHeight = height * layerScale;
+
   return (
-    <div className="relative">
+    <div
+      className="relative"
+      style={{
+        width: scaledWidth > 0 ? scaledWidth : "100%",
+        height: scaledHeight > 0 ? scaledHeight : "100%",
+      }}
+    >
       <img
-        ref={imageRef}
+        ref={imageRef as any}
         src={mapImage}
         alt="World map"
         className="max-w-none"
         style={{
-          width: width > 0 ? "auto" : "100%",
-          height: height > 0 ? "auto" : "100%",
+          width: "100%",
+          height: "100%",
           objectFit: "contain",
         }}
         onLoad={onLoad}
@@ -43,21 +56,22 @@ export const MapImage: FC<MapImageProps> = ({
         <svg
           className="absolute top-0 left-0 pointer-events-none"
           style={{
-            width: width || "100%",
-            height: height || "100%",
+            width: scaledWidth || "100%",
+            height: scaledHeight || "100%",
+            zIndex: 5,
           }}
-          viewBox={`0 0 ${width || 1920} ${height || 1080}`}
+          viewBox={`0 0 ${scaledWidth || 1920} ${scaledHeight || 1080}`}
           preserveAspectRatio="none"
         >
           <defs>
             <pattern
               id={`grid-${gridSize}`}
-              width={gridSize}
-              height={gridSize}
+              width={gridSize * layerScale}
+              height={gridSize * layerScale}
               patternUnits="userSpaceOnUse"
             >
               <path
-                d={`M ${gridSize} 0 L 0 0 0 ${gridSize}`}
+                d={`M ${gridSize * layerScale} 0 L 0 0 0 ${gridSize * layerScale}`}
                 fill="none"
                 stroke="rgba(212, 175, 55, 0.2)"
                 strokeWidth="1"
@@ -68,7 +82,15 @@ export const MapImage: FC<MapImageProps> = ({
         </svg>
       )}
 
-      {children}
+      {/* Pass ORIGINAL dimensions to children (pins need this for correct positioning) */}
+      {React.Children.map(children, (child) => {
+        if (React.isValidElement(child)) {
+          return React.cloneElement(child, {
+            imageDimensions: { width, height },
+          } as any);
+        }
+        return child;
+      })}
     </div>
   );
 };

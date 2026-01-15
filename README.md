@@ -60,9 +60,101 @@ npm run db:reset      # Reset database (dev only)
 npm run db:studio     # Open Prisma Studio
 ```
 
+## Testing
+
+```bash
+# Run all tests
+npm run test
+
+# Run tests in watch mode
+npm run test -- --watch
+
+# Run tests with UI
+npm run test:ui
+
+# Run tests with coverage report
+npm run test:coverage
+
+# Run specific test file
+npm run test -- use-pin-drag
+```
+
+### Test Coverage
+
+Current test coverage for the pin feature: **98.92%** (64/64 tests passing)
+
+| Hook/Component | Tests | Coverage |
+|----------------|-------|----------|
+| `usePinDrag` | 18 tests | 98.46% |
+| `usePinEvents` | 16 tests | 100% |
+| `usePinPosition` | 30 tests | 100% |
+| **Overall** | **64 tests** | **98.92%** |
+
+### Running Specific Tests
+
+```bash
+# Test drag functionality
+npm run test -- use-pin-drag
+
+# Test event handling
+npm run test -- use-pin-events
+
+# Test position calculation
+npm run test -- use-pin-position
+
+# Run tests matching a pattern
+npm run test -- --grep "drag"
+```
+
+## Development Workflow
+
+### Adding New Features
+
+1. **Create component** following `ui/logic/methods` pattern:
+   ```bash
+   src/components/[feature]/
+   ├── ui/           # Presentational components
+   ├── logic/        # Custom hooks, state management
+   └── methods/      # API calls, data transformations
+   ```
+
+2. **Write tests** alongside implementation:
+   ```bash
+   src/components/[feature]/logic/__tests__/
+   └── your-hook.test.ts
+   ```
+
+3. **Run tests** to ensure quality:
+   ```bash
+   npm run test:coverage
+   ```
+
+4. **Update documentation** (CLAUDE.md, README.md)
+
+### Code Quality Standards
+
+- **Max 70 lines per component** (extract sub-components if larger)
+- **TypeScript strict mode** (no `any` types)
+- **JSDoc comments** on all exported functions
+- **80%+ test coverage** on business logic
+- **ESLint passing** (`npm run lint`)
+- **TypeScript passing** (`npm run build`)
+
+### Performance Guidelines
+
+- Use `memo()` for components that re-render frequently
+- Implement custom comparison functions for complex props
+- Apply `useMemo` for expensive calculations
+- Use optimistic updates for better UX
+- Test with React DevTools Profiler
+
 ## Documentation
 
-See [docs/MASTER_PLAN.md](docs/MASTER_PLAN.md) for complete architecture documentation and roadmap.
+- **[REFACTORING.md](REFACTORING.md)** - Pin feature refactoring summary (48% code reduction, 98.92% test coverage)
+- **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** - Component hierarchy and data flow diagrams
+- **[docs/HOOK_API.md](docs/HOOK_API.md)** - Hook API documentation with examples
+- **[CLAUDE.md](CLAUDE.md)** - Development guidelines and architecture patterns
+- **[docs/MASTER_PLAN.md](docs/MASTER_PLAN.md)** - Complete roadmap and planning
 
 ## License
 

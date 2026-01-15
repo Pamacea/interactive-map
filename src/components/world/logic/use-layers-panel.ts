@@ -1,9 +1,11 @@
 import { useState, useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useMapStore } from "@/stores/map-store";
-import type { MapLayer } from "@/types/world.type";
+import type { OptimizedWorldLayer } from "@/types/world.type";
 
 interface UseLayersPanelProps {
-  worldLayers?: MapLayer[];
+  worldId?: string;
+  worldLayers?: OptimizedWorldLayer[];
 }
 
 interface AddLayerData {
@@ -12,9 +14,14 @@ interface AddLayerData {
   locked: boolean;
   opacity: number;
   zIndex: number;
+  scale: number;
+  offsetX: number;
+  offsetY: number;
 }
 
-export function useLayersPanel({ worldLayers = [] }: UseLayersPanelProps) {
+export function useLayersPanel({ worldId, worldLayers = [] }: UseLayersPanelProps) {
+  const router = useRouter();
+
   // Store selectors
   const layers = useMapStore((state) => state.layers);
   const toggleLayerVisibility = useMapStore((state) => state.toggleLayerVisibility);
@@ -29,6 +36,7 @@ export function useLayersPanel({ worldLayers = [] }: UseLayersPanelProps) {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [newLayerName, setNewLayerName] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
+  const [showUploadDialog, setShowUploadDialog] = useState(false);
 
   // Computed
   const sortedLayers = [...layers].sort((a, b) => b.zIndex - a.zIndex);
@@ -47,12 +55,18 @@ export function useLayersPanel({ worldLayers = [] }: UseLayersPanelProps) {
   }, [updateLayerOpacity]);
 
   const handleMoveUp = useCallback((layerId: string) => {
+    // Prevent moving the base map layer
+    const layer = layers.find((l) => l.id === layerId);
+    if (layer?.isBaseMap) return;
     moveLayerUp(layerId);
-  }, [moveLayerUp]);
+  }, [moveLayerUp, layers]);
 
   const handleMoveDown = useCallback((layerId: string) => {
+    // Prevent moving the base map layer
+    const layer = layers.find((l) => l.id === layerId);
+    if (layer?.isBaseMap) return;
     moveLayerDown(layerId);
-  }, [moveLayerDown]);
+  }, [moveLayerDown, layers]);
 
   const handleAddLayer = useCallback(() => {
     if (newLayerName.trim()) {
@@ -63,6 +77,9 @@ export function useLayersPanel({ worldLayers = [] }: UseLayersPanelProps) {
         locked: false,
         opacity: 1,
         zIndex: maxZIndex + 1,
+        scale: 1.0,
+        offsetX: 0,
+        offsetY: 0,
       };
       addLayer(layerData);
       setNewLayerName("");
@@ -71,9 +88,12 @@ export function useLayersPanel({ worldLayers = [] }: UseLayersPanelProps) {
   }, [newLayerName, layers, addLayer]);
 
   const handleDeleteLayer = useCallback((layerId: string) => {
+    // Prevent deleting the base map layer
+    const layer = layers.find((l) => l.id === layerId);
+    if (layer?.isBaseMap) return;
     removeLayer(layerId);
     setShowDeleteConfirm(null);
-  }, [removeLayer]);
+  }, [removeLayer, layers]);
 
   const handleCancelDelete = useCallback(() => {
     setShowDeleteConfirm(null);
@@ -91,6 +111,26 @@ export function useLayersPanel({ worldLayers = [] }: UseLayersPanelProps) {
   const handleStartDeleteConfirm = useCallback((layerId: string) => {
     setShowDeleteConfirm(layerId);
   }, []);
+
+  const handleOpenUploadDialog = useCallback(() => {
+    setShowUploadDialog(true);
+  }, []);
+
+  const handleCloseUploadDialog = useCallback(() => {
+    setShowUploadDialog(false);
+  }, []);
+
+  const handleMapUploadSuccess = useCallback(
+    (mapUrl: string) => {
+      setShowUploadDialog(false);
+
+      // Refresh the page to show the new map
+      if (worldId) {
+        router.refresh();
+      }
+    },
+    [worldId, router]
+  );
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -118,6 +158,7 @@ export function useLayersPanel({ worldLayers = [] }: UseLayersPanelProps) {
     showAddDialog,
     newLayerName,
     showDeleteConfirm,
+    showUploadDialog,
 
     // Actions
     setNewLayerName,
@@ -132,6 +173,9 @@ export function useLayersPanel({ worldLayers = [] }: UseLayersPanelProps) {
     handleOpenAddDialog,
     handleCloseAddDialog,
     handleStartDeleteConfirm,
+    handleOpenUploadDialog,
+    handleCloseUploadDialog,
+    handleMapUploadSuccess,
 
     // Utilities
     getLayerColor,

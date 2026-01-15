@@ -4,45 +4,34 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import type { Pin } from "@prisma/client";
 import { PopupHeader } from "./popup-header";
-import { PopupContent } from "./popup-content";
-import { PopupActions } from "./popup-actions";
+import { PopupContentEnhanced } from "./popup-content-enhanced";
 import { PopupArrow } from "./popup-arrow";
+import { eventManager, stopPropagation } from "@/lib/event-manager";
 
 interface PinPopupProps {
   pin: Pin;
   onClose?: () => void;
-  onEdit?: () => void;
   onDelete?: () => void;
-  isOwner?: boolean;
-  position?: { x: number; y: number };
+  onTitleChange?: (newTitle: string) => void;
 }
 
 export function PinPopup({
   pin,
   onClose,
-  onEdit,
   onDelete,
-  isOwner = true,
-  position,
+  onTitleChange,
 }: PinPopupProps) {
   const popupRef = React.useRef<HTMLDivElement>(null);
 
-  // Close popup on click outside
+  // Capture events when popup is mounted to prevent map interactions
   React.useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        popupRef.current &&
-        !popupRef.current.contains(event.target as Node)
-      ) {
-        onClose?.();
-      }
-    };
+    const release = eventManager.capture("pin-popup");
+    return () => release();
+  }, []);
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [onClose]);
+  // NOTE: We DON'T close popup on click outside anymore
+  // User must explicitly click the X button or press Escape to close
+  // This allows clicking on the map without losing pin selection
 
   // Close popup on Escape key
   React.useEffect(() => {
@@ -62,20 +51,17 @@ export function PinPopup({
     <div
       ref={popupRef}
       className={cn(
-        "absolute z-50 w-80 rounded-sm border-2 border-[var(--color-accent-gold)]",
+        "relative z-50 min-w-[320px] max-w-[400px] rounded-sm border-2 border-[var(--color-accent-gold)]",
         "bg-[var(--color-background-card)] shadow-2xl",
         "font-display text-[var(--color-text-primary)]",
         "animate-in fade-in zoom-in-95 duration-200"
       )}
-      style={{
-        left: position?.x ?? 0,
-        top: position?.y ?? 0,
-        transform: "translate(-50%, -100%) translateY(-16px)",
-      }}
+      onClick={stopPropagation}
+      onMouseDown={stopPropagation}
+      onMouseUp={stopPropagation}
     >
-      <PopupHeader pin={pin} onClose={onClose} />
-      <PopupContent pin={pin} />
-      {isOwner && <PopupActions onEdit={onEdit} onDelete={onDelete} />}
+      <PopupHeader pin={pin} onClose={onClose} onDelete={onDelete} onTitleChange={onTitleChange} />
+      <PopupContentEnhanced pin={pin} />
       <PopupArrow />
     </div>
   );

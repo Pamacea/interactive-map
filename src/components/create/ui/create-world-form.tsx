@@ -28,15 +28,6 @@ export function CreateWorldForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log("📝 Form submit handler called with:", {
-      name: formData.name,
-      description: formData.description.substring(0, 50) + "...",
-      isPublic: formData.isPublic,
-      hasMap: !!formData.map,
-      mapName: formData.map?.name,
-      mapSize: formData.map?.size,
-    });
-
     try {
       const result = await mutation.mutateAsync({
         title: formData.name,
@@ -45,13 +36,11 @@ export function CreateWorldForm() {
         map: formData.map || undefined,
       });
 
-      console.log("✅ Form submission result:", result);
-
       if (result?.worldId) {
         router.push(`/world/${result.worldId}`);
       }
     } catch (error) {
-      console.error("❌ Form submission error:", error);
+      console.error("[create-world-form] Submission error:", error);
     }
   };
 

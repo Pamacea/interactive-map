@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import type { Pin } from "@prisma/client";
+import { usePinTypeFilters } from "@/stores/use-pins-store";
 
 // Extended type for pins with layer relations (using Prisma types)
 export interface PinWithLayer extends Pin {
@@ -17,6 +18,9 @@ export interface UsePinsFilteringOptions {
 }
 
 export function usePinsFiltering({ pins, layers }: UsePinsFilteringOptions) {
+  // Get active filters from store (Record<PinTypeEnum, boolean>)
+  const pinFilters = usePinTypeFilters();
+
   const visiblePins = useMemo(() => {
     return pins
       .filter((pin) => {
@@ -32,6 +36,12 @@ export function usePinsFiltering({ pins, layers }: UsePinsFilteringOptions) {
           }
         }
 
+        // Apply user-defined type filters
+        // If the pin type is explicitly set to false in filters, hide it
+        if (pinFilters[pin.pinType] === false) {
+          return false;
+        }
+
         // Pin is visible
         return true;
       })
@@ -43,7 +53,7 @@ export function usePinsFiltering({ pins, layers }: UsePinsFilteringOptions) {
         const bZIndex = bLayer?.zIndex ?? 0;
         return aZIndex - bZIndex;
       });
-  }, [pins, layers]);
+  }, [pins, layers, pinFilters]);
 
   return {
     visiblePins,
