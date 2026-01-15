@@ -69,8 +69,8 @@
       "agent": "smite-builder",
       "tech": "nextjs",
       "dependencies": ["US-001"],
-      "passes": false,
-      "notes": "Identifier et corriger tous les max-w, w-full, et autres classes CSS qui causent le problème"
+      "passes": true,
+      "notes": "FIXED: Used React Portal (createPortal) to render dialog outside parent container constraints - dialog now renders directly to document.body, bypassing pin popup's max-w-[400px] constraint"
     },
     {
       "id": "US-005",
