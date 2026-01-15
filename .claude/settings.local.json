@@ -80,7 +80,12 @@
       "Bash(git reset:*)",
       "Bash(git log:*)",
       "Bash(pnpm tsc:*)",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "Bash(git push:*)",
+      "Bash(gh pr create:*)",
+      "Bash(gh auth status:*)",
+      "Bash(gh auth login:*)",
+      "Bash(gh:*)"
     ]
   },
   "hooks": {},
