@@ -1,162 +1,95 @@
 {
-  "project": "Interactive Map - Server Component Performance Optimization",
-  "branchName": "optimize/server-component-performance",
-  "description": "Optimize Server Components to achieve <20ms compile + render times (currently 1516ms). Use TanStack Query for all data fetching, eliminate blocking awaits, and implement proper client/server separation.",
-
+  "project": "PinPopup-FullFix",
+  "branchName": "fix/popup-dialog-layout-comprehensive",
+  "description": "Correction complète et systématique de tous les problèmes de layout du pin popup et du dialog de suppression",
   "userStories": [
     {
-      "id": "US-PERF-001",
-      "title": "Convert Server Component to Client Component with TanStack Query",
-      "description": "The main performance bottleneck is src/app/world/[id]/page.tsx which is a Server Component doing synchronous database awaits. This blocks the entire page render. Convert to Client Component using TanStack Query for non-blocking data fetching.",
+      "id": "US-001",
+      "title": "Analyser la structure DOM actuelle du popup",
+      "description": "Analyser en profondeur la structure DOM complète du popup, du pin et du dialog pour identifier les problèmes de positionnement et de styling qui causent les bugs visuels.",
       "acceptanceCriteria": [
-        "Page component is now a Client Component ('use client' directive)",
-        "World data fetched via TanStack Query useQuery (non-blocking)",
-        "Initial render shows loading skeleton immediately",
-        "Data loads asynchronously without blocking render",
-        "Compile time < 10ms",
-        "Render time < 10ms",
-        "Total page load < 20ms",
-        "Debug console logs removed"
+        "Structure DOM documentée dans un fichier d'analyse",
+        "Tous les problèmes de positionnement identifiés",
+        "Tous les conflits CSS identifiés",
+        "Solution proposée pour chaque problème"
       ],
       "priority": 1,
-      "agent": "smite-constructor",
+      "agent": "smite-explorer",
       "tech": "nextjs",
       "dependencies": [],
       "passes": false,
-      "notes": "Current problem: await getWorldById() and await auth() block rendering for 1516ms. Solution: Use useQuery for world data, useSession for auth, render skeleton immediately."
+      "notes": "Utiliser Read, Search, et Grep pour explorer tous les fichiers liés au popup et au dialog"
     },
     {
-      "id": "US-PERF-002",
-      "title": "Optimize getWorldById Server Action",
-      "description": "The getWorldById function fetches too much data (user, layers, pins, loreEntries) even though not all is needed initially. Implement selective loading and consider caching.",
+      "id": "US-002",
+      "title": "Corriger le positionnement du popup au-dessus du pin",
+      "description": "Le popup doit être parfaitement centré au-dessus du pin, avec un espace de 24px entre le popup et le pin. Le popup ne doit pas être décalé ou mal positionné.",
       "acceptanceCriteria": [
-        "Create getWorldByIdMinimal that fetches only essential fields (id, title, map)",
-        "Pins fetched separately via usePins hook (already implemented)",
-        "Layers fetched separately (already in world.layers)",
-        "Consider adding Prisma query caching",
-        "Add select for only needed fields (avoid fetching unused data)",
-        "Server action response time < 50ms"
+        "Popup centré horizontalement par rapport au pin",
+        "Popup positionné 24px au-dessus du pin",
+        "Tests visuels sur desktop et mobile",
+        "Typecheck passe"
       ],
       "priority": 2,
-      "agent": "smite-constructor",
-      "tech": "prisma",
-      "dependencies": [],
-      "passes": false,
-      "notes": "getWorldById includes pins and loreEntries but these should be fetched via TanStack Query in client components. Only fetch world metadata + layers in server action."
+      "agent": "smite-builder",
+      "tech": "nextjs",
+      "dependencies": ["US-001"],
+      "passes": true,
+      "notes": "Corriger selected-pin-popup.tsx et pin-popup.tsx pour éliminer les doubles transformations - FIX APPLIED: Parent handles all positioning, child is pure presentational with no transforms"
     },
     {
-      "id": "US-PERF-003",
-      "title": "Implement React Query DevTools for Performance Monitoring",
-      "description": "Add React Query DevTools in development to monitor query performance, identify slow queries, and track cache hits/misses.",
+      "id": "US-003",
+      "title": "Corriger le mouvement du popup avec la map",
+      "description": "Le popup doit suivre le pin quand la map est draguée. Le popup ne doit pas bouger indépendamment du pin ou rester en place pendant que le pin bouge.",
       "acceptanceCriteria": [
-        "ReactQueryDevtools component added to app layout",
-        "Only renders in development (NODE_ENV === 'development')",
-        "Shows all active queries",
-        "Displays query timings (fetch, stale, cache)",
-        "Helps identify performance bottlenecks",
-        "DevTools toggle button visible in corner"
+        "Popup suit le pin quand la map est draguée",
+        "Popup reste ancré au pin pendant le zoom",
+        "Pas de décalage entre popup et pin",
+        "Tests de drag fonctionnels"
+      ],
+      "priority": 2,
+      "agent": "smite-builder",
+      "tech": "nextjs",
+      "dependencies": ["US-002"],
+      "passes": false,
+      "notes": "Vérifier que le popup est dans le bon conteneur DOM et que les transformations sont correctement appliquées"
+    },
+    {
+      "id": "US-004",
+      "title": "Corriger le dialog de suppression (texte écrasé/vertical)",
+      "description": "Le dialog de suppression doit être correctement affiché avec du texte lisible horizontallement, pas écrasé ou en vertical. Le dialog doit avoir une largeur appropriée et être responsive.",
+      "acceptanceCriteria": [
+        "Texte du dialog lisible horizontalement",
+        "Dialog pas écrasé ou étiré",
+        "Largeur responsive correcte (max-w-md sur mobile, max-w-lg sur desktop)",
+        "Pas de mots coupés ou tronqués",
+        "Tests visuels sur différentes tailles d'écran"
+      ],
+      "priority": 1,
+      "agent": "smite-builder",
+      "tech": "nextjs",
+      "dependencies": ["US-001"],
+      "passes": false,
+      "notes": "Identifier et corriger tous les max-w, w-full, et autres classes CSS qui causent le problème"
+    },
+    {
+      "id": "US-005",
+      "title": "Tester et valider toutes les corrections",
+      "description": "Tester exhaustivement tous les aspects du popup et du dialog pour s'assurer que tous les problèmes sont résolus. Inclure des tests visuels et fonctionnels.",
+      "acceptanceCriteria": [
+        "Build compile sans erreur",
+        "Typecheck passe",
+        "Lint passe",
+        "Tests visuels validés (desktop, mobile, tablette)",
+        "Tests fonctionnels validés (drag, zoom, click)",
+        "Documentation mise à jour si nécessaire"
       ],
       "priority": 3,
-      "agent": "smite-constructor",
+      "agent": "smite-finalize",
       "tech": "nextjs",
-      "dependencies": ["US-PERF-001"],
+      "dependencies": ["US-002", "US-003", "US-004"],
       "passes": false,
-      "notes": "Install @tanstack/react-query-devtools if not already installed. Add to src/app/layout.tsx or src/components/providers.tsx"
-    },
-    {
-      "id": "US-PERF-004",
-      "title": "Add Loading Skeletons for Better UX",
-      "description": "While data loads via TanStack Query, show loading skeletons instead of blank screen. This improves perceived performance even if actual load time is similar.",
-      "acceptanceCriteria": [
-        "Create WorldSkeleton component",
-        "Shows skeleton UI while world data loads",
-        "Skeleton mimics actual layout (sidebar, map area)",
-        "Smooth fade-in when data loads",
-        "Error boundary with retry if query fails",
-        "Loading indicator for pins, layers"
-      ],
-      "priority": 2,
-      "agent": "smite-constructor",
-      "tech": "nextjs",
-      "dependencies": ["US-PERF-001"],
-      "passes": false,
-      "notes": "Use shadcn/ui Skeleton component or build custom. Should match WorldClient layout structure."
-    },
-    {
-      "id": "US-PERF-005",
-      "title": "Remove Debug Console Logs",
-      "description": "The debug console.log in page.tsx adds unnecessary overhead. Remove all debug logs from production code.",
-      "acceptanceCriteria": [
-        "Remove console.log from src/app/world/[id]/page.tsx",
-        "Search codebase for other debug console.logs",
-        "Remove or wrap in if (process.env.NODE_ENV === 'development')",
-        "No console.logs in production build",
-        "Performance improvement: ~5-10ms"
-      ],
-      "priority": 3,
-      "agent": "smite-surgeon",
-      "tech": "typescript",
-      "dependencies": [],
-      "passes": false,
-      "notes": "Use grep to find all console.log statements. Keep error/warning logs, remove debug logs."
-    },
-    {
-      "id": "US-PERF-006",
-      "title": "Optimize useWorldInitialization Hook",
-      "description": "The useWorldInitialization hook transforms DB layer data to UI format on every render. Memoize the transformation to prevent unnecessary recalculations.",
-      "acceptanceCriteria": [
-        "useMemo for layer transformation",
-        "Only recalculates when worldLayers change",
-        "Prevents unnecessary setLayers calls",
-        "Reduces re-renders in child components",
-        "Benchmark shows improvement in React DevTools Profiler"
-      ],
-      "priority": 2,
-      "agent": "smite-surgeon",
-      "tech": "nextjs",
-      "dependencies": [],
-      "passes": false,
-      "notes": "Add useMemo around the map transformation. Dependency array: [worldLayers]."
-    },
-    {
-      "id": "US-PERF-007",
-      "title": "Implement Suspense Boundaries for Progressive Loading",
-      "description": "Wrap heavy components in React Suspense boundaries to load them progressively. This allows the page to render incrementally instead of waiting for all data.",
-      "acceptanceCriteria": [
-        "Sidebar wrapped in Suspense with fallback",
-        "MapCanvas wrapped in Suspense with fallback",
-        "Pins data loaded separately via Suspense",
-        "Page renders shell immediately",
-        "Each section loads as data becomes available",
-        "Waterfall loading reduced",
-        "Time to First Byte (TTFB) < 100ms"
-      ],
-      "priority": 3,
-      "agent": "smite-constructor",
-      "tech": "nextjs",
-      "dependencies": ["US-PERF-001", "US-PERF-004"],
-      "passes": false,
-      "notes": "Next.js 13+ App Router supports Suspense. Use Suspense boundaries in WorldClient component."
-    },
-    {
-      "id": "US-PERF-008",
-      "title": "Add Query Caching and Stale-Time Configuration",
-      "description": "Configure proper staleTime and cacheTime for TanStack Query to minimize unnecessary refetches. Use stale data while revalidating in background.",
-      "acceptanceCriteria": [
-        "World query: staleTime 5 minutes (world metadata rarely changes)",
-        "Pins query: staleTime 1 minute",
-        "Layers query: staleTime 2 minutes",
-        "RefetchOnWindowFocus: false for world/layers",
-        "RefetchOnMount: false for cached data",
-        "Cache keys properly typed",
-        "QueryClient configured with defaults"
-      ],
-      "priority": 2,
-      "agent": "smite-constructor",
-      "tech": "nextjs",
-      "dependencies": ["US-PERF-001"],
-      "passes": false,
-      "notes": "Configure in usePins and create useWorld hook. Add QueryClientProvider with proper defaults in app layout."
+      "notes": "Exécuter pnpm build, pnpm typecheck, pnpm lint et valider visuellement dans le navigateur"
     }
   ]
 }

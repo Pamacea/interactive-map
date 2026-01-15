@@ -14,7 +14,6 @@ import { useAutosave } from "@/hooks/use-autosave";
 import { updateWorldState } from "@/actions/worlds";
 import type { OptimizedWorld } from "@/types/world.type";
 import type { Pin } from "@/types/pin.type";
-import { FPSCounter } from "@/lib/performance-test-utils";
 
 interface WorldClientProps {
   world: OptimizedWorld;
@@ -84,8 +83,6 @@ export function WorldClient({ world, pins, isAuthenticated }: WorldClientProps) 
           <AutosaveIndicator status={status} />
         </main>
       </div>
-      {/* Development-only FPS counter */}
-      <FPSCounter />
     </div>
   );
 }

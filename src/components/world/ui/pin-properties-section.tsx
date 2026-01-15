@@ -4,7 +4,7 @@ import { Switch } from "@/components/ui/switch";
 import { IconUploadDialog } from "./icon-upload-dialog";
 import * as PinIcons from "lucide-react";
 import type { Pin } from "@prisma/client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface PinPropertiesSectionProps {
   pin: Pin;
@@ -40,6 +40,18 @@ export function PinPropertiesSection({
   const [iconSearchTerm, setIconSearchTerm] = useState("");
   const [showIconDropdown, setShowIconDropdown] = useState(false);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
+
+  // Local state for title editing (to avoid triggering updates on every keystroke)
+  const [localTitle, setLocalTitle] = useState(formState.title);
+
+  // Local state for description editing (to avoid triggering updates on every keystroke)
+  const [localDescription, setLocalDescription] = useState(formState.description);
+
+  // Sync local states when formState changes externally
+  useEffect(() => {
+    setLocalTitle(formState.title);
+    setLocalDescription(formState.description);
+  }, [formState.title, formState.description]);
 
   const iconCategories = getUniqueCategories();
 
@@ -111,12 +123,32 @@ export function PinPropertiesSection({
           </label>
           <input
             type="text"
-            value={formState.title}
+            value={localTitle}
             onChange={(e) => {
               const title = e.target.value;
-              // Validate: non-empty and max 200 characters
-              if (title.trim().length > 0 && title.length <= 200) {
-                onUpdate("title", title);
+              // Only update local state, don't trigger server update
+              if (title.length <= 200) {
+                setLocalTitle(title);
+              }
+            }}
+            onBlur={() => {
+              // Only trigger update on blur
+              const trimmedTitle = localTitle.trim();
+              if (trimmedTitle.length > 0 && trimmedTitle !== formState.title) {
+                onUpdate("title", trimmedTitle);
+              } else if (trimmedTitle.length === 0) {
+                // Revert to original if empty
+                setLocalTitle(formState.title);
+              }
+            }}
+            onKeyDown={(e) => {
+              // Allow Enter to trigger update
+              if (e.key === "Enter") {
+                e.currentTarget.blur();
+              } else if (e.key === "Escape") {
+                // Revert on Escape
+                setLocalTitle(formState.title);
+                e.currentTarget.blur();
               }
             }}
             disabled={isUpdating}
@@ -132,12 +164,29 @@ export function PinPropertiesSection({
             Description
           </label>
           <textarea
-            value={formState.description}
+            value={localDescription}
             onChange={(e) => {
               const description = e.target.value;
-              // Validate: max 5000 characters
+              // Only update local state, don't trigger server update
               if (description.length <= 5000) {
-                onUpdate("description", description);
+                setLocalDescription(description);
+              }
+            }}
+            onBlur={() => {
+              // Only trigger update on blur
+              const trimmedDescription = localDescription.trim();
+              if (trimmedDescription !== formState.description) {
+                onUpdate("description", trimmedDescription);
+              } else {
+                // Revert to original if unchanged
+                setLocalDescription(formState.description);
+              }
+            }}
+            onKeyDown={(e) => {
+              // Allow Escape to revert
+              if (e.key === "Escape") {
+                setLocalDescription(formState.description);
+                e.currentTarget.blur();
               }
             }}
             disabled={isUpdating}
@@ -215,16 +264,36 @@ export function PinPropertiesSection({
                       value={iconSearchTerm}
                       onChange={(e) => setIconSearchTerm(e.target.value)}
                       placeholder="Search icons..."
-                      className="w-full pl-8 pr-3 py-1.5 text-sm bg-background-base border border-border-subtle rounded focus:outline-none focus:ring-1 focus:ring-accent-gold/50"
+                      className="w-full pl-8 pr-8 py-1.5 text-sm bg-background-base border border-border-subtle rounded focus:outline-none focus:ring-1 focus:ring-accent-gold/50"
                     />
+                    {iconSearchTerm && (
+                      <button
+                        type="button"
+                        onClick={() => setIconSearchTerm("")}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
+                        title="Clear search"
+                      >
+                        <PinIcons.X className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </div>
 
                 {/* Icon List */}
                 <div className="p-1">
                   {filteredIcons.length === 0 ? (
-                    <div className="px-2 py-4 text-sm text-text-muted text-center">
-                      No icons found
+                    <div className="px-2 py-8 text-center">
+                      <PinIcons.Search className="w-8 h-8 text-text-muted mx-auto mb-2 opacity-50" />
+                      <p className="text-sm text-text-muted mb-3">
+                        No icons found matching "{iconSearchTerm}"
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setIconSearchTerm("")}
+                        className="text-sm text-accent-gold hover:underline transition-colors"
+                      >
+                        Clear search to see all icons
+                      </button>
                     </div>
                   ) : (
                     iconCategories.map((category) => {

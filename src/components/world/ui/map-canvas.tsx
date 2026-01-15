@@ -224,8 +224,6 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
                 {selectedPin && (
                   <SelectedPinPopup
                     selectedPin={selectedPin}
-                    imageDimensions={imageDimensions}
-                    transform={transform}
                     onClose={handlePopupClose}
                   />
                 )}
@@ -254,8 +252,6 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
                 {selectedPin && (
                   <SelectedPinPopup
                     selectedPin={selectedPin}
-                    imageDimensions={imageDimensions}
-                    transform={transform}
                     onClose={handlePopupClose}
                   />
                 )}
