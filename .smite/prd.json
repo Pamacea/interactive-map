@@ -51,8 +51,8 @@
       "agent": "smite-builder",
       "tech": "nextjs",
       "dependencies": ["US-002"],
-      "passes": false,
-      "notes": "Vérifier que le popup est dans le bon conteneur DOM et que les transformations sont correctement appliquées"
+      "passes": true,
+      "notes": "FIX APPLIED: Changed from pixel-based positioning with manual transform offset to percentage-based positioning (like pins). The parent container's transform now handles all panning/zooming, eliminating double-transformation that caused popup to drift independently of pin."
     },
     {
       "id": "US-004",
