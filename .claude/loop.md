@@ -2,6 +2,7 @@
 iteration: 1
 max_iterations: 50
 completion_promise: COMPLETE
+status: COMPLETE
 ---
 
 # Ralph Loop: Interactive Map Platform Fixes & Improvements
