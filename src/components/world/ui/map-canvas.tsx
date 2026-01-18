@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useEffect } from "react";
 import { useGrid, useScale, useLayers, useSelectedLayerId, useBaseMapVisible, useMapStore } from "@/stores/map-store";
 import {
   usePins,
@@ -26,6 +26,7 @@ import { MapContent } from "./map-canvas/map-content";
 import { MapPinsWrapper } from "./map-canvas/map-pins-wrapper";
 import { usePinPosition } from "@/components/pins/logic/use-pin-position";
 import { MapCenterProvider } from "../context/map-context";
+import { useMapExport } from "@/components/export/utils/use-map-export-context";
 
 const GRID_SIZE = 40;
 
@@ -36,6 +37,7 @@ export interface MapCanvasProps {
 
 export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { setMapElement } = useMapExport();
   const grid = useGrid();
   const scale = useScale();
   const layers = useLayers();
@@ -149,6 +151,17 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
       );
     };
   }, [pins, imageDimensions, layers, centerToPin]);
+
+  // Update map element reference for export
+  useEffect(() => {
+    if (containerRef.current) {
+      setMapElement(containerRef.current);
+    }
+
+    return () => {
+      setMapElement(null);
+    };
+  }, [setMapElement]);
 
   return (
     <MapCenterProvider centerOnPin={centerOnPin}>

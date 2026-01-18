@@ -327,8 +327,8 @@
       "title": "Implement Map Export Functionality",
       "priority": 17,
       "agent": "builder:builder",
-      "status": "pending",
-      "passes": false,
+      "status": "completed",
+      "passes": true,
       "description": "Export maps as PNG, PDF, or JSON",
       "acceptance_criteria": [
         "Export to PNG functionality",
@@ -347,8 +347,8 @@
       "title": "Implement Full-Text Search",
       "priority": 18,
       "agent": "builder:builder",
-      "status": "pending",
-      "passes": false,
+      "status": "completed",
+      "passes": true,
       "description": "Search across pin titles, descriptions, and properties instead of basic filtering",
       "acceptance_criteria": [
         "Full-text search across all pin content",

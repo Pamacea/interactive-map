@@ -3,51 +3,43 @@
  * Centralized type system for Pin feature
  */
 
+import type { PinType as PrismaPinType } from "@prisma/client";
+
 /**
  * Pin type enum - categorizes map markers by their purpose
  * Matches Prisma PinType enum exactly
  */
-export enum PinTypeEnum {
-  CITY = "CITY",
-  VILLAGE = "VILLAGE",
-  POI = "POI", // Point of Interest
-  CHARACTER = "CHARACTER",
-  DUNGEON = "DUNGEON",
-  SHOP = "SHOP",
-  QUEST = "QUEST",
-  TREASURE = "TREASURE",
-  CUSTOM = "CUSTOM",
-}
+export type PinTypeEnum = PrismaPinType;
 
 /**
  * Color mapping for each pin type
  * Colors are semantic and provide visual hierarchy
  */
 export const PIN_TYPE_COLORS: Record<PinTypeEnum, string> = {
-  [PinTypeEnum.CITY]: "#c9a227", // Gold - major settlements
-  [PinTypeEnum.VILLAGE]: "#8b7355", // Brown - smaller settlements
-  [PinTypeEnum.POI]: "#3b82f6", // Blue - points of interest
-  [PinTypeEnum.CHARACTER]: "#10b981", // Emerald - NPCs
-  [PinTypeEnum.DUNGEON]: "#ef4444", // Red - danger areas
-  [PinTypeEnum.SHOP]: "#f59e0b", // Amber - commerce
-  [PinTypeEnum.QUEST]: "#8b5cf6", // Purple - quest markers
-  [PinTypeEnum.TREASURE]: "#eab308", // Yellow - loot
-  [PinTypeEnum.CUSTOM]: "#64748b", // Slate - user-defined
+  CITY: "#c9a227", // Gold - major settlements
+  VILLAGE: "#8b7355", // Brown - smaller settlements
+  POI: "#3b82f6", // Blue - points of interest
+  CHARACTER: "#10b981", // Emerald - NPCs
+  DUNGEON: "#ef4444", // Red - danger areas
+  SHOP: "#f59e0b", // Amber - commerce
+  QUEST: "#8b5cf6", // Purple - quest markers
+  TREASURE: "#eab308", // Yellow - loot
+  CUSTOM: "#64748b", // Slate - user-defined
 };
 
 /**
  * Default size for each pin type (in pixels)
  */
 export const PIN_TYPE_SIZES: Record<PinTypeEnum, number> = {
-  [PinTypeEnum.CITY]: 48, // Largest - major locations
-  [PinTypeEnum.VILLAGE]: 40, // Medium-large
-  [PinTypeEnum.POI]: 32, // Standard
-  [PinTypeEnum.CHARACTER]: 36, // Medium
-  [PinTypeEnum.DUNGEON]: 44, // Large - important
-  [PinTypeEnum.SHOP]: 32, // Standard
-  [PinTypeEnum.QUEST]: 32, // Standard
-  [PinTypeEnum.TREASURE]: 28, // Small-medium
-  [PinTypeEnum.CUSTOM]: 32, // Standard
+  CITY: 48, // Largest - major locations
+  VILLAGE: 40, // Medium-large
+  POI: 32, // Standard
+  CHARACTER: 36, // Medium
+  DUNGEON: 44, // Large - important
+  SHOP: 32, // Standard
+  QUEST: 32, // Standard
+  TREASURE: 28, // Small-medium
+  CUSTOM: 32, // Standard
 };
 
 /**
@@ -55,15 +47,15 @@ export const PIN_TYPE_SIZES: Record<PinTypeEnum, number> = {
  * Maps to common icon libraries (Lucide, Heroicons, etc.)
  */
 export const PIN_TYPE_ICONS: Record<PinTypeEnum, string[]> = {
-  [PinTypeEnum.CITY]: ["building", "castle", "city"],
-  [PinTypeEnum.VILLAGE]: ["house", "home", "village"],
-  [PinTypeEnum.POI]: ["map-pin", "star", "bookmark"],
-  [PinTypeEnum.CHARACTER]: ["user", "users", "person-standing"],
-  [PinTypeEnum.DUNGEON]: ["skull", "mountain", "cave"],
-  [PinTypeEnum.SHOP]: ["shopping-bag", "store", "cart"],
-  [PinTypeEnum.QUEST]: ["scroll", "flag", "target"],
-  [PinTypeEnum.TREASURE]: ["gem", "coins", "chest"],
-  [PinTypeEnum.CUSTOM]: ["circle", "dot", "map-pin"],
+  CITY: ["building", "castle", "city"],
+  VILLAGE: ["house", "home", "village"],
+  POI: ["map-pin", "star", "bookmark"],
+  CHARACTER: ["user", "users", "person-standing"],
+  DUNGEON: ["skull", "mountain", "cave"],
+  SHOP: ["shopping-bag", "store", "cart"],
+  QUEST: ["scroll", "flag", "target"],
+  TREASURE: ["gem", "coins", "chest"],
+  CUSTOM: ["circle", "dot", "map-pin"],
 };
 
 /**
@@ -180,7 +172,7 @@ export interface PinDisplayMetadata {
  * Helper function for consistent color mapping
  */
 export function getPinTypeColor(pinType: PinTypeEnum): string {
-  return PIN_TYPE_COLORS[pinType] || PIN_TYPE_COLORS[PinTypeEnum.CUSTOM];
+  return PIN_TYPE_COLORS[pinType] || PIN_TYPE_COLORS.CUSTOM;
 }
 
 /**
@@ -188,7 +180,7 @@ export function getPinTypeColor(pinType: PinTypeEnum): string {
  * Helper function for consistent size mapping
  */
 export function getPinTypeSize(pinType: PinTypeEnum): number {
-  return PIN_TYPE_SIZES[pinType] || PIN_TYPE_SIZES[PinTypeEnum.CUSTOM];
+  return PIN_TYPE_SIZES[pinType] || PIN_TYPE_SIZES.CUSTOM;
 }
 
 /**
@@ -196,7 +188,7 @@ export function getPinTypeSize(pinType: PinTypeEnum): number {
  * Returns first icon in the suggestions array
  */
 export function getPinTypeIcon(pinType: PinTypeEnum): string {
-  const icons = PIN_TYPE_ICONS[pinType] || PIN_TYPE_ICONS[PinTypeEnum.CUSTOM];
+  const icons = PIN_TYPE_ICONS[pinType] || PIN_TYPE_ICONS.CUSTOM;
   return icons[0];
 }
 

@@ -6,14 +6,21 @@ import { ChevronLeft, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AutosaveIndicator } from "./autosave-indicator";
 import { type AutosaveStatus } from "@/hooks/use-autosave";
+import { SearchBar } from "@/components/search";
+import type { SearchResultItem } from "@/actions/search";
+import { ExportButton } from "@/components/export";
+import { useMapExport } from "@/components/export/utils/use-map-export-context";
 
 interface WorldNavigationProps {
   worldTitle?: string;
   autosaveStatus?: AutosaveStatus;
+  worldId?: string;
+  onSearchResultClick?: (result: SearchResultItem) => void;
 }
 
-export function WorldNavigation({ worldTitle, autosaveStatus }: WorldNavigationProps) {
+export function WorldNavigation({ worldTitle, autosaveStatus, worldId, onSearchResultClick }: WorldNavigationProps) {
   const pathname = usePathname();
+  const { mapElement } = useMapExport();
 
   return (
     <nav className="h-12 bg-background-base/95 backdrop-blur-sm border-b border-b-accent-gold-dark flex items-center justify-between px-6">
@@ -25,7 +32,17 @@ export function WorldNavigation({ worldTitle, autosaveStatus }: WorldNavigationP
         <span className="text-sm font-display font-medium">Back</span>
       </Link>
 
-      <div className="flex items-center gap-8">
+      <div className="flex items-center gap-4">
+        {/* Search Bar - only show if worldId is provided */}
+        {worldId && (
+          <SearchBar
+            worldId={worldId}
+            onResultClick={onSearchResultClick}
+            className="w-64"
+          />
+        )}
+
+        <div className="flex items-center gap-8">
         <Link
           href="/worlds"
           className={cn(
@@ -71,13 +88,23 @@ export function WorldNavigation({ worldTitle, autosaveStatus }: WorldNavigationP
           )}
         </Link>
       </div>
+      </div>
 
-      <Link
-        href="/profile"
-        className="p-2 text-text-secondary hover:text-accent-gold transition-colors"
-      >
-        <User className="w-4 h-4" />
-      </Link>
+      <div className="flex items-center gap-2">
+        {worldId && worldTitle && (
+          <ExportButton
+            worldId={worldId}
+            worldTitle={worldTitle}
+            mapElement={mapElement}
+          />
+        )}
+        <Link
+          href="/profile"
+          className="p-2 text-text-secondary hover:text-accent-gold transition-colors"
+        >
+          <User className="w-4 h-4" />
+        </Link>
+      </div>
     </nav>
   );
 }

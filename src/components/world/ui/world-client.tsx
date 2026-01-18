@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useCallback } from "react";
 import { MapCanvas } from "@/components/world/ui/map-canvas";
 import { Sidebar } from "@/components/world/ui/sidebar";
 import { WorldNavigation } from "@/components/world/ui/world-navigation";
@@ -11,12 +11,17 @@ import { useResizableSidebar } from "@/components/world/logic/use-resizable-side
 import { useWorldInitialization } from "@/components/world/logic/use-world-initialization";
 import { useAutosavePreparation } from "@/components/world/logic/use-autosave-preparation";
 import { useAutosave } from "@/hooks/use-autosave";
+import { useKeyboardShortcut, SHORTCUTS } from "@/hooks/use-keyboard-shortcut";
 import { updateWorldState } from "@/actions/worlds";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { MapExportProvider } from "@/components/export/utils/use-map-export-context";
 import { useLoreStore } from "@/stores/use-lore-store";
+import { usePinsStore } from "@/stores/use-pins-store";
+import { useSearchStore } from "@/store/use-search-store";
 import type { OptimizedWorld } from "@/types/world.type";
 import type { Pin } from "@/types/pin.type";
 import type { LoreEntry } from "@/types/lore.type";
+import type { SearchResultItem } from "@/actions/search";
 
 interface WorldClientProps {
   world: OptimizedWorld;
@@ -34,6 +39,37 @@ export function WorldClient({ world, pins, loreEntries, isAuthenticated }: World
   if (loreEntries && loreEntries.length > 0) {
     setLoreEntries(loreEntries);
   }
+
+  // Pins store for handling search result clicks
+  const selectPin = usePinsStore((state) => state.selectPin);
+
+  // Search store for keyboard shortcut
+  const toggleSearch = useSearchStore((state) => state.toggleSearch);
+
+  // Handle search result clicks
+  const handleSearchResultClick = useCallback(
+    (result: SearchResultItem) => {
+      if (result.type === "pin") {
+        // Select the pin and center on it
+        selectPin(result.id);
+        // TODO: Add functionality to center map on pin coordinates
+        console.log("[WorldClient] Selected pin:", result.id, "at", result.latitude, result.longitude);
+      } else {
+        // Handle lore entry clicks
+        // TODO: Add functionality to open lore entry in sidebar
+        console.log("[WorldClient] Selected lore entry:", result.id);
+      }
+    },
+    [selectPin]
+  );
+
+  // Register keyboard shortcuts
+  useKeyboardShortcut([
+    {
+      ...SHORTCUTS.SEARCH,
+      handler: toggleSearch,
+    },
+  ]);
 
   // Sidebar state
   const { width, isCollapsed, isResizing, startResize, toggleCollapse, sidebarRef } = useResizableSidebar();
@@ -73,49 +109,55 @@ export function WorldClient({ world, pins, loreEntries, isAuthenticated }: World
         console.error("[WorldClient] Component stack:", errorInfo.componentStack);
       }}
     >
-      <div className="h-screen bg-background-base flex flex-col">
-        <WorldNavigation />
-        <div className="flex flex-1 overflow-hidden">
-          <ErrorBoundary
-            fallback={
-              <div className="w-64 bg-background-card border-r border-border-subtle p-4 flex items-center justify-center">
-                <p className="text-sm text-text-secondary">Sidebar failed to load</p>
-              </div>
-            }
-          >
-            <Suspense fallback={<SidebarSkeleton />}>
-              <Sidebar
-                ref={sidebarRef}
-                slug={world.title}
-                worldId={world.id}
-                width={width}
-                isCollapsed={isCollapsed}
-                isResizing={isResizing}
-                onToggle={toggleCollapse}
-                onResizeStart={startResize}
-                worldLayers={world.layers}
-                showPinsSection={hasLayers}
-                mapImage={world.map}
-                initialPins={pins}
-              />
-            </Suspense>
-          </ErrorBoundary>
-          <main className="flex-1 relative flex flex-col">
+      <MapExportProvider>
+        <div className="h-screen bg-background-base flex flex-col">
+          <WorldNavigation
+            worldTitle={world.title}
+            worldId={world.id}
+            onSearchResultClick={handleSearchResultClick}
+          />
+          <div className="flex flex-1 overflow-hidden">
             <ErrorBoundary
               fallback={
-                <div className="flex-1 flex items-center justify-center bg-background-base">
-                  <p className="text-text-secondary">Map canvas failed to load</p>
+                <div className="w-64 bg-background-card border-r border-border-subtle p-4 flex items-center justify-center">
+                  <p className="text-sm text-text-secondary">Sidebar failed to load</p>
                 </div>
               }
             >
-              <Suspense fallback={<MapSkeleton />}>
-                <MapCanvas mapImage={world.map} worldId={world.id} />
+              <Suspense fallback={<SidebarSkeleton />}>
+                <Sidebar
+                  ref={sidebarRef}
+                  slug={world.title}
+                  worldId={world.id}
+                  width={width}
+                  isCollapsed={isCollapsed}
+                  isResizing={isResizing}
+                  onToggle={toggleCollapse}
+                  onResizeStart={startResize}
+                  worldLayers={world.layers}
+                  showPinsSection={hasLayers}
+                  mapImage={world.map}
+                  initialPins={pins}
+                />
               </Suspense>
             </ErrorBoundary>
-            <AutosaveIndicator status={status} />
-          </main>
+            <main className="flex-1 relative flex flex-col">
+              <ErrorBoundary
+                fallback={
+                  <div className="flex-1 flex items-center justify-center bg-background-base">
+                    <p className="text-text-secondary">Map canvas failed to load</p>
+                  </div>
+                }
+              >
+                <Suspense fallback={<MapSkeleton />}>
+                  <MapCanvas mapImage={world.map} worldId={world.id} />
+                </Suspense>
+              </ErrorBoundary>
+              <AutosaveIndicator status={status} />
+            </main>
+          </div>
         </div>
-      </div>
+      </MapExportProvider>
     </ErrorBoundary>
   );
 }
