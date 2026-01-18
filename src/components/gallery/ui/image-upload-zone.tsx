@@ -5,6 +5,10 @@ import { Upload, X, Image as ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
+  Card,
+  CardContent,
+} from "@/components/ui/card";
+import {
   validateAndPrepareImage,
   formatFileSize,
   revokePreviewURL,
@@ -114,9 +118,9 @@ export function ImageUploadZone({
   return (
     <div className={cn("space-y-4", className)}>
       {/* Upload zone */}
-      <div
+      <Card
         className={cn(
-          "relative border-2 border-dashed rounded-lg p-8 transition-colors duration-200",
+          "relative border-2 border-dashed transition-colors duration-200",
           isDragging
             ? "border-accent-gold bg-accent-gold/10"
             : "border-border-subtle hover:border-border-ornate"
@@ -125,30 +129,32 @@ export function ImageUploadZone({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
-        <input
-          type="file"
-          id="image-upload"
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-          accept={accept}
-          multiple={multiple}
-          onChange={handleFileInput}
-        />
+        <CardContent className="p-8">
+          <input
+            type="file"
+            id="image-upload"
+            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            accept={accept}
+            multiple={multiple}
+            onChange={handleFileInput}
+          />
 
-        <div className="flex flex-col items-center justify-center text-center space-y-3">
-          <div className="w-16 h-16 bg-background-elevated rounded-full flex items-center justify-center">
-            <Upload className="w-8 h-8 text-accent-gold" />
-          </div>
+          <div className="flex flex-col items-center justify-center text-center space-y-3">
+            <div className="w-16 h-16 bg-background-elevated rounded-full flex items-center justify-center">
+              <Upload className="w-8 h-8 text-accent-gold" />
+            </div>
 
-          <div>
-            <p className="text-text-primary font-medium">
-              Drop images here or click to upload
-            </p>
-            <p className="text-text-secondary text-sm mt-1">
-              PNG, JPG, WEBP up to {formatFileSize(maxSize)}
-            </p>
+            <div>
+              <p className="text-text-primary font-medium">
+                Drop images here or click to upload
+              </p>
+              <p className="text-text-secondary text-sm mt-1">
+                PNG, JPG, WEBP up to {formatFileSize(maxSize)}
+              </p>
+            </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Pending files */}
       {pendingFiles.length > 0 && (
@@ -169,40 +175,44 @@ export function ImageUploadZone({
 
           <div className="grid grid-cols-2 gap-3">
             {pendingFiles.map((fileWithPreview, index) => (
-              <div
+              <Card
                 key={index}
                 className={cn(
-                  "relative aspect-square bg-background-card rounded-md border border-border-subtle overflow-hidden",
+                  "relative aspect-square bg-background-card overflow-hidden",
                   !fileWithPreview.valid && "opacity-50"
                 )}
               >
-                <img
-                  src={fileWithPreview.preview}
-                  alt={fileWithPreview.file.name}
-                  className="w-full h-full object-cover"
-                />
+                <CardContent className="p-0 h-full">
+                  <img
+                    src={fileWithPreview.preview}
+                    alt={fileWithPreview.file.name}
+                    className="w-full h-full object-cover"
+                  />
 
-                <button
-                  className="absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white rounded-full p-1 transition-colors"
-                  onClick={() => removePendingFile(index)}
-                >
-                  <X className="w-4 h-4" />
-                </button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-2 right-2 h-8 w-8 bg-black/60 hover:bg-black/80 text-white rounded-full"
+                    onClick={() => removePendingFile(index)}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
 
-                <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/60">
-                  <p className="text-white text-xs truncate">
-                    {fileWithPreview.file.name}
-                  </p>
-                  <p className="text-white/70 text-xs">
-                    {formatFileSize(fileWithPreview.file.size)}
-                  </p>
-                  {fileWithPreview.error && (
-                    <p className="text-red-400 text-xs mt-1">
-                      {fileWithPreview.error}
+                  <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/60">
+                    <p className="text-white text-xs truncate">
+                      {fileWithPreview.file.name}
                     </p>
-                  )}
-                </div>
-              </div>
+                    <p className="text-white/70 text-xs">
+                      {formatFileSize(fileWithPreview.file.size)}
+                    </p>
+                    {fileWithPreview.error && (
+                      <p className="text-red-400 text-xs mt-1">
+                        {fileWithPreview.error}
+                      </p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
