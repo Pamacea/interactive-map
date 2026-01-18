@@ -16,7 +16,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <SessionProvider>
         <QueryProvider>
           <ToastProvider>
-            <main className="w-full h-full min-h-screen">
+            <main id="main-content" className="w-full h-full min-h-screen">
                 {children}
             </main>
           </ToastProvider>

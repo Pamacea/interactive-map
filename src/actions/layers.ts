@@ -2,15 +2,18 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { safeAsync, type Result } from "@/lib/errors";
+import {
+  getAuthenticatedUser,
+  verifyWorldPermission,
+  verifyLayerPermission,
+} from "@/lib/server-helpers";
 
 /**
  * Create a new layer for a world
  * @param worldId - World ID to add layer to
  * @param data - Layer data (name, description, zIndex, etc.)
- * @returns Created layer
- * @throws Error if user not authorized or creation fails
+ * @returns Result with created layer or error
  */
 export async function createLayer(
   worldId: string,
@@ -24,79 +27,46 @@ export async function createLayer(
     offsetY?: number;
     scale?: number;
   }
-) {
-  const session = await getServerSession(authOptions);
+): Promise<Result<any>> {
+  return safeAsync(async () => {
+    // Get authenticated user
+    const user = await getAuthenticatedUser();
 
-  if (!session?.user?.id) {
-    console.error("[createLayer] No authenticated user session");
-    throw new Error("Not authenticated");
-  }
+    // Verify user has permission to edit the world
+    await verifyWorldPermission(worldId, user.id);
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-  });
+    // Get the highest zIndex to place new layer on top
+    const highestZIndex = await prisma.mapLayer.findFirst({
+      where: { gameWorldId: worldId },
+      orderBy: { zIndex: "desc" },
+      select: { zIndex: true },
+    });
 
-  if (!user) {
-    console.error("[createLayer] User not found in database");
-    throw new Error("User not found");
-  }
-
-  // Check if world exists and user has permission
-  const world = await prisma.gameWorld.findUnique({
-    where: { id: worldId },
-  });
-
-  if (!world) {
-    throw new Error("World not found");
-  }
-
-  // Check ownership or editor permission
-  if (world.userId !== user.id) {
-    const member = await prisma.worldMember.findFirst({
-      where: {
+    const layer = await prisma.mapLayer.create({
+      data: {
+        name: data.name,
+        description: data.description,
+        isVisible: data.isVisible ?? true,
+        opacity: data.opacity ?? 1.0,
+        zIndex: data.zIndex ?? (highestZIndex?.zIndex ?? -1) + 1,
+        offsetX: data.offsetX ?? 0,
+        offsetY: data.offsetY ?? 0,
+        scale: data.scale ?? 1.0,
         gameWorldId: worldId,
-        userId: user.id,
-        permission: { in: ["EDITOR", "OWNER"] },
       },
     });
 
-    if (!member) {
-      throw new Error("Unauthorized: You don't have permission to edit this world");
-    }
-  }
+    revalidatePath(`/world/${worldId}`);
 
-  // Get the highest zIndex to place new layer on top
-  const highestZIndex = await prisma.mapLayer.findFirst({
-    where: { gameWorldId: worldId },
-    orderBy: { zIndex: "desc" },
-    select: { zIndex: true },
-  });
-
-  const layer = await prisma.mapLayer.create({
-    data: {
-      name: data.name,
-      description: data.description,
-      isVisible: data.isVisible ?? true,
-      opacity: data.opacity ?? 1.0,
-      zIndex: data.zIndex ?? (highestZIndex?.zIndex ?? -1) + 1,
-      offsetX: data.offsetX ?? 0,
-      offsetY: data.offsetY ?? 0,
-      scale: data.scale ?? 1.0,
-      gameWorldId: worldId,
-    },
-  });
-
-  revalidatePath(`/world/${worldId}`);
-
-  return layer;
+    return layer;
+  }, "createLayer");
 }
 
 /**
  * Update a layer's properties
  * @param layerId - Layer ID to update
  * @param data - Partial layer data to update
- * @returns Updated layer
- * @throws Error if user not authorized or update fails
+ * @returns Result with updated layer or error
  */
 export async function updateLayer(
   layerId: string,
@@ -110,65 +80,32 @@ export async function updateLayer(
     offsetY?: number;
     scale?: number;
   }
-) {
-  const session = await getServerSession(authOptions);
+): Promise<Result<any>> {
+  return safeAsync(async () => {
+    // Get authenticated user
+    const user = await getAuthenticatedUser();
 
-  if (!session?.user?.id) {
-    console.error("[updateLayer] No authenticated user session");
-    throw new Error("Not authenticated");
-  }
+    // Verify layer exists and user has permission
+    const layer = await verifyLayerPermission(layerId, user.id);
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-  });
-
-  if (!user) {
-    console.error("[updateLayer] User not found in database");
-    throw new Error("User not found");
-  }
-
-  // Check if layer exists
-  const layer = await prisma.mapLayer.findUnique({
-    where: { id: layerId },
-    include: { gameWorld: true },
-  });
-
-  if (!layer) {
-    throw new Error("Layer not found");
-  }
-
-  // Check ownership or editor permission
-  if (layer.gameWorld.userId !== user.id) {
-    const member = await prisma.worldMember.findFirst({
-      where: {
-        gameWorldId: layer.gameWorldId,
-        userId: user.id,
-        permission: { in: ["EDITOR", "OWNER"] },
+    const updatedLayer = await prisma.mapLayer.update({
+      where: { id: layerId },
+      data: {
+        ...(data.name !== undefined && { name: data.name }),
+        ...(data.description !== undefined && { description: data.description }),
+        ...(data.isVisible !== undefined && { isVisible: data.isVisible }),
+        ...(data.opacity !== undefined && { opacity: data.opacity }),
+        ...(data.zIndex !== undefined && { zIndex: data.zIndex }),
+        ...(data.offsetX !== undefined && { offsetX: data.offsetX }),
+        ...(data.offsetY !== undefined && { offsetY: data.offsetY }),
+        ...(data.scale !== undefined && { scale: data.scale }),
       },
     });
 
-    if (!member) {
-      throw new Error("Unauthorized: You don't have permission to edit this world");
-    }
-  }
+    revalidatePath(`/world/${layer.gameWorldId}`);
 
-  const updatedLayer = await prisma.mapLayer.update({
-    where: { id: layerId },
-    data: {
-      ...(data.name !== undefined && { name: data.name }),
-      ...(data.description !== undefined && { description: data.description }),
-      ...(data.isVisible !== undefined && { isVisible: data.isVisible }),
-      ...(data.opacity !== undefined && { opacity: data.opacity }),
-      ...(data.zIndex !== undefined && { zIndex: data.zIndex }),
-      ...(data.offsetX !== undefined && { offsetX: data.offsetX }),
-      ...(data.offsetY !== undefined && { offsetY: data.offsetY }),
-      ...(data.scale !== undefined && { scale: data.scale }),
-    },
-  });
-
-  revalidatePath(`/world/${layer.gameWorldId}`);
-
-  return updatedLayer;
+    return updatedLayer;
+  }, "updateLayer");
 }
 
 /**
@@ -177,246 +114,109 @@ export async function updateLayer(
  * @param layerId - Layer ID to update
  * @param offsetX - X offset in pixels
  * @param offsetY - Y offset in pixels
- * @returns Updated layer
- * @throws Error if user not authorized or update fails
+ * @returns Result with updated layer or error
  */
 export async function updateLayerPosition(
   layerId: string,
   offsetX: number,
   offsetY: number
-) {
-  const session = await getServerSession(authOptions);
+): Promise<Result<any>> {
+  return safeAsync(async () => {
+    // Get authenticated user
+    const user = await getAuthenticatedUser();
 
-  if (!session?.user?.id) {
-    console.error("[updateLayerPosition] No authenticated user session");
-    throw new Error("Not authenticated");
-  }
+    // Verify layer exists and user has permission
+    await verifyLayerPermission(layerId, user.id);
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-  });
-
-  if (!user) {
-    console.error("[updateLayerPosition] User not found in database");
-    throw new Error("User not found");
-  }
-
-  // Check if layer exists
-  const layer = await prisma.mapLayer.findUnique({
-    where: { id: layerId },
-    include: { gameWorld: true },
-  });
-
-  if (!layer) {
-    throw new Error("Layer not found");
-  }
-
-  // Check ownership or editor permission
-  if (layer.gameWorld.userId !== user.id) {
-    const member = await prisma.worldMember.findFirst({
-      where: {
-        gameWorldId: layer.gameWorldId,
-        userId: user.id,
-        permission: { in: ["EDITOR", "OWNER"] },
-      },
+    const updatedLayer = await prisma.mapLayer.update({
+      where: { id: layerId },
+      data: { offsetX, offsetY },
     });
 
-    if (!member) {
-      throw new Error("Unauthorized: You don't have permission to edit this world");
-    }
-  }
+    // No revalidatePath needed - Zustand store manages client-side state
+    // This optimization prevents unnecessary page refreshes during drag operations
 
-  const updatedLayer = await prisma.mapLayer.update({
-    where: { id: layerId },
-    data: { offsetX, offsetY },
-  });
-
-  // No revalidatePath needed - Zustand store manages client-side state
-  // This optimization prevents unnecessary page refreshes during drag operations
-
-  return updatedLayer;
+    return updatedLayer;
+  }, "updateLayerPosition");
 }
 
 /**
  * Update layer scale
  * @param layerId - Layer ID to update
  * @param scale - Scale factor (0.5 - 2.0)
- * @returns Updated layer
- * @throws Error if user not authorized or update fails
+ * @returns Result with updated layer or error
  */
-export async function updateLayerScale(layerId: string, scale: number) {
-  const session = await getServerSession(authOptions);
+export async function updateLayerScale(layerId: string, scale: number): Promise<Result<any>> {
+  return safeAsync(async () => {
+    // Get authenticated user
+    const user = await getAuthenticatedUser();
 
-  if (!session?.user?.id) {
-    console.error("[updateLayerScale] No authenticated user session");
-    throw new Error("Not authenticated");
-  }
+    // Verify layer exists and user has permission
+    await verifyLayerPermission(layerId, user.id);
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-  });
-
-  if (!user) {
-    console.error("[updateLayerScale] User not found in database");
-    throw new Error("User not found");
-  }
-
-  // Check if layer exists
-  const layer = await prisma.mapLayer.findUnique({
-    where: { id: layerId },
-    include: { gameWorld: true },
-  });
-
-  if (!layer) {
-    throw new Error("Layer not found");
-  }
-
-  // Check ownership or editor permission
-  if (layer.gameWorld.userId !== user.id) {
-    const member = await prisma.worldMember.findFirst({
-      where: {
-        gameWorldId: layer.gameWorldId,
-        userId: user.id,
-        permission: { in: ["EDITOR", "OWNER"] },
-      },
+    const updatedLayer = await prisma.mapLayer.update({
+      where: { id: layerId },
+      data: { scale },
     });
 
-    if (!member) {
-      throw new Error("Unauthorized: You don't have permission to edit this world");
-    }
-  }
+    // No revalidatePath needed - Zustand store manages client-side state
 
-  const updatedLayer = await prisma.mapLayer.update({
-    where: { id: layerId },
-    data: { scale },
-  });
-
-  // No revalidatePath needed - Zustand store manages client-side state
-
-  return updatedLayer;
+    return updatedLayer;
+  }, "updateLayerScale");
 }
 
 /**
  * Update layer z-index (for reordering layers)
  * @param layerId - Layer ID to update
  * @param zIndex - New z-index value
- * @returns Updated layer
- * @throws Error if user not authorized or update fails
+ * @returns Result with updated layer or error
  */
-export async function updateLayerZIndex(layerId: string, zIndex: number) {
-  const session = await getServerSession(authOptions);
+export async function updateLayerZIndex(layerId: string, zIndex: number): Promise<Result<any>> {
+  return safeAsync(async () => {
+    // Get authenticated user
+    const user = await getAuthenticatedUser();
 
-  if (!session?.user?.id) {
-    console.error("[updateLayerZIndex] No authenticated user session");
-    throw new Error("Not authenticated");
-  }
+    // Verify layer exists and user has permission
+    await verifyLayerPermission(layerId, user.id);
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-  });
-
-  if (!user) {
-    console.error("[updateLayerZIndex] User not found in database");
-    throw new Error("User not found");
-  }
-
-  // Check if layer exists
-  const layer = await prisma.mapLayer.findUnique({
-    where: { id: layerId },
-    include: { gameWorld: true },
-  });
-
-  if (!layer) {
-    throw new Error("Layer not found");
-  }
-
-  // Check ownership or editor permission
-  if (layer.gameWorld.userId !== user.id) {
-    const member = await prisma.worldMember.findFirst({
-      where: {
-        gameWorldId: layer.gameWorldId,
-        userId: user.id,
-        permission: { in: ["EDITOR", "OWNER"] },
-      },
+    const updatedLayer = await prisma.mapLayer.update({
+      where: { id: layerId },
+      data: { zIndex },
     });
 
-    if (!member) {
-      throw new Error("Unauthorized: You don't have permission to edit this world");
-    }
-  }
+    // No revalidatePath needed - Zustand store manages client-side state
 
-  const updatedLayer = await prisma.mapLayer.update({
-    where: { id: layerId },
-    data: { zIndex },
-  });
-
-  // No revalidatePath needed - Zustand store manages client-side state
-
-  return updatedLayer;
+    return updatedLayer;
+  }, "updateLayerZIndex");
 }
 
 /**
  * Delete a layer
  * @param layerId - Layer ID to delete
- * @returns Deleted layer
- * @throws Error if user not authorized or deletion fails
+ * @returns Result with deleted layer or error
  */
-export async function deleteLayer(layerId: string) {
-  const session = await getServerSession(authOptions);
+export async function deleteLayer(layerId: string): Promise<Result<any>> {
+  return safeAsync(async () => {
+    // Get authenticated user
+    const user = await getAuthenticatedUser();
 
-  if (!session?.user?.id) {
-    console.error("[deleteLayer] No authenticated user session");
-    throw new Error("Not authenticated");
-  }
+    // Verify layer exists and user has permission
+    const layer = await verifyLayerPermission(layerId, user.id);
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-  });
-
-  if (!user) {
-    console.error("[deleteLayer] User not found in database");
-    throw new Error("User not found");
-  }
-
-  // Check if layer exists
-  const layer = await prisma.mapLayer.findUnique({
-    where: { id: layerId },
-    include: { gameWorld: true },
-  });
-
-  if (!layer) {
-    throw new Error("Layer not found");
-  }
-
-  // Check ownership or editor permission
-  if (layer.gameWorld.userId !== user.id) {
-    const member = await prisma.worldMember.findFirst({
-      where: {
-        gameWorldId: layer.gameWorldId,
-        userId: user.id,
-        permission: { in: ["EDITOR", "OWNER"] },
-      },
+    const deletedLayer = await prisma.mapLayer.delete({
+      where: { id: layerId },
     });
 
-    if (!member) {
-      throw new Error("Unauthorized: You don't have permission to edit this world");
-    }
-  }
+    revalidatePath(`/world/${layer.gameWorldId}`);
 
-  const deletedLayer = await prisma.mapLayer.delete({
-    where: { id: layerId },
-  });
-
-  revalidatePath(`/world/${layer.gameWorldId}`);
-
-  return deletedLayer;
+    return deletedLayer;
+  }, "deleteLayer");
 }
 
 /**
  * Batch update multiple layers (for z-index reordering)
  * @param updates - Array of layer updates
- * @returns Updated layers
- * @throws Error if user not authorized or update fails
+ * @returns Result with updated layers or error
  */
 export async function batchUpdateLayers(
   updates: Array<{
@@ -426,63 +226,31 @@ export async function batchUpdateLayers(
     offsetY?: number;
     scale?: number;
   }>
-) {
-  const session = await getServerSession(authOptions);
+): Promise<Result<any[]>> {
+  return safeAsync(async () => {
+    // Get authenticated user
+    const user = await getAuthenticatedUser();
 
-  if (!session?.user?.id) {
-    console.error("[batchUpdateLayers] No authenticated user session");
-    throw new Error("Not authenticated");
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-  });
-
-  if (!user) {
-    console.error("[batchUpdateLayers] User not found in database");
-    throw new Error("User not found");
-  }
-
-  // Verify permission for first layer (assumes all layers belong to same world)
-  if (updates.length > 0) {
-    const firstLayer = await prisma.mapLayer.findUnique({
-      where: { id: updates[0].id },
-      include: { gameWorld: true },
-    });
-
-    if (!firstLayer) {
-      throw new Error("Layer not found");
+    // Verify permission for first layer (assumes all layers belong to same world)
+    if (updates.length > 0) {
+      await verifyLayerPermission(updates[0].id, user.id);
     }
 
-    if (firstLayer.gameWorld.userId !== user.id) {
-      const member = await prisma.worldMember.findFirst({
-        where: {
-          gameWorldId: firstLayer.gameWorldId,
-          userId: user.id,
-          permission: { in: ["EDITOR", "OWNER"] },
-        },
-      });
+    // Update all layers in a transaction
+    const updatedLayers = await prisma.$transaction(
+      updates.map((update) =>
+        prisma.mapLayer.update({
+          where: { id: update.id },
+          data: {
+            zIndex: update.zIndex,
+            ...(update.offsetX !== undefined && { offsetX: update.offsetX }),
+            ...(update.offsetY !== undefined && { offsetY: update.offsetY }),
+            ...(update.scale !== undefined && { scale: update.scale }),
+          },
+        })
+      )
+    );
 
-      if (!member) {
-        throw new Error("Unauthorized: You don't have permission to edit this world");
-      }
-    }
-  }
-
-  // Update all layers in a transaction
-  const updatedLayers = await prisma.$transaction(
-    updates.map((update) =>
-      prisma.mapLayer.update({
-        where: { id: update.id },
-        data: {
-          zIndex: update.zIndex,
-          ...(update.offsetX !== undefined && { offsetX: update.offsetX }),
-          ...(update.offsetY !== undefined && { offsetY: update.offsetY }),
-          ...(update.scale !== undefined && { scale: update.scale }),
-        },
-      })
-    )
-  );
-
-  return updatedLayers;
+    return updatedLayers;
+  }, "batchUpdateLayers");
 }

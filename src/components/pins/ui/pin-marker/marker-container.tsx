@@ -119,10 +119,22 @@ export const MarkerContainer = memo(function MarkerContainer({
         transform: "translate(-50%, -50%)",
         zIndex,
       }}
+      role="button"
+      tabIndex={0}
+      aria-label={`Pin: ${title || 'Untitled'}`}
+      aria-describedby={isSelected ? 'pin-selected' : undefined}
+      aria-pressed={isSelected}
       onClick={onClick}
       onMouseDown={onMouseDown}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      onKeyDown={(e) => {
+        // Activate pin on Enter or Space
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick(e as any);
+        }
+      }}
     >
       {/* Selection ring indicator */}
       <MarkerSelectionRing isSelected={isSelected} pinSize={size} />
@@ -140,6 +152,7 @@ export const MarkerContainer = memo(function MarkerContainer({
           transform: transformScale,
           filter: lockedFilter,
         }}
+        aria-hidden="true"
       >
         <MarkerIcon
           iconName={iconName}

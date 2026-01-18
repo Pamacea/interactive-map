@@ -211,8 +211,8 @@
       "title": "Split Pins Store into Smaller Stores",
       "priority": 11,
       "agent": "simplifier:smite-simplifier",
-      "status": "pending",
-      "passes": false,
+      "status": "completed",
+      "passes": true,
       "description": "Store contains too much state (569 lines). Split into smaller, focused stores for better performance",
       "acceptance_criteria": [
         "Pins store split into focused sub-stores",
@@ -230,8 +230,8 @@
       "title": "Implement Proper Error Handling",
       "priority": 12,
       "agent": "builder:builder",
-      "status": "pending",
-      "passes": false,
+      "status": "completed",
+      "passes": true,
       "description": "API calls don't handle errors properly. Implement comprehensive error handling and user feedback",
       "acceptance_criteria": [
         "All API calls have try-catch blocks",
@@ -250,8 +250,8 @@
       "title": "Add Accessibility Features",
       "priority": 13,
       "agent": "builder:builder",
-      "status": "pending",
-      "passes": false,
+      "status": "completed",
+      "passes": true,
       "description": "Missing ARIA labels, keyboard navigation, and focus management. Add proper accessibility support",
       "acceptance_criteria": [
         "ARIA labels on all interactive elements",

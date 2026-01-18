@@ -1,10 +1,12 @@
 "use client";
 
+import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { pinTypeConfig, type PinType } from "@/constants/pin-types";
 import { useContextMenuPosition } from "../logic/use-context-menu-position";
 import { PinMenuHeader } from "./pin-menu-header";
 import { PinTypeMenuItem } from "./pin-type-menu-item";
+import { useFocusTrap } from "@/hooks/accessibility";
 
 export interface PinContextMenuProps {
   position: { x: number; y: number };
@@ -24,6 +26,23 @@ export function PinContextMenu({
     onClose,
   });
 
+  // Focus trap to keep keyboard navigation within the menu
+  useFocusTrap(true, menuRef);
+
+  // Close on Escape key
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [onClose]);
+
   const handleSelectPinType = (pinType: string) => {
     onSelectPinType(pinType, coordinates.lat, coordinates.lng);
     onClose();
@@ -32,6 +51,9 @@ export function PinContextMenu({
   return (
     <div
       ref={menuRef}
+      role="menu"
+      aria-label="Create pin menu"
+      aria-orientation="vertical"
       className={cn(
         "fixed z-50 min-w-[200px] rounded-sm border border-border-subtle",
         "bg-background-card shadow-xl p-1",
@@ -46,7 +68,7 @@ export function PinContextMenu({
     >
       <PinMenuHeader />
 
-      <div className="py-1">
+      <div role="none" className="py-1">
         {Object.entries(pinTypeConfig).map(([type, config]) => (
           <PinTypeMenuItem
             key={type}
@@ -57,16 +79,19 @@ export function PinContextMenu({
         ))}
       </div>
 
-      <div className="my-1 border-t border-border-subtle" />
+      <div role="none" className="my-1 border-t border-border-subtle" />
 
       <button
         onClick={onClose}
+        role="menuitem"
         className={cn(
           "w-full flex items-center justify-center px-3 py-2 rounded-sm",
           "text-sm font-medium text-text-muted",
           "hover:text-text-primary hover:bg-background-elevated",
-          "transition-all duration-150"
+          "transition-all duration-150",
+          "focus:outline-none focus:ring-2 focus:ring-accent-gold/50"
         )}
+        type="button"
       >
         Cancel
       </button>

@@ -24,13 +24,16 @@ export function PinTypeMenuItem({
   return (
     <button
       onClick={() => onSelect(type)}
+      role="menuitem"
       className={cn(
         "w-full flex items-center gap-3 px-3 py-2 rounded-sm",
         "text-left transition-all duration-150",
         "hover:bg-accent-gold/10 hover:border hover:border-accent-gold/50",
-        "group"
+        "group focus:outline-none focus:ring-2 focus:ring-accent-gold/50"
       )}
       title={config.description}
+      aria-label={`Create ${config.label} pin${config.description ? `: ${config.description}` : ""}`}
+      type="button"
     >
       <div
         className="flex h-8 w-8 items-center justify-center rounded-sm"
@@ -38,6 +41,7 @@ export function PinTypeMenuItem({
           backgroundColor: `${config.color}20`,
           border: `1px solid ${config.color}40`,
         }}
+        aria-hidden="true"
       >
         <IconComponent
           className="h-4 w-4"
@@ -52,6 +56,7 @@ export function PinTypeMenuItem({
       <div
         className="h-3 w-3 rounded-full shadow-sm"
         style={{ backgroundColor: config.color }}
+        aria-hidden="true"
       />
     </button>
   );
