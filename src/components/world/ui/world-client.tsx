@@ -13,18 +13,27 @@ import { useAutosavePreparation } from "@/components/world/logic/use-autosave-pr
 import { useAutosave } from "@/hooks/use-autosave";
 import { updateWorldState } from "@/actions/worlds";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { useLoreStore } from "@/stores/use-lore-store";
 import type { OptimizedWorld } from "@/types/world.type";
 import type { Pin } from "@/types/pin.type";
+import type { LoreEntry } from "@/types/lore.type";
 
 interface WorldClientProps {
   world: OptimizedWorld;
   pins: Pin[];
+  loreEntries: LoreEntry[];
   isAuthenticated: boolean;
 }
 
-export function WorldClient({ world, pins, isAuthenticated }: WorldClientProps) {
+export function WorldClient({ world, pins, loreEntries, isAuthenticated }: WorldClientProps) {
   // Initialize layers from world data (handle undefined from Prisma)
   useWorldInitialization(world.layers ?? null);
+
+  // Initialize lore store with server data
+  const setLoreEntries = useLoreStore((state) => state.setLoreEntries);
+  if (loreEntries && loreEntries.length > 0) {
+    setLoreEntries(loreEntries);
+  }
 
   // Sidebar state
   const { width, isCollapsed, isResizing, startResize, toggleCollapse, sidebarRef } = useResizableSidebar();

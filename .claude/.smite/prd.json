@@ -109,8 +109,8 @@
       "title": "Implement Lore Entries UI",
       "priority": 6,
       "agent": "builder:builder",
-      "status": "pending",
-      "passes": false,
+      "status": "completed",
+      "passes": true,
       "description": "Schema exists for Lore entries but UI is missing. Implement complete Lore entry management system",
       "acceptance_criteria": [
         "Lore entry creation/editing forms with rich text support",

@@ -1,7 +1,7 @@
-import { Layers, MapPin, Filter, Settings2 } from "lucide-react";
+import { Layers, MapPin, Filter, Settings2, BookOpen } from "lucide-react";
 
 interface SidebarCollapsedProps {
-  onIconClick: (section: "layers" | "filters" | "properties" | "pins") => void;
+  onIconClick: (section: "layers" | "filters" | "properties" | "pins" | "lore") => void;
   selectedLayerId: string | null;
   showPinsSection: boolean;
 }
@@ -14,6 +14,8 @@ export function SidebarCollapsed({ onIconClick, selectedLayerId, showPinsSection
       {showPinsSection && selectedLayerId && (
         <CollapsedButton onClick={() => onIconClick("pins")} icon={MapPin} label="Pins" />
       )}
+
+      <CollapsedButton onClick={() => onIconClick("lore")} icon={BookOpen} label="Lore" />
 
       <CollapsedButton onClick={() => onIconClick("filters")} icon={Filter} label="Filters" />
       <CollapsedButton onClick={() => onIconClick("properties")} icon={Settings2} label="Properties" />

@@ -3,6 +3,8 @@ import { LayersPanel } from "../layers-panel";
 import { PinsFilterPanel } from "../pins-filter-panel";
 import { PropertiesPanel } from "../properties-panel";
 import { PinActionDropdown, PinList } from "@/components/pins/ui";
+import { LoreList, LoreForm } from "@/components/lore/ui";
+import { useLoreStore } from "@/stores/use-lore-store";
 
 interface SidebarExpandedProps {
   worldId: string;
@@ -16,6 +18,8 @@ interface SidebarExpandedProps {
   setLayersOpen: (open: boolean) => void;
   pinsOpen: boolean;
   setPinsOpen: (open: boolean) => void;
+  loreOpen: boolean;
+  setLoreOpen: (open: boolean) => void;
   filtersOpen: boolean;
   setFiltersOpen: (open: boolean) => void;
   propertiesOpen: boolean;
@@ -34,11 +38,24 @@ export function SidebarExpanded({
   setLayersOpen,
   pinsOpen,
   setPinsOpen,
+  loreOpen,
+  setLoreOpen,
   filtersOpen,
   setFiltersOpen,
   propertiesOpen,
   setPropertiesOpen,
 }: SidebarExpandedProps) {
+  // Lore state
+  const isCreatingLore = useLoreStore((state) => state.isCreating);
+  const isEditingLore = useLoreStore((state) => state.isEditing);
+  const selectedLoreId = useLoreStore((state) => state.selectedLoreId);
+  const loreEntries = useLoreStore((state) => state.loreEntries);
+
+  // Get selected lore entry for editing
+  const selectedLore = selectedLoreId
+    ? loreEntries.find((lore) => lore.id === selectedLoreId)
+    : undefined;
+
   return (
     <div className="flex-1 overflow-y-auto">
       <CollapsibleSection title="Layers" isOpen={layersOpen} onToggle={() => setLayersOpen(!layersOpen)}>
@@ -59,6 +76,22 @@ export function SidebarExpanded({
           </div>
         </CollapsibleSection>
       )}
+
+      <CollapsibleSection title="Lore" isOpen={loreOpen} onToggle={() => setLoreOpen(!loreOpen)}>
+        <div className="space-y-3">
+          {(isCreatingLore || isEditingLore) ? (
+            <LoreForm
+              worldId={worldId}
+              lore={selectedLore}
+              onSuccess={() => {
+                setLoreOpen(true);
+              }}
+            />
+          ) : (
+            <LoreList worldId={worldId} />
+          )}
+        </div>
+      </CollapsibleSection>
 
       <CollapsibleSection title="Filters" isOpen={filtersOpen} onToggle={() => setFiltersOpen(!filtersOpen)}>
         <PinsFilterPanel />
