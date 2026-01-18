@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { MarkerIcon } from "./marker-icon";
 import { MarkerSelectionRing } from "./marker-selection-ring";
 
@@ -51,6 +52,8 @@ interface MarkerContainerProps {
  * - Icon (custom image or Lucide)
  * - Interactive handlers (click, drag, hover)
  *
+ * Memoized to prevent unnecessary re-renders of sub-components during pan/zoom.
+ *
  * @example
  * ```tsx
  * <MarkerContainer
@@ -76,7 +79,7 @@ interface MarkerContainerProps {
  * />
  * ```
  */
-export function MarkerContainer({
+export const MarkerContainer = memo(function MarkerContainer({
   x,
   y,
   zIndex,
@@ -147,4 +150,4 @@ export function MarkerContainer({
       </div>
     </div>
   );
-}
+});

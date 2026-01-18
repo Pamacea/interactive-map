@@ -30,6 +30,7 @@ export function TitleInput({
           if (trimmedTitle.length > 0 && trimmedTitle !== externalValue) {
             onUpdate(trimmedTitle);
           } else if (trimmedTitle.length === 0) {
+            // Reset to externalValue if empty
             onChange(externalValue);
           }
         }}
@@ -37,6 +38,7 @@ export function TitleInput({
           if (e.key === "Enter") {
             e.currentTarget.blur();
           } else if (e.key === "Escape") {
+            // Reset to externalValue on Escape
             onChange(externalValue);
             e.currentTarget.blur();
           }

@@ -1,3 +1,4 @@
+import { memo } from "react";
 import * as LucideIcons from "lucide-react";
 
 interface MarkerIconProps {
@@ -17,6 +18,8 @@ interface MarkerIconProps {
  * Displays either a custom uploaded image or a Lucide icon component.
  * Handles icon scaling and styling.
  *
+ * Memoized to prevent unnecessary re-renders when parent props change.
+ *
  * @example
  * ```tsx
  * <MarkerIcon
@@ -27,7 +30,7 @@ interface MarkerIconProps {
  * />
  * ```
  */
-export function MarkerIcon({ iconName, title, iconSize, isCustomImage }: MarkerIconProps) {
+export const MarkerIcon = memo(function MarkerIcon({ iconName, title, iconSize, isCustomImage }: MarkerIconProps) {
   if (isCustomImage) {
     return (
       <img
@@ -49,4 +52,4 @@ export function MarkerIcon({ iconName, title, iconSize, isCustomImage }: MarkerI
       style={{ color: "white", opacity: 0.9 }}
     />
   );
-}
+});

@@ -7,6 +7,7 @@ import { useSelectedLayerId } from "@/stores/map-store";
 import { pinTypeConfig, PinType } from "@/constants/pin-types";
 import type { Pin } from "@prisma/client";
 import * as LucideIcons from "lucide-react";
+import { useMapCenter } from "@/components/world/context/map-context";
 
 interface PinListProps {
   worldId: string;
@@ -19,6 +20,7 @@ export function PinList({ worldId }: PinListProps) {
   const selectedLayerId = useSelectedLayerId();
 
   const selectPin = usePinsStore((state) => state.selectPin);
+  const { centerOnPin } = useMapCenter();
 
   // Filter state
   const [selectedType, setSelectedType] = useState<PinType | "ALL">("ALL");
@@ -60,9 +62,8 @@ export function PinList({ worldId }: PinListProps) {
   const handlePinClick = (pin: Pin) => {
     selectPin(pin.id);
 
-    // TODO: Center map on pin
-    // This will require accessing the map transform state from MapCanvas
-    // For now, just select the pin to show in Properties
+    // Center the map on the clicked pin
+    centerOnPin(pin.id);
   };
 
   const pinCount = filteredPins.length;

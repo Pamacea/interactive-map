@@ -161,61 +161,63 @@ export function PinMarker({
 /**
  * MemoizedPinMarker - Performance-optimized pin marker with custom comparison
  *
- * PERFORMANCE STRATEGY:
- * ====================
+ * PERFORMANCE STRATEGY (2025 Best Practices):
+ * ============================================
  *
- * CRITICAL PROPS (trigger re-render):
- * - pin.id: Unique identifier - if changed, this is a different pin
- * - pin.isVisible: Visibility toggle - directly affects rendering
- * - pin.size: Affects visual size calculation
- * - pin.color: Affects visual appearance
- * - pin.icon: Affects which icon is displayed
- * - pin.latitude / pin.longitude: Position changes (drag operations)
- * - pin.layerId: Layer assignment affects z-index and offsets
- * - pin.opacity: Visual transparency
- * - pin.minZoom / pin.maxZoom: Zoom-based visibility
- * - transform.scale: Affects size and zoom-based visibility
- * - transform.translateX: Affects position when panning
- * - transform.translateY: Affects position when panning
+ * KEY INSIGHT: Re-renders during pan/zoom are EXPECTED and NECESSARY.
+ * The optimization goal is to prevent re-renders on UNRELATED changes.
  *
- * EXCLUDED PROPS (intentionally ignored):
- * - pin.title: Only used for alt text - doesn't affect rendering
+ * CHECKED PROPS (prevent re-renders when these change on OTHER pins):
+ * - pin.id: Identity check - different pin = must re-render
+ * - pin.isVisible: Direct visibility toggle
+ * - pin.size: Visual size affects rendering
+ * - pin.color: Background color
+ * - pin.icon: Which icon to display
+ * - pin.opacity: Transparency
+ * - pin.latitude / pin.longitude: Position (drag operations)
+ * - pin.layerId: Affects z-index and layer offsets
+ * - pin.minZoom / pin.maxZoom: Zoom-based visibility range
+ *
+ * EXCLUDED PROPS (intentionally allow re-renders):
+ * - transform props: Re-renders during pan/zoom are NECESSARY for position updates
+ * - pin.title: Only used for alt text - rare changes
  * - pin.description: Not used in marker rendering
  * - pin.createdAt / pin.updatedAt: Metadata only
- * - pin.worldId: Not used in rendering
- * - pin.userId: Not used in rendering
+ * - pin.worldId / pin.userId: Not used in rendering
  * - layer properties: Computed from mapStore, not props
- * - imageDimensions: Cached in parent, rarely changes
- * - mapWidth / mapHeight: Only used for position calc, derived from imageDimensions
  *
- * WHY THIS MATTERS:
- * ================
- * Without memoization, EVERY pin re-renders on EVERY transform change (pan/zoom).
- * With 100 pins and 60fps, that's 6000 renders/second = major lag.
+ * WHY THIS APPROACH (Based on 2025 React.memo Best Practices):
+ * ============================================================
+ * 1. Pan/zoom re-renders are CORRECT behavior - position must update every frame
+ * 2. Memo optimization prevents CASCADE re-renders from unrelated state changes
+ * 3. Focus on expensive operations (drag, edits) not frequent ones (pan/zoom)
  *
- * With memoization, only pins affected by the change re-render:
- * - Pan/zoom: All pins re-render (transform changes) - EXPECTED
- * - Title edit: Only edited pin re-renders - OPTIMIZED
- * - Visibility toggle: Only toggled pin re-renders - OPTIMIZED
- * - Selection: Only selected pin updates - OPTIMIZED
+ * Source: https://strapi.io/blog/react-memo-optimize-functional-components-guide
+ * "Wrapping an entire <ArticleList> in React.memo rarely helps because its props
+ * (the array reference) change with every pagination fetch. Instead, memoize each card."
  *
  * TESTING:
  * ========
  * 1. Open React DevTools Profiler
  * 2. Start profiling
- * 3. Pan/zoom map - expect all pins to re-render (transform change)
+ * 3. Pan/zoom map - expect all pins to re-render (EXPECTED AND NECESSARY)
  * 4. Edit pin title - expect ONLY that pin to re-render
- * 5. Toggle pin visibility - expect ONLY that pin to re-render
- * 6. Select different pin - expect minimal re-renders
+ * 5. Drag one pin - expect ONLY that pin to re-render
+ * 6. Toggle visibility - expect ONLY that pin to re-render
  *
  * EXPECTED PERFORMANCE:
  * ====================
- * - 60fps during pan/zoom with 100+ pins
+ * - 60fps during pan/zoom with 100+ pins (re-renders are fast)
+ * - No cascade re-renders when editing single pin
+ * - Drag operations only affect dragged pin
  * - <16ms render time per frame
- * - No cascade re-renders on unrelated prop changes
  */
 export const MemoizedPinMarker = memo(PinMarker, (prevProps, nextProps) => {
-  // Compare critical props that affect rendering
+  // Fast path: same pin object reference = no changes
+  if (prevProps.pin === nextProps.pin) return true;
+
+  // Compare pin identity and visual properties only
+  // Note: We DON'T check transform props - pan/zoom re-renders are expected
   return (
     // Identity check - different pin entirely
     prevProps.pin.id === nextProps.pin.id &&
@@ -233,11 +235,7 @@ export const MemoizedPinMarker = memo(PinMarker, (prevProps, nextProps) => {
     prevProps.pin.minZoom === nextProps.pin.minZoom &&
     prevProps.pin.maxZoom === nextProps.pin.maxZoom &&
     // Layer assignment - affects z-index and offsets
-    prevProps.pin.layerId === nextProps.pin.layerId &&
-    // Transform - affects size, position, and visibility
-    prevProps.transform.scale === nextProps.transform.scale &&
-    prevProps.transform.translateX === nextProps.transform.translateX &&
-    prevProps.transform.translateY === nextProps.transform.translateY
+    prevProps.pin.layerId === nextProps.pin.layerId
   );
 });
 

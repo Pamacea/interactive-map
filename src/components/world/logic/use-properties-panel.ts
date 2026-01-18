@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useSelectedPin, useUpdatePin } from "@/stores/use-pins-store";
+import { useSelectedPin, useUpdatePin, usePinsStore } from "@/stores/use-pins-store";
 import { updatePin, uploadPinIcon } from "@/actions/pins";
 import { useToast } from "@/hooks/use-toast";
 import type { Pin } from "@prisma/client";
@@ -38,10 +38,11 @@ export function usePropertiesPanel() {
   const [lastKnownGoodState, setLastKnownGoodState] = useState<PinFormState | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Update form when pin selection changes
+  // Update form when pin selection changes OR when pin data changes in store
+  // This ensures sync between sidebar and popup when either updates
   useEffect(() => {
     if (selectedPin) {
-      setFormState({
+      const newFormState = {
         title: selectedPin.title,
         description: selectedPin.description || "",
         pinType: selectedPin.pinType,
@@ -52,9 +53,17 @@ export function usePropertiesPanel() {
         isVisible: selectedPin.isVisible,
         minZoom: selectedPin.minZoom ?? 0,
         maxZoom: selectedPin.maxZoom ?? 200,
+      };
+
+      // Only update if values actually changed (prevent infinite loops)
+      setFormState((prev) => {
+        const hasChanged = Object.keys(newFormState).some(
+          (key) => newFormState[key as keyof PinFormState] !== prev[key as keyof PinFormState]
+        );
+        return hasChanged ? newFormState : prev;
       });
     }
-  }, [selectedPin]);
+  }, [selectedPin]); // Will re-run whenever selectedPin object reference changes from store updates
 
   // Handle pin updates with optimistic updates
   const handleUpdatePin = useCallback(

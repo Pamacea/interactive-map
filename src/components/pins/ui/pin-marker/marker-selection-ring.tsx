@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 interface MarkerSelectionRingProps {
   /** Whether this pin is currently selected */
   isSelected: boolean;
@@ -11,6 +13,8 @@ interface MarkerSelectionRingProps {
  * Displays a pulsing ring around selected pins to provide visual feedback.
  * Only rendered when the pin is selected.
  *
+ * Memoized to prevent unnecessary re-renders when parent props change.
+ *
  * @example
  * ```tsx
  * <MarkerSelectionRing
@@ -19,7 +23,7 @@ interface MarkerSelectionRingProps {
  * />
  * ```
  */
-export function MarkerSelectionRing({ isSelected, pinSize }: MarkerSelectionRingProps) {
+export const MarkerSelectionRing = memo(function MarkerSelectionRing({ isSelected, pinSize }: MarkerSelectionRingProps) {
   if (!isSelected) {
     return null;
   }
@@ -37,4 +41,4 @@ export function MarkerSelectionRing({ isSelected, pinSize }: MarkerSelectionRing
       }}
     />
   );
-}
+});

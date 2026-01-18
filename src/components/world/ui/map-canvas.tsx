@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useMemo } from "react";
 import { useGrid, useScale, useLayers, useSelectedLayerId, useBaseMapVisible, useMapStore } from "@/stores/map-store";
 import {
   usePins,
@@ -24,6 +24,8 @@ import { MapContainer } from "./map-canvas/map-container";
 import { MapTransformLayer } from "./map-canvas/map-transform-layer";
 import { MapContent } from "./map-canvas/map-content";
 import { MapPinsWrapper } from "./map-canvas/map-pins-wrapper";
+import { usePinPosition } from "@/components/pins/logic/use-pin-position";
+import { MapCenterProvider } from "../context/map-context";
 
 const GRID_SIZE = 40;
 
@@ -56,6 +58,7 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
     handleMouseDown,
     reset: resetTransform,
     setTransform,
+    centerToPin,
   } = useMapPan({ isCreatingPin });
 
   const { handleZoomIn, handleZoomOut } = useMapZoom(transform, setTransform);
@@ -118,16 +121,46 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
 
   const layerScale = baseMapLayer?.scale ?? 1;
 
+  /**
+   * Center the map on a specific pin by ID
+   * This function is exposed via context to the pin list
+   */
+  const centerOnPin = useMemo(() => {
+    return (pinId: string) => {
+      const pin = pins.find((p) => p.id === pinId);
+      if (!pin || !imageDimensions || !containerRef.current) return;
+
+      // Calculate pin position using the same logic as the marker
+      const layer = layers.find((l) => l.id === pin.layerId);
+      const layerOffsetX = layer?.offsetX ?? 0;
+      const layerOffsetY = layer?.offsetY ?? 0;
+
+      // Convert lat/lng to pixel coordinates
+      const pinX = pin.longitude * imageDimensions.width + layerOffsetX;
+      const pinY = pin.latitude * imageDimensions.height + layerOffsetY;
+
+      // Call the centering function from useMapPan
+      centerToPin(
+        pinX,
+        pinY,
+        imageDimensions.width,
+        imageDimensions.height,
+        containerRef
+      );
+    };
+  }, [pins, imageDimensions, layers, centerToPin]);
+
   return (
-    <MapContainer
-      ref={containerRef}
-      isCreatingPin={isCreatingPin}
-      isDragging={isDragging}
-      showContextMenu={!!contextMenu}
-      onMouseDown={handleMouseDown}
-      onClick={handleClick}
-      onContextMenu={handleContextMenu}
-    >
+    <MapCenterProvider centerOnPin={centerOnPin}>
+      <MapContainer
+        ref={containerRef}
+        isCreatingPin={isCreatingPin}
+        isDragging={isDragging}
+        showContextMenu={!!contextMenu}
+        onMouseDown={handleMouseDown}
+        onClick={handleClick}
+        onContextMenu={handleContextMenu}
+      >
       <MapTransformLayer
         translateX={transform.translateX}
         translateY={transform.translateY}
@@ -197,5 +230,6 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
         />
       )}
     </MapContainer>
+    </MapCenterProvider>
   );
 }

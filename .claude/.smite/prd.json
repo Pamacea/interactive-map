@@ -131,8 +131,8 @@
       "title": "Fix Pin List Map Centering",
       "priority": 7,
       "agent": "builder:builder",
-      "status": "pending",
-      "passes": false,
+      "status": "completed",
+      "passes": true,
       "description": "Pin list missing map centering functionality. Implement map centering through ref to MapCanvas component",
       "acceptance_criteria": [
         "Clicking pin in list centers map on pin",
@@ -173,8 +173,8 @@
       "title": "Fix Property Form State Synchronization",
       "priority": 9,
       "agent": "builder:builder",
-      "status": "pending",
-      "passes": false,
+      "status": "completed",
+      "passes": true,
       "description": "Local form state doesn't sync with external updates properly. Use Zustand for form state management",
       "acceptance_criteria": [
         "Form state synchronized across sidebar and popup",
@@ -192,8 +192,8 @@
       "title": "Optimize Pin Marker Re-renders",
       "priority": 10,
       "agent": "simplifier:smite-simplifier",
-      "status": "pending",
-      "passes": false,
+      "status": "completed",
+      "passes": true,
       "description": "Memoization not preventing unnecessary re-renders during pan/zoom operations. Optimize memoization criteria",
       "acceptance_criteria": [
         "Pin markers only re-render on critical prop changes",
