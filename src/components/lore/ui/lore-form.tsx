@@ -5,6 +5,17 @@ import { X, Loader2 } from "lucide-react";
 import { useLoreStore } from "@/stores/use-lore-store";
 import { LoreCategory } from "@/types/lore.type";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { LoreEntry } from "@/types/lore.type";
 
 interface LoreFormProps {
@@ -133,17 +144,18 @@ export function LoreForm({ worldId, lore, onSuccess }: LoreFormProps) {
 
         {/* Title */}
         <div>
-          <label className="block text-sm font-medium text-text-secondary mb-1">
+          <Label htmlFor="lore-title">
             Title <span className="text-red-500">*</span>
-          </label>
-          <input
+          </Label>
+          <Input
+            id="lore-title"
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Enter title..."
-            className="w-full h-10 px-3 text-sm bg-background-base border border-border-base rounded-sm focus:outline-none focus:ring-1 focus:ring-accent-gold focus:border-accent-gold placeholder:text-text-muted"
             disabled={isSubmitting}
             maxLength={200}
+            className="mt-1"
           />
           <p className="text-xs text-text-muted mt-1">
             {title.length} / 200 characters
@@ -152,36 +164,39 @@ export function LoreForm({ worldId, lore, onSuccess }: LoreFormProps) {
 
         {/* Category */}
         <div>
-          <label className="block text-sm font-medium text-text-secondary mb-1">
-            Category
-          </label>
-          <select
+          <Label htmlFor="lore-category">Category</Label>
+          <Select
             value={category}
-            onChange={(e) => setCategory(e.target.value as LoreCategory)}
-            className="w-full h-10 px-3 text-sm bg-background-base border border-border-base rounded-sm focus:outline-none focus:ring-1 focus:ring-accent-gold focus:border-accent-gold cursor-pointer"
+            onValueChange={(value) => setCategory(value as LoreCategory)}
             disabled={isSubmitting}
           >
-            {categories.map((cat) => (
-              <option key={cat.value} value={cat.value}>
-                {cat.label}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger id="lore-category" className="mt-1">
+              <SelectValue placeholder="Select a category" />
+            </SelectTrigger>
+            <SelectContent>
+              {categories.map((cat) => (
+                <SelectItem key={cat.value} value={cat.value}>
+                  {cat.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Content */}
         <div>
-          <label className="block text-sm font-medium text-text-secondary mb-1">
+          <Label htmlFor="lore-content">
             Content <span className="text-red-500">*</span>
-          </label>
-          <textarea
+          </Label>
+          <Textarea
+            id="lore-content"
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Write your lore entry here... (Markdown supported)"
             rows={8}
-            className="w-full px-3 py-2 text-sm bg-background-base border border-border-base rounded-sm focus:outline-none focus:ring-1 focus:ring-accent-gold focus:border-accent-gold placeholder:text-text-muted resize-y"
             disabled={isSubmitting}
             maxLength={50000}
+            className="mt-1 resize-y"
           />
           <p className="text-xs text-text-muted mt-1">
             {content.length} / 50,000 characters
@@ -190,27 +205,35 @@ export function LoreForm({ worldId, lore, onSuccess }: LoreFormProps) {
 
         {/* Visibility toggles */}
         <div className="flex gap-4">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
+          <div className="flex items-center gap-2 cursor-pointer">
+            <Checkbox
+              id="lore-visible"
               checked={isVisible}
-              onChange={(e) => setIsVisible(e.target.checked)}
-              className="w-4 h-4 rounded-sm border-border-base text-accent-gold focus:ring-accent-gold"
+              onCheckedChange={(checked) => setIsVisible(checked === true)}
               disabled={isSubmitting}
             />
-            <span className="text-sm text-text-secondary">Visible in map</span>
-          </label>
+            <Label
+              htmlFor="lore-visible"
+              className="cursor-pointer text-text-secondary"
+            >
+              Visible in map
+            </Label>
+          </div>
 
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
+          <div className="flex items-center gap-2 cursor-pointer">
+            <Checkbox
+              id="lore-public"
               checked={isPublic}
-              onChange={(e) => setIsPublic(e.target.checked)}
-              className="w-4 h-4 rounded-sm border-border-base text-accent-gold focus:ring-accent-gold"
+              onCheckedChange={(checked) => setIsPublic(checked === true)}
               disabled={isSubmitting}
             />
-            <span className="text-sm text-text-secondary">Public</span>
-          </label>
+            <Label
+              htmlFor="lore-public"
+              className="cursor-pointer text-text-secondary"
+            >
+              Public
+            </Label>
+          </div>
         </div>
 
         {/* Actions */}

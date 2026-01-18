@@ -6,6 +6,8 @@ import { useLoreStore } from "@/stores/use-lore-store";
 import { LoreCategory } from "@/types/lore.type";
 import { LoreCard } from "./lore-card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge as ShadcnBadge } from "@/components/ui/badge";
 
 interface LoreListProps {
   worldId: string;
@@ -96,35 +98,40 @@ export function LoreList({ worldId }: LoreListProps) {
       <div className="mb-3">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted" />
-          <input
+          <Input
             type="text"
             placeholder="Search lore..."
             value={localSearchTerm}
             onChange={handleSearchChange}
-            className="w-full h-9 pl-9 pr-3 text-sm bg-background-base border border-border-base rounded-sm focus:outline-none focus:ring-1 focus:ring-accent-gold focus:border-accent-gold placeholder:text-text-muted"
+            className="pl-9 h-9"
           />
         </div>
       </div>
 
       {/* Filters */}
       <div className="mb-3 flex items-center gap-2">
-        <button
+        <Button
+          size="sm"
+          variant={showVisibleOnly ? "default" : "outline"}
           onClick={toggleShowVisibleOnly}
           className={`
-            px-2 py-1 text-xs rounded-sm transition-colors
+            px-2 py-1 text-xs h-7
             ${showVisibleOnly
-              ? "bg-accent-gold/20 text-accent-gold border border-accent-gold/30"
-              : "bg-background-elevated text-text-muted border border-border-base hover:border-border-muted"
+              ? "bg-accent-gold/20 text-accent-gold border-accent-gold/30 hover:bg-accent-gold/30"
+              : ""
             }
           `}
         >
           Visible Only
-        </button>
+        </Button>
         <div className="ml-auto">
-          <Badge className="text-xs bg-accent-gold/10 text-accent-gold border-accent-gold/30">
+          <ShadcnBadge
+            variant="outline"
+            className="text-xs bg-accent-gold/10 text-accent-gold border-accent-gold/30"
+          >
             {loreCount}
             {totalCount > loreCount && ` / ${totalCount}`}
-          </Badge>
+          </ShadcnBadge>
         </div>
       </div>
 
@@ -133,11 +140,13 @@ export function LoreList({ worldId }: LoreListProps) {
         {Object.entries(categoryLabels).map(([category, label]) => {
           const isEnabled = categoryFilters[category as LoreCategory];
           return (
-            <button
+            <Button
               key={category}
+              size="sm"
+              variant={isEnabled ? "outline" : "ghost"}
               onClick={() => toggleCategoryFilter(category as LoreCategory)}
               className={`
-                px-2 py-1 text-xs rounded-sm transition-colors border
+                px-2 py-1 text-xs h-7
                 ${isEnabled
                   ? "bg-background-elevated text-text-secondary border-border-base"
                   : "bg-background-base text-text-muted border-border-base opacity-50"
@@ -146,7 +155,7 @@ export function LoreList({ worldId }: LoreListProps) {
               title={`Filter by ${label}`}
             >
               {label}
-            </button>
+            </Button>
           );
         })}
       </div>

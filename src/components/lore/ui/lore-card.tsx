@@ -4,6 +4,8 @@ import { BookOpen, Clock, Eye, EyeOff, Edit, Trash2 } from "lucide-react";
 import { LoreEntry } from "@/types/lore.type";
 import { useLoreStore } from "@/stores/use-lore-store";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 // Simple utility to format time ago
 function formatTimeAgo(date: Date): string {
@@ -98,10 +100,10 @@ export function LoreCard({ lore, isSelected, onSelect, categoryLabel }: LoreCard
   const timeAgo = formatTimeAgo(new Date(lore.updatedAt));
 
   return (
-    <div
+    <Card
       onClick={onSelect}
       className={`
-        group relative p-3 rounded-sm border transition-all duration-200 cursor-pointer
+        group relative p-3 transition-all duration-200 cursor-pointer
         ${isSelected
           ? "border-accent-gold/30 bg-accent-gold/10"
           : "border-transparent hover:bg-background-elevated/80"
@@ -122,8 +124,9 @@ export function LoreCard({ lore, isSelected, onSelect, categoryLabel }: LoreCard
             {lore.title}
           </h3>
           <div className="flex items-center gap-2 mt-0.5">
-            <span className="text-xs text-text-muted">{categoryLabel}</span>
-            <span className="text-xs text-text-muted">•</span>
+            <Badge variant="outline" className="text-xs px-1.5 py-0">
+              {categoryLabel}
+            </Badge>
             <div className="flex items-center gap-1 text-xs text-text-muted">
               <Clock className="w-3 h-3" />
               <span>{timeAgo}</span>
@@ -132,10 +135,12 @@ export function LoreCard({ lore, isSelected, onSelect, categoryLabel }: LoreCard
         </div>
 
         {/* Visibility indicator */}
-        <button
+        <Button
+          size="sm"
+          variant="ghost"
           onClick={handleToggleVisibility}
           className={`
-            flex-shrink-0 p-1 rounded-sm transition-colors
+            flex-shrink-0 h-8 w-8 p-0
             ${lore.isVisible
               ? "text-accent-gold hover:bg-accent-gold/10"
               : "text-text-muted hover:bg-background-elevated"
@@ -148,7 +153,7 @@ export function LoreCard({ lore, isSelected, onSelect, categoryLabel }: LoreCard
           ) : (
             <EyeOff className="w-4 h-4" />
           )}
-        </button>
+        </Button>
       </div>
 
       {/* Content preview */}
@@ -175,6 +180,6 @@ export function LoreCard({ lore, isSelected, onSelect, categoryLabel }: LoreCard
           <Trash2 className="w-3 h-3" />
         </Button>
       </div>
-    </div>
+    </Card>
   );
 }
