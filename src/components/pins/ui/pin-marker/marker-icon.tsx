@@ -1,5 +1,5 @@
 import { memo } from "react";
-import * as LucideIcons from "lucide-react";
+import { getLucideIcon } from "@/lib/icon-utils";
 
 interface MarkerIconProps {
   /** Icon name (Lucide icon or custom image path) */
@@ -42,8 +42,8 @@ export const MarkerIcon = memo(function MarkerIcon({ iconName, title, iconSize, 
     );
   }
 
-  // Get Lucide icon component for non-custom icons
-  const IconComponent = (LucideIcons as any)[iconName] || LucideIcons.MapPin;
+  // Get Lucide icon component for non-custom icons (type-safe)
+  const IconComponent = getLucideIcon(iconName);
 
   return (
     <IconComponent

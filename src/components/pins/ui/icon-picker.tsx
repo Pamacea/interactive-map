@@ -1,9 +1,9 @@
 "use client"
 
 import * as React from "react"
-import * as LucideIcons from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Search, X } from "lucide-react"
+import { getLucideIconNames, getLucideIcon } from "@/lib/icon-utils"
 
 interface IconPickerProps {
   onSelect: (iconName: string) => void
@@ -11,17 +11,8 @@ interface IconPickerProps {
   currentIcon?: string
 }
 
-// Get all Lucide icon COMPONENTS (filter out non-functions)
-const iconNames = Object.keys(LucideIcons).filter((key) => {
-  const item = (LucideIcons as any)[key]
-  return (
-    key !== "createLucideIcon" &&
-    key !== "default" &&
-    key !== "Icon" &&
-    typeof item === "function" &&
-    item.displayName // React components have displayName
-  )
-})
+// Get all Lucide icon COMPONENTS (type-safe)
+const iconNames = getLucideIconNames()
 
 export function IconPicker({ onSelect, onClose, currentIcon }: IconPickerProps) {
   const [search, setSearch] = React.useState("")
@@ -64,9 +55,7 @@ export function IconPicker({ onSelect, onClose, currentIcon }: IconPickerProps) 
   }
 
   const IconComponent = (iconName: string) => {
-    const Icon = (LucideIcons as any)[iconName]
-    // Defensive: Only render if Icon is a function (React component)
-    if (typeof Icon !== "function") return null
+    const Icon = getLucideIcon(iconName)
     try {
       return <Icon className="w-6 h-6" />
     } catch (error) {

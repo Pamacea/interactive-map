@@ -1,4 +1,4 @@
-import * as PinIcons from "lucide-react";
+import { getLucideIcon } from "@/lib/icon-utils";
 import type { Pin } from "@prisma/client";
 import { getPinTypeOptions } from "@/constants/pin-types";
 
@@ -10,8 +10,7 @@ export function SectionHeader({ pinType }: SectionHeaderProps) {
   const pinTypeOptions = getPinTypeOptions();
 
   const getPinIcon = (iconName: string) => {
-    const IconComponent = (PinIcons as any)[iconName];
-    return IconComponent ? IconComponent : PinIcons.MapPin;
+    return getLucideIcon(iconName);
   };
 
   const CurrentPinTypeIcon = getPinIcon(

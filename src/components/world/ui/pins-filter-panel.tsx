@@ -4,7 +4,7 @@ import { Filter, Eye, EyeOff } from "lucide-react";
 import { usePinTypeFilters, useTogglePinTypeFilter, useShowAllPinTypes, useHideAllPinTypes } from "@/stores/use-pins-store";
 import { PinTypeEnum } from "@/types/pin.type";
 import { pinTypeConfig } from "@/constants/pin-types";
-import * as PinIcons from "lucide-react";
+import { getLucideIcon } from "@/lib/icon-utils";
 
 export function PinsFilterPanel() {
   const filters = usePinTypeFilters();
@@ -13,8 +13,7 @@ export function PinsFilterPanel() {
   const hideAllTypes = useHideAllPinTypes();
 
   const getPinIcon = (iconName: string) => {
-    const IconComponent = (PinIcons as any)[iconName];
-    return IconComponent ? IconComponent : PinIcons.MapPin;
+    return getLucideIcon(iconName);
   };
 
   const allVisible = Object.values(filters).every((v) => v === true);

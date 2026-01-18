@@ -1,6 +1,6 @@
 import { ButtonHTMLAttributes, ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { Loader2 } from "lucide-react";
+import { SkeletonSpinner } from "@/components/ui/skeleton";
 
 interface MetallicButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "gold" | "silver" | "bronze";
@@ -48,7 +48,7 @@ export function MetallicButton({
     >
       <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/40 to-white/0 opacity-0 hover:opacity-100 transition-opacity duration-225 pointer-events-none translate-x-[-100%] hover:translate-x-[100%] transition-transform duration-500" />
       <span className="relative z-10 flex items-center gap-2">
-        {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+        {isLoading && <SkeletonSpinner size="sm" />}
         {children}
       </span>
     </button>

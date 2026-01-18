@@ -6,7 +6,7 @@ import { usePinsStore } from "@/stores/use-pins-store";
 import { useSelectedLayerId } from "@/stores/map-store";
 import { pinTypeConfig, PinType } from "@/constants/pin-types";
 import type { Pin } from "@prisma/client";
-import * as LucideIcons from "lucide-react";
+import { getLucideIcon } from "@/lib/icon-utils";
 import { useMapCenter } from "@/components/world/context/map-context";
 
 interface PinListProps {
@@ -53,10 +53,9 @@ export function PinList({ worldId }: PinListProps) {
     return types;
   }, []);
 
-  // Get icon component by name
+  // Get icon component by name (type-safe)
   const getIconComponent = (iconName: string) => {
-    const Icon = (LucideIcons as any)[iconName];
-    return Icon ? Icon : MapPin;
+    return getLucideIcon(iconName);
   };
 
   const handlePinClick = (pin: Pin) => {

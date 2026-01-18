@@ -187,25 +187,6 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
                 gridSize={getGridSize()}
               />
 
-              {!baseMapVisible && selectedPin && imageDimensions && (
-                <MapPinsWrapper
-                  baseMapVisible={false}
-                  visiblePins={visiblePins}
-                  selectedPin={selectedPin ?? null}
-                  imageDimensions={imageDimensions}
-                  layerScale={layerScale}
-                  mapImage={mapImage!}
-                  transform={transform}
-                  imageRef={imageRef}
-                  onPinClick={handlePinClick}
-                  onPopupClose={handlePopupClose}
-                  onImageLoad={handleImageLoad}
-                  onImageError={handleImageError}
-                  showGrid={false}
-                  gridSize={getGridSize()}
-                />
-              )}
-
               <MapLayersIndicator layers={visibleLayers} />
             </>
           )}

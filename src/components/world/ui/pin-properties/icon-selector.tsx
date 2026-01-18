@@ -1,5 +1,6 @@
 import { PIN_ICONS, getUniqueCategories } from "@/constants/pin-icons";
-import * as PinIcons from "lucide-react";
+import { getLucideIcon } from "@/lib/icon-utils";
+import { ChevronDown, Search, X, Upload, Check } from "lucide-react";
 import { useState } from "react";
 
 interface IconSelectorProps {
@@ -24,8 +25,7 @@ export function IconSelector({
   const isCustomImage = currentIcon?.startsWith("/");
 
   const getPinIcon = (iconName: string) => {
-    const IconComponent = (PinIcons as any)[iconName];
-    return IconComponent ? IconComponent : PinIcons.MapPin;
+    return getLucideIcon(iconName);
   };
 
   const CurrentIconComponent = getPinIcon(currentIcon || "map-pin");
@@ -63,7 +63,7 @@ export function IconSelector({
               : PIN_ICONS.find((i) => i.name === currentIcon)?.label ||
                 "Default Icon"}
           </span>
-          <PinIcons.ChevronDown
+          <ChevronDown
             className={`w-4 h-4 text-text-muted transition-transform ${
               showDropdown ? "rotate-180" : ""
             }`}
@@ -74,7 +74,7 @@ export function IconSelector({
           <div className="absolute z-50 mt-2 w-full max-h-80 overflow-y-auto rounded-lg bg-background-elevated border border-border-subtle shadow-lg">
             <div className="sticky top-0 bg-background-elevated border-b border-border-subtle p-2">
               <div className="relative">
-                <PinIcons.Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
                 <input
                   type="text"
                   value={searchTerm}
@@ -89,7 +89,7 @@ export function IconSelector({
                     className="absolute right-2 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
                     title="Clear search"
                   >
-                    <PinIcons.X className="w-4 h-4" />
+                    <X className="w-4 h-4" />
                   </button>
                 )}
               </div>
@@ -98,7 +98,7 @@ export function IconSelector({
             <div className="p-1">
               {filteredIcons.length === 0 ? (
                 <div className="px-2 py-8 text-center">
-                  <PinIcons.Search className="w-8 h-8 text-text-muted mx-auto mb-2 opacity-50" />
+                  <Search className="w-8 h-8 text-text-muted mx-auto mb-2 opacity-50" />
                   <p className="text-sm text-text-muted mb-3">
                     No icons found matching "{searchTerm}"
                   </p>
@@ -146,7 +146,7 @@ export function IconSelector({
                               {iconOption.label}
                             </span>
                             {isSelected && (
-                              <PinIcons.Check className="w-4 h-4 text-accent-gold" />
+                              <Check className="w-4 h-4 text-accent-gold" />
                             )}
                           </button>
                         );
@@ -167,7 +167,7 @@ export function IconSelector({
                 disabled={isUpdating || !canUpload}
                 className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-sm text-text-secondary hover:bg-background-base hover:text-text-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                <PinIcons.Upload className="w-4 h-4" />
+                <Upload className="w-4 h-4" />
                 <span className="flex-1 text-left">Upload Custom...</span>
               </button>
             </div>

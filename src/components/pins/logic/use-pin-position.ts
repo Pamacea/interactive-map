@@ -41,10 +41,10 @@ export function usePinPosition(
   const position = useMemo(() => {
     // Find the layer this pin belongs to (if any)
     const layer = pin.layerId
-      ? layers.find((layer) => layer.id === pin.layerId)
+      ? layers.find((layer) => layer.id === pin.layerId) ?? null
       : null;
 
-    // Extract layer offset for position calculation
+    // Extract layer offset for position calculation (null-safe)
     const layerOffsetX = layer?.offsetX ?? 0;
     const layerOffsetY = layer?.offsetY ?? 0;
 

@@ -36,7 +36,7 @@ export function PinEditForm({
     initialData: {
       title: pin.title,
       description: pin.description || "",
-      pinType: pin.pinType as any,
+      pinType: pin.pinType,
       latitude: pin.latitude,
       longitude: pin.longitude,
       color: pin.color,
@@ -159,7 +159,7 @@ export function PinEditForm({
       <PinForm
         formData={form.formData}
         errors={form.errors}
-        onUpdateField={form.updateField as any}
+        onUpdateField={form.updateField}
         layers={layers}
         mode="edit"
         showLayer={layers.length > 0}

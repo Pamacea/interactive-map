@@ -1,7 +1,8 @@
 "use client";
 
-import { Loader2, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
 import { useRef } from "react";
+import { SkeletonSpinner } from "@/components/ui/skeleton";
 
 interface FileUploadZoneProps {
   previewUrl: string | null;
@@ -58,7 +59,7 @@ export function FileUploadZone({
         <div className="space-y-2">
           <div className="w-12 h-12 mx-auto flex items-center justify-center rounded-full bg-background-base">
             {isUploading ? (
-              <Loader2 className="w-6 h-6 text-accent-gold animate-spin" />
+              <SkeletonSpinner size="sm" />
             ) : (
               <Upload className="w-6 h-6 text-text-muted" />
             )}

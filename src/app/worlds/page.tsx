@@ -3,12 +3,13 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { Sparkles, Plus, Loader2, AlertCircle } from "lucide-react";
+import { Sparkles, Plus, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { MetallicButton } from "@/components/ui/metallic-button";
 import { NavigationBar } from "@/components/ui/navigation-bar";
 import { Footer } from "@/components/home/ui/footer";
 import { WorldCard } from "@/components/ui/world-card";
+import { SkeletonGrid } from "@/components/ui/skeleton";
 import { useMyWorlds } from "@/components/worlds/logic/use-my-worlds";
 
 export default function MyWorldsPage() {
@@ -52,9 +53,7 @@ export default function MyWorldsPage() {
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 text-accent-gold animate-spin" />
-          </div>
+          <SkeletonGrid items={6} columns={{ sm: 1, md: 2, lg: 3 }} />
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <AlertCircle className="w-16 h-16 text-red-500 mb-4" />

@@ -1,4 +1,5 @@
 import { Layers, MapPin, Filter, Settings2, BookOpen, Image } from "lucide-react";
+import type { LucideProps } from "lucide-react";
 
 interface SidebarCollapsedProps {
   onIconClick: (section: "layers" | "filters" | "properties" | "pins" | "lore" | "gallery") => void;
@@ -26,7 +27,7 @@ export function SidebarCollapsed({ onIconClick, selectedLayerId, showPinsSection
 
 interface CollapsedButtonProps {
   onClick: () => void;
-  icon: any;
+  icon: React.ComponentType<LucideProps>;
   label: string;
 }
 

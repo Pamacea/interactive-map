@@ -1,6 +1,7 @@
 "use client";
 
-import { Loader2, Upload, X } from "lucide-react";
+import { Upload, X } from "lucide-react";
+import { SkeletonSpinner } from "@/components/ui/skeleton";
 
 interface FileUploadActionsProps {
   isUploading: boolean;
@@ -33,7 +34,7 @@ export function FileUploadActions({
       >
         {isUploading ? (
           <>
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <SkeletonSpinner size="sm" />
             Uploading...
           </>
         ) : (

@@ -270,8 +270,8 @@
       "title": "Standardize Loading Patterns",
       "priority": 14,
       "agent": "simplifier:smite-simplifier",
-      "status": "pending",
-      "passes": false,
+      "status": "completed",
+      "passes": true,
       "description": "Different components use different loading patterns. Standardize loading patterns across the app",
       "acceptance_criteria": [
         "Consistent loading UI across all components",
@@ -289,8 +289,8 @@
       "title": "Fix Type Safety Violations",
       "priority": 15,
       "agent": "simplifier:smite-simplifier",
-      "status": "pending",
-      "passes": false,
+      "status": "completed",
+      "passes": true,
       "description": "Remove unsafe type casts and add proper null checks",
       "acceptance_criteria": [
         "No 'any' type casts",
@@ -309,8 +309,8 @@
       "title": "Fix Double Rendering of Selected Pin Popup",
       "priority": 16,
       "agent": "simplifier:smite-simplifier",
-      "status": "pending",
-      "passes": false,
+      "status": "completed",
+      "passes": true,
       "description": "Selected pin popup rendered twice with different conditions. Remove redundant rendering logic",
       "acceptance_criteria": [
         "Single popup rendering for selected pin",

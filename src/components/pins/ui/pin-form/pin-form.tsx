@@ -18,7 +18,7 @@ import {
 export interface PinFormProps {
   formData: PinFormData;
   errors: Record<string, string>;
-  onUpdateField: (field: string | number | symbol, value: string | number | boolean) => void;
+  onUpdateField: (field: keyof PinFormData, value: string | number | boolean) => void;
   layers: Array<{ id: string; name: string }>;
   mode: "create" | "edit";
   showLayer?: boolean;

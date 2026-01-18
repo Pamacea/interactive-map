@@ -6,10 +6,11 @@ import { PinActionDropdown, PinList } from "@/components/pins/ui";
 import { LoreList, LoreForm } from "@/components/lore/ui";
 import { ImageGallery } from "@/components/gallery/ui";
 import { useLoreStore } from "@/stores/use-lore-store";
+import type { OptimizedWorldLayer } from "@/types/world.type";
 
 interface SidebarExpandedProps {
   worldId: string;
-  worldLayers: any[];
+  worldLayers: OptimizedWorldLayer[];
   mapImage?: string | null;
   selectedLayerId: string | null;
   showPinsSection: boolean;

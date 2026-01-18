@@ -50,13 +50,6 @@ export function MapPinsWrapper({
     />
   );
 
-  const selectedPinPopup = selectedPin ? (
-    <SelectedPinPopup
-      selectedPin={selectedPin}
-      onClose={onPopupClose}
-    />
-  ) : null;
-
   if (baseMapVisible) {
     return (
       <MapImage
@@ -70,7 +63,12 @@ export function MapPinsWrapper({
         onError={onImageError}
       >
         {pinsRenderer}
-        {selectedPinPopup}
+        {selectedPin && (
+          <SelectedPinPopup
+            selectedPin={selectedPin}
+            onClose={onPopupClose}
+          />
+        )}
       </MapImage>
     );
   }
@@ -85,6 +83,12 @@ export function MapPinsWrapper({
       }}
     >
       {pinsRenderer}
+      {selectedPin && (
+        <SelectedPinPopup
+          selectedPin={selectedPin}
+          onClose={onPopupClose}
+        />
+      )}
     </div>
   );
 }

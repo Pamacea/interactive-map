@@ -6,6 +6,7 @@ import { useCreatePin } from "@/stores/use-pins-store";
 import { usePinForm } from "../logic/use-pin-form";
 import { PinForm } from "./pin-form";
 import { useToast } from "@/hooks/use-toast";
+import { PinTypeEnum } from "@/types/pin.type";
 
 interface FormLayer {
   id: string;
@@ -43,7 +44,7 @@ export function PinCreateForm({
       latitude: initialLat || 0,
       longitude: initialLng || 0,
       layerId: initialLayerId || "",
-      pinType: initialPinType as any,
+      pinType: (initialPinType as PinTypeEnum) || PinTypeEnum.CUSTOM,
     },
   });
 
@@ -114,7 +115,7 @@ export function PinCreateForm({
       <PinForm
         formData={form.formData}
         errors={form.errors}
-        onUpdateField={form.updateField as any}
+        onUpdateField={form.updateField}
         layers={layers}
         mode="create"
         showLayer={layers.length > 0}
