@@ -9,5 +9,11 @@ export async function createWorld(data: {
   map?: File;
 }) {
   const result = await createWorldAction(data);
-  return result;
+
+  // Extract the worldId from the Result type
+  if (!result.success) {
+    throw new Error(result.error.message || "Failed to create world");
+  }
+
+  return result.data; // Return { worldId: string }
 }

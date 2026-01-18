@@ -103,6 +103,10 @@ export const usePinsDataStore = create<PinDataStore>()(
 
       // Server sync methods with optimistic updates
       createPin: async (data) => {
+        console.log("[PinsDataStore.createPin] === CREATE PIN START ===");
+        console.log("[PinsDataStore.createPin] Input data:", data);
+        console.log("[PinsDataStore.createPin] Current pins count:", get().pins.length);
+
         try {
           // Optimistic update - add pin with temporary ID
           const tempId = `temp-${Date.now()}`;
@@ -118,23 +122,35 @@ export const usePinsDataStore = create<PinDataStore>()(
             maxZoom: 200,
           } as Pin;
 
+          console.log("[PinsDataStore.createPin] Creating optimistic pin:", optimisticPin);
           get().addPin(optimisticPin);
+          console.log("[PinsDataStore.createPin] Optimistic pin added. Pins count:", get().pins.length);
 
           // Server call
+          console.log("[PinsDataStore.createPin] Calling server action...");
           const result = await createPinAction(data);
+          console.log("[PinsDataStore.createPin] Server response:", result);
+
+          if (!result.success) {
+            throw new Error(result.error.message);
+          }
 
           // Replace optimistic pin with real one
-          set((state) => ({
-            pins: state.pins.map((p) =>
-              p.id === tempId ? { ...result.pin, gameWorldId: data.gameWorldId } : p
-            ),
-          }));
+          set((state) => {
+            const updatedPins = state.pins.map((p) =>
+              p.id === tempId ? { ...result.data.pin, gameWorldId: data.gameWorldId } as Pin : p
+            );
+            console.log("[PinsDataStore.createPin] Replaced temp pin with real pin. Pins count:", updatedPins.length);
+            return { pins: updatedPins };
+          });
 
           // Re-apply filters after replacement
           const applyFilters = usePinsFilterStore.getState().applyFilters;
+          console.log("[PinsDataStore.createPin] Re-applying filters...");
           applyFilters(get().pins);
+          console.log("[PinsDataStore.createPin] ✅ CREATE PIN COMPLETE");
         } catch (error) {
-          console.error("[PinsDataStore] Failed to create pin:", error);
+          console.error("[PinsDataStore.createPin] ❌ Failed to create pin:", error);
           get().setError(error instanceof Error ? error.message : "Failed to create pin");
           throw error;
         }

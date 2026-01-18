@@ -3,7 +3,7 @@ import type {
   SearchResults,
   SearchResultItem,
   SearchFilters,
-} from "@/actions/search";
+} from "@/lib/search-types";
 
 interface SearchState {
   // UI State

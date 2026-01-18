@@ -2,7 +2,7 @@
 
 import { memo } from "react";
 import { useMapStore } from "@/stores/map-store";
-import { usePinsStore } from "@/stores/use-pins-store";
+import { useSelectPin, useUpdatePin, useSelectedPinId } from "@/stores/use-pins-store";
 import { getPinTypeConfig, type PinType } from "@/constants/pin-types";
 import { usePinDrag } from "@/components/pins/logic/use-pin-drag";
 import { usePinEvents } from "@/components/pins/logic/use-pin-events";
@@ -57,9 +57,9 @@ export function PinMarker({
 }: PinMarkerProps) {
   // Store access
   const layers = useMapStore((state) => state.layers);
-  const selectPin = usePinsStore((state) => state.selectPin);
-  const updatePin = usePinsStore((state) => state.updatePin);
-  const selectedPinId = usePinsStore((state) => state.selectedPinId);
+  const selectPin = useSelectPin();
+  const updatePin = useUpdatePin();
+  const selectedPinId = useSelectedPinId();
 
   const isPinSelected = selectedPinId === pin.id;
 

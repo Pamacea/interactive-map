@@ -16,12 +16,12 @@ import { updateWorldState } from "@/actions/worlds";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { MapExportProvider } from "@/components/export/utils/use-map-export-context";
 import { useLoreStore } from "@/stores/use-lore-store";
-import { usePinsStore } from "@/stores/use-pins-store";
+import { useSelectPin } from "@/stores/use-pins-store";
 import { useSearchStore } from "@/store/use-search-store";
 import type { OptimizedWorld } from "@/types/world.type";
 import type { Pin } from "@/types/pin.type";
 import type { LoreEntry } from "@/types/lore.type";
-import type { SearchResultItem } from "@/actions/search";
+import type { SearchResultItem } from "@/lib/search-types";
 
 interface WorldClientProps {
   world: OptimizedWorld;
@@ -41,7 +41,7 @@ export function WorldClient({ world, pins, loreEntries, isAuthenticated }: World
   }
 
   // Pins store for handling search result clicks
-  const selectPin = usePinsStore((state) => state.selectPin);
+  const selectPin = useSelectPin();
 
   // Search store for keyboard shortcut
   const toggleSearch = useSearchStore((state) => state.toggleSearch);

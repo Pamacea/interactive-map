@@ -27,7 +27,7 @@ export function PinContextMenu({
   });
 
   // Focus trap to keep keyboard navigation within the menu
-  useFocusTrap(true, menuRef);
+  useFocusTrap(true, menuRef as React.RefObject<HTMLElement>);
 
   // Close on Escape key
   useEffect(() => {

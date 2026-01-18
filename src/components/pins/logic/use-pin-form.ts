@@ -1,12 +1,12 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { z } from "zod";
-import { PinTypeEnum, PIN_TYPE_COLORS, PIN_TYPE_SIZES, type PinCreateInput, type PinUpdateInput } from "@/types/pin.type";
+import { PinType, PIN_TYPE_COLORS, PIN_TYPE_SIZES, type PinCreateInput, type PinUpdateInput } from "@/types/pin.type";
 import { CreatePinSchema, UpdatePinSchema } from "./pin-schemas";
 
 export interface PinFormData {
   title: string;
   description: string;
-  pinType: PinTypeEnum;
+  pinType: (typeof PinType)[keyof typeof PinType];
   latitude: number;
   longitude: number;
   color: string;
@@ -28,11 +28,11 @@ export function usePinForm({ initialData, mode, worldId, pinId }: UsePinFormOpti
   const [formData, setFormData] = useState<PinFormData>({
     title: initialData?.title || "",
     description: initialData?.description || "",
-    pinType: initialData?.pinType || PinTypeEnum.CUSTOM,
+    pinType: initialData?.pinType || PinType.CUSTOM,
     latitude: initialData?.latitude || 0,
     longitude: initialData?.longitude || 0,
-    color: initialData?.color || PIN_TYPE_COLORS[PinTypeEnum.CUSTOM],
-    size: initialData?.size || PIN_TYPE_SIZES[PinTypeEnum.CUSTOM],
+    color: initialData?.color || PIN_TYPE_COLORS[PinType.CUSTOM],
+    size: initialData?.size || PIN_TYPE_SIZES[PinType.CUSTOM],
     isVisible: initialData?.isVisible ?? true,
     properties: initialData?.properties || "",
     icon: initialData?.icon || "",
@@ -150,11 +150,11 @@ export function usePinForm({ initialData, mode, worldId, pinId }: UsePinFormOpti
     setFormData({
       title: initialData?.title || "",
       description: initialData?.description || "",
-      pinType: initialData?.pinType || PinTypeEnum.CUSTOM,
+      pinType: initialData?.pinType || PinType.CUSTOM,
       latitude: initialData?.latitude || 0,
       longitude: initialData?.longitude || 0,
-      color: initialData?.color || PIN_TYPE_COLORS[PinTypeEnum.CUSTOM],
-      size: initialData?.size || PIN_TYPE_SIZES[PinTypeEnum.CUSTOM],
+      color: initialData?.color || PIN_TYPE_COLORS[PinType.CUSTOM],
+      size: initialData?.size || PIN_TYPE_SIZES[PinType.CUSTOM],
       isVisible: initialData?.isVisible ?? true,
       properties: initialData?.properties || "",
       icon: initialData?.icon || "",

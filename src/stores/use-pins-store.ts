@@ -76,11 +76,14 @@ export type { PinFilters } from "./pins/use-pins-filter-store";
 
 // Legacy: Export a composed hook that combines all stores
 // This maintains backward compatibility with code using usePinsStore()
-import { usePinsUIStore } from "./pins/use-pins-ui-store";
+import { usePinsUIStore, useSelectedPinId as useSelectedPinIdFromUI } from "./pins/use-pins-ui-store";
 import { usePinsFilterStore } from "./pins/use-pins-filter-store";
-import { usePinsDataStore } from "./pins/use-pins-data-store";
+import { usePinsDataStore, usePins } from "./pins/use-pins-data-store";
 import type { Pin } from "@prisma/client";
-import { PinTypeEnum } from "@/types/pin.type";
+import { PinType } from "@/types/pin.type";
+
+// Type alias for the filter record
+type PinTypeEnum = (typeof PinType)[keyof typeof PinType];
 
 /**
  * Composed store interface for backward compatibility
@@ -220,7 +223,7 @@ export const usePinsStore = (): LegacyPinsStore => {
 
 // Export a convenience hook for getting the selected pin
 export const useSelectedPin = () => {
-  const selectedPinId = useSelectedPinId();
+  const selectedPinId = useSelectedPinIdFromUI();
   const pins = usePins();
 
   return selectedPinId

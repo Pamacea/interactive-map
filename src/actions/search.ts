@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { z } from "zod";
+import type { PinType as PrismaPinType, LoreCategory as PrismaLoreCategory } from "@prisma/client";
 import {
   safeAsync,
   ValidationError,
@@ -11,71 +11,14 @@ import {
   getAuthenticatedUser,
   verifyWorldPermission,
 } from "@/lib/server-helpers";
-
-// ============================================
-// SEARCH SCHEMAS
-// ============================================
-
-/**
- * Search filters schema
- */
-export const SearchFiltersSchema = z.object({
-  contentType: z.enum(["all", "pins", "lore"]).default("all"),
-  pinType: z.enum(["CITY", "VILLAGE", "POI", "CHARACTER", "DUNGEON", "SHOP", "QUEST", "TREASURE", "CUSTOM"]).optional(),
-  loreCategory: z.enum(["GENERAL", "HISTORY", "GEOGRAPHY", "CHARACTERS", "FACTIONS", "MAGIC", "ITEMS", "QUESTS", "CUSTOM"]).optional(),
-  layerId: z.string().optional(),
-});
-
-export type SearchFilters = z.infer<typeof SearchFiltersSchema>;
-
-/**
- * Search query schema
- */
-export const SearchQuerySchema = z.object({
-  worldId: z.string().min(1, "World ID is required"),
-  query: z.string().min(1, "Search query is required").max(200, "Search query too long"),
-  filters: SearchFiltersSchema.optional(),
-  limit: z.number().min(1).max(100).default(50),
-});
-
-export type SearchQuery = z.infer<typeof SearchQuerySchema>;
-
-/**
- * Search result item types
- */
-export interface PinSearchResult {
-  type: "pin";
-  id: string;
-  title: string;
-  description: string | null;
-  pinType: string;
-  latitude: number;
-  longitude: number;
-  layerId: string | null;
-  layerName: string | null;
-  icon: string | null;
-  color: string;
-  relevance: number;
-}
-
-export interface LoreSearchResult {
-  type: "lore";
-  id: string;
-  title: string;
-  content: string;
-  category: string;
-  slug: string;
-  relevance: number;
-}
-
-export type SearchResultItem = PinSearchResult | LoreSearchResult;
-
-export interface SearchResults {
-  pins: PinSearchResult[];
-  lore: LoreSearchResult[];
-  total: number;
-  query: string;
-}
+import {
+  SearchQuerySchema,
+  type SearchFilters,
+  type SearchQuery,
+  type PinSearchResult,
+  type LoreSearchResult,
+  type SearchResults,
+} from "@/lib/search-types";
 
 // ============================================
 // SEARCH HELPERS
@@ -240,7 +183,7 @@ async function searchPinsInWorld(
   });
 
   // Filter by query text and calculate relevance
-  const results: PinSearchResult[] = pins
+  const results = pins
     .map(pin => {
       const titleMatch = pin.title.toLowerCase().includes(query);
       const descMatch = pin.description?.toLowerCase().includes(query);
@@ -300,7 +243,7 @@ async function searchLoreInWorld(
   });
 
   // Filter by query text and calculate relevance
-  const results: LoreSearchResult[] = loreEntries
+  const results = loreEntries
     .map(lore => {
       const titleMatch = lore.title.toLowerCase().includes(query);
       const contentMatch = lore.content.toLowerCase().includes(query);

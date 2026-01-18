@@ -34,7 +34,7 @@ export function PinPopup({
   useFocusReturn(true);
 
   // Focus trap - keep focus within popup
-  useFocusTrap(true, popupRef);
+  useFocusTrap(true, popupRef as React.RefObject<HTMLElement>);
 
   // Announce to screen readers
   React.useEffect(() => {

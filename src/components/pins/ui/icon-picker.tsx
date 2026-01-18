@@ -35,7 +35,7 @@ export function IconPicker({ onSelect, onClose, currentIcon }: IconPickerProps) 
 
   // Focus management
   useFocusReturn(true)
-  useFocusTrap(true, dialogRef)
+  useFocusTrap(true, dialogRef as React.RefObject<HTMLElement>)
 
   // Close on Escape
   React.useEffect(() => {
@@ -111,7 +111,6 @@ export function IconPicker({ onSelect, onClose, currentIcon }: IconPickerProps) 
             Select Icon
           </h2>
           <button
-            ref={searchInputRef}
             onClick={onClose}
             className="text-text-secondary hover:text-accent-gold transition-colors focus:outline-none focus:ring-2 focus:ring-accent-gold/50 rounded-sm p-1"
             aria-label="Close icon picker"

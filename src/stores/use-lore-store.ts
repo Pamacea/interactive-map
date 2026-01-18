@@ -218,11 +218,15 @@ export const useLoreStore = create<LoreStore>()(
         try {
           const result = await createLoreAction(data);
 
+          if (!result.success) {
+            throw new Error(result.error.message);
+          }
+
           // Replace optimistic entry with real one
           set(
             (state) => ({
               loreEntries: state.loreEntries.map((lore) =>
-                lore.id === tempId ? result.loreEntry : lore
+                lore.id === tempId ? result.data.loreEntry : lore
               ),
             }),
             false,
@@ -311,11 +315,15 @@ export const useLoreStore = create<LoreStore>()(
         try {
           const result = await updateLoreAction(data);
 
+          if (!result.success) {
+            throw new Error(result.error.message);
+          }
+
           // Update with server response
           set(
             (state) => ({
               loreEntries: state.loreEntries.map((lore) =>
-                lore.id === data.id ? result : lore
+                lore.id === data.id ? result.data : lore
               ),
             }),
             false,

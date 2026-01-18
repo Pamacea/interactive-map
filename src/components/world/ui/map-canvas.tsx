@@ -2,13 +2,14 @@
 
 import { useRef, useMemo, useEffect } from "react";
 import { useGrid, useScale, useLayers, useSelectedLayerId, useBaseMapVisible, useMapStore } from "@/stores/map-store";
-import {
-  usePins,
-  useCreatePin,
-  useSelectedPin,
-  useIsCreatingPin,
-  usePinsStore,
-} from "@/stores/use-pins-store";
+import { usePins } from "@/stores/pins/use-pins-data-store";
+import { useCreatePin } from "@/stores/pins/use-pins-data-store";
+import { useSelectedPin } from "@/stores/use-pins-store";
+import { useIsCreatingPin } from "@/stores/pins/use-pins-ui-store";
+import { useSelectPin } from "@/stores/pins/use-pins-ui-store";
+import { useClearSelection } from "@/stores/pins/use-pins-ui-store";
+import { useStopCreating } from "@/stores/pins/use-pins-ui-store";
+import { useStartCreating } from "@/stores/pins/use-pins-ui-store";
 import { PinContextMenu } from "@/components/pins/ui/pin-context-menu";
 import { useMapPan } from "../logic/use-map-pan";
 import { useMapZoom } from "../logic/use-map-zoom";
@@ -45,14 +46,15 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
   const baseMapVisible = useBaseMapVisible();
   const baseMapLayer = useMapStore((state) => state.layers.find((l) => l.isBaseMap));
 
+  // Use new modular stores
   const pins = usePins();
   const createPin = useCreatePin();
   const selectedPin = useSelectedPin();
   const isCreatingPin = useIsCreatingPin();
-  const selectPin = usePinsStore((state) => state.selectPin);
-  const clearSelection = usePinsStore((state) => state.clearSelection);
-  const stopCreating = usePinsStore((state) => state.stopCreating);
-  const startCreating = usePinsStore((state) => state.startCreating);
+  const selectPin = useSelectPin();
+  const clearSelection = useClearSelection();
+  const stopCreating = useStopCreating();
+  const startCreating = useStartCreating();
 
   const {
     transform,
@@ -216,12 +218,19 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
       <PlacementIndicator show={isCreatingPin && !contextMenu} />
 
       {contextMenu && worldId && (
-        <PinContextMenu
-          position={contextMenu.position}
-          coordinates={contextMenu.coordinates}
-          onClose={closeContextMenu}
-          onSelectPinType={handleSelectPinType}
-        />
+        <>
+          {console.log("[MapCanvas] Rendering PinContextMenu:", {
+            worldId,
+            position: contextMenu.position,
+            coordinates: contextMenu.coordinates,
+          })}
+          <PinContextMenu
+            position={contextMenu.position}
+            coordinates={contextMenu.coordinates}
+            onClose={closeContextMenu}
+            onSelectPinType={handleSelectPinType}
+          />
+        </>
       )}
     </MapContainer>
     </MapCenterProvider>

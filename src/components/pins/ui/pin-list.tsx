@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { MapPin, Badge } from "lucide-react";
-import { usePinsStore } from "@/stores/use-pins-store";
+import { usePins, useSelectedPinId, useSelectPin } from "@/stores/use-pins-store";
 import { useSelectedLayerId } from "@/stores/map-store";
 import { pinTypeConfig, PinType } from "@/constants/pin-types";
 import type { Pin } from "@prisma/client";
@@ -15,11 +15,11 @@ interface PinListProps {
 
 export function PinList({ worldId }: PinListProps) {
   // Use Zustand store directly - already synced by WorldClient
-  const pins = usePinsStore((state) => state.pins);
-  const selectedPinId = usePinsStore((state) => state.selectedPinId);
+  const pins = usePins();
+  const selectedPinId = useSelectedPinId();
   const selectedLayerId = useSelectedLayerId();
 
-  const selectPin = usePinsStore((state) => state.selectPin);
+  const selectPin = useSelectPin();
   const { centerOnPin } = useMapCenter();
 
   // Filter state

@@ -2,7 +2,7 @@ import { FC } from "react";
 import React from "react";
 import type { Pin } from "@prisma/client";
 import { PinPopup } from "@/components/pins/ui/pin-popup";
-import { usePinsStore } from "@/stores/use-pins-store";
+import { useDeletePinServer } from "@/stores/use-pins-store";
 import type { PinWithLayer } from "../logic/use-pins-filtering";
 
 export interface SelectedPinPopupProps {
@@ -14,7 +14,7 @@ export const SelectedPinPopup: FC<SelectedPinPopupProps> = ({
   selectedPin,
   onClose,
 }) => {
-  const deletePinServer = usePinsStore((state) => state.deletePinServer);
+  const deletePinServer = useDeletePinServer();
 
   const handleDelete = async () => {
     try {

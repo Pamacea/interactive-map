@@ -1,4 +1,11 @@
 import { getPinTypeOptions } from "@/constants/pin-types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { Pin } from "@prisma/client";
 
 interface PinTypeSelectProps {
@@ -17,18 +24,18 @@ export function PinTypeSelect({
   return (
     <div className="px-3 py-2 rounded-sm bg-background-elevated border border-border-subtle">
       <label className="block text-xs text-text-muted mb-1.5">Pin Type</label>
-      <select
-        value={value}
-        onChange={(e) => onUpdate(e.target.value as Pin["pinType"])}
-        disabled={disabled}
-        className="w-full bg-transparent text-sm text-text-primary focus:outline-none disabled:opacity-50"
-      >
-        {pinTypeOptions.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
+      <Select value={value} onValueChange={onUpdate} disabled={disabled}>
+        <SelectTrigger className="w-full bg-transparent text-sm text-text-primary focus:outline-none disabled:opacity-50 border-0 p-0 h-auto focus:ring-0">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {pinTypeOptions.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 }

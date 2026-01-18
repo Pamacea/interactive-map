@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, MapPin, BookOpen } from "lucide-react";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { WorldCardProps, WorldCardContentProps } from "@/types/components.type";
 
@@ -17,27 +18,50 @@ export function WorldCard({
 }: WorldCardProps) {
   const pinCount = _count?.pins ?? 0;
   const loreCount = _count?.loreEntries ?? 0;
+  
+  if (viewMode === "list") {
+    return (
+      <Link
+        href={`/world/${id}`}
+        className={cn(
+          "group relative",
+          "w-full",
+          "bg-background-card/60 backdrop-blur-sm",
+          "rounded-sm",
+          "border border-border-subtle",
+          "hover:border-accent-gold/40",
+          "overflow-hidden",
+          "transition-all duration-300",
+          "hover:bg-muted",
+          "cursor-pointer",
+          "flex flex-row",
+          className
+        )}
+      >
+        <CoverImage map={map} title={title} isPublic={isPublic} viewMode={viewMode} />
+        <Content title={title} description={description} pinCount={pinCount} loreCount={loreCount} author={user} viewMode={viewMode} />
+      </Link>
+    );
+  }
+
   return (
-    <Link
-      href={`/world/${id}`}
-      className={cn(
-        "group relative",
-        "w-full",
-        "bg-background-card/60 backdrop-blur-sm",
-        "rounded-sm",
-        "border border-border-subtle",
-        "hover:border-accent-gold/40",
-        "overflow-hidden",
-        "transition-all duration-300",
-        "hover:bg-muted",
-        "cursor-pointer",
-        viewMode === "list" && "flex flex-row",
-        className
-      )}
-    >
-      <CoverImage map={map} title={title} isPublic={isPublic} viewMode={viewMode} />
-      <Content title={title} description={description} pinCount={pinCount} loreCount={loreCount} author={user} viewMode={viewMode} />
-    </Link>
+    <Card className={cn(
+      "group relative w-full bg-background-card/60 backdrop-blur-sm border border-border-subtle hover:border-accent-gold/40 overflow-hidden transition-all duration-300 hover:bg-muted cursor-pointer",
+      className
+    )}>
+      <Link href={`/world/${id}`}>
+        <CoverImage map={map} title={title} isPublic={isPublic} viewMode={viewMode} />
+        <CardContent className="p-4 sm:p-6">
+          <Title title={title} />
+          <Description description={description} />
+          <Meta pinCount={pinCount} loreCount={loreCount} />
+        </CardContent>
+        <CardFooter className="flex items-center justify-between pt-4 border-t border-border-subtle">
+          <Author name={user.name} />
+          <ArrowRight className="w-4 h-4 text-text-muted group-hover:text-accent-gold transition-all" />
+        </CardFooter>
+      </Link>
+    </Card>
   );
 }
 
@@ -121,7 +145,7 @@ function Description({ description }: { description: string | null }) {
 
 function Meta({ pinCount, loreCount }: { pinCount: number; loreCount: number }) {
   return (
-    <div className="flex items-center gap-3 text-sm text-text-muted">
+    <div className="flex items-center gap-3 text-sm text-text-muted pt-4">
       <div className="flex items-center gap-1.5">
         <MapPin className="w-4 h-4" />
         <span>{pinCount} pins</span>

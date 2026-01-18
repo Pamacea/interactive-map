@@ -46,7 +46,7 @@ export function UploadMapDialog({
         const formData = new FormData();
         formData.append("file", file);
         const result = await uploadWorldMap(worldId, formData);
-        if (result.success) onSuccess(result.mapUrl);
+        if (result.success) onSuccess(result.data.mapUrl);
       },
       onSuccess: onClose,
     }

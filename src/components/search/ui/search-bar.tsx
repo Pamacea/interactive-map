@@ -7,7 +7,7 @@ import { searchWorld, getSearchSuggestions } from "@/actions/search";
 import { useSearchStore } from "@/store/use-search-store";
 import { SearchResults } from "./search-results";
 import { cn } from "@/lib/utils";
-import type { SearchResultItem } from "@/actions/search";
+import type { SearchResultItem } from "@/lib/search-types";
 
 interface SearchBarProps {
   worldId: string;
@@ -126,12 +126,12 @@ export function SearchBar({ worldId, onResultClick, className }: SearchBarProps)
       if (showSuggestions && suggestions.length > 0) {
         if (e.key === "ArrowDown") {
           e.preventDefault();
-          setHighlightedIndex((prev) =>
-            prev < suggestions.length - 1 ? prev + 1 : prev
+          setHighlightedIndex(
+            highlightedIndex < suggestions.length - 1 ? highlightedIndex + 1 : highlightedIndex
           );
         } else if (e.key === "ArrowUp") {
           e.preventDefault();
-          setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : 0));
+          setHighlightedIndex(highlightedIndex > 0 ? highlightedIndex - 1 : 0);
         } else if (e.key === "Enter" && highlightedIndex >= 0) {
           e.preventDefault();
           const suggestion = suggestions[highlightedIndex];

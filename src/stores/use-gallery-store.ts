@@ -240,10 +240,14 @@ export const useGalleryStore = create<GalleryStore>()(
           // Upload to server
           const result = await uploadGalleryImage(formData);
 
+          if (!result.success) {
+            throw new Error(result.error.message);
+          }
+
           // Add to store
           set(
             (state) => ({
-              galleryItems: [result.galleryItem, ...state.galleryItems],
+              galleryItems: [result.data.galleryItem, ...state.galleryItems],
               isUploading: false,
             }),
             false,
@@ -333,11 +337,15 @@ export const useGalleryStore = create<GalleryStore>()(
         try {
           const result = await updateGalleryItemAction(data);
 
+          if (!result.success) {
+            throw new Error(result.error.message);
+          }
+
           // Update with server response
           set(
             (state) => ({
               galleryItems: state.galleryItems.map((item) =>
-                item.id === data.id ? result : item
+                item.id === data.id ? result.data : item
               ),
             }),
             false,

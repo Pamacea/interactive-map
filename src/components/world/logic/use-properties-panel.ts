@@ -135,11 +135,15 @@ export function usePropertiesPanel() {
 
         const result = await uploadPinIcon(selectedPin.id, formData);
 
+        if (!result.success) {
+          throw new Error(result.error.message);
+        }
+
         // Update local state
-        setFormState((prev) => ({ ...prev, icon: result.pin.icon }));
+        setFormState((prev) => ({ ...prev, icon: result.data.pin.icon }));
 
         // Update Zustand store (source of truth)
-        updatePinInStore(selectedPin.id, { icon: result.pin.icon });
+        updatePinInStore(selectedPin.id, { icon: result.data.pin.icon });
 
         showToast("Icon uploaded successfully", "success");
       } catch (err) {

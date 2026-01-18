@@ -3,7 +3,7 @@
 import React, { useCallback } from "react";
 import { MapPin, BookOpen, Loader2 } from "lucide-react";
 import { SearchHighlight } from "./search-highlight";
-import type { SearchResults, SearchResultItem } from "@/actions/search";
+import type { SearchResults, SearchResultItem } from "@/lib/search-types";
 import { cn } from "@/lib/utils";
 
 interface SearchResultsProps {

@@ -6,7 +6,7 @@ import { z } from "zod";
  */
 
 // Enum from Prisma schema
-export const PinTypeEnum = z.enum([
+export const PinTypeSchema = z.enum([
   "CITY",
   "VILLAGE",
   "POI",
@@ -18,7 +18,7 @@ export const PinTypeEnum = z.enum([
   "CUSTOM",
 ]);
 
-export type PinType = z.infer<typeof PinTypeEnum>;
+export type PinTypeZod = z.infer<typeof PinTypeSchema>;
 
 /**
  * Core Pin schema - matches Prisma Pin model
@@ -27,7 +27,7 @@ export const PinSchema = z.object({
   id: z.string().cuid(),
   title: z.string().min(1, "Title is required").max(200, "Title too long"),
   description: z.string().max(5000, "Description too long").optional().nullable(),
-  pinType: PinTypeEnum.default("CUSTOM"),
+  pinType: PinTypeSchema.default("CUSTOM"),
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
   icon: z.string().max(100).optional().nullable(),
@@ -52,7 +52,7 @@ export const CreatePinSchema = z
   .object({
     title: z.string().min(1, "Title is required").max(200),
     description: z.string().max(5000).optional(),
-    pinType: PinTypeEnum.default("CUSTOM"),
+    pinType: PinTypeSchema.default("CUSTOM"),
     latitude: z.number().min(-90).max(90),
     longitude: z.number().min(-180).max(180),
     icon: z.string().max(100).optional(),
@@ -81,7 +81,7 @@ export const UpdatePinSchema = z
     id: z.string().cuid(),
     title: z.string().min(1).max(200).optional(),
     description: z.string().max(5000).optional(),
-    pinType: PinTypeEnum.optional(),
+    pinType: PinTypeSchema.optional(),
     latitude: z.number().min(-90).max(90).optional(),
     longitude: z.number().min(-180).max(180).optional(),
     icon: z.string().max(100).optional(),
@@ -112,7 +112,7 @@ export type UpdatePinInput = z.infer<typeof UpdatePinSchema>;
  */
 export const PinFiltersSchema = z.object({
   gameWorldId: z.string().cuid(),
-  pinTypes: z.array(PinTypeEnum).optional(),
+  pinTypes: z.array(PinTypeSchema).optional(),
   layerIds: z.array(z.string().cuid()).optional(),
   searchTerm: z.string().optional(),
   showVisibleOnly: z.boolean().optional(),
@@ -138,7 +138,7 @@ export const QuickPinSchema = z.object({
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
   gameWorldId: z.string().cuid(),
-  pinType: PinTypeEnum.default("CUSTOM"),
+  pinType: PinTypeSchema.default("CUSTOM"),
 });
 
 export type QuickPinInput = z.infer<typeof QuickPinSchema>;

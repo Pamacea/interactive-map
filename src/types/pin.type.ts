@@ -3,19 +3,19 @@
  * Centralized type system for Pin feature
  */
 
-import type { PinType as PrismaPinType } from "@prisma/client";
+import { PinType as PrismaPinType } from "@prisma/client";
 
 /**
  * Pin type enum - categorizes map markers by their purpose
- * Matches Prisma PinType enum exactly
+ * Re-exports Prisma PinType enum for use throughout the app
  */
-export type PinTypeEnum = PrismaPinType;
+export const PinType = PrismaPinType;
 
 /**
  * Color mapping for each pin type
  * Colors are semantic and provide visual hierarchy
  */
-export const PIN_TYPE_COLORS: Record<PinTypeEnum, string> = {
+export const PIN_TYPE_COLORS: Record<keyof typeof PrismaPinType, string> = {
   CITY: "#c9a227", // Gold - major settlements
   VILLAGE: "#8b7355", // Brown - smaller settlements
   POI: "#3b82f6", // Blue - points of interest
@@ -30,7 +30,7 @@ export const PIN_TYPE_COLORS: Record<PinTypeEnum, string> = {
 /**
  * Default size for each pin type (in pixels)
  */
-export const PIN_TYPE_SIZES: Record<PinTypeEnum, number> = {
+export const PIN_TYPE_SIZES: Record<keyof typeof PrismaPinType, number> = {
   CITY: 48, // Largest - major locations
   VILLAGE: 40, // Medium-large
   POI: 32, // Standard
@@ -46,7 +46,7 @@ export const PIN_TYPE_SIZES: Record<PinTypeEnum, number> = {
  * Icon suggestions for each pin type
  * Maps to common icon libraries (Lucide, Heroicons, etc.)
  */
-export const PIN_TYPE_ICONS: Record<PinTypeEnum, string[]> = {
+export const PIN_TYPE_ICONS: Record<keyof typeof PrismaPinType, string[]> = {
   CITY: ["building", "castle", "city"],
   VILLAGE: ["house", "home", "village"],
   POI: ["map-pin", "star", "bookmark"],
@@ -66,7 +66,7 @@ export interface Pin {
   id: string;
   title: string;
   description: string | null;
-  pinType: PinTypeEnum;
+  pinType: (typeof PrismaPinType)[keyof typeof PrismaPinType];
   latitude: number;
   longitude: number;
   icon: string | null;
@@ -91,7 +91,7 @@ export interface Pin {
 export interface PinCreateInput {
   title: string;
   description?: string;
-  pinType?: PinTypeEnum;
+  pinType?: (typeof PrismaPinType)[keyof typeof PrismaPinType];
   latitude: number;
   longitude: number;
   icon?: string;
@@ -112,7 +112,7 @@ export interface PinUpdateInput {
   id: string;
   title?: string;
   description?: string;
-  pinType?: PinTypeEnum;
+  pinType?: (typeof PrismaPinType)[keyof typeof PrismaPinType];
   latitude?: number;
   longitude?: number;
   icon?: string;
@@ -138,7 +138,7 @@ export interface PinCoordinates {
  */
 export interface PinFilters {
   gameWorldId: string;
-  pinTypes?: PinTypeEnum[];
+  pinTypes?: (typeof PrismaPinType)[keyof typeof PrismaPinType][];
   layerIds?: string[];
   searchTerm?: string;
   showVisibleOnly?: boolean;
@@ -153,7 +153,7 @@ export interface QuickPinInput {
   latitude: number;
   longitude: number;
   gameWorldId: string;
-  pinType?: PinTypeEnum;
+  pinType?: (typeof PrismaPinType)[keyof typeof PrismaPinType];
 }
 
 /**
@@ -171,7 +171,7 @@ export interface PinDisplayMetadata {
  * Get color for pin type
  * Helper function for consistent color mapping
  */
-export function getPinTypeColor(pinType: PinTypeEnum): string {
+export function getPinTypeColor(pinType: (typeof PrismaPinType)[keyof typeof PrismaPinType]): string {
   return PIN_TYPE_COLORS[pinType] || PIN_TYPE_COLORS.CUSTOM;
 }
 
@@ -179,7 +179,7 @@ export function getPinTypeColor(pinType: PinTypeEnum): string {
  * Get size for pin type
  * Helper function for consistent size mapping
  */
-export function getPinTypeSize(pinType: PinTypeEnum): number {
+export function getPinTypeSize(pinType: (typeof PrismaPinType)[keyof typeof PrismaPinType]): number {
   return PIN_TYPE_SIZES[pinType] || PIN_TYPE_SIZES.CUSTOM;
 }
 
@@ -187,7 +187,7 @@ export function getPinTypeSize(pinType: PinTypeEnum): number {
  * Get default icon for pin type
  * Returns first icon in the suggestions array
  */
-export function getPinTypeIcon(pinType: PinTypeEnum): string {
+export function getPinTypeIcon(pinType: (typeof PrismaPinType)[keyof typeof PrismaPinType]): string {
   const icons = PIN_TYPE_ICONS[pinType] || PIN_TYPE_ICONS.CUSTOM;
   return icons[0];
 }

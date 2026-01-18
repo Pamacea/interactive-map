@@ -30,8 +30,21 @@ export async function createPin(data: PinCreateInput): Promise<Result<{ pinId: s
     // Validate input with Zod
     const validated = CreatePinSchema.parse(data);
 
+    console.log("[createPin] === CREATE PIN START ===");
+    console.log("[createPin] Validated data:", {
+      title: validated.title,
+      gameWorldId: validated.gameWorldId,
+      latitude: validated.latitude,
+      longitude: validated.longitude,
+    });
+
     // Get authenticated user
     const user = await getAuthenticatedUser();
+    console.log("[createPin] Authenticated User:", {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    });
 
     // Verify user has access to the world
     await verifyWorldPermission(validated.gameWorldId, user.id);
@@ -67,7 +80,20 @@ export async function createPin(data: PinCreateInput): Promise<Result<{ pinId: s
       },
     });
 
-    // Note: No revalidatePath needed - TanStack Query manages client cache via optimistic updates
+    console.log("[createPin] ✅ Pin created in database:", {
+      pinId: pin.id,
+      title: pin.title,
+      latitude: pin.latitude,
+      longitude: pin.longitude,
+      isVisible: pin.isVisible,
+      layerId: pin.layerId,
+    });
+
+    // CRITICAL: Revalidate the world page to refresh server component data
+    // This ensures the new pin appears when the page reloads or data is refreshed
+    revalidatePath(`/world/${pin.gameWorldId}`);
+
+    console.log("[createPin] ✅ Path revalidated:", `/world/${pin.gameWorldId}`);
 
     return { pinId: pin.id, pin };
   }, "createPin");

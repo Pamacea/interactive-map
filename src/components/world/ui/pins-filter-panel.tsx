@@ -2,7 +2,7 @@
 
 import { Filter, Eye, EyeOff } from "lucide-react";
 import { usePinTypeFilters, useTogglePinTypeFilter, useShowAllPinTypes, useHideAllPinTypes } from "@/stores/use-pins-store";
-import { PinTypeEnum } from "@/types/pin.type";
+import { PinType } from "@/types/pin.type";
 import { pinTypeConfig } from "@/constants/pin-types";
 import { getLucideIcon } from "@/lib/icon-utils";
 
@@ -19,9 +19,9 @@ export function PinsFilterPanel() {
   const allVisible = Object.values(filters).every((v) => v === true);
   const allHidden = Object.values(filters).every((v) => v === false);
 
-  // Convert PinTypeEnum to PinType for config lookup
-  const getPinConfig = (type: PinTypeEnum) => {
-    // PinTypeEnum and PinType have the same values, just different enum types
+  // Convert (typeof PinType)[keyof typeof PinType] to PinType for config lookup
+  const getPinConfig = (type: (typeof PinType)[keyof typeof PinType]) => {
+    // (typeof PinType)[keyof typeof PinType] and PinType have the same values, just different enum types
     return pinTypeConfig[type as unknown as keyof typeof pinTypeConfig];
   };
 
@@ -62,13 +62,13 @@ export function PinsFilterPanel() {
       {/* Filter List */}
       <div className="space-y-1" role="group" aria-label="Pin type filters">
         {Object.entries(filters).map(([type, isVisible]) => {
-          const config = getPinConfig(type as PinTypeEnum);
+          const config = getPinConfig(type as (typeof PinType)[keyof typeof PinType]);
           const IconComponent = getPinIcon(config.icon);
 
           return (
             <button
               key={type}
-              onClick={() => toggleFilter(type as PinTypeEnum)}
+              onClick={() => toggleFilter(type as (typeof PinType)[keyof typeof PinType])}
               aria-pressed={isVisible}
               aria-label={`${config.label}: ${isVisible ? "visible" : "hidden"}`}
               className={`

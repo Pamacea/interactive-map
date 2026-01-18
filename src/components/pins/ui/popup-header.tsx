@@ -8,7 +8,7 @@ import { X, Check, X as XIcon, Trash2, AlertTriangle } from "lucide-react";
 import { pinTypeConfig, type PinType } from "@/constants/pin-types";
 import { getPinEmoji } from "../utils/pin-popup-utils";
 import type { Pin } from "@prisma/client";
-import { usePinsStore } from "@/stores/use-pins-store";
+import { useUpdatePinServer, useUpdatePin } from "@/stores/use-pins-store";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,8 +34,8 @@ export function PopupHeader({ pin, onClose, onDelete, onTitleChange }: PopupHead
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
   const [isDeleting, setIsDeleting] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
-  const updatePinServer = usePinsStore((state) => state.updatePinServer);
-  const updatePin = usePinsStore((state) => state.updatePin);
+  const updatePinServer = useUpdatePinServer();
+  const updatePin = useUpdatePin();
 
   // Keep local state in sync with pin prop when not editing
   React.useEffect(() => {

@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { AutosaveIndicator } from "./autosave-indicator";
 import { type AutosaveStatus } from "@/hooks/use-autosave";
 import { SearchBar } from "@/components/search";
-import type { SearchResultItem } from "@/actions/search";
+import type { SearchResultItem } from "@/lib/search-types";
 import { ExportButton } from "@/components/export";
 import { useMapExport } from "@/components/export/utils/use-map-export-context";
 

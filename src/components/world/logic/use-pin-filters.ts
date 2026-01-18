@@ -7,7 +7,7 @@ import {
   useVisiblePinTypes,
   useShowAllPinTypesValue,
 } from "@/stores/use-pins-store";
-import type { PinTypeEnum } from "@/types/pin.type";
+import { PinType } from "@/types/pin.type";
 
 /**
  * Hook for accessing pin filters state and actions
@@ -18,12 +18,12 @@ import type { PinTypeEnum } from "@/types/pin.type";
  * const { filters, showAll, toggleFilter, isTypeVisible } = usePinFilters();
  *
  * // Check if city pins are visible
- * if (isTypeVisible(PinTypeEnum.CITY)) {
+ * if (isTypeVisible((typeof PinType)[keyof typeof PinType].CITY)) {
  *   // Show city pins
  * }
  *
  * // Toggle a filter
- * toggleFilter(PinTypeEnum.DUNGEON);
+ * toggleFilter((typeof PinType)[keyof typeof PinType].DUNGEON);
  * ```
  */
 export function usePinFilters() {
@@ -34,13 +34,13 @@ export function usePinFilters() {
   const hideAllTypes = useHideAllPinTypes();
   const visibleTypes = useVisiblePinTypes();
 
-  const isTypeVisible = (pinType: PinTypeEnum): boolean => {
+  const isTypeVisible = (pinType: (typeof PinType)[keyof typeof PinType]): boolean => {
     return filters[pinType] ?? true;
   };
 
   return {
     toggleFilter,
-    setFilter: (pinType: PinTypeEnum, value: boolean) => {
+    setFilter: (pinType: (typeof PinType)[keyof typeof PinType], value: boolean) => {
       // This is handled by toggle, but we could add setPinTypeFilter if needed
       if (value !== filters[pinType]) {
         toggleFilter(pinType);
@@ -61,10 +61,10 @@ export function usePinFilters() {
  *
  * @example
  * ```tsx
- * const isCityVisible = useIsPinTypeVisible(PinTypeEnum.CITY);
+ * const isCityVisible = useIsPinTypeVisible((typeof PinType)[keyof typeof PinType].CITY);
  * ```
  */
-export function useIsPinTypeVisible(pinType: PinTypeEnum): boolean {
+export function useIsPinTypeVisible(pinType: (typeof PinType)[keyof typeof PinType]): boolean {
   const filters = usePinTypeFilters();
   return filters[pinType] ?? true;
 }
@@ -77,7 +77,7 @@ export function useIsPinTypeVisible(pinType: PinTypeEnum): boolean {
  * const filteredPins = useFilteredPins(allPins);
  * ```
  */
-export function useFilteredPins<T extends { pinType: PinTypeEnum }>(pins: T[]): T[] {
+export function useFilteredPins<T extends { pinType: (typeof PinType)[keyof typeof PinType] }>(pins: T[]): T[] {
   const visibleTypes = useVisiblePinTypes();
 
   return useCallback(() => {

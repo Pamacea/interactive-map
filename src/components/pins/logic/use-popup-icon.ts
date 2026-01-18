@@ -3,14 +3,14 @@
  */
 
 import * as React from "react"
-import { usePinsStore } from "@/stores/use-pins-store"
+import { useUpdatePinServer, useUpdatePin } from "@/stores/use-pins-store"
 import type { Pin } from "@prisma/client"
 
 export function usePopupIcon(pin: Pin) {
   const [isOpen, setIsOpen] = React.useState(false)
 
-  const updatePinServer = usePinsStore((state) => state.updatePinServer)
-  const updatePin = usePinsStore((state) => state.updatePin)
+  const updatePinServer = useUpdatePinServer()
+  const updatePin = useUpdatePin()
 
   const handleSelect = async (iconName: string) => {
     // Optimistic update

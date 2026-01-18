@@ -1,12 +1,14 @@
 {
   "version": "1.0.0",
-  "createdAt": "2026-01-18T12:25:35.010Z",
+  "createdAt": "2026-01-18T20:31:29.970Z",
   "projectDir": "C:\\Users\\Yanis\\Projects\\interactive-map",
   "metadata": {
-    "totalNodes": 220,
-    "totalEdges": 542,
+    "totalNodes": 296,
+    "totalEdges": 721,
     "circularDeps": 0,
-    "deadCode": 299
+    "deadCode": 495,
+    "added": 8,
+    "removed": 0
   },
   "graph": {
     "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\actions\\pins.ts": {
@@ -3694,6 +3696,1267 @@
         "exports": 2,
         "lines": 103
       }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\actions\\export.ts": {
+      "imports": [
+        "@/lib/prisma",
+        "@prisma/client"
+      ],
+      "exports": [],
+      "importedBy": [],
+      "stats": {
+        "imports": 2,
+        "exports": 0,
+        "lines": 93
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\actions\\gallery.ts": {
+      "imports": [
+        "@/lib/prisma",
+        "next/cache",
+        "@/types/gallery.type",
+        "fs/promises",
+        "path"
+      ],
+      "exports": [],
+      "importedBy": [],
+      "stats": {
+        "imports": 5,
+        "exports": 0,
+        "lines": 471
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\actions\\layers.ts": {
+      "imports": [
+        "@/lib/prisma",
+        "next/cache",
+        "@/lib/errors"
+      ],
+      "exports": [],
+      "importedBy": [],
+      "stats": {
+        "imports": 3,
+        "exports": 0,
+        "lines": 257
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\actions\\lore.ts": {
+      "imports": [
+        "@/lib/prisma",
+        "next/cache",
+        "@/types/lore.type"
+      ],
+      "exports": [],
+      "importedBy": [],
+      "stats": {
+        "imports": 3,
+        "exports": 0,
+        "lines": 243
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\actions\\search.ts": {
+      "imports": [
+        "@/lib/prisma",
+        "zod"
+      ],
+      "exports": [
+        "SearchFiltersSchema",
+        "SearchQuerySchema"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 2,
+        "exports": 2,
+        "lines": 400
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\app\\global-error.tsx": {
+      "imports": [
+        "react",
+        "@/components/ui/button",
+        "lucide-react"
+      ],
+      "exports": [
+        "GlobalError"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 3,
+        "exports": 1,
+        "lines": 147
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\app\\world\\[id]\\error.tsx": {
+      "imports": [
+        "react",
+        "@/components/ui/button",
+        "lucide-react"
+      ],
+      "exports": [
+        "WorldError"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 3,
+        "exports": 1,
+        "lines": 143
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\export\\index.ts": {
+      "imports": [],
+      "exports": [
+        "ExportButton",
+        "ExportDialog",
+        "generateExportFilename"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 0,
+        "exports": 3,
+        "lines": 6
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\export\\ui\\export-button.tsx": {
+      "imports": [
+        "react",
+        "@/components/ui/button",
+        "lucide-react",
+        "./export-dialog",
+        "@/actions/export"
+      ],
+      "exports": [
+        "ExportButton"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 5,
+        "exports": 1,
+        "lines": 71
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\export\\ui\\export-dialog.tsx": {
+      "imports": [
+        "react",
+        "@/components/ui/button",
+        "@/components/ui/input",
+        "@/components/ui/label",
+        "lucide-react",
+        "../utils/export-utils",
+        "../utils/filename-utils",
+        "@/actions/export"
+      ],
+      "exports": [
+        "ExportDialog"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 8,
+        "exports": 1,
+        "lines": 207
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\export\\utils\\export-utils.ts": {
+      "imports": [
+        "html2canvas",
+        "jspdf",
+        "@/actions/export"
+      ],
+      "exports": [
+        "estimateFileSize",
+        "formatFileSize"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 3,
+        "exports": 2,
+        "lines": 229
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\export\\utils\\filename-utils.ts": {
+      "imports": [
+        "@/actions/export"
+      ],
+      "exports": [
+        "generateExportFilename"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 1,
+        "exports": 1,
+        "lines": 27
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\export\\utils\\use-map-export-context.tsx": {
+      "imports": [
+        "react"
+      ],
+      "exports": [
+        "MapExportProvider",
+        "useMapExport"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 1,
+        "exports": 2,
+        "lines": 40
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\index.ts": {
+      "imports": [],
+      "exports": [
+        "ImageCard",
+        "ImageUploadZone",
+        "ImageLightbox",
+        "ImageGallery"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 0,
+        "exports": 4,
+        "lines": 12
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\logic\\gallery-schemas.ts": {
+      "imports": [
+        "zod",
+        "@prisma/client"
+      ],
+      "exports": [
+        "CreateGalleryItemSchema",
+        "UpdateGalleryItemSchema",
+        "ImageUploadSchema",
+        "ImageFileSchema",
+        "IMAGE_MAX_SIZE",
+        "IMAGE_ALLOWED_TYPES",
+        "validateImageFile",
+        "generateSafeFilename"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 2,
+        "exports": 8,
+        "lines": 95
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\ui\\image-card.tsx": {
+      "imports": [
+        "react",
+        "next/image",
+        "lucide-react",
+        "@/lib/utils",
+        "@/components/ui/button",
+        "@/types/gallery.type"
+      ],
+      "exports": [
+        "ImageCard"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 6,
+        "exports": 1,
+        "lines": 171
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\ui\\image-gallery.tsx": {
+      "imports": [
+        "react",
+        "lucide-react",
+        "@/lib/utils",
+        "@/components/ui/button",
+        "./image-card",
+        "./image-lightbox",
+        "./image-upload-zone",
+        "@/stores/use-gallery-store",
+        "@/types/gallery.type"
+      ],
+      "exports": [
+        "ImageGallery"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 9,
+        "exports": 1,
+        "lines": 203
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\ui\\image-lightbox.tsx": {
+      "imports": [
+        "react",
+        "next/image",
+        "lucide-react",
+        "@/lib/utils",
+        "@/components/ui/button",
+        "../utils/image-utils",
+        "@/types/gallery.type"
+      ],
+      "exports": [
+        "ImageLightbox"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 7,
+        "exports": 1,
+        "lines": 195
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\ui\\image-upload-zone.tsx": {
+      "imports": [
+        "react",
+        "lucide-react",
+        "@/lib/utils",
+        "@/components/ui/button"
+      ],
+      "exports": [
+        "ImageUploadZone"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 4,
+        "exports": 1,
+        "lines": 219
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\ui\\index.ts": {
+      "imports": [],
+      "exports": [
+        "ImageCard",
+        "ImageUploadZone",
+        "ImageLightbox",
+        "ImageGallery"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 0,
+        "exports": 4,
+        "lines": 5
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\utils\\image-utils.ts": {
+      "imports": [],
+      "exports": [
+        "readFileAsDataURL",
+        "getImageDimensions",
+        "formatFileSize",
+        "isImageFile",
+        "getFileExtension",
+        "createPreviewURL",
+        "revokePreviewURL",
+        "downloadImage",
+        "getAspectRatio",
+        "fitImageToConstraints"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 0,
+        "exports": 10,
+        "lines": 242
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\index.ts": {
+      "imports": [],
+      "exports": [],
+      "importedBy": [],
+      "stats": {
+        "imports": 0,
+        "exports": 0,
+        "lines": 3
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\logic\\index.ts": {
+      "imports": [],
+      "exports": [
+        "useLoreList",
+        "useLoreForm"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 0,
+        "exports": 2,
+        "lines": 4
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\logic\\lore-schemas.ts": {
+      "imports": [
+        "zod"
+      ],
+      "exports": [
+        "LoreCategoryEnum",
+        "LoreEntrySchema",
+        "CreateLoreEntrySchema",
+        "UpdateLoreEntrySchema",
+        "LoreFiltersSchema",
+        "QuickLoreSchema"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 1,
+        "exports": 6,
+        "lines": 127
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\logic\\use-lore-form.ts": {
+      "imports": [
+        "react",
+        "@/stores/use-lore-store",
+        "@/types/lore.type"
+      ],
+      "exports": [
+        "useLoreForm"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 3,
+        "exports": 1,
+        "lines": 165
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\logic\\use-lore-list.ts": {
+      "imports": [
+        "react",
+        "@/stores/use-lore-store",
+        "@/actions/lore",
+        "@/types/lore.type"
+      ],
+      "exports": [
+        "useLoreList"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 4,
+        "exports": 1,
+        "lines": 65
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\ui\\index.ts": {
+      "imports": [],
+      "exports": [
+        "LoreList",
+        "LoreCard",
+        "LoreForm"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 0,
+        "exports": 3,
+        "lines": 4
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\ui\\lore-card.tsx": {
+      "imports": [
+        "lucide-react",
+        "@/types/lore.type",
+        "@/stores/use-lore-store",
+        "@/components/ui/button"
+      ],
+      "exports": [
+        "LoreCard"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 4,
+        "exports": 1,
+        "lines": 181
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\ui\\lore-form.tsx": {
+      "imports": [
+        "react",
+        "lucide-react",
+        "@/stores/use-lore-store",
+        "@/types/lore.type",
+        "@/components/ui/button"
+      ],
+      "exports": [
+        "LoreForm"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 5,
+        "exports": 1,
+        "lines": 248
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\ui\\lore-list.tsx": {
+      "imports": [
+        "react",
+        "lucide-react",
+        "@/stores/use-lore-store",
+        "@/types/lore.type",
+        "./lore-card",
+        "@/components/ui/button"
+      ],
+      "exports": [
+        "LoreList"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 6,
+        "exports": 1,
+        "lines": 183
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\logic\\pin-sync-queue.ts": {
+      "imports": [],
+      "exports": [
+        "pinSyncQueue"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 0,
+        "exports": 1,
+        "lines": 111
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\index.ts": {
+      "imports": [],
+      "exports": [
+        "SearchBar",
+        "SearchResults",
+        "SearchHighlight"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 0,
+        "exports": 3,
+        "lines": 4
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\search-bar.tsx": {
+      "imports": [
+        "react",
+        "lucide-react",
+        "@/hooks/use-debounce",
+        "@/actions/search",
+        "@/store/use-search-store",
+        "./search-results",
+        "@/lib/utils"
+      ],
+      "exports": [
+        "SearchBar"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 7,
+        "exports": 1,
+        "lines": 300
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\search-highlight.tsx": {
+      "imports": [
+        "react"
+      ],
+      "exports": [
+        "SearchHighlight"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 1,
+        "exports": 1,
+        "lines": 65
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\search-results.tsx": {
+      "imports": [
+        "react",
+        "lucide-react",
+        "./search-highlight",
+        "@/actions/search",
+        "@/lib/utils"
+      ],
+      "exports": [
+        "SearchResults"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 5,
+        "exports": 1,
+        "lines": 276
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\error-boundary.tsx": {
+      "imports": [
+        "react",
+        "@/components/ui/button",
+        "lucide-react"
+      ],
+      "exports": [
+        "ErrorBoundary",
+        "DefaultErrorFallback"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 3,
+        "exports": 2,
+        "lines": 193
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\error-test-button.tsx": {
+      "imports": [
+        "react",
+        "@/components/ui/button"
+      ],
+      "exports": [
+        "ErrorTestButton"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 2,
+        "exports": 1,
+        "lines": 139
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\input.tsx": {
+      "imports": [
+        "react",
+        "@/lib/utils"
+      ],
+      "exports": [
+        "Input"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 2,
+        "exports": 1,
+        "lines": 23
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\label.tsx": {
+      "imports": [
+        "react",
+        "@/lib/utils"
+      ],
+      "exports": [
+        "Label"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 2,
+        "exports": 1,
+        "lines": 20
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\skeleton\\index.ts": {
+      "imports": [],
+      "exports": [
+        "Skeleton",
+        "SkeletonCard",
+        "SkeletonText",
+        "SkeletonList",
+        "SkeletonPin",
+        "SkeletonGrid",
+        "SkeletonSpinner"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 0,
+        "exports": 7,
+        "lines": 18
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\skeleton\\skeleton-card.tsx": {
+      "imports": [
+        "./skeleton",
+        "@/lib/utils"
+      ],
+      "exports": [
+        "SkeletonCard"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 2,
+        "exports": 1,
+        "lines": 53
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\skeleton\\skeleton-grid.tsx": {
+      "imports": [
+        "./skeleton-card",
+        "@/lib/utils"
+      ],
+      "exports": [
+        "SkeletonGrid"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 2,
+        "exports": 1,
+        "lines": 41
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\skeleton\\skeleton-list.tsx": {
+      "imports": [
+        "./skeleton",
+        "@/lib/utils"
+      ],
+      "exports": [
+        "SkeletonList"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 2,
+        "exports": 1,
+        "lines": 36
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\skeleton\\skeleton-pin.tsx": {
+      "imports": [
+        "./skeleton"
+      ],
+      "exports": [
+        "SkeletonPin"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 1,
+        "exports": 1,
+        "lines": 39
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\skeleton\\skeleton-spinner.tsx": {
+      "imports": [
+        "@/lib/utils"
+      ],
+      "exports": [
+        "SkeletonSpinner"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 1,
+        "exports": 1,
+        "lines": 33
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\skeleton\\skeleton-text.tsx": {
+      "imports": [
+        "./skeleton",
+        "@/lib/utils"
+      ],
+      "exports": [
+        "SkeletonText"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 2,
+        "exports": 1,
+        "lines": 35
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\skeleton\\skeleton.tsx": {
+      "imports": [
+        "@/lib/utils"
+      ],
+      "exports": [
+        "Skeleton"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 1,
+        "exports": 1,
+        "lines": 32
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\world\\context\\map-context.tsx": {
+      "imports": [
+        "react"
+      ],
+      "exports": [
+        "MapCenterProvider",
+        "useMapCenter"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 1,
+        "exports": 2,
+        "lines": 39
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\accessibility\\index.ts": {
+      "imports": [],
+      "exports": [
+        "useFocusTrap",
+        "useFocusReturn",
+        "useFocusManagement",
+        "useKeyboardNav",
+        "useMapKeyboardNav",
+        "MAP_SHORTCUTS",
+        "useAnnounce",
+        "useLiveRegion",
+        "announce"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 0,
+        "exports": 9,
+        "lines": 14
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\accessibility\\use-announce.ts": {
+      "imports": [
+        "react"
+      ],
+      "exports": [
+        "useAnnounce",
+        "useLiveRegion",
+        "announce"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 1,
+        "exports": 3,
+        "lines": 161
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\accessibility\\use-focus-return.ts": {
+      "imports": [
+        "react"
+      ],
+      "exports": [
+        "useFocusReturn",
+        "useFocusManagement"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 1,
+        "exports": 2,
+        "lines": 74
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\accessibility\\use-focus-trap.ts": {
+      "imports": [
+        "react"
+      ],
+      "exports": [
+        "useFocusTrap"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 1,
+        "exports": 1,
+        "lines": 76
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\accessibility\\use-keyboard-nav.ts": {
+      "imports": [
+        "react"
+      ],
+      "exports": [
+        "useKeyboardNav",
+        "MAP_SHORTCUTS",
+        "useMapKeyboardNav"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 1,
+        "exports": 3,
+        "lines": 150
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\use-keyboard-shortcut.ts": {
+      "imports": [
+        "react"
+      ],
+      "exports": [
+        "useKeyboardShortcut",
+        "SHORTCUTS"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 1,
+        "exports": 2,
+        "lines": 77
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\use-loading-state.ts": {
+      "imports": [
+        "react"
+      ],
+      "exports": [
+        "useLoadingState",
+        "useAsyncOperation"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 1,
+        "exports": 2,
+        "lines": 152
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\lib\\errors.ts": {
+      "imports": [],
+      "exports": [
+        "AppError",
+        "ValidationError",
+        "AuthenticationError",
+        "AuthorizationError",
+        "NotFoundError",
+        "DatabaseError",
+        "FileUploadError",
+        "ok",
+        "err",
+        "logError",
+        "getErrorMessage"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 0,
+        "exports": 11,
+        "lines": 161
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\lib\\icon-utils.ts": {
+      "imports": [
+        "lucide-react"
+      ],
+      "exports": [
+        "isLucideIconName",
+        "getLucideIcon",
+        "getLucideIconNames"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 1,
+        "exports": 3,
+        "lines": 53
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\lib\\icon-utils.tsx": {
+      "imports": [
+        "react",
+        "lucide-react"
+      ],
+      "exports": [
+        "isLucideIconName",
+        "getLucideIcon",
+        "getLucideIconNames",
+        "DynamicIcon"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 2,
+        "exports": 4,
+        "lines": 77
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\lib\\server-helpers.ts": {
+      "imports": [
+        "@/lib/prisma",
+        "next-auth",
+        "@/app/api/auth/[...nextauth]/route",
+        "@/lib/errors"
+      ],
+      "exports": [],
+      "importedBy": [],
+      "stats": {
+        "imports": 4,
+        "exports": 0,
+        "lines": 213
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\store\\use-search-store.ts": {
+      "imports": [
+        "zustand"
+      ],
+      "exports": [
+        "useSearchStore",
+        "useSearchIsOpen",
+        "useSearchQuery",
+        "useSearchResults",
+        "useSearchIsLoading",
+        "useSearchError"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 1,
+        "exports": 6,
+        "lines": 117
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\index.ts": {
+      "imports": [],
+      "exports": [],
+      "importedBy": [],
+      "stats": {
+        "imports": 0,
+        "exports": 0,
+        "lines": 70
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-data-store.ts": {
+      "imports": [
+        "zustand",
+        "zustand/middleware",
+        "@prisma/client",
+        "@/actions/pins",
+        "./use-pins-filter-store"
+      ],
+      "exports": [
+        "usePinsDataStore",
+        "usePins",
+        "usePinById",
+        "usePinsLoading",
+        "usePinsError",
+        "useSetPins",
+        "useAddPin",
+        "useUpdatePin",
+        "useDeletePin",
+        "useCreatePin",
+        "useDeletePinServer",
+        "useUpdatePinServer"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 5,
+        "exports": 12,
+        "lines": 199
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-filter-store.ts": {
+      "imports": [
+        "zustand",
+        "zustand/middleware",
+        "@prisma/client",
+        "@/types/pin.type"
+      ],
+      "exports": [
+        "usePinsFilterStore",
+        "usePinFilters",
+        "usePinTypeFilters",
+        "useSearchTerm",
+        "useLayerIds",
+        "useShowVisibleOnly",
+        "useFilteredPins",
+        "useVisiblePinTypes",
+        "useSetSearchTerm",
+        "useSetPinTypeFilter",
+        "useTogglePinTypeFilter",
+        "useShowAllPinTypes",
+        "useHideAllPinTypes",
+        "useSetLayerIds",
+        "useToggleLayerId",
+        "useToggleShowVisibleOnly",
+        "useResetFilters",
+        "useApplyFilters",
+        "useGetVisiblePinTypes",
+        "useIsPinTypeVisible",
+        "useShowAllPinTypesValue"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 4,
+        "exports": 21,
+        "lines": 309
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-ui-store.ts": {
+      "imports": [
+        "zustand",
+        "zustand/middleware"
+      ],
+      "exports": [
+        "usePinsUIStore",
+        "useSelectedPinId",
+        "useIsCreatingPin",
+        "useIsEditingPin",
+        "useHoverPinId",
+        "useSelectPin",
+        "useClearSelection",
+        "useStartCreating",
+        "useStopCreating",
+        "useStartEditing",
+        "useStopEditing",
+        "useSetHoverPin"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 2,
+        "exports": 12,
+        "lines": 89
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\use-gallery-store.ts": {
+      "imports": [
+        "zustand",
+        "zustand/middleware",
+        "@/types/gallery.type"
+      ],
+      "exports": [
+        "useGalleryStore"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 3,
+        "exports": 1,
+        "lines": 460
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\use-lore-store.ts": {
+      "imports": [
+        "zustand",
+        "zustand/middleware",
+        "@prisma/client"
+      ],
+      "exports": [
+        "useLoreStore"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 3,
+        "exports": 1,
+        "lines": 464
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\types\\gallery.type.ts": {
+      "imports": [
+        "@prisma/client"
+      ],
+      "exports": [],
+      "importedBy": [],
+      "stats": {
+        "imports": 1,
+        "exports": 0,
+        "lines": 78
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\types\\lore.type.ts": {
+      "imports": [
+        "@prisma/client"
+      ],
+      "exports": [],
+      "importedBy": [],
+      "stats": {
+        "imports": 1,
+        "exports": 0,
+        "lines": 83
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\actions\\migrations.ts": {
+      "imports": [
+        "@/lib/prisma",
+        "@/lib/errors"
+      ],
+      "exports": [],
+      "importedBy": [],
+      "stats": {
+        "imports": 2,
+        "exports": 0,
+        "lines": 86
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\app\\api\\migrations\\fix-permissions\\route.ts": {
+      "imports": [
+        "@/actions/migrations",
+        "next/server"
+      ],
+      "exports": [],
+      "importedBy": [],
+      "stats": {
+        "imports": 2,
+        "exports": 0,
+        "lines": 41
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\card.tsx": {
+      "imports": [
+        "react",
+        "@/lib/utils"
+      ],
+      "exports": [
+        "Card",
+        "CardHeader",
+        "CardFooter",
+        "CardTitle",
+        "CardDescription",
+        "CardContent"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 2,
+        "exports": 6,
+        "lines": 80
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\collapsible.tsx": {
+      "imports": [
+        "react",
+        "@radix-ui/react-collapsible",
+        "@/lib/utils"
+      ],
+      "exports": [
+        "Collapsible",
+        "CollapsibleTrigger",
+        "CollapsibleContent"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 3,
+        "exports": 3,
+        "lines": 44
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\dialog.tsx": {
+      "imports": [
+        "react",
+        "@radix-ui/react-dialog",
+        "lucide-react",
+        "@/lib/utils"
+      ],
+      "exports": [],
+      "importedBy": [],
+      "stats": {
+        "imports": 4,
+        "exports": 0,
+        "lines": 123
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\select.tsx": {
+      "imports": [
+        "react",
+        "@radix-ui/react-select",
+        "lucide-react",
+        "@/lib/utils"
+      ],
+      "exports": [],
+      "importedBy": [],
+      "stats": {
+        "imports": 4,
+        "exports": 0,
+        "lines": 160
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\tabs.tsx": {
+      "imports": [
+        "react",
+        "@radix-ui/react-tabs",
+        "@/lib/utils"
+      ],
+      "exports": [
+        "Tabs",
+        "TabsList",
+        "TabsTrigger",
+        "TabsContent"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 3,
+        "exports": 4,
+        "lines": 55
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\lib\\search-types.ts": {
+      "imports": [
+        "zod",
+        "@prisma/client"
+      ],
+      "exports": [
+        "SearchFiltersSchema",
+        "SearchQuerySchema"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 2,
+        "exports": 2,
+        "lines": 68
+      }
     }
   },
   "issues": {
@@ -4894,6 +6157,790 @@
       {
         "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\utils\\pin-visibility.ts",
         "export": "filterPinsByZoom"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\actions\\search.ts",
+        "export": "SearchFiltersSchema"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\actions\\search.ts",
+        "export": "SearchQuerySchema"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\app\\global-error.tsx",
+        "export": "GlobalError"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\app\\world\\[id]\\error.tsx",
+        "export": "WorldError"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\export\\index.ts",
+        "export": "ExportButton"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\export\\index.ts",
+        "export": "ExportDialog"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\export\\index.ts",
+        "export": "generateExportFilename"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\export\\ui\\export-button.tsx",
+        "export": "ExportButton"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\export\\ui\\export-dialog.tsx",
+        "export": "ExportDialog"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\export\\utils\\export-utils.ts",
+        "export": "estimateFileSize"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\export\\utils\\export-utils.ts",
+        "export": "formatFileSize"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\export\\utils\\filename-utils.ts",
+        "export": "generateExportFilename"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\export\\utils\\use-map-export-context.tsx",
+        "export": "MapExportProvider"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\export\\utils\\use-map-export-context.tsx",
+        "export": "useMapExport"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\index.ts",
+        "export": "ImageCard"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\index.ts",
+        "export": "ImageUploadZone"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\index.ts",
+        "export": "ImageLightbox"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\index.ts",
+        "export": "ImageGallery"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\logic\\gallery-schemas.ts",
+        "export": "CreateGalleryItemSchema"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\logic\\gallery-schemas.ts",
+        "export": "UpdateGalleryItemSchema"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\logic\\gallery-schemas.ts",
+        "export": "ImageUploadSchema"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\logic\\gallery-schemas.ts",
+        "export": "ImageFileSchema"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\logic\\gallery-schemas.ts",
+        "export": "IMAGE_MAX_SIZE"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\logic\\gallery-schemas.ts",
+        "export": "IMAGE_ALLOWED_TYPES"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\logic\\gallery-schemas.ts",
+        "export": "validateImageFile"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\logic\\gallery-schemas.ts",
+        "export": "generateSafeFilename"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\ui\\image-card.tsx",
+        "export": "ImageCard"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\ui\\image-gallery.tsx",
+        "export": "ImageGallery"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\ui\\image-lightbox.tsx",
+        "export": "ImageLightbox"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\ui\\image-upload-zone.tsx",
+        "export": "ImageUploadZone"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\ui\\index.ts",
+        "export": "ImageCard"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\ui\\index.ts",
+        "export": "ImageUploadZone"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\ui\\index.ts",
+        "export": "ImageLightbox"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\ui\\index.ts",
+        "export": "ImageGallery"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\utils\\image-utils.ts",
+        "export": "readFileAsDataURL"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\utils\\image-utils.ts",
+        "export": "getImageDimensions"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\utils\\image-utils.ts",
+        "export": "formatFileSize"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\utils\\image-utils.ts",
+        "export": "isImageFile"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\utils\\image-utils.ts",
+        "export": "getFileExtension"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\utils\\image-utils.ts",
+        "export": "createPreviewURL"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\utils\\image-utils.ts",
+        "export": "revokePreviewURL"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\utils\\image-utils.ts",
+        "export": "downloadImage"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\utils\\image-utils.ts",
+        "export": "getAspectRatio"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\utils\\image-utils.ts",
+        "export": "fitImageToConstraints"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\logic\\index.ts",
+        "export": "useLoreList"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\logic\\index.ts",
+        "export": "useLoreForm"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\logic\\lore-schemas.ts",
+        "export": "LoreCategoryEnum"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\logic\\lore-schemas.ts",
+        "export": "LoreEntrySchema"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\logic\\lore-schemas.ts",
+        "export": "CreateLoreEntrySchema"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\logic\\lore-schemas.ts",
+        "export": "UpdateLoreEntrySchema"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\logic\\lore-schemas.ts",
+        "export": "LoreFiltersSchema"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\logic\\lore-schemas.ts",
+        "export": "QuickLoreSchema"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\logic\\use-lore-form.ts",
+        "export": "useLoreForm"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\logic\\use-lore-list.ts",
+        "export": "useLoreList"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\ui\\index.ts",
+        "export": "LoreList"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\ui\\index.ts",
+        "export": "LoreCard"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\ui\\index.ts",
+        "export": "LoreForm"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\ui\\lore-card.tsx",
+        "export": "LoreCard"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\ui\\lore-form.tsx",
+        "export": "LoreForm"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\ui\\lore-list.tsx",
+        "export": "LoreList"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\logic\\pin-sync-queue.ts",
+        "export": "pinSyncQueue"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\index.ts",
+        "export": "SearchBar"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\index.ts",
+        "export": "SearchResults"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\index.ts",
+        "export": "SearchHighlight"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\search-bar.tsx",
+        "export": "SearchBar"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\search-highlight.tsx",
+        "export": "SearchHighlight"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\search-results.tsx",
+        "export": "SearchResults"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\error-boundary.tsx",
+        "export": "ErrorBoundary"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\error-boundary.tsx",
+        "export": "DefaultErrorFallback"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\error-test-button.tsx",
+        "export": "ErrorTestButton"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\input.tsx",
+        "export": "Input"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\label.tsx",
+        "export": "Label"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\skeleton\\index.ts",
+        "export": "Skeleton"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\skeleton\\index.ts",
+        "export": "SkeletonCard"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\skeleton\\index.ts",
+        "export": "SkeletonText"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\skeleton\\index.ts",
+        "export": "SkeletonList"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\skeleton\\index.ts",
+        "export": "SkeletonPin"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\skeleton\\index.ts",
+        "export": "SkeletonGrid"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\skeleton\\index.ts",
+        "export": "SkeletonSpinner"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\skeleton\\skeleton-card.tsx",
+        "export": "SkeletonCard"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\skeleton\\skeleton-grid.tsx",
+        "export": "SkeletonGrid"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\skeleton\\skeleton-list.tsx",
+        "export": "SkeletonList"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\skeleton\\skeleton-pin.tsx",
+        "export": "SkeletonPin"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\skeleton\\skeleton-spinner.tsx",
+        "export": "SkeletonSpinner"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\skeleton\\skeleton-text.tsx",
+        "export": "SkeletonText"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\skeleton\\skeleton.tsx",
+        "export": "Skeleton"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\world\\context\\map-context.tsx",
+        "export": "MapCenterProvider"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\world\\context\\map-context.tsx",
+        "export": "useMapCenter"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\accessibility\\index.ts",
+        "export": "useFocusTrap"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\accessibility\\index.ts",
+        "export": "useFocusReturn"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\accessibility\\index.ts",
+        "export": "useFocusManagement"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\accessibility\\index.ts",
+        "export": "useKeyboardNav"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\accessibility\\index.ts",
+        "export": "useMapKeyboardNav"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\accessibility\\index.ts",
+        "export": "MAP_SHORTCUTS"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\accessibility\\index.ts",
+        "export": "useAnnounce"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\accessibility\\index.ts",
+        "export": "useLiveRegion"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\accessibility\\index.ts",
+        "export": "announce"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\accessibility\\use-announce.ts",
+        "export": "useAnnounce"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\accessibility\\use-announce.ts",
+        "export": "useLiveRegion"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\accessibility\\use-announce.ts",
+        "export": "announce"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\accessibility\\use-focus-return.ts",
+        "export": "useFocusReturn"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\accessibility\\use-focus-return.ts",
+        "export": "useFocusManagement"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\accessibility\\use-focus-trap.ts",
+        "export": "useFocusTrap"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\accessibility\\use-keyboard-nav.ts",
+        "export": "useKeyboardNav"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\accessibility\\use-keyboard-nav.ts",
+        "export": "MAP_SHORTCUTS"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\accessibility\\use-keyboard-nav.ts",
+        "export": "useMapKeyboardNav"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\use-keyboard-shortcut.ts",
+        "export": "useKeyboardShortcut"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\use-keyboard-shortcut.ts",
+        "export": "SHORTCUTS"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\use-loading-state.ts",
+        "export": "useLoadingState"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\hooks\\use-loading-state.ts",
+        "export": "useAsyncOperation"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\lib\\errors.ts",
+        "export": "AppError"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\lib\\errors.ts",
+        "export": "ValidationError"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\lib\\errors.ts",
+        "export": "AuthenticationError"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\lib\\errors.ts",
+        "export": "AuthorizationError"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\lib\\errors.ts",
+        "export": "NotFoundError"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\lib\\errors.ts",
+        "export": "DatabaseError"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\lib\\errors.ts",
+        "export": "FileUploadError"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\lib\\errors.ts",
+        "export": "ok"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\lib\\errors.ts",
+        "export": "err"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\lib\\errors.ts",
+        "export": "logError"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\lib\\errors.ts",
+        "export": "getErrorMessage"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\lib\\icon-utils.ts",
+        "export": "isLucideIconName"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\lib\\icon-utils.ts",
+        "export": "getLucideIcon"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\lib\\icon-utils.ts",
+        "export": "getLucideIconNames"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\lib\\icon-utils.tsx",
+        "export": "isLucideIconName"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\lib\\icon-utils.tsx",
+        "export": "getLucideIcon"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\lib\\icon-utils.tsx",
+        "export": "getLucideIconNames"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\lib\\icon-utils.tsx",
+        "export": "DynamicIcon"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\store\\use-search-store.ts",
+        "export": "useSearchStore"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\store\\use-search-store.ts",
+        "export": "useSearchIsOpen"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\store\\use-search-store.ts",
+        "export": "useSearchQuery"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\store\\use-search-store.ts",
+        "export": "useSearchResults"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\store\\use-search-store.ts",
+        "export": "useSearchIsLoading"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\store\\use-search-store.ts",
+        "export": "useSearchError"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-data-store.ts",
+        "export": "usePinsDataStore"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-data-store.ts",
+        "export": "usePins"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-data-store.ts",
+        "export": "usePinById"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-data-store.ts",
+        "export": "usePinsLoading"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-data-store.ts",
+        "export": "usePinsError"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-data-store.ts",
+        "export": "useSetPins"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-data-store.ts",
+        "export": "useAddPin"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-data-store.ts",
+        "export": "useUpdatePin"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-data-store.ts",
+        "export": "useDeletePin"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-data-store.ts",
+        "export": "useCreatePin"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-data-store.ts",
+        "export": "useDeletePinServer"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-data-store.ts",
+        "export": "useUpdatePinServer"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-filter-store.ts",
+        "export": "usePinsFilterStore"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-filter-store.ts",
+        "export": "usePinFilters"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-filter-store.ts",
+        "export": "usePinTypeFilters"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-filter-store.ts",
+        "export": "useSearchTerm"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-filter-store.ts",
+        "export": "useLayerIds"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-filter-store.ts",
+        "export": "useShowVisibleOnly"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-filter-store.ts",
+        "export": "useFilteredPins"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-filter-store.ts",
+        "export": "useVisiblePinTypes"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-filter-store.ts",
+        "export": "useSetSearchTerm"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-filter-store.ts",
+        "export": "useSetPinTypeFilter"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-filter-store.ts",
+        "export": "useTogglePinTypeFilter"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-filter-store.ts",
+        "export": "useShowAllPinTypes"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-filter-store.ts",
+        "export": "useHideAllPinTypes"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-filter-store.ts",
+        "export": "useSetLayerIds"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-filter-store.ts",
+        "export": "useToggleLayerId"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-filter-store.ts",
+        "export": "useToggleShowVisibleOnly"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-filter-store.ts",
+        "export": "useResetFilters"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-filter-store.ts",
+        "export": "useApplyFilters"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-filter-store.ts",
+        "export": "useGetVisiblePinTypes"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-filter-store.ts",
+        "export": "useIsPinTypeVisible"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-filter-store.ts",
+        "export": "useShowAllPinTypesValue"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-ui-store.ts",
+        "export": "usePinsUIStore"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-ui-store.ts",
+        "export": "useSelectedPinId"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-ui-store.ts",
+        "export": "useIsCreatingPin"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-ui-store.ts",
+        "export": "useIsEditingPin"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-ui-store.ts",
+        "export": "useHoverPinId"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-ui-store.ts",
+        "export": "useSelectPin"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-ui-store.ts",
+        "export": "useClearSelection"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-ui-store.ts",
+        "export": "useStartCreating"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-ui-store.ts",
+        "export": "useStopCreating"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-ui-store.ts",
+        "export": "useStartEditing"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-ui-store.ts",
+        "export": "useStopEditing"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\pins\\use-pins-ui-store.ts",
+        "export": "useSetHoverPin"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\use-gallery-store.ts",
+        "export": "useGalleryStore"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\stores\\use-lore-store.ts",
+        "export": "useLoreStore"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\card.tsx",
+        "export": "Card"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\card.tsx",
+        "export": "CardHeader"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\card.tsx",
+        "export": "CardFooter"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\card.tsx",
+        "export": "CardTitle"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\card.tsx",
+        "export": "CardDescription"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\card.tsx",
+        "export": "CardContent"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\collapsible.tsx",
+        "export": "Collapsible"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\collapsible.tsx",
+        "export": "CollapsibleTrigger"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\collapsible.tsx",
+        "export": "CollapsibleContent"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\tabs.tsx",
+        "export": "Tabs"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\tabs.tsx",
+        "export": "TabsList"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\tabs.tsx",
+        "export": "TabsTrigger"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\tabs.tsx",
+        "export": "TabsContent"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\lib\\search-types.ts",
+        "export": "SearchFiltersSchema"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\lib\\search-types.ts",
+        "export": "SearchQuerySchema"
       }
     ]
   }

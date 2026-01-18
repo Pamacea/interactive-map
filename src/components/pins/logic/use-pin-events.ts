@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { usePinsStore } from "@/stores/use-pins-store";
+import { useSetHoverPin } from "@/stores/use-pins-store";
 import { eventManager } from "@/lib/event-manager";
 
 interface UsePinEventsParams {
@@ -39,7 +39,7 @@ export function usePinEvents({
   const [isHovered, setIsHovered] = useState(false);
 
   // Store methods for hover and selection
-  const setHoverPin = usePinsStore((state) => state.setHoverPin);
+  const setHoverPin = useSetHoverPin();
 
   /**
    * Capture events when pin is hovered or selected.

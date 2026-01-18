@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { PinTypeEnum } from "@/types/pin.type";
+import { PinType } from "@/types/pin.type";
 import {
   Building2,
   Home,
@@ -13,20 +13,20 @@ import {
 } from "lucide-react";
 
 const PIN_TYPE_OPTIONS = [
-  { value: PinTypeEnum.CITY, label: "City", icon: Building2 },
-  { value: PinTypeEnum.VILLAGE, label: "Village", icon: Home },
-  { value: PinTypeEnum.POI, label: "Point of Interest", icon: MapPin },
-  { value: PinTypeEnum.CHARACTER, label: "Character", icon: User },
-  { value: PinTypeEnum.DUNGEON, label: "Dungeon", icon: Mountain },
-  { value: PinTypeEnum.SHOP, label: "Shop", icon: ShoppingBag },
-  { value: PinTypeEnum.QUEST, label: "Quest", icon: Scroll },
-  { value: PinTypeEnum.TREASURE, label: "Treasure", icon: Gem },
-  { value: PinTypeEnum.CUSTOM, label: "Custom", icon: Circle },
+  { value: PinType.CITY, label: "City", icon: Building2 },
+  { value: PinType.VILLAGE, label: "Village", icon: Home },
+  { value: PinType.POI, label: "Point of Interest", icon: MapPin },
+  { value: PinType.CHARACTER, label: "Character", icon: User },
+  { value: PinType.DUNGEON, label: "Dungeon", icon: Mountain },
+  { value: PinType.SHOP, label: "Shop", icon: ShoppingBag },
+  { value: PinType.QUEST, label: "Quest", icon: Scroll },
+  { value: PinType.TREASURE, label: "Treasure", icon: Gem },
+  { value: PinType.CUSTOM, label: "Custom", icon: Circle },
 ];
 
 export interface FormPinTypeSelectorProps {
-  value: PinTypeEnum;
-  onChange: (value: PinTypeEnum) => void;
+  value: (typeof PinType)[keyof typeof PinType];
+  onChange: (value: (typeof PinType)[keyof typeof PinType]) => void;
   error?: string;
   mode?: "grid" | "select";
   disabled?: boolean;
@@ -47,7 +47,7 @@ export const FormPinTypeSelector: FC<FormPinTypeSelectorProps> = ({
         </label>
         <select
           value={value}
-          onChange={(e) => onChange(e.target.value as PinTypeEnum)}
+          onChange={(e) => onChange(e.target.value as (typeof PinType)[keyof typeof PinType])}
           disabled={disabled}
           className={`h-10 rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
             error ? "border-red-500" : "border-slate-200"

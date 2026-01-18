@@ -4,6 +4,15 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Download, FileImage, FileText, Code, Loader2 } from "lucide-react";
 import { exportMap, estimateFileSize, formatFileSize } from "../utils/export-utils";
 import { generateExportFilename } from "../utils/filename-utils";
@@ -24,6 +33,16 @@ export function ExportDialog({
   worldData,
   mapElement,
 }: ExportDialogProps) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md bg-background-card border-border-subtle">
+        <DialogHeader>
+          <DialogTitle className="text-lg font-semibold text-text-primary">Export Map</DialogTitle>
+          <DialogDescription className="text-sm text-text-muted mt-1">
+            Choose a format to export your world. The exported file will be
+            downloaded to your device.
+          </DialogDescription>
+        </DialogHeader>
   const [format, setFormat] = useState<ExportFormat>("png");
   const [filename, setFilename] = useState(worldTitle);
   const [isExporting, setIsExporting] = useState(false);
@@ -59,12 +78,7 @@ export function ExportDialog({
     setFormat(newFormat);
   };
 
-  if (!open) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-background-card rounded-lg shadow-lg max-w-md w-full mx-4">
-        <div className="p-6">
           <div className="mb-4">
             <h2 className="text-lg font-semibold text-text-primary">Export Map</h2>
             <p className="text-sm text-text-muted mt-1">

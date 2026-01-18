@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Pin } from "@prisma/client";
-import { PinTypeEnum } from "@/types/pin.type";
+import { PinType } from "@/types/pin.type";
 import { eventManager } from "@/lib/event-manager";
 
 export interface ContextMenuState {
@@ -18,7 +18,7 @@ export interface UseMapInteractionsOptions {
   onCreatePin?: (data: {
     gameWorldId: string;
     title: string;
-    pinType: PinTypeEnum;
+    pinType: (typeof PinType)[keyof typeof PinType];
     latitude: number;
     longitude: number;
     layerId?: string;
@@ -47,6 +47,11 @@ export function useMapInteractions(options: UseMapInteractionsOptions) {
 
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const isMountedRef = useRef(true);
+
+  // Debug: Log contextMenu state changes
+  useEffect(() => {
+    console.log("[useMapInteractions] contextMenu state changed:", contextMenu);
+  }, [contextMenu]);
 
   useEffect(() => {
     return () => {
@@ -84,15 +89,33 @@ export function useMapInteractions(options: UseMapInteractionsOptions) {
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
 
+    console.log("[handleContextMenu] === CONTEXT MENU TRIGGERED ===");
+    console.log("[handleContextMenu] Event:", { button: e.button, clientX: e.clientX, clientY: e.clientY });
+
     const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
+    if (!rect) {
+      console.error("[handleContextMenu] No container rect found");
+      return;
+    }
 
     // Get screen coordinates
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
+    console.log("[handleContextMenu] Container coordinates:", { x, y });
+    console.log("[handleContextMenu] Transform:", transform);
+    console.log("[handleContextMenu] Image dimensions:", imageDimensions);
+
     // Guard against division by zero
-    if (transform.scale <= 0) return;
+    if (transform.scale <= 0) {
+      console.error("[handleContextMenu] Invalid scale:", transform.scale);
+      return;
+    }
+
+    if (imageDimensions.width === 0 || imageDimensions.height === 0) {
+      console.error("[handleContextMenu] Invalid image dimensions:", imageDimensions);
+      return;
+    }
 
     // Convert to map coordinates (0-1 range)
     const adjustedX = (x - transform.translateX) / transform.scale;
@@ -101,12 +124,20 @@ export function useMapInteractions(options: UseMapInteractionsOptions) {
     const lng = adjustedX / imageDimensions.width;
     const lat = adjustedY / imageDimensions.height;
 
-    if (!isMountedRef.current) return;
+    console.log("[handleContextMenu] Map coordinates:", { lat, lng });
+    console.log("[handleContextMenu] isMounted:", isMountedRef.current);
+
+    if (!isMountedRef.current) {
+      console.error("[handleContextMenu] Component not mounted");
+      return;
+    }
 
     setContextMenu({
       position: { x: e.clientX, y: e.clientY },
       coordinates: { lat, lng },
     });
+
+    console.log("[handleContextMenu] ✅ Context menu state set");
   }, [containerRef, transform, imageDimensions]);
 
   const closeContextMenu = useCallback(() => {
@@ -126,7 +157,7 @@ export function useMapInteractions(options: UseMapInteractionsOptions) {
     onCreatePin?.({
       gameWorldId: worldId,
       title: `New ${pinType}`,
-      pinType: pinType as PinTypeEnum,
+      pinType: pinType as (typeof PinType)[keyof typeof PinType],
       latitude: lat,
       longitude: lng,
       layerId: undefined, // Will be set by the selected layer from store

@@ -3,7 +3,7 @@
  */
 
 import * as React from "react"
-import { usePinsStore } from "@/stores/use-pins-store"
+import { useUpdatePinServer, useUpdatePin } from "@/stores/use-pins-store"
 import type { Pin } from "@prisma/client"
 
 export function usePopupDescription(pin: Pin) {
@@ -11,8 +11,8 @@ export function usePopupDescription(pin: Pin) {
   const [editedDesc, setEditedDesc] = React.useState(pin.description || "")
   const textareaRef = React.useRef<HTMLTextAreaElement>(null)
 
-  const updatePinServer = usePinsStore((state) => state.updatePinServer)
-  const updatePin = usePinsStore((state) => state.updatePin)
+  const updatePinServer = useUpdatePinServer()
+  const updatePin = useUpdatePin()
 
   // Keep local state in sync with pin prop when not editing
   React.useEffect(() => {
