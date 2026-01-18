@@ -2,102 +2,76 @@
 iteration: 1
 max_iterations: 50
 completion_promise: COMPLETE
-status: COMPLETE
 ---
 
-# Ralph Loop: Interactive Map Platform Fixes & Improvements
+# Ralph Loop: Shadcn UI Migration
 
-## Original Prompt
-
-Explore le projet, analyse le projet, trouve les bugs, les failles de logique, les features à implémenter, les features à corriger(car y'a beaucoup de bugs, genre on peut pas déplacer les pins, les layers, les propriétés), fait une analyse du design et des layout du site. Mets à jour le prd.json avec tout ca et lance le. Ensuite envoie moi le plan de fix, improve, etc..
-
-## Analysis Summary
-
-A comprehensive analysis has identified **18 critical issues** across multiple categories:
-
-### Critical Bugs (Immediate Action Required)
-1. **Pin Drag Position Calculation Error** - Pins jump to incorrect positions during drag
-2. **Layer Position Not Persisted** - Layer movements lost after page refresh
-3. **Layer Lock State Not Propagated** - Drag initializes before lock check
-4. **Drag Race Condition** - Optimistic updates conflict with database sync
-5. **Missing Error Boundaries** - App can crash from single component error
-
-### High-Priority Issues
-6. **Lore Entries UI Missing** - Schema ready, no implementation
-7. **Pin Marker Re-renders** - Performance issues during pan/zoom
-8. **Property Form State Sync** - Sidebar and popup states conflict
-9. **Pin List Centering** - TODO functionality not implemented
-
-### Medium-Priority Issues
-10. **Image Gallery UI Missing** - Schema ready, no implementation
-11. **Pins Store Too Large** - 569 lines, needs splitting
-12. **Error Handling** - Silent failures, no user feedback
-13. **Accessibility** - Missing ARIA labels, keyboard nav
-14. **Type Safety** - Unsafe casts, missing null checks
-15. **Map Export** - No export functionality
-16. **Full-Text Search** - Only basic filtering exists
-
-### Low-Priority Issues
-17. **Loading Patterns** - Inconsistent across app
-18. **Double Popup Rendering** - Redundant render logic
+## Objective
+Migrate all components to use Shadcn UI components for a consistent, Lego-like design system.
 
 ## User Stories
 
-See `.claude/.smite/prd.json` for complete user stories with acceptance criteria.
+### US-001: Audit Current Component Usage
+**Priority**: 1
+**Agent**: smite:smite-explore
 
-## Execution Plan
+Audit all components NOT using Shadcn UI. Create inventory with migration priorities.
 
-Stories are prioritized by severity and dependencies:
+### US-002: Install Missing Shadcn Components
+**Priority**: 2
+**Agent**: builder
 
-### Phase 1: Critical Bug Fixes (US-001 to US-005)
-Fix blocking bugs that prevent core functionality:
-- Fix pin dragging (US-001)
-- Fix layer persistence (US-002)
-- Fix layer lock propagation (US-003)
-- Fix drag race conditions (US-004)
-- Add error boundaries (US-005)
+Install all required Shadcn components via CLI.
 
-### Phase 2: High Priority Features (US-006 to US-010)
-Implement missing critical features and performance fixes:
-- Lore entries UI (US-006)
-- Pin list centering (US-007)
-- Property form sync (US-008)
-- Pin marker optimization (US-009)
-- Image gallery UI (US-010)
+### US-003: Migrate World Components
+**Priority**: 3
+**Agent**: builder
 
-### Phase 3: Architecture Improvements (US-011 to US-016)
-Refactor and improve code quality:
-- Split pins store (US-011)
-- Error handling (US-012)
-- Accessibility (US-013)
-- Loading patterns (US-014)
-- Type safety (US-015)
-- Fix double rendering (US-016)
+Refactor `src/components/world/` to use Shadcn UI.
 
-### Phase 4: Feature Enhancements (US-017 to US-018)
-Add new capabilities:
-- Map export (US-017)
-- Full-text search (US-018)
+### US-004: Migrate Pin Components
+**Priority**: 4
+**Agent**: builder
 
-## Instructions
+Refactor `src/components/pins/` to use Shadcn UI.
 
-Execute user stories in priority order (1-18). For each story:
+### US-005: Migrate Search Components
+**Priority**: 5
+**Agent**: builder
 
-1. Read the story details from PRD
-2. Invoke appropriate agent (builder or simplifier)
-3. Mark story as `passes: true` in PRD after completion
-4. Run tests if applicable
-5. Commit changes with descriptive message
-6. Continue to next story
+Refactor `src/components/search/` to use Shadcn UI.
 
-When ALL stories are complete, output:
+### US-006: Migrate Export Components
+**Priority**: 6
+**Agent**: builder
 
-```
-<promise>COMPLETE</promise>
-```
+Ensure export dialog uses Shadcn UI completely.
 
-## Status
+### US-007: Migrate Auth Components
+**Priority**: 7
+**Agent**: builder
 
-**Iteration**: 1/50
-**Stories Completed**: 0/18
-**Current Story**: US-001 - Fix Pin Drag Position Calculation
+Refactor `src/components/auth/` to use Shadcn UI.
+
+### US-008: Migrate Create Components
+**Priority**: 8
+**Agent**: builder
+
+Refactor `src/components/create/` to use Shadcn UI.
+
+### US-009: Standardize Layout & Theme
+**Priority**: 9
+**Agent**: builder
+
+Update Tailwind config and CSS for Shadcn compatibility.
+
+### US-010: Verify & Test
+**Priority**: 10
+**Agent**: smite:finalize
+
+Test all flows, verify accessibility, update docs.
+
+## Progress
+- Current iteration: 1
+- Active: US-001
+- Status: Starting audit

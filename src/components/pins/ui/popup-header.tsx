@@ -9,6 +9,8 @@ import { pinTypeConfig, type PinType } from "@/constants/pin-types";
 import { getPinEmoji } from "../utils/pin-popup-utils";
 import type { Pin } from "@prisma/client";
 import { useUpdatePinServer, useUpdatePin } from "@/stores/use-pins-store";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -135,7 +137,7 @@ export function PopupHeader({ pin, onClose, onDelete, onTitleChange }: PopupHead
               onClick={(e) => e.stopPropagation()}
               onMouseDown={(e) => e.stopPropagation()}
             >
-              <input
+              <Input
                 ref={inputRef}
                 type="text"
                 value={editedTitle}
@@ -144,30 +146,34 @@ export function PopupHeader({ pin, onClose, onDelete, onTitleChange }: PopupHead
                   setEditedTitle(e.target.value);
                 }}
                 onKeyDown={handleKeyDown}
-                className="flex-1 text-lg font-semibold bg-background-base border-2 border-accent-gold rounded-sm px-2 py-1 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-gold/50"
+                className="flex-1 text-lg font-semibold"
                 onClick={(e) => e.stopPropagation()}
                 onMouseDown={(e) => e.stopPropagation()}
               />
-              <button
+              <Button
+                size="icon"
+                variant="ghost"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleSaveEdit();
                 }}
-                className="p-1 text-green-600 hover:text-green-700 transition-colors flex-shrink-0"
+                className="flex-shrink-0 text-green-600 hover:text-green-700"
                 title="Save"
               >
                 <Check className="h-4 w-4" />
-              </button>
-              <button
+              </Button>
+              <Button
+                size="icon"
+                variant="ghost"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleCancelEdit();
                 }}
-                className="p-1 text-red-600 hover:text-red-700 transition-colors flex-shrink-0"
+                className="flex-shrink-0 text-red-600 hover:text-red-700"
                 title="Cancel"
               >
                 <XIcon className="h-4 w-4" />
-              </button>
+              </Button>
             </div>
           ) : (
             <div
@@ -193,25 +199,29 @@ export function PopupHeader({ pin, onClose, onDelete, onTitleChange }: PopupHead
       <div className="flex items-center gap-1 flex-shrink-0 ml-2">
         {/* Delete Button */}
         {onDelete && (
-          <button
+          <Button
+            size="icon"
+            variant="ghost"
             onClick={() => setShowDeleteDialog(true)}
-            className="text-text-muted hover:text-red-600 transition-colors p-1 rounded hover:bg-red-950/20"
+            className="text-text-muted hover:text-red-600"
             aria-label="Delete pin"
             title="Delete pin"
           >
             <Trash2 className="h-4 w-4" />
-          </button>
+          </Button>
         )}
 
         {/* Close Button */}
-        <button
+        <Button
+          size="icon"
+          variant="ghost"
           onClick={onClose}
-          className="text-text-muted hover:text-accent-gold transition-colors p-1 rounded hover:bg-accent-gold/10"
+          className="text-text-muted hover:text-accent-gold"
           aria-label="Close popup"
           title="Close popup"
         >
           <X className="h-5 w-5" />
-        </button>
+        </Button>
       </div>
 
       {/* Delete Confirmation Dialog */}

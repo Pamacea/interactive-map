@@ -70,46 +70,30 @@ const filterPins = (
   layerIds: string[],
   showVisibleOnly: boolean
 ): Pin[] => {
-  console.log("[filterPins] === FILTER PINS ===");
-  console.log("[filterPins] Input pins:", pins.length);
-  console.log("[filterPins] Filters:", {
-    searchTerm,
-    pinTypeFilters: Object.keys(pinTypeFilters).filter(k => pinTypeFilters[k as keyof typeof pinTypeFilters]),
-    layerIds,
-    showVisibleOnly,
-  });
-
   const filtered = pins.filter((pin) => {
     // Search term filter
     if (searchTerm && !pin.title.toLowerCase().includes(searchTerm.toLowerCase())) {
-      console.log(`[filterPins] ❌ "${pin.title}" filtered out by search term`);
       return false;
     }
 
     // Pin type filter - check if type is explicitly set to false
     if (pinTypeFilters[pin.pinType as (typeof PinType)[keyof typeof PinType]] === false) {
-      console.log(`[filterPins] ❌ "${pin.title}" (${pin.pinType}) filtered out by type filter`);
       return false;
     }
 
     // Layer filter
     if (layerIds.length > 0 && pin.layerId && !layerIds.includes(pin.layerId)) {
-      console.log(`[filterPins] ❌ "${pin.title}" filtered out by layer filter (layer: ${pin.layerId})`);
       return false;
     }
 
     // Visibility filter
     if (showVisibleOnly && !pin.isVisible) {
-      console.log(`[filterPins] ❌ "${pin.title}" filtered out by visibility (isVisible: ${pin.isVisible})`);
       return false;
     }
 
-    console.log(`[filterPins] ✅ "${pin.title}" (${pin.pinType}) passed all filters`);
     return true;
   });
 
-  console.log("[filterPins] Output pins:", filtered.length);
-  console.log("[filterPins] Filtered IDs:", filtered.map(p => p.id));
   return filtered;
 };
 

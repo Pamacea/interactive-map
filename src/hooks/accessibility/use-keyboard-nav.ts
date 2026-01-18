@@ -25,7 +25,7 @@ export interface KeyboardShortcut {
  *   {
  *     key: 'k',
  *     ctrlKey: true,
- *     handler: () => console.log('Cmd+K pressed'),
+ *     handler: () => alert('Cmd+K pressed'),
  *     description: 'Open command palette'
  *   },
  *   {

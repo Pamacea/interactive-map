@@ -48,11 +48,6 @@ export function useMapInteractions(options: UseMapInteractionsOptions) {
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const isMountedRef = useRef(true);
 
-  // Debug: Log contextMenu state changes
-  useEffect(() => {
-    console.log("[useMapInteractions] contextMenu state changed:", contextMenu);
-  }, [contextMenu]);
-
   useEffect(() => {
     return () => {
       isMountedRef.current = false;
@@ -89,12 +84,8 @@ export function useMapInteractions(options: UseMapInteractionsOptions) {
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
 
-    console.log("[handleContextMenu] === CONTEXT MENU TRIGGERED ===");
-    console.log("[handleContextMenu] Event:", { button: e.button, clientX: e.clientX, clientY: e.clientY });
-
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) {
-      console.error("[handleContextMenu] No container rect found");
       return;
     }
 
@@ -102,18 +93,12 @@ export function useMapInteractions(options: UseMapInteractionsOptions) {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    console.log("[handleContextMenu] Container coordinates:", { x, y });
-    console.log("[handleContextMenu] Transform:", transform);
-    console.log("[handleContextMenu] Image dimensions:", imageDimensions);
-
     // Guard against division by zero
     if (transform.scale <= 0) {
-      console.error("[handleContextMenu] Invalid scale:", transform.scale);
       return;
     }
 
     if (imageDimensions.width === 0 || imageDimensions.height === 0) {
-      console.error("[handleContextMenu] Invalid image dimensions:", imageDimensions);
       return;
     }
 
@@ -124,11 +109,7 @@ export function useMapInteractions(options: UseMapInteractionsOptions) {
     const lng = adjustedX / imageDimensions.width;
     const lat = adjustedY / imageDimensions.height;
 
-    console.log("[handleContextMenu] Map coordinates:", { lat, lng });
-    console.log("[handleContextMenu] isMounted:", isMountedRef.current);
-
     if (!isMountedRef.current) {
-      console.error("[handleContextMenu] Component not mounted");
       return;
     }
 
@@ -136,8 +117,6 @@ export function useMapInteractions(options: UseMapInteractionsOptions) {
       position: { x: e.clientX, y: e.clientY },
       coordinates: { lat, lng },
     });
-
-    console.log("[handleContextMenu] ✅ Context menu state set");
   }, [containerRef, transform, imageDimensions]);
 
   const closeContextMenu = useCallback(() => {
@@ -146,7 +125,6 @@ export function useMapInteractions(options: UseMapInteractionsOptions) {
 
   const handleSelectPinType = useCallback((pinType: string, lat: number, lng: number) => {
     if (!worldId) {
-      console.error("[handleSelectPinType] No worldId provided");
       return;
     }
 

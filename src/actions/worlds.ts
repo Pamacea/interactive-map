@@ -29,21 +29,8 @@ export async function createWorld(data: {
   map?: File;
 }): Promise<Result<{ worldId: string }>> {
   return safeAsync(async () => {
-    console.log("[createWorld] === CREATE WORLD START ===");
-    console.log("[createWorld] Input data:", {
-      title: data.title,
-      description: data.description,
-      isPublic: data.isPublic,
-      hasMap: !!data.map,
-    });
-
     // Get authenticated user
     const user = await getAuthenticatedUser();
-    console.log("[createWorld] Authenticated User:", {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-    });
 
     let mapPath: string | undefined;
 
@@ -89,13 +76,6 @@ export async function createWorld(data: {
           },
         },
       },
-    });
-
-    console.log("[createWorld] ✅ World created successfully:", {
-      worldId: world.id,
-      title: world.title,
-      userId: world.userId,
-      membersCount: 1,
     });
 
     revalidatePath("/explore");
@@ -261,8 +241,6 @@ export async function getMyWorlds() {
     // CRITICAL FIX: Use authenticated user, not random first user!
     const user = await getAuthenticatedUser();
 
-    console.log("[getMyWorlds] Fetching worlds for user:", user.id);
-
     const worlds = await prisma.gameWorld.findMany({
       where: {
         OR: [
@@ -298,7 +276,6 @@ export async function getMyWorlds() {
       },
     });
 
-    console.log("[getMyWorlds] Found", worlds.length, "worlds for user", user.id);
     return worlds;
   } catch (error) {
     console.error("[getMyWorlds] Failed to fetch user worlds:", error);

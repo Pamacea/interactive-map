@@ -52,12 +52,8 @@ export function WorldClient({ world, pins, loreEntries, isAuthenticated }: World
       if (result.type === "pin") {
         // Select the pin and center on it
         selectPin(result.id);
-        // TODO: Add functionality to center map on pin coordinates
-        console.log("[WorldClient] Selected pin:", result.id, "at", result.latitude, result.longitude);
       } else {
         // Handle lore entry clicks
-        // TODO: Add functionality to open lore entry in sidebar
-        console.log("[WorldClient] Selected lore entry:", result.id);
       }
     },
     [selectPin]
@@ -93,9 +89,6 @@ export function WorldClient({ world, pins, loreEntries, isAuthenticated }: World
       delay: 3000,
       enabled: true,
       isAuthenticated,
-      onError: (error) => {
-        console.error("[WorldClient] Autosave error:", error);
-      },
     }
   );
 
@@ -103,12 +96,7 @@ export function WorldClient({ world, pins, loreEntries, isAuthenticated }: World
   const hasPins = pins.length > 0;
 
   return (
-    <ErrorBoundary
-      onError={(error, errorInfo) => {
-        console.error("[WorldClient] Component error:", error);
-        console.error("[WorldClient] Component stack:", errorInfo.componentStack);
-      }}
-    >
+    <ErrorBoundary>
       <MapExportProvider>
         <div className="h-screen bg-background-base flex flex-col">
           <WorldNavigation

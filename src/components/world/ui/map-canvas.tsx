@@ -218,19 +218,12 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
       <PlacementIndicator show={isCreatingPin && !contextMenu} />
 
       {contextMenu && worldId && (
-        <>
-          {console.log("[MapCanvas] Rendering PinContextMenu:", {
-            worldId,
-            position: contextMenu.position,
-            coordinates: contextMenu.coordinates,
-          })}
-          <PinContextMenu
-            position={contextMenu.position}
-            coordinates={contextMenu.coordinates}
-            onClose={closeContextMenu}
-            onSelectPinType={handleSelectPinType}
-          />
-        </>
+        <PinContextMenu
+          position={contextMenu.position}
+          coordinates={contextMenu.coordinates}
+          onClose={closeContextMenu}
+          onSelectPinType={handleSelectPinType}
+        />
       )}
     </MapContainer>
     </MapCenterProvider>

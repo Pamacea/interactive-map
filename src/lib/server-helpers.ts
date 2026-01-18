@@ -46,34 +46,12 @@ export async function verifyWorldPermission(worldId: string, userId: string) {
     throw new NotFoundError("World");
   }
 
-  // DEBUG: Log detailed permission check
-  console.log("[verifyWorldPermission] === PERMISSION CHECK START ===");
-  console.log("[verifyWorldPermission] World ID:", worldId);
-  console.log("[verifyWorldPermission] Authenticated User ID:", userId);
-  console.log("[verifyWorldPermission] World Owner ID:", world.userId);
-  console.log("[verifyWorldPermission] Is Owner?:", world.userId === userId);
-
   // World owner always has full permissions
   if (world.userId === userId) {
-    console.log("[verifyWorldPermission] ✅ ACCESS GRANTED: User is world owner");
     return world;
   }
 
   // Check if user is a member with EDITOR or OWNER permissions
-  console.log("[verifyWorldPermission] Checking WorldMember records...");
-
-  // First, check if ANY WorldMember exists for this world
-  const allMembers = await prisma.worldMember.findMany({
-    where: {
-      gameWorldId: worldId,
-    },
-  });
-
-  console.log("[verifyWorldPermission] Total WorldMembers for this world:", allMembers.length);
-  allMembers.forEach((m, i) => {
-    console.log(`[verifyWorldPermission]   Member ${i + 1}: userId=${m.userId}, permission=${m.permission}`);
-  });
-
   const member = await prisma.worldMember.findFirst({
     where: {
       gameWorldId: worldId,
@@ -83,13 +61,9 @@ export async function verifyWorldPermission(worldId: string, userId: string) {
   });
 
   if (!member) {
-    console.log("[verifyWorldPermission] ❌ ACCESS DENIED: No matching WorldMember found");
-    console.log("[verifyWorldPermission] === PERMISSION CHECK END ===\n");
     throw new AuthorizationError("You don't have permission to access this world");
   }
 
-  console.log("[verifyWorldPermission] ✅ ACCESS GRANTED: User has", member.permission, "permission");
-  console.log("[verifyWorldPermission] === PERMISSION CHECK END ===\n");
   return world;
 }
 

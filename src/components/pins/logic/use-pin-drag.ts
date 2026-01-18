@@ -193,7 +193,6 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
 
         // Check if request was cancelled (user dragged again)
         if (abortController.signal.aborted) {
-          console.log("[usePinDrag] Sync request cancelled (user dragged again)");
           return;
         }
 
@@ -202,12 +201,10 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
       } catch (error) {
         // Check if request was aborted (expected when user drags again)
         if (abortController.signal.aborted) {
-          console.log("[usePinDrag] Sync request aborted (superseded by new drag)");
           return;
         }
 
         // Real error occurred: rollback and notify user
-        console.error("[usePinDrag] Failed to save pin position to database:", error);
 
         // Rollback to last known position
         if (onUpdatePin && rollbackPosition) {

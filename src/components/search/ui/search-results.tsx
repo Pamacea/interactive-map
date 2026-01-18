@@ -5,6 +5,8 @@ import { MapPin, BookOpen, Loader2 } from "lucide-react";
 import { SearchHighlight } from "./search-highlight";
 import type { SearchResults, SearchResultItem } from "@/lib/search-types";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 interface SearchResultsProps {
   results: SearchResults | null;
@@ -110,24 +112,26 @@ export function SearchResults({
     <div className="flex flex-col h-full">
       {/* Tabs */}
       <div className="flex border-b border-border-subtle">
-        <button
+        <Button
+          variant="ghost"
           onClick={() => onTabChange("all")}
           className={cn(
-            "flex-1 px-4 py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2",
+            "flex-1 px-4 py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2 rounded-none",
             activeTab === "all"
               ? "text-accent-gold bg-background-elevated border-b-2 border-accent-gold"
               : "text-text-muted hover:text-text-secondary"
           )}
         >
           All
-          <span className="text-xs px-1.5 py-0.5 bg-background-elevated rounded-full">
+          <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
             {results.total}
-          </span>
-        </button>
-        <button
+          </Badge>
+        </Button>
+        <Button
+          variant="ghost"
           onClick={() => onTabChange("pins")}
           className={cn(
-            "flex-1 px-4 py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2",
+            "flex-1 px-4 py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2 rounded-none",
             activeTab === "pins"
               ? "text-accent-gold bg-background-elevated border-b-2 border-accent-gold"
               : "text-text-muted hover:text-text-secondary"
@@ -135,14 +139,15 @@ export function SearchResults({
         >
           <MapPin className="w-4 h-4" />
           Pins
-          <span className="text-xs px-1.5 py-0.5 bg-background-elevated rounded-full">
+          <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
             {pinsCount}
-          </span>
-        </button>
-        <button
+          </Badge>
+        </Button>
+        <Button
+          variant="ghost"
           onClick={() => onTabChange("lore")}
           className={cn(
-            "flex-1 px-4 py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2",
+            "flex-1 px-4 py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2 rounded-none",
             activeTab === "lore"
               ? "text-accent-gold bg-background-elevated border-b-2 border-accent-gold"
               : "text-text-muted hover:text-text-secondary"
@@ -150,10 +155,10 @@ export function SearchResults({
         >
           <BookOpen className="w-4 h-4" />
           Lore
-          <span className="text-xs px-1.5 py-0.5 bg-background-elevated rounded-full">
+          <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
             {loreCount}
-          </span>
-        </button>
+          </Badge>
+        </Button>
       </div>
 
       {/* Results list */}
@@ -204,11 +209,12 @@ function SearchResultItem({ result, query, onClick }: SearchResultItemProps) {
   const isPin = result.type === "pin";
 
   return (
-    <button
+    <Button
+      variant="ghost"
       onClick={handleClick}
-      className="w-full px-4 py-3 text-left hover:bg-background-card-hover transition-colors focus:outline-none focus:bg-background-card-hover"
+      className="w-full justify-start px-4 py-3 text-left hover:bg-background-card-hover focus:bg-background-card-hover rounded-none"
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-3 w-full">
         {/* Icon */}
         <div
           className={cn(
@@ -244,23 +250,23 @@ function SearchResultItem({ result, query, onClick }: SearchResultItemProps) {
           <div className="flex items-center gap-2 mt-2 text-xs text-text-muted">
             {/* Pin: Layer */}
             {isPin && (result as any).layerName && (
-              <span className="px-1.5 py-0.5 bg-background-elevated rounded">
+              <Badge variant="outline" className="px-1.5 py-0.5">
                 {(result as any).layerName}
-              </span>
+              </Badge>
             )}
 
             {/* Pin: Type */}
             {isPin && (
-              <span className="px-1.5 py-0.5 bg-background-elevated rounded capitalize">
+              <Badge variant="outline" className="px-1.5 py-0.5 capitalize">
                 {(result as any).pinType}
-              </span>
+              </Badge>
             )}
 
             {/* Lore: Category */}
             {!isPin && (
-              <span className="px-1.5 py-0.5 bg-background-elevated rounded capitalize">
+              <Badge variant="outline" className="px-1.5 py-0.5 capitalize">
                 {(result as any).category}
-              </span>
+              </Badge>
             )}
 
             {/* Relevance indicator */}
@@ -270,6 +276,6 @@ function SearchResultItem({ result, query, onClick }: SearchResultItemProps) {
           </div>
         </div>
       </div>
-    </button>
+    </Button>
   );
 }

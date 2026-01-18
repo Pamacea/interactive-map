@@ -25,7 +25,6 @@ export function useSidebarState(initialPins: Pin[]) {
 
   // Initialize pins store with initialPins from props
   useEffect(() => {
-    console.log("[useSidebarState] Initializing pins store with", initialPins.length, "pins");
     if (initialPins && initialPins.length > 0) {
       setPins(initialPins as any);
     }

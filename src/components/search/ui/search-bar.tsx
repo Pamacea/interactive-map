@@ -8,6 +8,8 @@ import { useSearchStore } from "@/store/use-search-store";
 import { SearchResults } from "./search-results";
 import { cn } from "@/lib/utils";
 import type { SearchResultItem } from "@/lib/search-types";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 interface SearchBarProps {
   worldId: string;
@@ -202,12 +204,10 @@ export function SearchBar({ worldId, onResultClick, className }: SearchBarProps)
 
   if (!isOpen) {
     return (
-      <button
+      <Button
+        variant="outline"
         onClick={openSearch}
-        className={cn(
-          "flex items-center gap-2 px-4 py-2 bg-background-card border border-border-subtle rounded-md text-sm text-text-muted hover:text-text-secondary hover:border-border-ornate transition-all",
-          className
-        )}
+        className={cn("flex items-center gap-2", className)}
         aria-label="Open search (Ctrl+K)"
       >
         <Search className="w-4 h-4" />
@@ -215,7 +215,7 @@ export function SearchBar({ worldId, onResultClick, className }: SearchBarProps)
         <kbd className="ml-auto px-1.5 py-0.5 bg-background-elevated border border-border-subtle rounded text-xs">
           Ctrl K
         </kbd>
-      </button>
+      </Button>
     );
   }
 
@@ -233,7 +233,7 @@ export function SearchBar({ worldId, onResultClick, className }: SearchBarProps)
         {/* Search input */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-border-subtle">
           <Search className="w-5 h-5 text-text-muted flex-shrink-0" />
-          <input
+          <Input
             ref={inputRef}
             type="text"
             value={query}
@@ -248,13 +248,14 @@ export function SearchBar({ worldId, onResultClick, className }: SearchBarProps)
           {isLoading && <Loader2 className="w-5 h-5 animate-spin text-accent-gold" />}
 
           {query && !isLoading && (
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={handleClear}
-              className="p-1 hover:bg-background-card-hover rounded transition-colors"
               aria-label="Clear search"
             >
-              <X className="w-5 h-5 text-text-muted" />
-            </button>
+              <X className="w-5 h-5" />
+            </Button>
           )}
 
           <kbd className="px-1.5 py-0.5 bg-background-elevated border border-border-subtle rounded text-xs text-text-muted">
@@ -266,17 +267,18 @@ export function SearchBar({ worldId, onResultClick, className }: SearchBarProps)
         {showSuggestions && suggestions.length > 0 && !results && (
           <div className="max-h-64 overflow-y-auto border-b border-border-subtle">
             {suggestions.map((suggestion, index) => (
-              <button
+              <Button
                 key={index}
+                variant="ghost"
                 onClick={() => handleSuggestionClick(suggestion)}
                 className={cn(
-                  "w-full px-4 py-2 text-left text-sm hover:bg-background-card-hover transition-colors",
+                  "w-full justify-start text-left px-4 py-2 hover:bg-background-card-hover",
                   highlightedIndex === index && "bg-background-card-hover"
                 )}
               >
-                <Search className="w-4 h-4 inline mr-2 text-text-muted" />
+                <Search className="w-4 h-4 mr-2 text-text-muted" />
                 {suggestion}
-              </button>
+              </Button>
             ))}
           </div>
         )}

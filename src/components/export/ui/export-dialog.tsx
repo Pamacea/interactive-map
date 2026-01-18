@@ -33,16 +33,6 @@ export function ExportDialog({
   worldData,
   mapElement,
 }: ExportDialogProps) {
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md bg-background-card border-border-subtle">
-        <DialogHeader>
-          <DialogTitle className="text-lg font-semibold text-text-primary">Export Map</DialogTitle>
-          <DialogDescription className="text-sm text-text-muted mt-1">
-            Choose a format to export your world. The exported file will be
-            downloaded to your device.
-          </DialogDescription>
-        </DialogHeader>
   const [format, setFormat] = useState<ExportFormat>("png");
   const [filename, setFilename] = useState(worldTitle);
   const [isExporting, setIsExporting] = useState(false);
@@ -78,14 +68,16 @@ export function ExportDialog({
     setFormat(newFormat);
   };
 
-
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold text-text-primary">Export Map</h2>
-            <p className="text-sm text-text-muted mt-1">
-              Choose a format to export your world. The exported file will be
-              downloaded to your device.
-            </p>
-          </div>
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md bg-background-card border-border-subtle">
+        <DialogHeader>
+          <DialogTitle className="text-lg font-semibold text-text-primary">Export Map</DialogTitle>
+          <DialogDescription className="text-sm text-text-muted mt-1">
+            Choose a format to export your world. The exported file will be
+            downloaded to your device.
+          </DialogDescription>
+        </DialogHeader>
 
           <div className="space-y-6">
             {/* Format Selection */}
@@ -186,9 +178,8 @@ export function ExportDialog({
               </div>
             )}
           </div>
-        </div>
 
-        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-border-subtle">
+        <DialogFooter className="flex items-center justify-end gap-2 px-6 py-4 border-t border-border-subtle">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
@@ -213,8 +204,8 @@ export function ExportDialog({
               </>
             )}
           </Button>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

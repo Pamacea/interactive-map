@@ -240,7 +240,6 @@ export class PerformanceLogger {
  *
  * // After operation
  * const report = compareRenderCounts(before)
- * console.log(report)
  * ```
  */
 export function usePerformanceTracker() {

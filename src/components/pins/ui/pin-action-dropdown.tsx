@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { MapPin, ChevronDown, Plus, Crosshair, FileText, Copy, Lock } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -49,34 +50,18 @@ export function PinActionDropdown({
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <div className="relative">
-          <button
-            disabled={!isLayerSelected}
-            className={`
-              w-full flex items-center justify-center gap-2 px-3 py-2 rounded-sm
-              transition-all duration-200
-              bg-background-elevated border border-border-subtle
-              ${isLayerSelected
-                ? "hover:text-accent-gold hover:border-accent-gold/50 hover:bg-accent-gold/10 cursor-pointer"
-                : "opacity-50 cursor-not-allowed"
-              }
-              ${isOpen ? "border-accent-gold/50 bg-accent-gold/10" : "text-text-secondary"}
-            `}
-            title={isLayerSelected ? "Add Pin" : undefined}
-          >
-            <MapPin className="w-4 h-4" />
-            <span className="text-sm font-medium">Add Pin</span>
-            {isLayerSelected && (
-              <ChevronDown
-                className={`
-                  w-4 h-4 transition-transform duration-200
-                  ${isOpen ? "rotate-180" : ""}
-                `}
-              />
-            )}
-            {!isLayerSelected && <Lock className="w-3 h-3 ml-auto" />}
-          </button>
-        </div>
+        <Button
+          variant="outline"
+          disabled={!isLayerSelected}
+          className="w-full justify-start"
+        >
+          <MapPin className="w-4 h-4" />
+          <span>Add Pin</span>
+          {isLayerSelected && (
+            <ChevronDown className={`w-4 h-4 ml-auto transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+          )}
+          {!isLayerSelected && <Lock className="w-3 h-3 ml-auto" />}
+        </Button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent 
