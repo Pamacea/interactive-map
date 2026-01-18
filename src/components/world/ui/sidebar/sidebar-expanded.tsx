@@ -4,6 +4,7 @@ import { PinsFilterPanel } from "../pins-filter-panel";
 import { PropertiesPanel } from "../properties-panel";
 import { PinActionDropdown, PinList } from "@/components/pins/ui";
 import { LoreList, LoreForm } from "@/components/lore/ui";
+import { ImageGallery } from "@/components/gallery/ui";
 import { useLoreStore } from "@/stores/use-lore-store";
 
 interface SidebarExpandedProps {
@@ -24,6 +25,8 @@ interface SidebarExpandedProps {
   setFiltersOpen: (open: boolean) => void;
   propertiesOpen: boolean;
   setPropertiesOpen: (open: boolean) => void;
+  galleryOpen: boolean;
+  setGalleryOpen: (open: boolean) => void;
 }
 
 export function SidebarExpanded({
@@ -44,6 +47,8 @@ export function SidebarExpanded({
   setFiltersOpen,
   propertiesOpen,
   setPropertiesOpen,
+  galleryOpen,
+  setGalleryOpen,
 }: SidebarExpandedProps) {
   // Lore state
   const isCreatingLore = useLoreStore((state) => state.isCreating);
@@ -99,6 +104,10 @@ export function SidebarExpanded({
 
       <CollapsibleSection title="Properties" isOpen={propertiesOpen} onToggle={() => setPropertiesOpen(!propertiesOpen)}>
         <PropertiesPanel />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="Gallery" isOpen={galleryOpen} onToggle={() => setGalleryOpen(!galleryOpen)}>
+        <ImageGallery worldId={worldId} />
       </CollapsibleSection>
     </div>
   );

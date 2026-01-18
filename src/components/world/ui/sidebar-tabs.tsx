@@ -1,9 +1,9 @@
 "use client";
 
 import { useCallback } from "react";
-import { Layers, Settings2, Filter } from "lucide-react";
+import { Layers, Settings2, Filter, Image } from "lucide-react";
 
-type TabValue = "layers" | "filters" | "properties";
+type TabValue = "layers" | "filters" | "properties" | "gallery";
 
 interface SidebarTabsProps {
   activeTab: TabValue;
@@ -63,6 +63,21 @@ export function SidebarTabs({ activeTab, onTabChange }: SidebarTabsProps) {
       >
         <Settings2 className="w-4 h-4" />
         Properties
+      </button>
+
+      <button
+        onClick={() => handleTabChange("gallery")}
+        className={`
+          flex-1 px-4 py-3 text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2
+          ${
+            activeTab === "gallery"
+              ? "text-accent-gold bg-background-elevated border-b-2 border-accent-gold"
+              : "text-text-muted hover:text-text-secondary"
+          }
+        `}
+      >
+        <Image className="w-4 h-4" />
+        Gallery
       </button>
     </div>
   );

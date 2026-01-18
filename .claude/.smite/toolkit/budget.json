@@ -1,9 +1,9 @@
 {
   "maxTokens": 100000,
-  "usedTokens": 168500,
+  "usedTokens": 205500,
   "warnThreshold": 0.7,
   "criticalThreshold": 0.9,
   "createdAt": "2026-01-18T12:25:34.883Z",
   "lastReset": "2026-01-18T12:25:34.884Z",
-  "lastUpdated": "2026-01-18T13:17:31.477Z"
+  "lastUpdated": "2026-01-18T13:32:15.394Z"
 }

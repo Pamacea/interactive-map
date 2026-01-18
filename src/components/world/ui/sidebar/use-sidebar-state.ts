@@ -10,6 +10,7 @@ export function useSidebarState(initialPins: Pin[]) {
   const [propertiesOpen, setPropertiesOpen] = useState(true);
   const [pinsOpen, setPinsOpen] = useState(true);
   const [loreOpen, setLoreOpen] = useState(true);
+  const [galleryOpen, setGalleryOpen] = useState(true);
 
   const selectedLayerId = useSelectedLayerId();
   const startCreating = usePinsStore((state) => state.startCreating);
@@ -30,13 +31,14 @@ export function useSidebarState(initialPins: Pin[]) {
     startCreating();
   };
 
-  const handleIconClick = (section: "layers" | "filters" | "properties" | "pins" | "lore", onToggle: () => void) => {
+  const handleIconClick = (section: "layers" | "filters" | "properties" | "pins" | "lore" | "gallery", onToggle: () => void) => {
     // Reset all sections
     setLayersOpen(section === "layers");
     setFiltersOpen(section === "filters");
     setPropertiesOpen(section === "properties");
     setPinsOpen(section === "pins");
     setLoreOpen(section === "lore");
+    setGalleryOpen(section === "gallery");
 
     // Expand sidebar if collapsed
     onToggle();
@@ -53,6 +55,8 @@ export function useSidebarState(initialPins: Pin[]) {
     setPinsOpen,
     loreOpen,
     setLoreOpen,
+    galleryOpen,
+    setGalleryOpen,
     isCreating,
     startCreating,
     handleTogglePlaceMode,

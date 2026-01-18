@@ -56,13 +56,15 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(
       setPinsOpen,
       loreOpen,
       setLoreOpen,
+      galleryOpen,
+      setGalleryOpen,
       isCreating,
       startCreating,
       handleTogglePlaceMode,
       handleIconClick: handleIconClickState,
     } = useSidebarState(initialPins);
 
-    const handleIconClick = (section: "layers" | "filters" | "properties" | "pins" | "lore") => {
+    const handleIconClick = (section: "layers" | "filters" | "properties" | "pins" | "lore" | "gallery") => {
       handleIconClickState(section, onToggle);
     };
 
@@ -111,6 +113,8 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(
             setFiltersOpen={setFiltersOpen}
             propertiesOpen={propertiesOpen}
             setPropertiesOpen={setPropertiesOpen}
+            galleryOpen={galleryOpen}
+            setGalleryOpen={setGalleryOpen}
           />
         )}
 
