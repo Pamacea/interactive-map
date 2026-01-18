@@ -148,6 +148,105 @@ npm run test -- --grep "drag"
 - Use optimistic updates for better UX
 - Test with React DevTools Profiler
 
+## Error Handling
+
+The application implements comprehensive error boundaries to gracefully handle errors and prevent the entire app from crashing.
+
+### Error Boundary Architecture
+
+Based on [Next.js 16 Error Handling](https://nextjs.org/docs/app/getting-started/error-handling):
+
+1. **Global Error Boundary** (`app/global-error.tsx`):
+   - Catches errors at the root layout level
+   - Last resort error handler for the entire application
+   - Must define its own `<html>` and `<body>` tags
+
+2. **Route-level Error Boundaries** (`app/world/[id]/error.tsx`):
+   - Catches errors in specific route segments
+   - Provides contextual error messages for world editor
+   - Allows recovery without losing entire app
+
+3. **Component-level Error Boundaries** (`components/ui/error-boundary.tsx`):
+   - Reusable ErrorBoundary component for wrapping critical components
+   - Used in WorldClient, Layout, and other interactive components
+   - Provides granular error isolation
+
+### Usage Examples
+
+**Basic ErrorBoundary:**
+```tsx
+import { ErrorBoundary } from "@/components/ui/error-boundary";
+
+<ErrorBoundary
+  onError={(error, errorInfo) => {
+    console.error("Component error:", error);
+    // Send to error reporting service
+  }}
+>
+  <YourComponent />
+</ErrorBoundary>
+```
+
+**Custom Fallback:**
+```tsx
+<ErrorBoundary
+  fallback={
+    <div className="p-4">
+      <p>Something went wrong loading this section</p>
+      <button onClick={reset}>Try Again</button>
+    </div>
+  }
+>
+  <YourComponent />
+</ErrorBoundary>
+```
+
+### Error Logging
+
+Errors are automatically logged to the console in development. In production, integrate with an error reporting service (Sentry, LogRocket, etc.) by modifying the `logErrorToService` method in the ErrorBoundary components.
+
+### Testing Error Boundaries
+
+Use the `ErrorTestButton` component to verify error boundaries work correctly:
+
+```tsx
+import { ErrorTestButton } from "@/components/ui/error-test-button";
+
+<ErrorTestButton type="render" /> // Tests rendering errors
+```
+
+**IMPORTANT**: Remove ErrorTestButton in production - it's only for development/testing.
+
+### What Errors Are Caught?
+
+- ✅ Rendering errors (component trees, lifecycle methods)
+- ✅ Errors in useEffect and other hooks
+- ❌ Event handler errors (use try/catch manually)
+- ❌ Async errors (use try/catch in async functions)
+- ❌ Server-side errors (use Server Actions error handling)
+
+### Best Practices
+
+1. **Place error boundaries strategically**:
+   - Around third-party components
+   - Around complex interactive features
+   - At route levels (Next.js error.tsx)
+
+2. **Provide helpful fallback UI**:
+   - Clear error messages
+   - Recovery actions (retry, go home)
+   - Context-specific guidance
+
+3. **Log errors appropriately**:
+   - Development: Console logs with details
+   - Production: Error reporting service integration
+   - Include context (component stack, user info)
+
+4. **Don't overuse**:
+   - Error boundaries have performance overhead
+   - Use for critical UI sections, not every component
+   - Prioritize preventing errors over catching them
+
 ## Documentation
 
 - **[REFACTORING.md](REFACTORING.md)** - Pin feature refactoring summary (48% code reduction, 98.92% test coverage)

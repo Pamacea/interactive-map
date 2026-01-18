@@ -103,6 +103,10 @@ export function MarkerContainer({
       ? "cursor-not-allowed"
       : "cursor-pointer";
 
+  // Visual feedback for locked state
+  const lockedOpacity = isLayerLocked ? 0.5 : opacity;
+  const lockedFilter = isLayerLocked ? "grayscale(100%)" : "none";
+
   return (
     <div
       className={`absolute ${cursorClass}`}
@@ -128,9 +132,10 @@ export function MarkerContainer({
           height: `${size}px`,
           backgroundColor: isCustomImage ? "transparent" : color,
           borderRadius: "var(--radius-sm)",
-          opacity,
+          opacity: lockedOpacity,
           boxShadow,
           transform: transformScale,
+          filter: lockedFilter,
         }}
       >
         <MarkerIcon

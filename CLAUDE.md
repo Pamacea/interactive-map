@@ -306,7 +306,24 @@ try {
 // Components
 const { data, error } = useQuery(...)
 if (error) return <Error message={error.message} />
+
+// Error Boundaries (for catching component errors)
+import { ErrorBoundary } from "@/components/ui/error-boundary"
+
+<ErrorBoundary
+  onError={(error, errorInfo) => {
+    console.error("Error:", error);
+    // Send to error reporting service
+  }}
+>
+  <YourComponent />
+</ErrorBoundary>
 ```
+
+**Error Boundary Strategy**:
+- Global: `app/global-error.tsx` - Root level errors
+- Route: `app/world/[id]/error.tsx` - Route-specific errors
+- Component: `<ErrorBoundary>` - Wrapping critical UI sections
 
 ### Styling Conventions
 

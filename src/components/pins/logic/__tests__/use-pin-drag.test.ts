@@ -664,7 +664,7 @@ describe('usePinDrag', () => {
 
       await waitFor(() => {
         expect(consoleSpy).toHaveBeenCalledWith(
-          'Failed to save pin position to database:',
+          '[usePinDrag] Failed to save pin position to database:',
           expect.any(Error)
         )
       })

@@ -31,6 +31,9 @@ export const MapLayerSchema = z.object({
   isVisible: z.boolean().default(true),
   opacity: z.number().default(1.0),
   zIndex: z.number().default(0),
+  offsetX: z.number().default(0),
+  offsetY: z.number().default(0),
+  scale: z.number().default(1.0),
   gameWorldId: z.string().cuid(),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -111,6 +114,9 @@ export const OptimizedWorldLayerSchema = z.object({
   isVisible: z.boolean(),
   opacity: z.number(),
   zIndex: z.number(),
+  offsetX: z.number(),
+  offsetY: z.number(),
+  scale: z.number(),
 });
 
 export const OptimizedWorldSchema = z.object({

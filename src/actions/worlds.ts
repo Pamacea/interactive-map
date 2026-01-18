@@ -105,6 +105,9 @@ export async function getWorldById(id: string): Promise<OptimizedWorld | null> {
           isVisible: true,
           opacity: true,
           zIndex: true,
+          offsetX: true,
+          offsetY: true,
+          scale: true,
         },
         orderBy: { zIndex: "asc" },
       },
@@ -154,6 +157,9 @@ export async function getWorldWithData(id: string) {
           isVisible: true,
           opacity: true,
           zIndex: true,
+          offsetX: true,
+          offsetY: true,
+          scale: true,
         },
         orderBy: { zIndex: "asc" },
       },
@@ -281,6 +287,9 @@ export async function updateWorldState(
       locked: boolean;
       opacity: number;
       zIndex: number;
+      offsetX?: number;
+      offsetY?: number;
+      scale?: number;
     }>;
     grid?: boolean;
     snap?: boolean;
@@ -333,13 +342,18 @@ export async function updateWorldState(
   if (state.layers) {
     // Process each layer: create or update
     for (const layer of state.layers) {
+      // Skip base map layer - it's a virtual layer that doesn't exist in DB
+      if (layer.id === "base-map") {
+        continue;
+      }
+
       // Check if layer exists
       const existingLayer = await prisma.mapLayer.findUnique({
         where: { id: layer.id },
       });
 
       if (existingLayer) {
-        // Update existing layer
+        // Update existing layer with all fields including position and scale
         await prisma.mapLayer.update({
           where: { id: layer.id },
           data: {
@@ -347,6 +361,9 @@ export async function updateWorldState(
             isVisible: layer.visible,
             opacity: layer.opacity,
             zIndex: layer.zIndex,
+            offsetX: layer.offsetX ?? 0,
+            offsetY: layer.offsetY ?? 0,
+            scale: layer.scale ?? 1.0,
           },
         });
       } else {
@@ -358,6 +375,9 @@ export async function updateWorldState(
             isVisible: layer.visible,
             opacity: layer.opacity,
             zIndex: layer.zIndex,
+            offsetX: layer.offsetX ?? 0,
+            offsetY: layer.offsetY ?? 0,
+            scale: layer.scale ?? 1.0,
             gameWorldId: worldId,
           },
         });

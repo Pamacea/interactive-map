@@ -1,0 +1,366 @@
+{
+  "title": "Interactive Map Platform - Bug Fixes & Feature Implementation",
+  "description": "Comprehensive bug fixes, feature implementations, and improvements for the Next.js interactive map platform",
+  "version": "1.0.0",
+  "user_stories": [
+    {
+      "id": "US-001",
+      "title": "Fix Pin Drag Position Calculation",
+      "priority": 1,
+      "agent": "builder:builder",
+      "status": "completed",
+      "passes": true,
+      "description": "Fix critical bug where pin drag position calculation incorrectly uses initialPixelX/initialPixelY as starting points instead of converting from pixels back to coordinates",
+      "acceptance_criteria": [
+        "Pins can be dragged smoothly without jumping to incorrect positions",
+        "Final pin position after drag is accurate and matches cursor position",
+        "Drag works correctly at all zoom levels",
+        "No race conditions between drag start and position updates"
+      ],
+      "files": [
+        "src/components/pins/logic/use-pin-drag.ts:126-127",
+        "src/components/pins/logic/use-pin-drag.ts:160-161"
+      ],
+      "severity": "Critical"
+    },
+    {
+      "id": "US-002",
+      "title": "Implement Layer Position Persistence",
+      "priority": 2,
+      "agent": "builder:builder",
+      "status": "completed",
+      "passes": true,
+      "description": "Layer position changes are currently not saved to database. Need to add server actions for layer position persistence",
+      "acceptance_criteria": [
+        "Layer position changes are persisted to database",
+        "Layer positions are restored correctly after page refresh",
+        "Multiple layers maintain their relative positions",
+        "Z-index updates properly update all layer relationships"
+      ],
+      "files": [
+        "src/components/world/stores/map-store.ts:166-180",
+        "src/components/world/stores/map-store.ts:218-260",
+        "prisma/schema.prisma"
+      ],
+      "severity": "Critical"
+    },
+    {
+      "id": "US-003",
+      "title": "Fix Layer Lock State Propagation",
+      "priority": 3,
+      "agent": "builder:builder",
+      "status": "completed",
+      "passes": true,
+      "description": "Layer lock check occurs after drag initialization starts. Move layer lock check to the beginning of handleMouseDown",
+      "acceptance_criteria": [
+        "Locked layers prevent drag initialization entirely",
+        "Visual feedback indicates layer is locked",
+        "Lock state changes immediately affect all pins on layer",
+        "No drag events are triggered for locked layers"
+      ],
+      "files": [
+        "src/components/pins/ui/pin-marker.tsx:70-71",
+        "src/components/pins/ui/pin-marker.tsx:74-84"
+      ],
+      "severity": "High"
+    },
+    {
+      "id": "US-004",
+      "title": "Fix Drag Race Condition with Database Sync",
+      "priority": 4,
+      "agent": "builder:builder",
+      "status": "completed",
+      "passes": true,
+      "description": "Optimistic update and database sync can create race conditions. Implement proper rollback mechanism or queue system",
+      "acceptance_criteria": [
+        "Rapid dragging doesn't cause position reversion",
+        "Database sync errors trigger proper rollback",
+        "User is notified of sync failures",
+        "Queue system prevents conflicting updates"
+      ],
+      "files": [
+        "src/components/pins/logic/use-pin-drag.ts:163-178"
+      ],
+      "severity": "High"
+    },
+    {
+      "id": "US-005",
+      "title": "Implement Error Boundaries",
+      "priority": 5,
+      "agent": "builder:builder",
+      "status": "completed",
+      "passes": true,
+      "description": "Add React error boundaries to prevent entire app crashes from single component errors",
+      "acceptance_criteria": [
+        "Error boundaries catch component errors gracefully",
+        "User-friendly error messages displayed",
+        "App continues functioning when non-critical components fail",
+        "Error logging for debugging"
+      ],
+      "files": [
+        "app/layout.tsx",
+        "app/world/[id]/page.tsx",
+        "components/world/ui/world-client.tsx"
+      ],
+      "severity": "High"
+    },
+    {
+      "id": "US-006",
+      "title": "Implement Lore Entries UI",
+      "priority": 6,
+      "agent": "builder:builder",
+      "status": "pending",
+      "passes": false,
+      "description": "Schema exists for Lore entries but UI is missing. Implement complete Lore entry management system",
+      "acceptance_criteria": [
+        "Lore entry creation/editing forms with rich text support",
+        "Lore list in sidebar with filtering",
+        "Lore entry positioning on map",
+        "Lore categorization and search functionality",
+        "Link lore entries to pins and locations"
+      ],
+      "files": [
+        "prisma/schema.prisma:185-216",
+        "components/lore/",
+        "actions/lore.ts"
+      ],
+      "severity": "High"
+    },
+    {
+      "id": "US-007",
+      "title": "Fix Pin List Map Centering",
+      "priority": 7,
+      "agent": "builder:builder",
+      "status": "pending",
+      "passes": false,
+      "description": "Pin list missing map centering functionality. Implement map centering through ref to MapCanvas component",
+      "acceptance_criteria": [
+        "Clicking pin in list centers map on pin",
+        "Smooth animation to pin location",
+        "Pin popup opens after centering",
+        "Works at all zoom levels"
+      ],
+      "files": [
+        "src/components/pins/ui/pin-list.tsx:60-66",
+        "src/components/world/ui/map-canvas.tsx"
+      ],
+      "severity": "Medium"
+    },
+    {
+      "id": "US-008",
+      "title": "Implement Image Gallery UI",
+      "priority": 8,
+      "agent": "builder:builder",
+      "status": "pending",
+      "passes": false,
+      "description": "Schema exists for Image Gallery but UI is missing. Implement complete image gallery system",
+      "acceptance_criteria": [
+        "Image upload interface with drag-and-drop",
+        "Gallery organization with folders/albums",
+        "Image association with pins and lore entries",
+        "Image display in popups and sidebars",
+        "Image metadata and captions"
+      ],
+      "files": [
+        "prisma/schema.prisma:222-245",
+        "components/gallery/",
+        "actions/gallery.ts"
+      ],
+      "severity": "Medium"
+    },
+    {
+      "id": "US-009",
+      "title": "Fix Property Form State Synchronization",
+      "priority": 9,
+      "agent": "builder:builder",
+      "status": "pending",
+      "passes": false,
+      "description": "Local form state doesn't sync with external updates properly. Use Zustand for form state management",
+      "acceptance_criteria": [
+        "Form state synchronized across sidebar and popup",
+        "Changes in one location reflect in the other",
+        "Real-time updates for collaborative editing",
+        "No conflicting states between editors"
+      ],
+      "files": [
+        "src/components/world/logic/use-pin-properties-form.ts:24-30"
+      ],
+      "severity": "Medium"
+    },
+    {
+      "id": "US-010",
+      "title": "Optimize Pin Marker Re-renders",
+      "priority": 10,
+      "agent": "simplifier:smite-simplifier",
+      "status": "pending",
+      "passes": false,
+      "description": "Memoization not preventing unnecessary re-renders during pan/zoom operations. Optimize memoization criteria",
+      "acceptance_criteria": [
+        "Pin markers only re-render on critical prop changes",
+        "Smooth performance during pan/zoom",
+        "No lag when multiple pins visible",
+        "Optimized memo comparison function"
+      ],
+      "files": [
+        "src/components/pins/ui/pin-marker.tsx:217-242"
+      ],
+      "severity": "High"
+    },
+    {
+      "id": "US-011",
+      "title": "Split Pins Store into Smaller Stores",
+      "priority": 11,
+      "agent": "simplifier:smite-simplifier",
+      "status": "pending",
+      "passes": false,
+      "description": "Store contains too much state (569 lines). Split into smaller, focused stores for better performance",
+      "acceptance_criteria": [
+        "Pins store split into focused sub-stores",
+        "Each store handles specific concern (UI, data, filters)",
+        "Improved state update performance",
+        "Better testability and maintainability"
+      ],
+      "files": [
+        "src/stores/use-pins-store.ts"
+      ],
+      "severity": "Medium"
+    },
+    {
+      "id": "US-012",
+      "title": "Implement Proper Error Handling",
+      "priority": 12,
+      "agent": "builder:builder",
+      "status": "pending",
+      "passes": false,
+      "description": "API calls don't handle errors properly. Implement comprehensive error handling and user feedback",
+      "acceptance_criteria": [
+        "All API calls have try-catch blocks",
+        "User-friendly error messages displayed",
+        "Error logging for debugging",
+        "Silent failures eliminated"
+      ],
+      "files": [
+        "src/actions/pins.ts",
+        "src/actions/worlds.ts"
+      ],
+      "severity": "Medium"
+    },
+    {
+      "id": "US-013",
+      "title": "Add Accessibility Features",
+      "priority": 13,
+      "agent": "builder:builder",
+      "status": "pending",
+      "passes": false,
+      "description": "Missing ARIA labels, keyboard navigation, and focus management. Add proper accessibility support",
+      "acceptance_criteria": [
+        "ARIA labels on all interactive elements",
+        "Full keyboard navigation support",
+        "Proper focus management",
+        "Screen reader compatibility"
+      ],
+      "files": [
+        "src/components/pins/ui/",
+        "src/components/world/ui/"
+      ],
+      "severity": "Medium"
+    },
+    {
+      "id": "US-014",
+      "title": "Standardize Loading Patterns",
+      "priority": 14,
+      "agent": "simplifier:smite-simplifier",
+      "status": "pending",
+      "passes": false,
+      "description": "Different components use different loading patterns. Standardize loading patterns across the app",
+      "acceptance_criteria": [
+        "Consistent loading UI across all components",
+        "Skeleton screens for async content",
+        "Loading states properly communicated",
+        "No inconsistent loading experiences"
+      ],
+      "files": [
+        "src/components/world/ui/world-client.tsx:60-88"
+      ],
+      "severity": "Low"
+    },
+    {
+      "id": "US-015",
+      "title": "Fix Type Safety Violations",
+      "priority": 15,
+      "agent": "simplifier:smite-simplifier",
+      "status": "pending",
+      "passes": false,
+      "description": "Remove unsafe type casts and add proper null checks",
+      "acceptance_criteria": [
+        "No 'any' type casts",
+        "Proper null checks everywhere",
+        "Type-safe icon components",
+        "No potential runtime crashes from null references"
+      ],
+      "files": [
+        "src/components/pins/ui/pin-list.tsx:56",
+        "src/components/pins/logic/use-pin-position.ts:43-45"
+      ],
+      "severity": "Medium"
+    },
+    {
+      "id": "US-016",
+      "title": "Fix Double Rendering of Selected Pin Popup",
+      "priority": 16,
+      "agent": "simplifier:smite-simplifier",
+      "status": "pending",
+      "passes": false,
+      "description": "Selected pin popup rendered twice with different conditions. Remove redundant rendering logic",
+      "acceptance_criteria": [
+        "Single popup rendering for selected pin",
+        "No duplicate popups visible",
+        "Clean render logic"
+      ],
+      "files": [
+        "src/components/world/ui/map-canvas.tsx:157-174"
+      ],
+      "severity": "Low"
+    },
+    {
+      "id": "US-017",
+      "title": "Implement Map Export Functionality",
+      "priority": 17,
+      "agent": "builder:builder",
+      "status": "pending",
+      "passes": false,
+      "description": "Export maps as PNG, PDF, or JSON",
+      "acceptance_criteria": [
+        "Export to PNG functionality",
+        "Export to PDF functionality",
+        "Export to JSON for backup",
+        "Export options dialog"
+      ],
+      "files": [
+        "components/world/",
+        "actions/export.ts"
+      ],
+      "severity": "Medium"
+    },
+    {
+      "id": "US-018",
+      "title": "Implement Full-Text Search",
+      "priority": 18,
+      "agent": "builder:builder",
+      "status": "pending",
+      "passes": false,
+      "description": "Search across pin titles, descriptions, and properties instead of basic filtering",
+      "acceptance_criteria": [
+        "Full-text search across all pin content",
+        "Search in lore entries",
+        "Search results highlighting",
+        "Advanced search filters"
+      ],
+      "files": [
+        "components/search/",
+        "actions/search.ts"
+      ],
+      "severity": "Medium"
+    }
+  ]
+}

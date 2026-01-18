@@ -1,5 +1,7 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { updatePinPosition } from "@/actions/pins";
+import { pinSyncQueue } from "./pin-sync-queue";
+import { useToast } from "@/hooks/use-toast";
 
 /**
  * Configuration for usePinDrag hook
@@ -81,22 +83,23 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
   const [dragPosition, setDragPosition] = useState<{ x: number; y: number } | null>(null);
   const [hasMovedDuringDrag, setHasMovedDuringDrag] = useState(false);
 
+  // Toast notifications
+  const { showToast } = useToast();
+
   // Refs for drag logic
   const dragStartPos = useRef<{ x: number; y: number } | null>(null);
+  const dragOffset = useRef<{ x: number; y: number } | null>(null);
   const isDraggingRef = useRef(false);
   const dragPositionRef = useRef<{ x: number; y: number } | null>(null);
   const hasMovedDuringDragRef = useRef(false);
-
-  // Convert percentage coordinates to pixels
-  const initialPixelX = longitude * mapWidth;
-  const initialPixelY = latitude * mapHeight;
+  const lastKnownPositionRef = useRef<{ latitude: number; longitude: number } | null>(null);
 
   /**
    * Mouse move handler - attached to window during drag
    */
   const handleMouseMove = useCallback((e: MouseEvent) => {
     // Initialize drag on first significant movement
-    if (!dragStartPos.current) {
+    if (!dragStartPos.current || !dragOffset.current) {
       return;
     }
 
@@ -122,9 +125,9 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
       return;
     }
 
-    // Calculate new position (start from pin's original position)
-    let newX = initialPixelX + deltaX;
-    let newY = initialPixelY + deltaY;
+    // Calculate new position: current mouse position minus offset (both adjusted for scale)
+    let newX = (e.clientX / scale) - dragOffset.current.x;
+    let newY = (e.clientY / scale) - dragOffset.current.y;
 
     // Clamp to map boundaries
     newX = Math.max(0, Math.min(mapWidth, newX));
@@ -134,7 +137,7 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
     const newPosition = { x: newX, y: newY };
     dragPositionRef.current = newPosition;
     setDragPosition(newPosition);
-  }, [scale, mapWidth, mapHeight, initialPixelX, initialPixelY]);
+  }, [scale, mapWidth, mapHeight]);
 
   /**
    * Mouse up handler - attached to window during drag
@@ -147,6 +150,7 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
     // Only proceed with drag logic if we were actually dragging
     if (!isDraggingRef.current) {
       dragStartPos.current = null;
+      dragOffset.current = null;
       return;
     }
 
@@ -160,6 +164,13 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
       const newLatitude = Math.max(0, Math.min(1, currentDragPosition.y / mapHeight));
       const newLongitude = Math.max(0, Math.min(1, currentDragPosition.x / mapWidth));
 
+      // Store position for potential rollback
+      const rollbackPosition = lastKnownPositionRef.current || { latitude, longitude };
+
+      // CRITICAL FIX: Cancel any pending sync request for this pin
+      // This prevents race conditions when dragging rapidly
+      pinSyncQueue.cancelPendingRequest(pinId);
+
       // CRITICAL FIX: Update Zustand store FIRST (optimistic update)
       // This prevents race condition where TanStack Query refetch overwrites new position
       if (onUpdatePin) {
@@ -169,13 +180,50 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
         });
       }
 
-      // Then update database in background (fire-and-forget)
+      // Store the new position as last known
+      lastKnownPositionRef.current = { latitude: newLatitude, longitude: newLongitude };
+
+      // Register new sync request and get abort controller
+      const abortController = pinSyncQueue.registerRequest(pinId, rollbackPosition);
+
+      // Then update database in background
       // Zustand is now source of truth, DB sync happens asynchronously
-      updatePinPosition(pinId, newLatitude, newLongitude).catch((error) => {
-        console.error("Failed to save pin position to database:", error);
-        // Note: We could rollback here, but for UX we keep the optimistic update
-        // The next page refresh will sync with DB state
-      });
+      try {
+        await updatePinPosition(pinId, newLatitude, newLongitude);
+
+        // Check if request was cancelled (user dragged again)
+        if (abortController.signal.aborted) {
+          console.log("[usePinDrag] Sync request cancelled (user dragged again)");
+          return;
+        }
+
+        // Success: mark request as completed
+        pinSyncQueue.markCompleted(pinId);
+      } catch (error) {
+        // Check if request was aborted (expected when user drags again)
+        if (abortController.signal.aborted) {
+          console.log("[usePinDrag] Sync request aborted (superseded by new drag)");
+          return;
+        }
+
+        // Real error occurred: rollback and notify user
+        console.error("[usePinDrag] Failed to save pin position to database:", error);
+
+        // Rollback to last known position
+        if (onUpdatePin && rollbackPosition) {
+          onUpdatePin(pinId, rollbackPosition);
+          lastKnownPositionRef.current = rollbackPosition;
+        }
+
+        // Show error toast to user
+        showToast(
+          "Failed to save pin position. Please check your connection.",
+          "error"
+        );
+
+        // Mark as completed (failed)
+        pinSyncQueue.markCompleted(pinId);
+      }
 
       // Clear drag position
       dragPositionRef.current = null;
@@ -183,9 +231,10 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
     }
 
     dragStartPos.current = null;
+    dragOffset.current = null;
     // Note: Don't reset hasMovedDuringDrag here, as handleClick needs it
     // It will be reset on next mouseDown
-  }, [mapWidth, mapHeight, pinId, onUpdatePin, handleMouseMove]);
+  }, [mapWidth, mapHeight, pinId, latitude, longitude, onUpdatePin, handleMouseMove, showToast]);
 
   /**
    * Mouse down handler - attach to pin element
@@ -204,10 +253,21 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
     e.preventDefault();
     e.stopPropagation();
 
+    // Convert pin's current position to pixels (accounting for scale)
+    const pinPixelX = longitude * mapWidth;
+    const pinPixelY = latitude * mapHeight;
+
     // Store initial mouse position
     dragStartPos.current = {
       x: e.clientX,
       y: e.clientY,
+    };
+
+    // Calculate offset: distance from mouse to pin (in scaled coordinates)
+    // This ensures the pin doesn't "jump" to the mouse position on drag start
+    dragOffset.current = {
+      x: (e.clientX / scale) - pinPixelX,
+      y: (e.clientY / scale) - pinPixelY,
     };
 
     // DON'T set isDragging yet - wait for actual mouse movement
@@ -223,7 +283,14 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
     // Add window-level event listeners for drag continuation
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseup", handleMouseUp);
-  }, [isLocked, pinId, onSelectPin, handleMouseMove, handleMouseUp]);
+  }, [isLocked, pinId, latitude, longitude, mapWidth, mapHeight, scale, onSelectPin, handleMouseMove, handleMouseUp]);
+
+  // Cleanup: Cancel any pending sync requests on unmount
+  useEffect(() => {
+    return () => {
+      pinSyncQueue.cancelPendingRequest(pinId);
+    };
+  }, [pinId]);
 
   return {
     isDragging,

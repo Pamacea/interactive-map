@@ -27,9 +27,9 @@ export function useWorldInitialization(worldLayers: OptimizedWorldLayer[] | null
       locked: false,
       opacity: layer.opacity,
       zIndex: layer.zIndex,
-      scale: 1.0,
-      offsetX: 0,
-      offsetY: 0,
+      scale: layer.scale ?? 1.0,
+      offsetX: layer.offsetX ?? 0,
+      offsetY: layer.offsetY ?? 0,
     }));
   }, [worldLayers]);
 

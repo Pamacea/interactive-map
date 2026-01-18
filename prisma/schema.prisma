@@ -123,6 +123,9 @@ model MapLayer {
   isVisible   Boolean   @default(true)
   opacity     Float     @default(1.0)
   zIndex      Int       @default(0)
+  offsetX     Float     @default(0) // Pixel offset from top-left (X axis)
+  offsetY     Float     @default(0) // Pixel offset from top-left (Y axis)
+  scale       Float     @default(1.0) // Visual scale of layer content (0.5 - 2.0)
   gameWorldId String
   gameWorld   GameWorld @relation(fields: [gameWorldId], references: [id], onDelete: Cascade)
   pins        Pin[]

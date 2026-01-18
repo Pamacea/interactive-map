@@ -12,6 +12,7 @@ import { useWorldInitialization } from "@/components/world/logic/use-world-initi
 import { useAutosavePreparation } from "@/components/world/logic/use-autosave-preparation";
 import { useAutosave } from "@/hooks/use-autosave";
 import { updateWorldState } from "@/actions/worlds";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 import type { OptimizedWorld } from "@/types/world.type";
 import type { Pin } from "@/types/pin.type";
 
@@ -57,32 +58,55 @@ export function WorldClient({ world, pins, isAuthenticated }: WorldClientProps) 
   const hasPins = pins.length > 0;
 
   return (
-    <div className="h-screen bg-background-base flex flex-col">
-      <WorldNavigation />
-      <div className="flex flex-1 overflow-hidden">
-        <Suspense fallback={<SidebarSkeleton />}>
-          <Sidebar
-            ref={sidebarRef}
-            slug={world.title}
-            worldId={world.id}
-            width={width}
-            isCollapsed={isCollapsed}
-            isResizing={isResizing}
-            onToggle={toggleCollapse}
-            onResizeStart={startResize}
-            worldLayers={world.layers}
-            showPinsSection={hasLayers}
-            mapImage={world.map}
-            initialPins={pins}
-          />
-        </Suspense>
-        <main className="flex-1 relative flex flex-col">
-          <Suspense fallback={<MapSkeleton />}>
-            <MapCanvas mapImage={world.map} worldId={world.id} />
-          </Suspense>
-          <AutosaveIndicator status={status} />
-        </main>
+    <ErrorBoundary
+      onError={(error, errorInfo) => {
+        console.error("[WorldClient] Component error:", error);
+        console.error("[WorldClient] Component stack:", errorInfo.componentStack);
+      }}
+    >
+      <div className="h-screen bg-background-base flex flex-col">
+        <WorldNavigation />
+        <div className="flex flex-1 overflow-hidden">
+          <ErrorBoundary
+            fallback={
+              <div className="w-64 bg-background-card border-r border-border-subtle p-4 flex items-center justify-center">
+                <p className="text-sm text-text-secondary">Sidebar failed to load</p>
+              </div>
+            }
+          >
+            <Suspense fallback={<SidebarSkeleton />}>
+              <Sidebar
+                ref={sidebarRef}
+                slug={world.title}
+                worldId={world.id}
+                width={width}
+                isCollapsed={isCollapsed}
+                isResizing={isResizing}
+                onToggle={toggleCollapse}
+                onResizeStart={startResize}
+                worldLayers={world.layers}
+                showPinsSection={hasLayers}
+                mapImage={world.map}
+                initialPins={pins}
+              />
+            </Suspense>
+          </ErrorBoundary>
+          <main className="flex-1 relative flex flex-col">
+            <ErrorBoundary
+              fallback={
+                <div className="flex-1 flex items-center justify-center bg-background-base">
+                  <p className="text-text-secondary">Map canvas failed to load</p>
+                </div>
+              }
+            >
+              <Suspense fallback={<MapSkeleton />}>
+                <MapCanvas mapImage={world.map} worldId={world.id} />
+              </Suspense>
+            </ErrorBoundary>
+            <AutosaveIndicator status={status} />
+          </main>
+        </div>
       </div>
-    </div>
+    </ErrorBoundary>
   );
 }
