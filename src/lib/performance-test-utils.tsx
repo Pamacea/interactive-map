@@ -28,11 +28,12 @@ import { useEffect, useRef, useState } from 'react';
  */
 export function useRenderCount(componentName: string): number {
   const rendersRef = useRef(0);
-  const [, forceUpdate] = useState({});
-
-  rendersRef.current += 1;
+  const [renderCount, setRenderCount] = useState(0);
 
   useEffect(() => {
+    rendersRef.current += 1;
+    setRenderCount(rendersRef.current);
+
     if (process.env.NODE_ENV === 'development') {
       console.log(
         `[Performance] ${componentName} rendered (count: ${rendersRef.current})`
@@ -40,7 +41,7 @@ export function useRenderCount(componentName: string): number {
     }
   });
 
-  return rendersRef.current;
+  return renderCount;
 }
 
 /**
@@ -93,23 +94,27 @@ export function PerformanceMonitor({
   logThreshold?: number;
 }) {
   const startTimeRef = useRef<number>(0);
+  const [, setRenderKey] = useState(0);
 
-  if (process.env.NODE_ENV === 'development') {
-    startTimeRef.current = performance.now();
-  }
-
+  // Set start time using useEffect to avoid ref access during render
   useEffect(() => {
-    if (process.env.NODE_ENV !== 'development') return;
-
-    const endTime = performance.now();
-    const renderTime = endTime - startTimeRef.current;
-
-    if (renderTime > logThreshold) {
-      console.warn(
-        `[Performance] Slow render detected in ${name}: ${renderTime.toFixed(2)}ms (threshold: ${logThreshold}ms)`
-      );
+    if (process.env.NODE_ENV === 'development') {
+      startTimeRef.current = performance.now();
     }
-  });
+
+    return () => {
+      if (process.env.NODE_ENV !== 'development') return;
+
+      const endTime = performance.now();
+      const renderTime = endTime - startTimeRef.current;
+
+      if (renderTime > logThreshold) {
+        console.warn(
+          `[Performance] Slow render detected in ${name}: ${renderTime.toFixed(2)}ms (threshold: ${logThreshold}ms)`
+        );
+      }
+    };
+  }, [name, logThreshold]);
 
   return <>{children}</>;
 }
@@ -121,21 +126,27 @@ export function PerformanceMonitor({
 export function FPSCounter() {
   const [fps, setFps] = useState(60);
   const framesRef = useRef(0);
-  const lastTimeRef = useRef(performance.now());
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     if (process.env.NODE_ENV !== 'development') return;
 
+    // Initialize lastTime in useEffect to avoid impure call during render
+    if (!isInitialized) {
+      setIsInitialized(true);
+    }
+
     let rafId: number;
+    let lastTime = performance.now();
 
     function updateFPS() {
       const now = performance.now();
       framesRef.current++;
 
-      if (now >= lastTimeRef.current + 1000) {
-        setFps(Math.round((framesRef.current * 1000) / (now - lastTimeRef.current)));
+      if (now >= lastTime + 1000) {
+        setFps(Math.round((framesRef.current * 1000) / (now - lastTime)));
         framesRef.current = 0;
-        lastTimeRef.current = now;
+        lastTime = now;
       }
 
       rafId = requestAnimationFrame(updateFPS);
@@ -144,7 +155,7 @@ export function FPSCounter() {
     rafId = requestAnimationFrame(updateFPS);
 
     return () => cancelAnimationFrame(rafId);
-  }, []);
+  }, [isInitialized]);
 
   if (process.env.NODE_ENV !== 'development') {
     return null;

@@ -1,5 +1,6 @@
 import { memo } from "react";
-import { getLucideIcon } from "@/lib/icon-utils";
+import * as LucideIcons from "lucide-react";
+import { isLucideIconName } from "@/lib/icon-utils";
 
 interface MarkerIconProps {
   /** Icon name (Lucide icon or custom image path) */
@@ -10,6 +11,31 @@ interface MarkerIconProps {
   iconSize: number;
   /** Whether this is a custom uploaded image */
   isCustomImage: boolean;
+}
+
+interface LucideIconWrapperProps {
+  iconName: string;
+  width: number;
+  height: number;
+  style: React.CSSProperties;
+}
+
+/**
+ * Wrapper component to render Lucide icons
+ * Declared outside render to satisfy react-hooks/static-components rule
+ */
+function LucideIconWrapper({ iconName, width, height, style }: LucideIconWrapperProps) {
+  if (!isLucideIconName(iconName)) {
+    return <LucideIcons.MapPin width={width} height={height} style={style} />;
+  }
+
+  const IconComponent = LucideIcons[iconName] as React.ComponentType<{
+    width?: number;
+    height?: number;
+    style?: React.CSSProperties;
+  }>;
+
+  return <IconComponent width={width} height={height} style={style} />;
 }
 
 /**
@@ -42,14 +68,6 @@ export const MarkerIcon = memo(function MarkerIcon({ iconName, title, iconSize, 
     );
   }
 
-  // Get Lucide icon component for non-custom icons (type-safe)
-  const IconComponent = getLucideIcon(iconName);
-
-  return (
-    <IconComponent
-      width={iconSize}
-      height={iconSize}
-      style={{ color: "white", opacity: 0.9 }}
-    />
-  );
+  // Render Lucide icon using wrapper component
+  return <LucideIconWrapper iconName={iconName} width={iconSize} height={iconSize} style={{ color: "white", opacity: 0.9 }} />;
 });

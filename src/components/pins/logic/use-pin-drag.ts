@@ -155,19 +155,22 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
    * Mouse up handler - attached to window during drag
    */
   const handleMouseUp = useCallback(async (e: MouseEvent) => {
-    // Always clean up window listeners, even if we never started dragging
-    window.removeEventListener("mousemove", handleMouseMove);
-    window.removeEventListener("mouseup", handleMouseUp);
-
     // Only proceed with drag logic if we were actually dragging
     if (!isDraggingRef.current) {
       dragStartPos.current = null;
       dragOffset.current = null;
+      // Clean up listeners even if we didn't drag
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
       return;
     }
 
     isDraggingRef.current = false;
     setIsDragging(false);
+
+    // Clean up listeners after drag completes
+    window.removeEventListener("mousemove", handleMouseMove);
+    window.removeEventListener("mouseup", handleMouseUp);
 
     // If we have a drag position and actually moved, save to database
     const currentDragPosition = dragPositionRef.current;
@@ -243,7 +246,7 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
     dragOffset.current = null;
     // Note: Don't reset hasMovedDuringDrag here, as handleClick needs it
     // It will be reset on next mouseDown
-  }, [mapWidth, mapHeight, pinId, latitude, longitude, onUpdatePin, handleMouseMove, showToast]);
+  }, [mapWidth, mapHeight, pinId, latitude, longitude, onUpdatePin, showToast]);
 
   /**
    * Mouse down handler - attach to pin element
@@ -298,8 +301,11 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
   useEffect(() => {
     return () => {
       pinSyncQueue.cancelPendingRequest(pinId);
+      // Clean up any dangling event listeners
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [pinId]);
+  }, [pinId, handleMouseMove, handleMouseUp]);
 
   return {
     isDragging,

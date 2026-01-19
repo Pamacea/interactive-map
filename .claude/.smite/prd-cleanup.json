@@ -1,0 +1,138 @@
+{
+  "title": "Technical Debt Cleanup - Achieve 100% Quality Score",
+  "version": "1.0.0",
+  "created": "2025-01-19",
+  "objective": "Clean up remaining technical debt to achieve 100% quality score from current 95.4%",
+  "scope": {
+    "includes": [
+      "Refactor 9 components >200 lines",
+      "Fix 47 ESLint errors (cosmetic issues)",
+      "Add missing type definitions",
+      "Create quality monitoring script"
+    ],
+    "excludes": [
+      "Feature additions",
+      "API changes",
+      "Database modifications"
+    ]
+  },
+  "principles": [
+    "Maintain backward compatibility",
+    "Follow ui/logic/methods pattern",
+    "All changes must pass tests",
+    "Improve code quality without breaking functionality"
+  ],
+  "user_stories": [
+    {
+      "id": "US-001",
+      "title": "Refactor 9 Components Exceeding 200 Lines",
+      "priority": 1,
+      "severity": "HIGH",
+      "agent": "smite:smite-simplifier",
+      "status": "pending",
+      "passes": false,
+      "description": "Refactor 9 components that exceed 200 lines to improve maintainability and follow quality standards",
+      "acceptance_criteria": [
+        "All components <200 lines",
+        "Functionality preserved",
+        "Tests still pass",
+        "Follow ui/logic/methods pattern"
+      ],
+      "files": [
+        "src/components/search/ui/search-results.tsx (281 lines)",
+        "src/components/lore/ui/lore-form.tsx (269 lines)",
+        "src/components/pins/ui/popup-header.tsx (255 lines)",
+        "src/components/pins/ui/pin-popup.tsx (241 lines)",
+        "src/components/home/ui/word-particle.tsx (238 lines)",
+        "src/components/pins/ui/popup-content.tsx (234 lines)",
+        "src/components/pins/ui/icon-picker.tsx (228 lines)",
+        "src/components/pins/ui/pin-marker/marker-container.tsx (217 lines)",
+        "src/components/world/ui/pin-properties/icon-selector.tsx (209 lines)"
+      ],
+      "dependencies": [],
+      "tech": "typescript, react",
+      "notes": "Focus on extracting sub-components and hooks"
+    },
+    {
+      "id": "US-002",
+      "title": "Fix 47 ESLint Errors",
+      "priority": 2,
+      "severity": "MEDIUM",
+      "agent": "smite:smite-simplifier",
+      "status": "pending",
+      "passes": false,
+      "description": "Fix 47 ESLint errors including unescaped entities, React purity violations, unused variables, and banned ts-comments",
+      "acceptance_criteria": [
+        "Zero ESLint errors",
+        "Zero unescaped entities in JSX",
+        "Zero React purity violations",
+        "Zero unused variables",
+        "All tests still pass"
+      ],
+      "files": [
+        "Components with ESLint errors (full scan needed)"
+      ],
+      "dependencies": [],
+      "tech": "eslint, typescript",
+      "notes": "Mostly cosmetic fixes"
+    },
+    {
+      "id": "US-003",
+      "title": "Add Missing Type Definition Packages",
+      "priority": 3,
+      "severity": "LOW",
+      "agent": "smite:smite-builder",
+      "status": "pending",
+      "passes": false,
+      "description": "Add @types/* packages for cleaner TypeScript output and eliminate library type warnings",
+      "acceptance_criteria": [
+        "All @types packages installed",
+        "TypeScript output shows zero type warnings",
+        "package.json updated"
+      ],
+      "files": [
+        "package.json"
+      ],
+      "dependencies": [],
+      "tech": "npm, typescript",
+      "notes": "Optional - improves developer experience"
+    },
+    {
+      "id": "US-004",
+      "title": "Create Quality Monitoring Script",
+      "priority": 3,
+      "severity": "LOW",
+      "agent": "smite:smite-builder",
+      "status": "pending",
+      "passes": false,
+      "description": "Create automated quality monitoring script that can be run weekly to track code quality metrics",
+      "acceptance_criteria": [
+        "Script created in scripts/ directory",
+        "Runs all quality checks (typecheck, lint, test)",
+        "Generates quality report",
+        "Can be scheduled with cron/npm scripts"
+      ],
+      "files": [
+        "scripts/quality-check.sh"
+      ],
+      "dependencies": [],
+      "tech": "bash, node",
+      "notes": "Enables ongoing quality monitoring"
+    }
+  ],
+  "definition_of_done": [
+    "All components <200 lines",
+    "Zero ESLint errors",
+    "TypeScript output clean",
+    "All tests passing",
+    "Quality monitoring script created",
+    "Quality score 100%"
+  ],
+  "testing_strategy": {
+    "unit_tests": "Run full test suite after each user story",
+    "type_check": "npx tsc --noEmit after changes",
+    "lint_check": "npm run lint after US-002",
+    "regression_testing": "Ensure no existing functionality broken"
+  },
+  "rollback_plan": "Git commits after each user story for easy rollback"
+}

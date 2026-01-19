@@ -1,7 +1,8 @@
 "use client";
 
 import { memo } from "react";
-import { getLucideIcon } from "@/lib/icon-utils";
+import * as LucideIcons from "lucide-react";
+import { isLucideIconName } from "@/lib/icon-utils";
 
 export interface PinIconProps {
   /** Icon name (Lucide icon name or custom image path starting with "/") */
@@ -14,6 +15,31 @@ export interface PinIconProps {
   opacity?: number;
   /** Alt text for custom images */
   alt?: string;
+}
+
+interface LucideIconWrapperProps {
+  iconName: string;
+  width: number;
+  height: number;
+  style: React.CSSProperties;
+}
+
+/**
+ * Wrapper component to render Lucide icons
+ * Declared outside render to satisfy react-hooks/static-components rule
+ */
+function LucideIconWrapper({ iconName, width, height, style }: LucideIconWrapperProps) {
+  if (!isLucideIconName(iconName)) {
+    return <LucideIcons.MapPin width={width} height={height} style={style} />;
+  }
+
+  const IconComponent = LucideIcons[iconName] as React.ComponentType<{
+    width?: number;
+    height?: number;
+    style?: React.CSSProperties;
+  }>;
+
+  return <IconComponent width={width} height={height} style={style} />;
 }
 
 /**
@@ -39,7 +65,7 @@ export function PinIcon({
   // Clamp size to constraints (60% of pin size, min 12px, max 32px)
   const clampedSize = Math.max(12, Math.min(32, size));
 
-  // Check if icon is a custom uploaded image (starts with /)
+  // Render custom image
   if (isCustomImage) {
     return (
       <img
@@ -51,16 +77,8 @@ export function PinIcon({
     );
   }
 
-  // Get Lucide icon component for non-custom icons (type-safe)
-  const IconComponent = getLucideIcon(iconName);
-
-  return (
-    <IconComponent
-      width={clampedSize}
-      height={clampedSize}
-      style={{ color, opacity }}
-    />
-  );
+  // Render Lucide icon using wrapper component
+  return <LucideIconWrapper iconName={iconName} width={clampedSize} height={clampedSize} style={{ color, opacity }} />;
 }
 
 // Memoize to prevent unnecessary re-renders

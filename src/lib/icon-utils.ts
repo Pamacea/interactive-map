@@ -32,7 +32,7 @@ export function getLucideIcon(iconName: string): LucideIcon {
   }
 
   // Fallback to MapPin
-  // @ts-ignore - MapPin exists in lucide-react
+  // @ts-expect-error - MapPin exists in lucide-react
   return LucideIcons.MapPin as LucideIcon;
 }
 

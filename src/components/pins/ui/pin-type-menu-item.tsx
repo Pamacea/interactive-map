@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
-import { getIconComponent } from "../utils/pin-icons";
+import * as LucideIcons from "lucide-react";
+import { isLucideIconName } from "@/lib/icon-utils";
 
 interface PinTypeConfig {
   icon: string;
@@ -14,13 +15,34 @@ interface PinTypeMenuItemProps {
   onSelect: (type: string) => void;
 }
 
+interface IconWrapperProps {
+  iconName: string;
+  className?: string;
+  style?: React.CSSProperties;
+}
+
+/**
+ * Wrapper component to render Lucide icons
+ * Declared outside render to satisfy react-hooks/static-components rule
+ */
+function IconWrapper({ iconName, className, style }: IconWrapperProps) {
+  if (!isLucideIconName(iconName)) {
+    return <LucideIcons.MapPin className={className} style={style} />;
+  }
+
+  const IconComponent = LucideIcons[iconName] as React.ComponentType<{
+    className?: string;
+    style?: React.CSSProperties;
+  }>;
+
+  return <IconComponent className={className} style={style} />;
+}
+
 export function PinTypeMenuItem({
   type,
   config,
   onSelect,
 }: PinTypeMenuItemProps) {
-  const IconComponent = getIconComponent(config.icon);
-
   return (
     <button
       onClick={() => onSelect(type)}
@@ -43,7 +65,8 @@ export function PinTypeMenuItem({
         }}
         aria-hidden="true"
       >
-        <IconComponent
+        <IconWrapper
+          iconName={config.icon}
           className="h-4 w-4"
           style={{ color: config.color }}
         />

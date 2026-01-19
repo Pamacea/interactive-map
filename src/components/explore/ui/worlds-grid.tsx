@@ -60,7 +60,7 @@ function EmptyStateTitle() {
 function EmptyStateDescription() {
   return (
     <p className="text-xl text-text-secondary">
-      Try adjusting your search or filters to find what you're looking for.
+      Try adjusting your search or filters to find what you&apos;re looking for.
     </p>
   );
 }

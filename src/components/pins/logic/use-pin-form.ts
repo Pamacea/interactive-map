@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { z } from "zod";
 import { PinType, PIN_TYPE_COLORS, PIN_TYPE_SIZES, type PinCreateInput, type PinUpdateInput } from "@/types/pin.type";
 import { CreatePinSchema, UpdatePinSchema } from "./pin-schemas";
@@ -25,7 +25,8 @@ export interface UsePinFormOptions {
 }
 
 export function usePinForm({ initialData, mode, worldId, pinId }: UsePinFormOptions) {
-  const [formData, setFormData] = useState<PinFormData>({
+  // Use a key to reset form when mode or initialData changes significantly
+  const [formData, setFormData] = useState<PinFormData>(() => ({
     title: initialData?.title || "",
     description: initialData?.description || "",
     pinType: initialData?.pinType || PinType.CUSTOM,
@@ -37,42 +38,32 @@ export function usePinForm({ initialData, mode, worldId, pinId }: UsePinFormOpti
     properties: initialData?.properties || "",
     icon: initialData?.icon || "",
     layerId: initialData?.layerId || "",
-  });
+  }));
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Auto-sync pin type color and size
-  useEffect(() => {
-    if (formData.pinType && !initialData?.color) {
-      setFormData((prev) => ({
-        ...prev,
-        color: PIN_TYPE_COLORS[formData.pinType],
-        size: PIN_TYPE_SIZES[formData.pinType],
-      }));
-    }
-  }, [formData.pinType, initialData?.color]);
-
-  // Sync initialData changes (for edit mode)
-  useEffect(() => {
-    if (mode === "edit" && initialData) {
-      setFormData((prev) => ({
-        ...prev,
-        ...initialData,
-      }));
-    }
-  }, [mode, initialData]);
-
   const updateField = useCallback((field: keyof PinFormData, value: string | number | boolean) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormData((prev) => {
+      // When pinType changes and we don't have a custom color, auto-update color/size
+      if (field === "pinType" && !initialData?.color) {
+        return {
+          ...prev,
+          [field]: value,
+          color: PIN_TYPE_COLORS[value as typeof PinType],
+          size: PIN_TYPE_SIZES[value as typeof PinType],
+        };
+      }
+      return { ...prev, [field]: value };
+    });
+
     // Clear error for this field when user types
-    if (errors[field]) {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
-    }
-  }, [errors]);
+    setErrors((prev) => {
+      if (!prev[field]) return prev;
+      const newErrors = { ...prev };
+      delete newErrors[field];
+      return newErrors;
+    });
+  }, [initialData?.color]);
 
   const validate = useCallback((): boolean => {
     const schema = mode === "create" ? CreatePinSchema : UpdatePinSchema;

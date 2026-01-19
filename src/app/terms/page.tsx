@@ -86,7 +86,7 @@ export default function TermsPage() {
                 Disclaimers
               </h2>
               <p className="text-text-secondary leading-relaxed">
-                Genesis is provided on an "as is" and "as available" basis. We make no warranties, expressed
+                Genesis is provided on an &quot;as is&quot; and &quot;as available&quot; basis. We make no warranties, expressed
                 or implied, and hereby disclaim all warranties regarding the service.
               </p>
             </section>

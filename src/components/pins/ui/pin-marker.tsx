@@ -104,6 +104,15 @@ export function PinMarker({
     isPinSelected,
   });
 
+  // Style calculations (must be called before early return to satisfy Rules of Hooks)
+  const markerStyling = useMarkerStyling({
+    pin,
+    transform,
+    isDragging,
+    isPinSelected,
+    isHovered,
+  });
+
   if (!shouldRender) {
     return null;
   }
@@ -113,14 +122,8 @@ export function PinMarker({
   const iconName = pin.icon || pinConfig.icon;
   const isCustomImage = iconName?.startsWith("/");
 
-  // Style calculations
-  const { finalZIndex, finalSize, iconSize, boxShadow, transformScale } = useMarkerStyling({
-    pin,
-    transform,
-    isDragging,
-    isPinSelected,
-    isHovered,
-  });
+  // Destructure styling after early return
+  const { finalZIndex, finalSize, iconSize, boxShadow, transformScale } = markerStyling;
 
   // Click handler (prevented if we just finished dragging)
   const handleClick = (e: React.MouseEvent) => {

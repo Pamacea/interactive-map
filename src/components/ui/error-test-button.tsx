@@ -100,7 +100,7 @@ export function ErrorTestButton({
             Trigger Event Handler Error
           </Button>
           <p className="text-xs text-text-muted">
-            This will throw an error in an event handler. Error boundaries don't
+            This will throw an error in an event handler. Error boundaries don&apos;t
             catch these - we handle them manually with try/catch.
           </p>
         </div>
@@ -118,7 +118,7 @@ export function ErrorTestButton({
             Trigger Async Error
           </Button>
           <p className="text-xs text-text-muted">
-            This will throw an error in async code. Error boundaries don't catch
+            This will throw an error in async code. Error boundaries don&apos;t catch
             these - we handle them with try/catch in the async function.
           </p>
         </div>
@@ -129,7 +129,7 @@ export function ErrorTestButton({
           ⚠️ Development Only
         </p>
         <p className="text-xs text-text-muted">
-          Remove this component in production. It's only for testing error
+          Remove this component in production. It&apos;s only for testing error
           boundaries during development.
         </p>
       </div>

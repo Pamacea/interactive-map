@@ -132,7 +132,7 @@ export function PinsFilterPanel() {
       {/* Info text */}
       <div className="px-3 py-2 rounded-sm bg-background-elevated border border-border-subtle">
         <p className="text-xs text-text-muted leading-relaxed">
-          Toggle pin types to control which markers appear on your map. Hidden
+          Toggle pin types to control which markers appear on your map. Hidden &apos;
           pins remain in your world but won't be displayed.
         </p>
       </div>

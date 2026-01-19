@@ -23,7 +23,7 @@ export default function AboutPage() {
               </h2>
               <p className="text-text-secondary leading-relaxed">
                 Genesis empowers storytellers, game masters, and world-builders to create stunning, interactive fantasy maps.
-                We believe that every great story begins with a great world, and we're here to help you build yours.
+                We believe that every great story begins with a great world, and we&apos;re here to help you build yours.
               </p>
             </section>
 
@@ -66,7 +66,7 @@ export default function AboutPage() {
                 Contact Us
               </h2>
               <p className="text-text-secondary leading-relaxed">
-                Have questions, feedback, or ideas? We'd love to hear from you. Reach out to us at{' '}
+                Have questions, feedback, or ideas? We&apos;d love to hear from you. Reach out to us at{' '}
                 <a href="mailto:hello@genesis.com" className="text-accent-gold hover:underline">
                   hello@genesis.com
                 </a>

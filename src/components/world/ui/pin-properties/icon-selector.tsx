@@ -1,6 +1,7 @@
 import { PIN_ICONS, getUniqueCategories } from "@/constants/pin-icons";
-import { getLucideIcon } from "@/lib/icon-utils";
-import { ChevronDown, Search, X, Upload, Check } from "lucide-react";
+import { isLucideIconName } from "@/lib/icon-utils";
+import { ChevronDown, Search, X, Upload, Check, MapPin } from "lucide-react";
+import * as LucideIcons from "lucide-react";
 import { useState } from "react";
 
 interface IconSelectorProps {
@@ -10,6 +11,25 @@ interface IconSelectorProps {
   onUploadClick: () => void;
   canUpload: boolean;
 }
+
+interface IconWrapperProps {
+  iconName: string;
+  className?: string;
+}
+
+/**
+ * Wrapper component to render Lucide icons
+ * Declared outside render to satisfy react-hooks/static-components rule
+ */
+function IconWrapper({ iconName, className }: IconWrapperProps) {
+  if (!isLucideIconName(iconName)) {
+    return <MapPin className={className} />;
+  }
+
+  const IconComponent = LucideIcons[iconName] as React.ComponentType<{ className?: string }>;
+  return <IconComponent className={className} />;
+}
+
 
 export function IconSelector({
   currentIcon,
@@ -23,12 +43,7 @@ export function IconSelector({
 
   const iconCategories = getUniqueCategories();
   const isCustomImage = currentIcon?.startsWith("/");
-
-  const getPinIcon = (iconName: string) => {
-    return getLucideIcon(iconName);
-  };
-
-  const CurrentIconComponent = getPinIcon(currentIcon || "map-pin");
+  const currentIconName = currentIcon || "map-pin";
 
   const filteredIcons = PIN_ICONS.filter((icon) => {
     const matchesSearch =
@@ -55,7 +70,7 @@ export function IconSelector({
               className="w-4 h-4 object-contain"
             />
           ) : (
-            <CurrentIconComponent className="w-4 h-4 text-accent-gold" />
+            <IconWrapper iconName={currentIconName} className="w-4 h-4 text-accent-gold" />
           )}
           <span className="text-sm text-text-primary flex-1 text-left">
             {isCustomImage
@@ -100,7 +115,7 @@ export function IconSelector({
                 <div className="px-2 py-8 text-center">
                   <Search className="w-8 h-8 text-text-muted mx-auto mb-2 opacity-50" />
                   <p className="text-sm text-text-muted mb-3">
-                    No icons found matching "{searchTerm}"
+                    No icons found matching &quot;{searchTerm}&quot;
                   </p>
                   <button
                     type="button"

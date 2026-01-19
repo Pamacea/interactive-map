@@ -62,15 +62,9 @@ export interface DynamicIconProps extends LucideProps {
 
 /**
  * DynamicIcon component that renders a Lucide icon by name
- * Returns null if icon cannot be rendered
+ * Note: Rendering errors should be caught by Error Boundaries, not try/catch
  */
 export function DynamicIcon({ iconName, ...props }: DynamicIconProps) {
   const IconComponent = getLucideIcon(iconName);
-
-  try {
-    return <IconComponent {...props} />;
-  } catch (error) {
-    console.error(`Failed to render icon: ${iconName}`, error);
-    return null;
-  }
+  return <IconComponent {...props} />;
 }
