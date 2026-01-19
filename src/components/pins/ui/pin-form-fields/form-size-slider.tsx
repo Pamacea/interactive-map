@@ -23,7 +23,7 @@ export const FormSizeSlider: FC<FormSizeSliderProps> = ({
     <div className="grid gap-2">
       <div className="flex items-center justify-between">
         <label className="text-sm font-medium leading-none">{label}</label>
-        <span className="text-sm text-slate-600">{value}px</span>
+        <span className="text-sm text-text-muted">{value}px</span>
       </div>
       <input
         type="range"
@@ -34,7 +34,7 @@ export const FormSizeSlider: FC<FormSizeSliderProps> = ({
         disabled={disabled}
         className="w-full disabled:opacity-50"
       />
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && <p className="text-xs text-status-error">{error}</p>}
     </div>
   );
 };

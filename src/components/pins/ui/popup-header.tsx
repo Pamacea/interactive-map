@@ -4,7 +4,7 @@
  */
 
 import * as React from "react";
-import { X, Check, X as XIcon, Trash2, AlertTriangle } from "lucide-react";
+import { X, Check, X as XIcon, Trash2 } from "lucide-react";
 import { pinTypeConfig, type PinType } from "@/constants/pin-types";
 import { getPinEmoji } from "../utils/pin-popup-utils";
 import type { Pin } from "@prisma/client";
@@ -230,7 +230,7 @@ export function PopupHeader({ pin, onClose, onDelete, onTitleChange }: PopupHead
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-red-600" />
+                <span className="text-xl">⚠️</span>
                 Delete Pin?
               </AlertDialogTitle>
               <AlertDialogDescription>

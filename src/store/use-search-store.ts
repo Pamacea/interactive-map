@@ -42,7 +42,18 @@ interface SearchState {
   clearSearch: () => void;
 }
 
-export const useSearchStore = create<SearchState>((set) => ({
+// Reset state object - consolidated search state reset logic
+const resetSearchState = {
+  query: "",
+  debouncedQuery: "",
+  results: null,
+  error: null,
+  suggestions: [],
+  showSuggestions: false,
+  highlightedIndex: -1,
+};
+
+export const useSearchStore = create<SearchState>((set, get) => ({
   // Initial state
   isOpen: false,
   query: "",
@@ -60,31 +71,20 @@ export const useSearchStore = create<SearchState>((set) => ({
 
   // Actions
   openSearch: () => set({ isOpen: true }),
+
   closeSearch: () => set({
     isOpen: false,
-    query: "",
-    debouncedQuery: "",
-    results: null,
-    error: null,
-    suggestions: [],
-    showSuggestions: false,
-    highlightedIndex: -1,
+    ...resetSearchState,
   }),
-  toggleSearch: () => set((state) => {
-    if (state.isOpen) {
-      return {
-        isOpen: false,
-        query: "",
-        debouncedQuery: "",
-        results: null,
-        error: null,
-        suggestions: [],
-        showSuggestions: false,
-        highlightedIndex: -1,
-      };
+
+  toggleSearch: () => {
+    const { isOpen } = get();
+    if (isOpen) {
+      set({ isOpen: false, ...resetSearchState });
+    } else {
+      set({ isOpen: true });
     }
-    return { isOpen: true };
-  }),
+  },
 
   setQuery: (query) => set({ query }),
   setDebouncedQuery: (debouncedQuery) => set({ debouncedQuery }),
@@ -97,20 +97,18 @@ export const useSearchStore = create<SearchState>((set) => ({
   setShowSuggestions: (showSuggestions) => set({ showSuggestions }),
   setHighlightedIndex: (highlightedIndex) => set({ highlightedIndex }),
 
-  clearSearch: () => set({
-    query: "",
-    debouncedQuery: "",
-    results: null,
-    error: null,
-    suggestions: [],
-    showSuggestions: false,
-    highlightedIndex: -1,
-  }),
+  clearSearch: () => set(resetSearchState),
 }));
 
 // Selector hooks for optimized re-renders
 export const useSearchIsOpen = () => useSearchStore((state) => state.isOpen);
 export const useSearchQuery = () => useSearchStore((state) => state.query);
+export const useSearchDebouncedQuery = () => useSearchStore((state) => state.debouncedQuery);
 export const useSearchResults = () => useSearchStore((state) => state.results);
 export const useSearchIsLoading = () => useSearchStore((state) => state.isLoading);
 export const useSearchError = () => useSearchStore((state) => state.error);
+export const useSearchFilters = () => useSearchStore((state) => state.filters);
+export const useSearchActiveTab = () => useSearchStore((state) => state.activeTab);
+export const useSearchSuggestions = () => useSearchStore((state) => state.suggestions);
+export const useSearchShowSuggestions = () => useSearchStore((state) => state.showSuggestions);
+export const useSearchHighlightedIndex = () => useSearchStore((state) => state.highlightedIndex);

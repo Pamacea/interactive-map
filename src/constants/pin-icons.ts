@@ -5,7 +5,7 @@
  * Each icon has a name, label, and category for filtering
  */
 
-import type { LucideIcon } from "lucide-react";
+import * as LucideIcons from "lucide-react";
 
 export type PinIconCategory =
   | "location"
@@ -17,6 +17,9 @@ export type PinIconCategory =
   | "quest"
   | "other";
 
+// Extract valid icon names from lucide-react
+type LucideIconName = keyof typeof LucideIcons;
+
 /**
  * Pin icon configuration interface
  */
@@ -26,16 +29,15 @@ export interface PinIconOption {
   /** Human-readable label */
   label: string;
   /** Lucide icon component name (e.g., "MapPin", "Castle") */
-  icon: keyof typeof import("lucide-react");
+  icon: LucideIconName;
   /** Category for filtering/grouping */
   category: PinIconCategory;
 }
 
 /**
- * Complete pin icon library
- * 45+ icons organized by category
+ * Raw icon data with literal types
  */
-export const PIN_ICONS: PinIconOption[] = [
+const RAW_PIN_ICONS = [
   // LOCATION icons
   {
     name: "map-pin",
@@ -345,19 +347,23 @@ export const PIN_ICONS: PinIconOption[] = [
     icon: "Bookmark",
     category: "other",
   },
-];
+] as const;
+
+/**
+ * Complete pin icon library
+ * 45+ icons organized by category
+ */
+export const PIN_ICONS: PinIconOption[] = RAW_PIN_ICONS.map((item) => ({
+  ...item,
+  icon: item.icon as LucideIconName,
+}));
 
 /**
  * Get icon by name
  * Returns MapPin as default if not found
  */
-export function getIconByName(
-  name: string
-): keyof typeof import("lucide-react") {
-  return (
-    (PIN_ICONS.find((i) => i.name === name)?.icon as keyof typeof import("lucide-react")) ||
-    "MapPin"
-  );
+export function getIconByName(name: string): LucideIconName {
+  return (PIN_ICONS.find((i) => i.name === name)?.icon as LucideIconName) || "MapPin";
 }
 
 /**

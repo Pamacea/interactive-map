@@ -82,18 +82,18 @@ export async function uploadGalleryImage(formData: FormData): Promise<Result<{ i
     }
 
     // Save file to disk
-    const { writeFile, mkdir } = require("fs/promises");
-    const path = require("path");
-    const uploadsDir = path.join(process.cwd(), "public", "uploads", "gallery");
+    const { writeFile, mkdir } = await import("fs/promises");
+    const path = await import("path");
+    const uploadsDir = path.default.join(process.cwd(), "public", "uploads", "gallery");
 
     try {
       await mkdir(uploadsDir, { recursive: true });
-    } catch (error) {
+    } catch {
       // Directory might already exist
     }
 
     const fileName = generateSafeFilename(file.name);
-    const filePath = path.join(uploadsDir, fileName);
+    const filePath = path.default.join(uploadsDir, fileName);
     const imageUrl = `/uploads/gallery/${fileName}`;
 
     const bytes = await file.arrayBuffer();
@@ -326,11 +326,11 @@ export async function deleteGalleryItem(id: string): Promise<Result<{ itemId: st
     const worldId = item.pin?.gameWorldId || item.loreEntry?.gameWorldId;
 
     // Delete file from disk
-    const { unlink } = require("fs/promises");
-    const path = require("path");
+    const { unlink } = await import("fs/promises");
+    const path = await import("path");
 
     try {
-      const filePath = path.join(process.cwd(), "public", item.imageUrl);
+      const filePath = path.default.join(process.cwd(), "public", item.imageUrl);
       await unlink(filePath);
     } catch (error) {
       console.warn("[deleteGalleryItem] Failed to delete file:", error);

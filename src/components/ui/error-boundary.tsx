@@ -125,7 +125,7 @@ export class ErrorBoundary extends React.Component<
                 <summary className="cursor-pointer text-sm text-text-secondary hover:text-accent-gold transition-colors">
                   Error Details
                 </summary>
-                <pre className="mt-3 text-xs text-text-muted overflow-auto max-h-48">
+                <pre className="pt-3 text-xs text-text-muted overflow-auto max-h-48">
                   {this.state.error.stack}
                 </pre>
               </details>
@@ -175,7 +175,9 @@ export function DefaultErrorFallback({
   return (
     <div className="flex items-center justify-center min-h-screen bg-background-base px-4">
       <div className="max-w-md w-full space-y-6 text-center">
-        <AlertCircle className="w-16 h-16 text-accent-gold mx-auto" />
+        <div className="flex justify-center">
+          <AlertCircle className="w-16 h-16 text-accent-gold" />
+        </div>
         <h1 className="text-2xl font-display font-semibold text-text-primary">
           Something went wrong
         </h1>

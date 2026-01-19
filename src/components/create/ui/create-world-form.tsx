@@ -105,7 +105,7 @@ export function CreateWorldForm() {
               formData.isPublic && "bg-accent-gold text-background-base hover:bg-accent-gold/90"
             )}
           >
-            <Globe className="w-5 h-5 mr-2" />
+            <Globe className="w-5 h-5" />
             Public
           </Button>
           <Button
@@ -117,7 +117,7 @@ export function CreateWorldForm() {
               !formData.isPublic && "bg-accent-gold text-background-base hover:bg-accent-gold/90"
             )}
           >
-            <Lock className="w-5 h-5 mr-2" />
+            <Lock className="w-5 h-5" />
             Private
           </Button>
         </div>
@@ -132,7 +132,7 @@ export function CreateWorldForm() {
           Cancel
         </Button>
         <Button type="submit" size="lg" disabled={mutation.isPending}>
-          <MapPin className="w-5 h-5 mr-2" />
+          <MapPin className="w-5 h-5" />
           {mutation.isPending ? "Creating..." : "Create World"}
         </Button>
       </div>

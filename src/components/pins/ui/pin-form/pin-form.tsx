@@ -3,9 +3,10 @@
 import { FC } from "react";
 import { Button } from "@/components/ui/button";
 import type { PinFormData } from "../../logic/use-pin-form";
-import { FormTextField, FormTextAreaField, FormNumberField } from "./form-fields";
-import { FormActions } from "./form-actions";
 import {
+  FormTextField,
+  FormTextAreaField,
+  FormNumberField,
   FormPinTypeSelector,
   FormColorPicker,
   FormSizeSlider,
@@ -13,7 +14,8 @@ import {
   FormLayerSelect,
   FormJsonField,
   FormIconSelect,
-} from "./pin-form-fields";
+} from "../pin-form-fields";
+import { FormActions } from "./form-actions";
 
 export interface PinFormProps {
   formData: PinFormData;

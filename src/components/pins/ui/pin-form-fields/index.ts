@@ -1,3 +1,4 @@
+export { FormFieldWrapper } from "./form-field-wrapper";
 export { FormTextField } from "./form-text-field";
 export { FormTextAreaField } from "./form-textarea-field";
 export { FormNumberField } from "./form-number-field";

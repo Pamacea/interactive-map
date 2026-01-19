@@ -77,7 +77,7 @@ export function PinPopup({
       aria-labelledby="pin-popup-title"
       aria-describedby="pin-popup-description"
       className={cn(
-        "relative z-50 min-w-[320px] max-w-[400px] rounded-sm border-2 border-[var(--color-accent-gold)]",
+        "relative z-50 min-w-80 max-w-96 rounded-sm border-2 border-[var(--color-accent-gold)]",
         "bg-[var(--color-background-card)] shadow-2xl",
         "font-display text-[var(--color-text-primary)]",
         "animate-in fade-in zoom-in-95 duration-200"

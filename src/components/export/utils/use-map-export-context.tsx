@@ -1,9 +1,9 @@
 "use client";
 
-import { createContext, useContext, useRef, ReactNode } from "react";
+import { createContext, useContext, useRef, ReactNode, useCallback } from "react";
 
 interface MapExportContextValue {
-  mapElement: HTMLElement | null;
+  getMapElement: () => HTMLElement | null;
   setMapElement: (element: HTMLElement | null) => void;
 }
 
@@ -14,14 +14,18 @@ const MapExportContext = createContext<MapExportContextValue | undefined>(
 export function MapExportProvider({ children }: { children: ReactNode }) {
   const mapElementRef = useRef<HTMLElement | null>(null);
 
-  const setMapElement = (element: HTMLElement | null) => {
+  const setMapElement = useCallback((element: HTMLElement | null) => {
     mapElementRef.current = element;
-  };
+  }, []);
+
+  const getMapElement = useCallback(() => {
+    return mapElementRef.current;
+  }, []);
 
   return (
     <MapExportContext.Provider
       value={{
-        mapElement: mapElementRef.current,
+        getMapElement,
         setMapElement,
       }}
     >

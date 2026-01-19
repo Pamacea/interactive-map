@@ -1,27 +1,62 @@
 @import "tailwindcss";
 
 @theme {
-  /* Colors */
+  /* ============================================
+     COLOR SYSTEM
+     ============================================
+
+     This color system provides consistent theming
+     across the entire application using CSS variables.
+
+     USAGE:
+     - Theme colors: Use CSS variables (bg-background-base)
+     - Functional colors: Can use Tailwind defaults (text-red-500)
+     - Custom colors: Define new variables here
+
+     CATEGORIES:
+     1. Background - Surface colors
+     2. Border - Edge/line colors
+     3. Text - Typography colors
+     4. Accent - Theme highlights (gold-based)
+     5. Interactive - UI feedback colors
+     6. Status - Semantic colors (success, error, etc.)
+  ============================================ */
+
+  /* Background Colors */
   --color-background-base: #0a0e13;
   --color-background-elevated: #141a1f;
   --color-background-card: #1a2228;
   --color-background-card-hover: #222b33;
   --color-background-overlay: rgba(10, 14, 19, 0.95);
+  --color-background-input: #1a2228;
+  --color-background-skeleton: #334155; /* Slate-700 equivalent */
 
+  /* Border Colors */
   --color-border-subtle: rgba(255, 255, 255, 0.08);
   --color-border-default: rgba(255, 255, 255, 0.12);
   --color-border-ornate: rgba(212, 175, 55, 0.3);
   --color-border-glow: rgba(212, 175, 55, 0.15);
+  --color-border-input: rgba(255, 255, 255, 0.15); /* Slate-200 equivalent for dark mode */
+  --color-border-hover: rgba(255, 255, 255, 0.2); /* Slate-300 equivalent for dark mode */
 
+  /* Text Colors */
   --color-text-primary: #e8e6e3;
   --color-text-secondary: #a8a49e;
   --color-text-muted: #6b6862;
   --color-text-inverse: #0a0e13;
 
+  /* Accent Colors (Gold Theme) */
   --color-accent-gold: #d4af37;
   --color-accent-gold-light: #f4d47c;
   --color-accent-gold-dark: #b8931f;
 
+  /* Interactive Colors (for focus, selection, etc.) */
+  --color-interactive-primary: #3b82f6; /* Blue-500 */
+  --color-interactive-primary-hover: #2563eb; /* Blue-600 */
+  --color-interactive-focus: #3b82f6; /* Blue-500 for focus rings */
+  --color-interactive-selected: #eff6ff; /* Blue-50 for selected states */
+
+  /* Pin Type Colors */
   --color-pin-city: #c9a227;
   --color-pin-village: #8b7355;
   --color-pin-poi: #4a9eff;
@@ -31,22 +66,81 @@
   --color-pin-quest: #f39c12;
   --color-pin-treasure: #1abc9c;
 
+  /* Faction Colors */
   --color-faction-light: #64b5f6;
   --color-faction-dark: #7b1fa2;
   --color-faction-nature: #66bb6a;
   --color-faction-fire: #ff6b35;
   --color-faction-ice: #42a5f5;
 
+  /* Rarity Colors */
   --color-rarity-common: #9e9e9e;
   --color-rarity-uncommon: #4caf50;
   --color-rarity-rare: #2196f3;
   --color-rarity-epic: #9b59b6;
   --color-rarity-legendary: #d4af37;
 
+  /* Status Colors (Semantic) */
   --color-status-success: #2ecc71;
+  --color-status-success-dark: #16a34a; /* Green-600 */
   --color-status-warning: #f39c12;
+  --color-status-warning-light: #f59e0b; /* Amber-500 */
   --color-status-error: #e74c3c;
+  --color-status-error-dark: #dc2626; /* Red-600 */
   --color-status-info: #3498db;
+
+  /* Particle/Decoration Colors */
+  --color-particle-purple: #a855f7; /* Purple-500 */
+  --color-particle-blue: #60a5fa; /* Blue-400 */
+  --color-particle-emerald: #34d399; /* Emerald-400 */
+  --color-particle-amber: #fbbf24; /* Amber-400 */
+  --color-particle-rose: #fb7185; /* Rose-400 */
+  --color-particle-cyan: #22d3ee; /* Cyan-400 */
+  --color-particle-violet: #a78bfa; /* Violet-400 */
+
+  /* ============================================
+     USAGE GUIDELINES
+     ============================================
+
+     1. THEME COLORS (Always use CSS variables):
+        - Backgrounds: bg-background-base, bg-background-elevated, etc.
+        - Borders: border-border-subtle, border-border-default, etc.
+        - Text: text-text-primary, text-text-secondary, text-text-muted
+        - Accents: bg-accent-gold, text-accent-gold-light
+
+     2. INTERACTIVE STATES:
+        - Focus: ring-interactive-focus
+        - Selected: bg-interactive-selected, border-interactive-primary
+        - Hover: border-hover
+        - Primary actions: bg-interactive-primary
+
+     3. STATUS/SEMANTIC COLORS:
+        - Success: text-status-success, bg-status-success
+        - Warning: text-status-warning, bg-status-warning-light
+        - Error: text-status-error, border-status-error
+        - Info: text-status-info
+
+     4. FUNCTIONAL COLORS (Can use Tailwind defaults):
+        - Functional colors like red-500, green-600, etc. are OK for:
+          * Specific functional purposes (alerts, badges)
+          * Third-party components
+          * When semantic meaning is more important than theme
+
+     5. WHEN TO ADD NEW VARIABLES:
+        - Add a new CSS variable when:
+          * The color is part of the theme (gold accent, backgrounds)
+          * The color will be used in multiple components
+          * The color might need to be changed globally later
+        - Use direct Tailwind colors when:
+          * The color is functional (success/error states)
+          * The color is used in one place only
+          * The color has standard semantic meaning
+
+     6. NAMING CONVENTIONS:
+        - Format: --color-[category]-[variant]
+        - Categories: background, border, text, accent, interactive, status, particle, pin, faction, rarity
+        - Use descriptive names: "elevated" not "dark", "subtle" not "light-gray"
+  ============================================ */
 
   /* Font Families */
   --font-display: 'Cinzel', 'Times New Roman', serif;

@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Home, RefreshCw } from "lucide-react";
+// Icons rendered as unicode to avoid global-error.tsx module resolution issues
 
 /**
  * Global Error Boundary
@@ -23,16 +23,6 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  useEffect(() => {
-    // Log error to console
-    console.error("[GlobalError] Critical application error:", error);
-
-    // Log to error reporting service in production
-    if (process.env.NODE_ENV === "production") {
-      logCriticalError(error);
-    }
-  }, [error]);
-
   /**
    * Log critical errors to external service
    */
@@ -50,6 +40,16 @@ export default function GlobalError({
     console.error("[GlobalError] Critical error logged:", errorPayload);
   };
 
+  useEffect(() => {
+    // Log error to console
+    console.error("[GlobalError] Critical application error:", error);
+
+    // Log to error reporting service in production
+    if (process.env.NODE_ENV === "production") {
+      logCriticalError(error);
+    }
+  }, [error]);
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="bg-background-base text-text-primary antialiased">
@@ -59,7 +59,9 @@ export default function GlobalError({
             <div className="flex justify-center">
               <div className="relative">
                 <div className="absolute inset-0 bg-status-error/30 rounded-full blur-2xl animate-pulse" />
-                <AlertTriangle className="relative w-24 h-24 text-status-error" />
+                <div className="relative w-24 h-24 text-6xl flex items-center justify-center text-status-error">
+                  ⚠️
+                </div>
               </div>
             </div>
 
@@ -111,7 +113,7 @@ export default function GlobalError({
                 size="lg"
                 className="gap-2"
               >
-                <RefreshCw className="w-5 h-5" />
+                <span className="text-lg">🔄</span>
                 Reload Application
               </Button>
               <Button
@@ -120,7 +122,7 @@ export default function GlobalError({
                 size="lg"
                 className="gap-2"
               >
-                <Home className="w-5 h-5" />
+                <span className="text-lg">🏠</span>
                 Go to Home
               </Button>
             </div>

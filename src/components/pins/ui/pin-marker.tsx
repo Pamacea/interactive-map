@@ -64,13 +64,15 @@ export function PinMarker({
   const isPinSelected = selectedPinId === pin.id;
 
   // Calculate position with layer offsets
+  // Note: Since usePinDrag now updates the store in real-time during drag,
+  // pin.latitude/longitude are already up-to-date. No need for dragAwarePosition!
   const position = usePinPosition(pin, null, imageDimensions, transform, layers);
 
   // Get layer info for lock state
   const layer = pin.layerId ? layers.find((layer) => layer.id === pin.layerId) : null;
   const isLayerLocked = layer?.locked ?? false;
 
-  // Drag functionality
+  // Drag functionality (updates pin.latitude/longitude in store during drag)
   const { isDragging, dragPosition, hasMovedDuringDrag, handleMouseDown } = usePinDrag({
     pinId: pin.id,
     latitude: pin.latitude,
@@ -82,9 +84,6 @@ export function PinMarker({
     onSelectPin: selectPin,
     onUpdatePin: updatePin,
   });
-
-  // Recalculate position with drag offset
-  const dragAwarePosition = usePinPosition(pin, dragPosition, imageDimensions, transform, layers);
 
   // Event handling (hover, event capture)
   const { isHovered, handleMouseEnter, handleMouseLeave } = usePinEvents({
@@ -135,8 +134,8 @@ export function PinMarker({
 
   return (
     <MarkerContainer
-      x={dragAwarePosition.x}
-      y={dragAwarePosition.y}
+      x={position.x}
+      y={position.y}
       zIndex={finalZIndex}
       size={finalSize}
       iconSize={iconSize}

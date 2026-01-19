@@ -13,7 +13,7 @@ import {
 import { downloadImage } from "../utils/image-utils";
 import type { GalleryItemWithRelations } from "@/types/gallery.type";
 
-interface ImageLightboxProps {
+export interface ImageLightboxProps {
   images: GalleryItemWithRelations[];
   currentIndex: number;
   isOpen: boolean;
@@ -57,7 +57,7 @@ export function ImageLightbox({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-black/95 border-none overflow-hidden">
-        <div className="relative w-full h-full min-h-[90vh] flex items-center justify-center">
+        <div className="relative w-full h-full min-h-screen flex items-center justify-center">
           {/* Close button */}
           <button
             className="absolute top-4 right-4 text-white hover:text-accent-gold transition-colors z-50"
@@ -114,7 +114,7 @@ export function ImageLightbox({
                   )}
 
                   {/* Linked items */}
-                  <div className="flex gap-2 mt-3">
+                  <div className="flex gap-2">
                     {currentImage.pinId && (
                       <Badge className="bg-accent-gold text-background-base hover:bg-accent-gold/80 flex items-center gap-1">
                         <Link2 className="w-3 h-3" />
@@ -148,8 +148,10 @@ export function ImageLightbox({
                       className="text-white border-white hover:bg-white/10"
                       onClick={() => onLinkToPin(currentImage)}
                     >
-                      <Link2 className="w-4 h-4 mr-2" />
-                      Link to Pin
+                      <div className="flex items-center gap-2">
+                        <Link2 className="w-4 h-4" />
+                        Link to Pin
+                      </div>
                     </Button>
                   )}
 
@@ -160,8 +162,10 @@ export function ImageLightbox({
                       className="text-white border-white hover:bg-white/10"
                       onClick={() => onLinkToLore(currentImage)}
                     >
-                      <Link2 className="w-4 h-4 mr-2" />
-                      Link to Lore
+                      <div className="flex items-center gap-2">
+                        <Link2 className="w-4 h-4" />
+                        Link to Lore
+                      </div>
                     </Button>
                   )}
                 </div>
@@ -169,7 +173,7 @@ export function ImageLightbox({
 
               {/* Image counter */}
               {images.length > 1 && (
-                <div className="mt-4 text-center">
+                <div className="text-center">
                   <p className="text-white/60 text-sm">
                     {currentIndex + 1} of {images.length}
                   </p>

@@ -133,11 +133,23 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
     newX = Math.max(0, Math.min(mapWidth, newX));
     newY = Math.max(0, Math.min(mapHeight, newY));
 
-    // Update visual position only (not database yet)
+    // Convert to lat/lng (0-1 range) and update store IMMEDIATELY (optimistic update)
+    const newLatitude = newY / mapHeight;
+    const newLongitude = newX / mapWidth;
+
+    // Update Zustand store in real-time so popup can follow
+    if (onUpdatePin) {
+      onUpdatePin(pinId, {
+        latitude: newLatitude,
+        longitude: newLongitude,
+      });
+    }
+
+    // Also update local drag position for PinMarker to use
     const newPosition = { x: newX, y: newY };
     dragPositionRef.current = newPosition;
     setDragPosition(newPosition);
-  }, [scale, mapWidth, mapHeight]);
+  }, [scale, mapWidth, mapHeight, pinId, onUpdatePin]);
 
   /**
    * Mouse up handler - attached to window during drag

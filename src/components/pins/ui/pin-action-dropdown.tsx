@@ -58,9 +58,9 @@ export function PinActionDropdown({
           <MapPin className="w-4 h-4" />
           <span>Add Pin</span>
           {isLayerSelected && (
-            <ChevronDown className={`w-4 h-4 ml-auto transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+            <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
           )}
-          {!isLayerSelected && <Lock className="w-3 h-3 ml-auto" />}
+          {!isLayerSelected && <Lock className="w-3 h-3" />}
         </Button>
       </DropdownMenuTrigger>
 
@@ -87,10 +87,10 @@ export function PinActionDropdown({
           `}
         >
           <Crosshair className="w-4 h-4 flex-shrink-0" />
-          <div className="flex-1 text-left">
+          <div className="flex items-center gap-2 flex-1">
             <span>Click on Map</span>
             {isPlacingMode && (
-              <span className="ml-2 text-xs text-accent-gold-light">(Active)</span>
+              <span className="text-xs text-accent-gold-light">(Active)</span>
             )}
           </div>
         </DropdownMenuItem>
@@ -102,9 +102,9 @@ export function PinActionDropdown({
           disabled
         >
           <FileText className="w-4 h-4 flex-shrink-0" />
-          <div className="flex-1 text-left">
+          <div className="flex items-center gap-2 flex-1">
             <span>Import from CSV</span>
-            <span className="ml-2 text-xs text-text-muted">(Coming soon)</span>
+            <span className="text-xs text-text-muted">(Coming soon)</span>
           </div>
         </DropdownMenuItem>
 
@@ -115,9 +115,9 @@ export function PinActionDropdown({
           disabled
         >
           <Copy className="w-4 h-4 flex-shrink-0" />
-          <div className="flex-1 text-left">
+          <div className="flex items-center gap-2 flex-1">
             <span>Duplicate Existing</span>
-            <span className="ml-2 text-xs text-text-muted">(Coming soon)</span>
+            <span className="text-xs text-text-muted">(Coming soon)</span>
           </div>
         </DropdownMenuItem>
       </DropdownMenuContent>

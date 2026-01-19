@@ -6,7 +6,10 @@
  * Icons use Lucide React component names
  */
 
-import type { LucideIcon } from "lucide-react";
+import * as React from "react";
+
+// LucideIcon type definition (components from lucide-react)
+export type LucideIcon = React.ComponentType<React.SVGProps<SVGSVGElement>>;
 
 // Pin type enum matching Prisma schema exactly
 export enum PinType {

@@ -23,7 +23,7 @@ const cards: FloatingCard[] = [
 ];
 
 export function FloatingCards() {
-  const [positions, setPositions] = useState(
+  const [positions, setPositions] = useState(() =>
     cards.map((card) => ({
       id: card.id,
       x: (Math.random() - 0.5) * 100,
@@ -62,7 +62,7 @@ export function FloatingCards() {
 
   return (
     <div className="relative w-full aspect-square max-w-lg mx-auto">
-      <div className="absolute inset-0 bg-accent-gold/10 rounded-3xl blur-3xl" />
+      <div className="absolute inset-0 bg-accent-gold/10 rounded-xl blur-3xl" />
 
       {cards.map((card, index) => {
         const pos = positions.find((p) => p.id === card.id)!;
@@ -71,16 +71,13 @@ export function FloatingCards() {
         return (
           <div
             key={card.id}
-            className="absolute rounded-2xl bg-gradient-to-br from-background-card via-background-elevated to-background-card border border-border-subtle overflow-hidden transition-all duration-75 ease-linear will-change-transform"
+            className={`absolute rounded-lg bg-gradient-to-br from-background-card via-background-elevated to-background-card border border-border-subtle overflow-hidden transition-all duration-75 ease-linear will-change-transform ${isMain ? "shadow-2xl" : "shadow-xl"}`}
             style={{
               width: card.size,
               height: card.size,
               left: `calc(50% - ${card.size / 2}px + ${pos.x}px)`,
               top: `calc(50% - ${card.size / 2}px + ${pos.y}px)`,
               transform: `rotate(${pos.rotation}deg)`,
-              boxShadow: isMain
-                ? "0 25px 50px -12px rgba(0, 0, 0, 0.5)"
-                : "0 20px 40px -10px rgba(0, 0, 0, 0.4)",
               zIndex: cards.length - index,
             }}
           >

@@ -1,14 +1,14 @@
 {
   "version": "1.0.0",
-  "createdAt": "2026-01-18T20:31:29.970Z",
+  "createdAt": "2026-01-19T20:37:27.882Z",
   "projectDir": "C:\\Users\\Yanis\\Projects\\interactive-map",
   "metadata": {
-    "totalNodes": 296,
-    "totalEdges": 721,
+    "totalNodes": 315,
+    "totalEdges": 767,
     "circularDeps": 0,
-    "deadCode": 495,
-    "added": 8,
-    "removed": 0
+    "deadCode": 515,
+    "added": 22,
+    "removed": 3
   },
   "graph": {
     "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\actions\\pins.ts": {
@@ -226,26 +226,6 @@
         "imports": 2,
         "exports": 1,
         "lines": 106
-      }
-    },
-    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\app\\profile\\page.tsx": {
-      "imports": [
-        "next-auth/react",
-        "next/navigation",
-        "next/link",
-        "react",
-        "lucide-react",
-        "@/components/ui/navigation-bar",
-        "@/components/home/ui/footer"
-      ],
-      "exports": [
-        "ProfilePage"
-      ],
-      "importedBy": [],
-      "stats": {
-        "imports": 7,
-        "exports": 1,
-        "lines": 122
       }
     },
     "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\app\\settings\\page.tsx": {
@@ -718,7 +698,6 @@
       "importedBy": [
         "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-create-form.tsx",
         "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-edit-form.tsx",
-        "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\form-fields.tsx",
         "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\pin-form.tsx"
       ],
       "stats": {
@@ -977,25 +956,6 @@
         "lines": 59
       }
     },
-    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\form-fields.tsx": {
-      "imports": [
-        "react",
-        "../../logic/use-pin-form"
-      ],
-      "exports": [
-        "FormTextField",
-        "FormTextAreaField",
-        "FormNumberField"
-      ],
-      "importedBy": [
-        "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\pin-form.tsx"
-      ],
-      "stats": {
-        "imports": 2,
-        "exports": 3,
-        "lines": 105
-      }
-    },
     "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\index.ts": {
       "imports": [],
       "exports": [
@@ -1006,30 +966,6 @@
         "imports": 0,
         "exports": 1,
         "lines": 3
-      }
-    },
-    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\pin-form-fields.tsx": {
-      "imports": [
-        "react",
-        "@/constants/pin-types"
-      ],
-      "exports": [
-        "FormTextField",
-        "FormTextAreaField",
-        "FormNumberField",
-        "FormPinTypeSelector",
-        "FormColorPicker",
-        "FormSizeSlider",
-        "FormVisibilityToggle",
-        "FormLayerSelect",
-        "FormJsonField",
-        "FormIconSelect"
-      ],
-      "importedBy": [],
-      "stats": {
-        "imports": 2,
-        "exports": 10,
-        "lines": 272
       }
     },
     "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\pin-form.tsx": {
@@ -4957,6 +4893,351 @@
         "exports": 2,
         "lines": 68
       }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\create\\ui\\index.ts": {
+      "imports": [],
+      "exports": [
+        "CreateWorldForm"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 0,
+        "exports": 1,
+        "lines": 10
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\logic\\index.ts": {
+      "imports": [],
+      "exports": [
+        "useImageUpload",
+        "useDragAndDrop"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 0,
+        "exports": 2,
+        "lines": 21
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\logic\\use-drag-and-drop.ts": {
+      "imports": [
+        "react"
+      ],
+      "exports": [
+        "useDragAndDrop"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 1,
+        "exports": 1,
+        "lines": 57
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\logic\\use-image-upload.ts": {
+      "imports": [
+        "react"
+      ],
+      "exports": [
+        "useImageUpload"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 1,
+        "exports": 1,
+        "lines": 144
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form-fields\\form-field-wrapper.tsx": {
+      "imports": [
+        "react"
+      ],
+      "exports": [
+        "FormFieldWrapper"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 1,
+        "exports": 1,
+        "lines": 40
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\logic\\index.ts": {
+      "imports": [],
+      "exports": [
+        "useSearchForm"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 0,
+        "exports": 1,
+        "lines": 2
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\logic\\use-search-form.ts": {
+      "imports": [
+        "react",
+        "@/store/use-search-store"
+      ],
+      "exports": [
+        "useSearchForm"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 2,
+        "exports": 1,
+        "lines": 101
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\index.ts": {
+      "imports": [],
+      "exports": [
+        "SearchBar",
+        "SearchInput",
+        "SearchSuggestions",
+        "SearchResults",
+        "SearchHighlight"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 0,
+        "exports": 5,
+        "lines": 27
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\search-input.tsx": {
+      "imports": [
+        "lucide-react",
+        "@/components/ui/button",
+        "@/components/ui/input",
+        "@/lib/utils"
+      ],
+      "exports": [
+        "SearchInput"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 4,
+        "exports": 1,
+        "lines": 59
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\search-suggestions.tsx": {
+      "imports": [
+        "lucide-react",
+        "@/components/ui/button",
+        "@/lib/utils"
+      ],
+      "exports": [
+        "SearchSuggestions"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 3,
+        "exports": 1,
+        "lines": 41
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\alert.tsx": {
+      "imports": [
+        "react",
+        "class-variance-authority",
+        "@/lib/utils"
+      ],
+      "exports": [
+        "Alert",
+        "AlertTitle",
+        "AlertDescription"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 3,
+        "exports": 3,
+        "lines": 60
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\badge.tsx": {
+      "imports": [
+        "react",
+        "class-variance-authority",
+        "@/lib/utils"
+      ],
+      "exports": [
+        "Badge",
+        "badgeVariants"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 3,
+        "exports": 2,
+        "lines": 37
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\checkbox.tsx": {
+      "imports": [
+        "react",
+        "@radix-ui/react-checkbox",
+        "lucide-react",
+        "@/lib/utils"
+      ],
+      "exports": [
+        "Checkbox"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 4,
+        "exports": 1,
+        "lines": 31
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\dropdown-menu.tsx": {
+      "imports": [
+        "react",
+        "@radix-ui/react-dropdown-menu",
+        "lucide-react",
+        "@/lib/utils"
+      ],
+      "exports": [],
+      "importedBy": [],
+      "stats": {
+        "imports": 4,
+        "exports": 0,
+        "lines": 200
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\popover.tsx": {
+      "imports": [
+        "react",
+        "@radix-ui/react-popover",
+        "@/lib/utils"
+      ],
+      "exports": [
+        "Popover",
+        "PopoverTrigger",
+        "PopoverContent"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 3,
+        "exports": 3,
+        "lines": 32
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\scroll-area.tsx": {
+      "imports": [
+        "react",
+        "@radix-ui/react-scroll-area",
+        "@/lib/utils"
+      ],
+      "exports": [
+        "ScrollArea",
+        "ScrollBar"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 3,
+        "exports": 2,
+        "lines": 49
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\slider.tsx": {
+      "imports": [
+        "react",
+        "@radix-ui/react-slider",
+        "@/lib/utils"
+      ],
+      "exports": [
+        "Slider"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 3,
+        "exports": 1,
+        "lines": 28
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\textarea.tsx": {
+      "imports": [
+        "react",
+        "@/lib/utils"
+      ],
+      "exports": [
+        "Textarea"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 2,
+        "exports": 1,
+        "lines": 23
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\world\\logic\\use-map-events.ts": {
+      "imports": [
+        "react",
+        "@/stores/map-store",
+        "@/stores/pins/use-pins-data-store",
+        "@/stores/use-pins-store",
+        "@/stores/pins/use-pins-ui-store",
+        "./use-map-pan",
+        "./use-map-zoom",
+        "./use-map-image",
+        "./use-map-interactions",
+        "./use-map-handlers",
+        "./use-map-wheel",
+        "./use-pins-filtering"
+      ],
+      "exports": [
+        "useMapEvents"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 12,
+        "exports": 1,
+        "lines": 239
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\world\\logic\\use-map-initialization.ts": {
+      "imports": [
+        "react",
+        "@/stores/map-store",
+        "@/components/export/utils/use-map-export-context"
+      ],
+      "exports": [
+        "useMapInitialization"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 3,
+        "exports": 1,
+        "lines": 66
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\world\\ui\\map-layers.tsx": {
+      "imports": [
+        "react",
+        "../../logic/use-pins-filtering",
+        "./map-canvas/map-pins-wrapper",
+        "./map-layers-indicator",
+        "../../logic/use-map-pan"
+      ],
+      "exports": [
+        "MapLayers"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 5,
+        "exports": 1,
+        "lines": 79
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\types\\shims.d.ts": {
+      "imports": [],
+      "exports": [],
+      "importedBy": [],
+      "stats": {
+        "imports": 0,
+        "exports": 0,
+        "lines": 22
+      }
     }
   },
   "issues": {
@@ -5005,10 +5286,6 @@
       {
         "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\app\\privacy\\page.tsx",
         "export": "PrivacyPage"
-      },
-      {
-        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\app\\profile\\page.tsx",
-        "export": "ProfilePage"
       },
       {
         "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\app\\settings\\page.tsx",
@@ -5149,46 +5426,6 @@
       {
         "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\index.ts",
         "export": "PinForm"
-      },
-      {
-        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\pin-form-fields.tsx",
-        "export": "FormTextField"
-      },
-      {
-        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\pin-form-fields.tsx",
-        "export": "FormTextAreaField"
-      },
-      {
-        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\pin-form-fields.tsx",
-        "export": "FormNumberField"
-      },
-      {
-        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\pin-form-fields.tsx",
-        "export": "FormPinTypeSelector"
-      },
-      {
-        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\pin-form-fields.tsx",
-        "export": "FormColorPicker"
-      },
-      {
-        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\pin-form-fields.tsx",
-        "export": "FormSizeSlider"
-      },
-      {
-        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\pin-form-fields.tsx",
-        "export": "FormVisibilityToggle"
-      },
-      {
-        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\pin-form-fields.tsx",
-        "export": "FormLayerSelect"
-      },
-      {
-        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\pin-form-fields.tsx",
-        "export": "FormJsonField"
-      },
-      {
-        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\pin-form-fields.tsx",
-        "export": "FormIconSelect"
       },
       {
         "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\pin-form.tsx",
@@ -6941,6 +7178,130 @@
       {
         "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\lib\\search-types.ts",
         "export": "SearchQuerySchema"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\create\\ui\\index.ts",
+        "export": "CreateWorldForm"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\logic\\index.ts",
+        "export": "useImageUpload"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\logic\\index.ts",
+        "export": "useDragAndDrop"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\logic\\use-drag-and-drop.ts",
+        "export": "useDragAndDrop"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\logic\\use-image-upload.ts",
+        "export": "useImageUpload"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form-fields\\form-field-wrapper.tsx",
+        "export": "FormFieldWrapper"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\logic\\index.ts",
+        "export": "useSearchForm"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\logic\\use-search-form.ts",
+        "export": "useSearchForm"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\index.ts",
+        "export": "SearchBar"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\index.ts",
+        "export": "SearchInput"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\index.ts",
+        "export": "SearchSuggestions"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\index.ts",
+        "export": "SearchResults"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\index.ts",
+        "export": "SearchHighlight"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\search-input.tsx",
+        "export": "SearchInput"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\search-suggestions.tsx",
+        "export": "SearchSuggestions"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\alert.tsx",
+        "export": "Alert"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\alert.tsx",
+        "export": "AlertTitle"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\alert.tsx",
+        "export": "AlertDescription"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\badge.tsx",
+        "export": "Badge"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\badge.tsx",
+        "export": "badgeVariants"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\checkbox.tsx",
+        "export": "Checkbox"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\popover.tsx",
+        "export": "Popover"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\popover.tsx",
+        "export": "PopoverTrigger"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\popover.tsx",
+        "export": "PopoverContent"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\scroll-area.tsx",
+        "export": "ScrollArea"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\scroll-area.tsx",
+        "export": "ScrollBar"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\slider.tsx",
+        "export": "Slider"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\textarea.tsx",
+        "export": "Textarea"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\world\\logic\\use-map-events.ts",
+        "export": "useMapEvents"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\world\\logic\\use-map-initialization.ts",
+        "export": "useMapInitialization"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\world\\ui\\map-layers.tsx",
+        "export": "MapLayers"
       }
     ]
   }

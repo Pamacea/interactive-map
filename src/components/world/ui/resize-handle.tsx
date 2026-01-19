@@ -18,7 +18,7 @@ export function ResizeHandle({ onResizeStart, isResizing }: ResizeHandleProps) {
         <div
           className={`absolute right-0 top-0 bottom-0 w-1 transition-all duration-200 ${
             isResizing
-              ? "bg-accent-gold shadow-[0_0_8px_rgba(255,215,0,0.5)]"
+              ? "bg-accent-gold shadow-lg"
               : "bg-transparent group-hover:bg-accent-gold/50"
           }`}
         />

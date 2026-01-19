@@ -302,23 +302,23 @@ export async function uploadPinIcon(
     }
 
     // Create pins/icons directory if it doesn't exist
-    const { writeFile, mkdir } = require("fs/promises");
-    const path = require("path");
-    const uploadsDir = path.join(process.cwd(), "public", "uploads", "pins", "icons");
+    const { writeFile, mkdir } = await import("fs/promises");
+    const path = await import("path");
+    const uploadsDir = path.default.join(process.cwd(), "public", "uploads", "pins", "icons");
 
     try {
       await mkdir(uploadsDir, { recursive: true });
-    } catch (error) {
+    } catch {
       // Directory might already exist, ignore error
     }
 
     // Generate unique filename with UUID
     const timestamp = Date.now();
     const randomId = Math.random().toString(36).substring(2, 15);
-    const ext = path.extname(file.name);
+    const ext = path.default.extname(file.name);
     const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
     const fileName = `${timestamp}-${randomId}-${sanitizedName}`;
-    const filePath = path.join(uploadsDir, fileName);
+    const filePath = path.default.join(uploadsDir, fileName);
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);

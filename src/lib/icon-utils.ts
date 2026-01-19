@@ -1,5 +1,5 @@
 import * as LucideIcons from "lucide-react";
-import type { LucideProps } from "lucide-react";
+import type { LucideIcon } from "@/constants/pin-types";
 
 /**
  * Type-safe Lucide icon component map
@@ -21,18 +21,19 @@ export function isLucideIconName(iconName: string): iconName is LucideIconName {
  * @param iconName - The name of the Lucide icon
  * @returns The Lucide icon component or MapPin as fallback
  */
-export function getLucideIcon(iconName: string): React.ComponentType<LucideProps> {
+export function getLucideIcon(iconName: string): LucideIcon {
   if (isLucideIconName(iconName)) {
     const IconComponent = LucideIcons[iconName];
 
     // Verify it's a React component
     if (typeof IconComponent === "function") {
-      return IconComponent as React.ComponentType<LucideProps>;
+      return IconComponent as LucideIcon;
     }
   }
 
   // Fallback to MapPin
-  return LucideIcons.MapPin;
+  // @ts-ignore - MapPin exists in lucide-react
+  return LucideIcons.MapPin as LucideIcon;
 }
 
 /**

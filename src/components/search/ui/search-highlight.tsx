@@ -1,6 +1,6 @@
 import React from "react";
 
-interface SearchHighlightProps {
+export interface SearchHighlightProps {
   text: string;
   query: string;
   className?: string;

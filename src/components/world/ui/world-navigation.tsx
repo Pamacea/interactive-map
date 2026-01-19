@@ -20,7 +20,8 @@ interface WorldNavigationProps {
 
 export function WorldNavigation({ worldTitle, autosaveStatus, worldId, onSearchResultClick }: WorldNavigationProps) {
   const pathname = usePathname();
-  const { mapElement } = useMapExport();
+  const { getMapElement } = useMapExport();
+  const mapElement = getMapElement();
 
   return (
     <nav className="h-12 bg-background-base/95 backdrop-blur-sm border-b border-b-accent-gold-dark flex items-center justify-between px-6">

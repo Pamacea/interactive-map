@@ -33,7 +33,7 @@ export function AutosaveIndicator({ status }: AutosaveIndicatorProps) {
       case "unsaved":
         return (
           <div
-            className="h-2 w-2 rounded-full bg-amber-500"
+            className="h-2 w-2 rounded-full bg-status-warning-light"
             title={statusText}
           />
         );
@@ -41,7 +41,7 @@ export function AutosaveIndicator({ status }: AutosaveIndicatorProps) {
       case "saving":
         return (
           <div
-            className="h-3 w-3 animate-spin rounded-full border-2 border-blue-500 border-t-transparent"
+            className="h-3 w-3 animate-spin rounded-full border-2 border-interactive-primary border-t-transparent"
             title={statusText}
           />
         );
@@ -49,7 +49,7 @@ export function AutosaveIndicator({ status }: AutosaveIndicatorProps) {
       case "saved":
         return (
           <svg
-            className="h-3 w-3 text-green-600"
+            className="h-3 w-3 text-status-success-dark"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -66,7 +66,7 @@ export function AutosaveIndicator({ status }: AutosaveIndicatorProps) {
       case "error":
         return (
           <svg
-            className="h-3 w-3 text-red-600"
+            className="h-3 w-3 text-status-error-dark"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

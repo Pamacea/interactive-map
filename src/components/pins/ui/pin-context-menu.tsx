@@ -55,7 +55,7 @@ export function PinContextMenu({
       aria-label="Create pin menu"
       aria-orientation="vertical"
       className={cn(
-        "fixed z-50 min-w-[200px] rounded-sm border border-border-subtle",
+        "fixed z-50 min-w-52 rounded-sm border border-border-subtle",
         "bg-background-card shadow-xl p-1",
         "animate-in fade-in zoom-in-95 duration-200",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",

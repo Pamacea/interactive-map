@@ -69,24 +69,22 @@ export function PinList({ worldId }: PinListProps) {
   const totalCount = pins.length;
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gap-3">
       {/* Filter Dropdown */}
-      <div className="mb-3">
-        <select
-          value={selectedType}
-          onChange={(e) => setSelectedType(e.target.value as PinType | "ALL")}
-          className="w-full h-9 px-3 text-sm bg-background-base border border-border-base rounded-sm focus:outline-none focus:ring-1 focus:ring-accent-gold focus:border-accent-gold cursor-pointer hover:border-border-muted transition-colors"
-        >
-          {pinTypes.map((type) => (
-            <option key={type.value} value={type.value}>
-              {type.label}
-            </option>
-          ))}
-        </select>
-      </div>
+      <select
+        value={selectedType}
+        onChange={(e) => setSelectedType(e.target.value as PinType | "ALL")}
+        className="w-full h-9 px-3 text-sm bg-background-base border border-border-base rounded-sm focus:outline-none focus:ring-1 focus:ring-accent-gold focus:border-accent-gold cursor-pointer hover:border-border-muted transition-colors"
+      >
+        {pinTypes.map((type) => (
+          <option key={type.value} value={type.value}>
+            {type.label}
+          </option>
+        ))}
+      </select>
 
       {/* Pin Count Badge */}
-      <div className="mb-2 flex items-center gap-2">
+      <div className="flex items-center gap-2">
         <Badge className="text-xs bg-accent-gold/10 text-accent-gold border-accent-gold/30">
           {pinCount}
           {totalCount > pinCount && ` / ${totalCount}`}
@@ -98,10 +96,10 @@ export function PinList({ worldId }: PinListProps) {
 
       {/* Pin List */}
       {filteredPins.length === 0 ? (
-        <div className="px-4 py-8 text-center">
-          <MapPin className="w-8 h-8 mx-auto mb-2 text-text-muted" />
+        <div className="flex flex-col items-center gap-2 px-4 py-8 text-center">
+          <MapPin className="w-8 h-8 text-text-muted" />
           <p className="text-sm text-text-muted">No pins found</p>
-          <p className="text-xs text-text-muted mt-1">
+          <p className="text-xs text-text-muted">
             {totalCount > 0
               ? "Try a different filter"
               : "Click on the map to add pins"}

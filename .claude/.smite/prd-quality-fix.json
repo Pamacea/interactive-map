@@ -1,0 +1,232 @@
+{
+  "title": "Quality Gates Remediation - Fix All Critical Issues",
+  "version": "1.0.0",
+  "created": "2025-01-19",
+  "objective": "Fix all critical quality gate issues identified in quality report to bring project from 68% to 95%+ quality score",
+  "scope": {
+    "includes": [
+      "TypeScript type errors (90+ errors)",
+      "Lucide React icon imports",
+      "Type system fixes (pin-icons.ts, pin-types.ts)",
+      "ESLint configuration",
+      "Failing tests (17 failures)",
+      "Design system violations (rounded-3xl)"
+    ],
+    "excludes": [
+      "Feature additions",
+      "Database schema changes",
+      "New functionality"
+    ]
+  },
+  "principles": [
+    "Fix blocking issues first (TypeScript)",
+    "Maintain backward compatibility",
+    "Follow existing code patterns",
+    "All fixes must pass typecheck and tests",
+    "Document breaking changes"
+  ],
+  "user_stories": [
+    {
+      "id": "US-001",
+      "title": "Audit and Fix All Lucide React Icon Imports",
+      "priority": 1,
+      "severity": "CRITICAL",
+      "agent": "builder:builder",
+      "status": "pending",
+      "passes": false,
+      "description": "Fix 90+ TypeScript errors caused by incorrect Lucide React icon imports. Verify correct icon names in lucide-react v0.562.0 or upgrade to latest version.",
+      "acceptance_criteria": [
+        "All icon imports use valid Lucide React icons",
+        "Zero TypeScript errors related to icon imports",
+        "Icons render correctly in browser",
+        "Typecheck passes completely",
+        "No breaking changes to component APIs"
+      ],
+      "files": [
+        "src/app/settings/page.tsx",
+        "src/app/world/[id]/error.tsx",
+        "src/app/worlds/page.tsx",
+        "src/components/create/ui/create-world-form.tsx",
+        "src/components/explore/**/*.tsx",
+        "src/components/export/**/*.tsx",
+        "src/components/gallery/**/*.tsx",
+        "src/components/home/**/*.tsx",
+        "src/components/lore/**/*.tsx",
+        "src/components/pins/**/*.tsx",
+        "src/components/search/**/*.tsx",
+        "src/components/world/**/*.tsx",
+        "src/components/ui/**/*.tsx",
+        "src/hooks/**/*.ts",
+        "src/lib/icon-utils.ts"
+      ],
+      "dependencies": [],
+      "tech": "lucide-react",
+      "notes": "This is blocking all other work. Priority #1."
+    },
+    {
+      "id": "US-002",
+      "title": "Fix Type System Errors in Constants",
+      "priority": 1,
+      "severity": "CRITICAL",
+      "agent": "builder:builder",
+      "status": "pending",
+      "passes": false,
+      "description": "Resolve 37 type inference errors in src/constants/pin-icons.ts and fix LucideIcon export issue in src/constants/pin-types.ts",
+      "acceptance_criteria": [
+        "pin-icons.ts has zero type errors",
+        "pin-types.ts exports LucideIcon correctly",
+        "All type annotations are explicit",
+        "Types are properly documented",
+        "Typecheck passes for constants/"
+      ],
+      "files": [
+        "src/constants/pin-icons.ts",
+        "src/constants/pin-types.ts"
+      ],
+      "dependencies": [],
+      "tech": "typescript",
+      "notes": "Core type system fix affecting entire pin feature"
+    },
+    {
+      "id": "US-003",
+      "title": "Fix Explicit Any Types in Test Files",
+      "priority": 2,
+      "severity": "HIGH",
+      "agent": "builder:builder",
+      "status": "pending",
+      "passes": false,
+      "description": "Add explicit types to 11 parameters in test files that currently have implicit 'any' types",
+      "acceptance_criteria": [
+        "Zero implicit 'any' types in test files",
+        "All test parameters have proper TypeScript types",
+        "Tests still pass after type additions",
+        "No test logic changes"
+      ],
+      "files": [
+        "src/hooks/__tests__/use-keyboard-shortcut.test.ts"
+      ],
+      "dependencies": [],
+      "tech": "typescript, vitest",
+      "notes": "Quick fix to improve type safety"
+    },
+    {
+      "id": "US-004",
+      "title": "Fix ESLint Configuration",
+      "priority": 2,
+      "severity": "HIGH",
+      "agent": "builder:builder",
+      "status": "pending",
+      "passes": false,
+      "description": "Fix ESLint configuration error preventing proper lint execution. Verify project directory and regenerate config if needed.",
+      "acceptance_criteria": [
+        "ESLint runs without errors",
+        "Project directory is correctly configured",
+        "ESLint config follows Next.js 16 best practices",
+        "Lint command executes successfully",
+        "Zero new linting errors introduced"
+      ],
+      "files": [
+        "eslint.config.js",
+        ".eslintrc.json",
+        "package.json"
+      ],
+      "dependencies": [],
+      "tech": "eslint, nextjs",
+      "notes": "Enables ongoing code quality enforcement"
+    },
+    {
+      "id": "US-005",
+      "title": "Fix All Failing Tests",
+      "priority": 2,
+      "severity": "HIGH",
+      "agent": "builder:builder",
+      "status": "pending",
+      "passes": false,
+      "description": "Debug and fix 17 failing tests across 2 test suites. Most failures likely related to TypeScript errors blocking compilation.",
+      "acceptance_criteria": [
+        "All 70 tests pass (53 currently passing + 17 fixed)",
+        "use-pin-events.test.ts: All 16 tests passing",
+        "use-pin-drag.test.ts: All 18 tests passing",
+        "Test coverage >= 76%",
+        "Zero test warnings or errors"
+      ],
+      "files": [
+        "src/components/pins/logic/__tests__/use-pin-events.test.ts",
+        "src/components/pins/logic/__tests__/use-pin-drag.test.ts"
+      ],
+      "dependencies": ["US-001", "US-002", "US-003"],
+      "tech": "vitest, testing-library",
+      "notes": "Tests likely failing due to TypeScript compilation errors. Should fix itself after US-001/US-002/US-003."
+    },
+    {
+      "id": "US-006",
+      "title": "Replace rounded-3xl with Design System Tokens",
+      "priority": 3,
+      "severity": "MEDIUM",
+      "agent": "simplifier:smite-simplifier",
+      "status": "pending",
+      "passes": false,
+      "description": "Replace 6 instances of prohibited rounded-3xl with approved design system tokens (rounded-xl) or document exception in quality.json",
+      "acceptance_criteria": [
+        "Zero instances of rounded-3xl in codebase",
+        "All border radius uses design system tokens",
+        "UI remains visually consistent",
+        "Component snapshots pass if applicable"
+      ],
+      "files": [
+        "src/components/ui/alert-dialog.tsx",
+        "src/components/pins/ui/popup-header.tsx",
+        "src/components/pins/ui/pin-popup.tsx",
+        "src/components/pins/ui/icon-picker.tsx",
+        "src/components/pins/ui/popup-content.tsx",
+        "src/components/ui/button.tsx"
+      ],
+      "dependencies": [],
+      "tech": "tailwindcss",
+      "notes": "Quick design system compliance fix"
+    },
+    {
+      "id": "US-007",
+      "title": "Verify All Fixes with Full Quality Check",
+      "priority": 4,
+      "severity": "MEDIUM",
+      "agent": "finalize:finalize",
+      "status": "pending",
+      "passes": false,
+      "description": "Run complete quality gate verification after all fixes to confirm 95%+ quality score achieved",
+      "acceptance_criteria": [
+        "Typecheck: 100% pass rate",
+        "Lint: 0 errors",
+        "Tests: 100% pass rate (70/70)",
+        "Component complexity: All < 200 lines",
+        "Design system: 100% compliance",
+        "Architecture: 100% compliance",
+        "Overall quality score: 95%+"
+      ],
+      "files": [
+        "Full codebase scan"
+      ],
+      "dependencies": ["US-001", "US-002", "US-003", "US-004", "US-005", "US-006"],
+      "tech": "quality-gate",
+      "notes": "Final verification gate"
+    }
+  ],
+  "definition_of_done": [
+    "Zero TypeScript errors",
+    "Zero ESLint errors",
+    "All tests passing (70/70)",
+    "Design system 100% compliant",
+    "Quality score 95%+",
+    "All user stories completed and verified",
+    "Documentation updated",
+    "Changes committed to git"
+  ],
+  "testing_strategy": {
+    "unit_tests": "Run full test suite after each user story",
+    "type_check": "npx tsc --noEmit after TypeScript-related stories",
+    "lint_check": "npm run lint after US-004 (ESLint fix)",
+    "manual_testing": "Verify icons render correctly in browser",
+    "regression_testing": "Ensure no existing functionality broken"
+  },
+  "rollback_plan": "Git commits after each user story for easy rollback. Use 'git revert' if needed."
+}

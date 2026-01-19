@@ -8,6 +8,14 @@ vi.mock('@/actions/pins', () => ({
   updatePinPosition: vi.fn(),
 }))
 
+// Mock the useToast hook
+const mockShowToast = vi.fn()
+vi.mock('@/hooks/use-toast', () => ({
+  useToast: () => ({
+    showToast: mockShowToast,
+  }),
+}))
+
 describe('usePinDrag', () => {
   const mockConfig = {
     pinId: 'pin-123',
@@ -617,8 +625,6 @@ describe('usePinDrag', () => {
       const onUpdatePin = vi.fn()
       vi.mocked(updatePinPosition).mockRejectedValue(new Error('Database error'))
 
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-
       const { result } = renderHook(() =>
         usePinDrag({
           ...mockConfig,
@@ -663,13 +669,11 @@ describe('usePinDrag', () => {
       })
 
       await waitFor(() => {
-        expect(consoleSpy).toHaveBeenCalledWith(
-          '[usePinDrag] Failed to save pin position to database:',
-          expect.any(Error)
+        expect(mockShowToast).toHaveBeenCalledWith(
+          'Failed to save pin position. Please check your connection.',
+          'error'
         )
       })
-
-      consoleSpy.mockRestore()
     })
   })
 })

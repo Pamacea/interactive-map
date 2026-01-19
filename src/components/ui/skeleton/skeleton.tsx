@@ -16,7 +16,7 @@ export function Skeleton({
   return (
     <div
       className={cn(
-        "animate-pulse bg-slate-700",
+        "animate-pulse bg-background-skeleton",
         {
           "rounded-md": variant === "default",
           "rounded-sm": variant === "text",

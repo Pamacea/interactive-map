@@ -79,9 +79,9 @@ export function LoreList({ worldId }: LoreListProps) {
   const totalCount = loreEntries.length;
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full gap-3">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-text-secondary">Lore</h2>
         <Button
           size="sm"
@@ -90,26 +90,24 @@ export function LoreList({ worldId }: LoreListProps) {
           className="h-8 px-3 text-accent-gold hover:bg-accent-gold/10"
         >
           <Plus className="w-4 h-4" />
-          <span className="ml-1">Add</span>
+          <span>Add</span>
         </Button>
       </div>
 
       {/* Search */}
-      <div className="mb-3">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted" />
-          <Input
-            type="text"
-            placeholder="Search lore..."
-            value={localSearchTerm}
-            onChange={handleSearchChange}
-            className="pl-9 h-9"
-          />
-        </div>
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted" />
+        <Input
+          type="text"
+          placeholder="Search lore..."
+          value={localSearchTerm}
+          onChange={handleSearchChange}
+          className="pl-9 h-9"
+        />
       </div>
 
       {/* Filters */}
-      <div className="mb-3 flex items-center gap-2">
+      <div className="flex items-center gap-2">
         <Button
           size="sm"
           variant={showVisibleOnly ? "default" : "outline"}
@@ -136,7 +134,7 @@ export function LoreList({ worldId }: LoreListProps) {
       </div>
 
       {/* Category Filters */}
-      <div className="mb-3 flex flex-wrap gap-1">
+      <div className="flex flex-wrap gap-1">
         {Object.entries(categoryLabels).map(([category, label]) => {
           const isEnabled = categoryFilters[category as LoreCategory];
           return (
@@ -163,9 +161,9 @@ export function LoreList({ worldId }: LoreListProps) {
       {/* Lore List */}
       {filteredLoreEntries.length === 0 ? (
         <div className="flex-1 flex items-center justify-center px-4 py-8">
-          <div className="text-center">
-            <BookOpen className="w-12 h-12 mx-auto mb-3 text-text-muted" />
-            <p className="text-sm text-text-muted mb-1">No lore entries found</p>
+          <div className="flex flex-col items-center gap-1 text-center">
+            <BookOpen className="w-12 h-12 text-text-muted" />
+            <p className="text-sm text-text-muted">No lore entries found</p>
             <p className="text-xs text-text-muted">
               {totalCount > 0
                 ? "Try adjusting your filters"

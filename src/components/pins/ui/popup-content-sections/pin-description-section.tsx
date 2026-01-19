@@ -43,7 +43,7 @@ export function PinDescriptionSection({
             onKeyDown={onKeyDown}
             onClick={(e) => e.stopPropagation()}
             onMouseDown={(e) => e.stopPropagation()}
-            className="w-full min-h-[80px] px-3 py-2 bg-background-base border-2 border-accent-gold rounded-sm text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-gold/50 resize-y"
+            className="w-full min-h-20 px-3 py-2 bg-background-base border-2 border-accent-gold rounded-sm text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-gold/50 resize-y"
             placeholder="Add a description..."
           />
           <div className="flex items-center gap-2 text-xs text-text-muted">

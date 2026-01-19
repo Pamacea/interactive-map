@@ -83,7 +83,7 @@ export function UserMenu() {
       {isOpen && (
         <div
           className={cn(
-            "absolute right-0 mt-8 w-56",
+            "absolute right-0 top-full pt-2 w-56",
             "bg-background-card",
             "rounded-sm border-2 border-border-ornate shadow-xl",
             "overflow-hidden",

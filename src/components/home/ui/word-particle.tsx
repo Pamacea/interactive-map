@@ -2,13 +2,13 @@
 
 const particleColors = [
   "bg-accent-gold",
-  "bg-purple-500",
-  "bg-blue-400",
-  "bg-emerald-400",
-  "bg-amber-400",
-  "bg-rose-400",
-  "bg-cyan-400",
-  "bg-violet-400"
+  "bg-particle-purple",
+  "bg-particle-blue",
+  "bg-particle-emerald",
+  "bg-particle-amber",
+  "bg-particle-rose",
+  "bg-particle-cyan",
+  "bg-particle-violet"
 ];
 
 export function WordParticles() {
@@ -37,21 +37,25 @@ export function WordParticles() {
 
       <style jsx>{`
         @keyframes float {
-          0%, 100% {
+          0% {
             transform: translate(0, 0) scale(1);
             opacity: 0.3;
           }
           25% {
-            transform: translate(${Math.random() * 15 - 7.5}px, ${Math.random() * 15 - 7.5}px) scale(1.3);
+            transform: translate(5px, -5px) scale(1.3);
             opacity: 0.6;
           }
           50% {
-            transform: translate(${Math.random() * 15 - 7.5}px, ${Math.random() * 15 - 7.5}px) scale(0.7);
+            transform: translate(-3px, 3px) scale(0.7);
             opacity: 0.4;
           }
           75% {
-            transform: translate(${Math.random() * 15 - 7.5}px, ${Math.random() * 15 - 7.5}px) scale(1.2);
+            transform: translate(4px, -4px) scale(1.2);
             opacity: 0.7;
+          }
+          100% {
+            transform: translate(0, 0) scale(1);
+            opacity: 0.3;
           }
         }
       `}</style>

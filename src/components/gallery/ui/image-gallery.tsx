@@ -12,7 +12,7 @@ import { ImageUploadZone } from "./image-upload-zone";
 import { useGalleryStore } from "@/stores/use-gallery-store";
 import type { GalleryItemWithRelations } from "@/types/gallery.type";
 
-interface ImageGalleryProps {
+export interface ImageGalleryProps {
   worldId: string;
   className?: string;
 }

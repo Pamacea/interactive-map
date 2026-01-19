@@ -12,7 +12,7 @@ export function FilterSidebar({ showFilters, activeFilters, onToggleFilter, onCl
   return (
     <aside
       className={cn(
-        "w-[280px] flex-shrink-0",
+        "w-72 flex-shrink-0",
         "py-6 pr-8",
         "divide-y divide-border-subtle",
         !showFilters && "hidden lg:block"

@@ -1,0 +1,178 @@
+{
+  "$schema": "./quality-schema.json",
+  "version": "1.0.0",
+  "enabled": true,
+  "project": {
+    "name": "interactive-map",
+    "type": "nextjs",
+    "stack": ["Next.js 16", "TypeScript", "Tailwind CSS 4", "Prisma", "Zustand"]
+  },
+  "complexity": {
+    "enabled": true,
+    "threshold": 10,
+    "perFunction": true,
+    "maxComponentLines": 200,
+    "maxHookLines": 150,
+    "rules": {
+      "enforceComponentSplit": true,
+      "enforceHookExtraction": true,
+      "allowJustification": true
+    }
+  },
+  "architecture": {
+    "enabled": true,
+    "patterns": {
+      "uiLogicMethodsSeparation": {
+        "enforced": true,
+        "description": "Components must follow ui/logic/methods separation"
+      },
+      "barrelExports": {
+        "enforced": true,
+        "directories": ["components/*/ui", "components/*/logic", "components/*/methods"],
+        "description": "All feature directories must have index.ts barrel exports"
+      },
+      "stateManagement": {
+        "serverState": "TanStack Query",
+        "clientState": "Zustand",
+        "formState": "React Hook Form + Zod"
+      }
+    }
+  },
+  "design": {
+    "enabled": true,
+    "tailwind": {
+      "version": 4,
+      "rules": {
+        "noArbitraryPixels": {
+          "enforced": true,
+          "exceptions": ["hero-sections", "dynamic-calculations"],
+          "description": "No arbitrary pixel values (w-[280px], h-[80px]) - use Tailwind scale"
+        },
+        "noMarginsForLayout": {
+          "enforced": true,
+          "description": "Use gap-* in flex/grid containers instead of margin classes"
+        },
+        "standardShadows": {
+          "enforced": true,
+          "allowed": ["shadow-lg", "shadow-xl", "shadow-2xl"],
+          "description": "Use standard Tailwind shadow utilities only"
+        },
+        "standardBorders": {
+          "enforced": true,
+          "primary": "border-2 border-accent-gold",
+          "secondary": "border border-border-subtle"
+        },
+        "borderRadius": {
+          "enforced": true,
+          "scale": ["rounded-sm", "rounded-md", "rounded-lg", "rounded-xl", "rounded-full"],
+          "prohibited": ["rounded-3xl"]
+        }
+      }
+    }
+  },
+  "codeQuality": {
+    "enabled": true,
+    "typescript": {
+      "strict": true,
+      "noAny": true,
+      "explicitTypes": true
+    },
+    "naming": {
+      "components": "kebab-case.tsx",
+      "hooks": "use-[feature].ts",
+      "actions": "[resource].ts",
+      "types": "[resource]-types.ts"
+    },
+    "documentation": {
+      "requireComplexFunctions": true,
+      "complexityThreshold": 8
+    }
+  },
+  "security": {
+    "enabled": true,
+    "patterns": [
+      "sql-injection",
+      "xss",
+      "weak-crypto",
+      "hardcoded-secrets",
+      "unsafe-eval"
+    ],
+    "inputValidation": {
+      "library": "Zod",
+      "enforced": true,
+      "entryPoints": ["API routes", "Server Actions", "Form inputs"]
+    }
+  },
+  "testing": {
+    "enabled": true,
+    "framework": "Vitest",
+    "coverage": {
+      "threshold": 80,
+      "perFile": false
+    },
+    "commands": {
+      "unit": "npm run test",
+      "coverage": "npm run test:coverage",
+      "onEveryWrite": false
+    },
+    "requirements": {
+      "testBusinessLogic": true,
+      "testCriticalPaths": ["auth", "pins", "worlds"],
+      "skipSimpleUI": true
+    }
+  },
+  "validation": {
+    "commands": {
+      "typecheck": "npm run typecheck || tsc --noEmit",
+      "lint": "npm run lint || next lint",
+      "build": "npm run build"
+    },
+    "runOn": {
+      "everySave": false,
+      "beforeCommit": true,
+      "afterRefactor": true
+    }
+  },
+  "errorHandling": {
+    "patterns": {
+      "serverActions": "try-catch with user-friendly errors",
+      "components": "Error boundaries",
+      "api": "Proper error responses"
+    },
+    "logging": "No console.logs - use proper logging"
+  },
+  "performance": {
+    "enabled": true,
+    "rules": {
+      "serverComponentsDefault": true,
+      "lazyLoadRoutes": true,
+      "memoization": "Use for expensive calculations",
+      "imageOptimization": "Next.js Image component"
+    }
+  },
+  "dependencies": {
+    "allowedUpdates": {
+      "major": false,
+      "minor": true,
+      "patch": true
+    }
+  },
+  "feedback": {
+    "maxRetries": 3,
+    "requireTests": true,
+    "requireTypeCheck": true,
+    "requireLint": true,
+    "interactiveMode": true
+  },
+  "paths": {
+    "components": "src/components",
+    "actions": "src/actions",
+    "hooks": "src/hooks",
+    "store": "src/store",
+    "lib": "src/lib"
+  },
+  "overrides": {
+    "legacyFiles": [],
+    "externalLibs": []
+  }
+}

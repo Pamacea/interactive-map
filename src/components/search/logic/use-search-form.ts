@@ -1,0 +1,100 @@
+import { useCallback, useEffect, useRef } from "react";
+import { useSearchStore } from "@/store/use-search-store";
+
+interface UseSearchFormProps {
+  worldId: string;
+  onClear?: () => void;
+}
+
+export function useSearchForm({ worldId, onClear }: UseSearchFormProps) {
+  const {
+    query,
+    setQuery,
+    setHighlightedIndex,
+    showSuggestions,
+    suggestions,
+    activeTab,
+    setActiveTab,
+    closeSearch,
+    clearSearch,
+  } = useSearchStore();
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Focus input when search opens
+  useEffect(() => {
+    const isOpen = useSearchStore.getState().isOpen;
+    if (isOpen && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
+
+  // Handle keyboard navigation
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      // Close on Escape
+      if (e.key === "Escape") {
+        e.preventDefault();
+        closeSearch();
+        return;
+      }
+
+      // Navigate suggestions
+      if (showSuggestions && suggestions.length > 0) {
+        const highlightedIndex = useSearchStore.getState().highlightedIndex;
+
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          setHighlightedIndex(
+            highlightedIndex < suggestions.length - 1 ? highlightedIndex + 1 : highlightedIndex
+          );
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          setHighlightedIndex(highlightedIndex > 0 ? highlightedIndex - 1 : 0);
+        } else if (e.key === "Enter" && highlightedIndex >= 0) {
+          e.preventDefault();
+          const suggestion = suggestions[highlightedIndex];
+          setQuery(suggestion);
+          useSearchStore.getState().setShowSuggestions(false);
+          setHighlightedIndex(-1);
+        }
+      }
+
+      // Navigate tabs with Tab
+      if (e.key === "Tab" && !e.shiftKey) {
+        const tabs: Array<"all" | "pins" | "lore"> = ["all", "pins", "lore"];
+        const currentIndex = tabs.indexOf(activeTab);
+        const nextTab = tabs[(currentIndex + 1) % tabs.length];
+        setActiveTab(nextTab);
+      }
+    },
+    [showSuggestions, suggestions, activeTab, closeSearch, setQuery, setHighlightedIndex, setActiveTab]
+  );
+
+  // Handle input change
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setQuery(value);
+      setHighlightedIndex(-1);
+    },
+    [setQuery, setHighlightedIndex]
+  );
+
+  // Handle clear
+  const handleClear = useCallback(() => {
+    clearSearch();
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+    onClear?.();
+  }, [clearSearch, onClear]);
+
+  return {
+    inputRef,
+    query,
+    handleKeyDown,
+    handleInputChange,
+    handleClear,
+  };
+}

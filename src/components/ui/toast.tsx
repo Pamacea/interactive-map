@@ -23,7 +23,7 @@ export function Toast({ toast, onHide }: ToastProps) {
   return (
     <div
       id="toast-notification"
-      className="fixed top-4 right-4 z-[9999] min-w-[300px] max-w-md animate-in fade-in duration-200"
+      className="fixed top-4 right-4 z-[9999] min-w-80 max-w-md animate-in fade-in duration-200"
     >
       <div
         className={`flex items-start gap-3 px-4 py-3 rounded-lg border shadow-lg ${
@@ -33,7 +33,7 @@ export function Toast({ toast, onHide }: ToastProps) {
         } backdrop-blur-sm`}
       >
         <Icon
-          className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
+          className={`w-5 h-5 flex-shrink-0 ${
             toast.type === "success" ? "text-emerald-400" : "text-rose-400"
           }`}
         />

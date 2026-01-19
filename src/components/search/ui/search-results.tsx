@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-interface SearchResultsProps {
+export interface SearchResultsProps {
   results: SearchResults | null;
   isLoading: boolean;
   error: string | null;
@@ -37,9 +37,9 @@ export function SearchResults({
   // Loading state
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12">
+      <div className="flex items-center justify-center gap-3 py-12">
         <Loader2 className="w-6 h-6 animate-spin text-accent-gold" />
-        <span className="ml-3 text-sm text-text-muted">Searching...</span>
+        <span className="text-sm text-text-muted">Searching...</span>
       </div>
     );
   }
@@ -56,11 +56,11 @@ export function SearchResults({
   // No results state
   if (results && results.total === 0) {
     return (
-      <div className="py-8 text-center">
+      <div className="flex flex-col gap-2 py-8 text-center">
         <p className="text-sm text-text-muted">
           No results found for &quot;{query}&quot;
         </p>
-        <p className="text-xs text-text-muted mt-2">
+        <p className="text-xs text-text-muted">
           Try different keywords or check your filters
         </p>
       </div>
@@ -70,11 +70,11 @@ export function SearchResults({
   // Initial state
   if (!results) {
     return (
-      <div className="py-8 text-center">
+      <div className="flex flex-col gap-6 py-8 text-center">
         <p className="text-sm text-text-muted">
           Start typing to search pins and lore entries
         </p>
-        <div className="mt-6 space-y-3">
+        <div className="flex flex-col gap-3">
           <div className="flex items-center gap-3 text-xs text-text-muted">
             <kbd className="px-2 py-1 bg-background-elevated border border-border-subtle rounded">
               Ctrl + K
@@ -234,20 +234,20 @@ function SearchResultItem({ result, query, onClick }: SearchResultItemProps) {
 
           {/* Pin: Description */}
           {isPin && result.description && (
-            <p className="text-xs text-text-secondary mt-1 line-clamp-2">
+            <p className="text-xs text-text-secondary line-clamp-2">
               <SearchHighlight text={result.description} query={query} />
             </p>
           )}
 
           {/* Lore: Content preview */}
           {!isPin && (
-            <p className="text-xs text-text-secondary mt-1 line-clamp-2">
+            <p className="text-xs text-text-secondary line-clamp-2">
               <SearchHighlight text={result.content} query={query} />
             </p>
           )}
 
           {/* Metadata */}
-          <div className="flex items-center gap-2 mt-2 text-xs text-text-muted">
+          <div className="flex items-center gap-2 text-xs text-text-muted">
             {/* Pin: Layer */}
             {isPin && (result as any).layerName && (
               <Badge variant="outline" className="px-1.5 py-0.5">

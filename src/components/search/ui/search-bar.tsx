@@ -1,17 +1,19 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef } from "react";
-import { Search, X, Loader2 } from "lucide-react";
+import React, { useCallback, useEffect } from "react";
+import { Search } from "lucide-react";
 import { useDebounce } from "@/hooks/use-debounce";
 import { searchWorld, getSearchSuggestions } from "@/actions/search";
 import { useSearchStore } from "@/store/use-search-store";
+import { SearchInput } from "./search-input";
+import { SearchSuggestions } from "./search-suggestions";
 import { SearchResults } from "./search-results";
+import { useSearchForm } from "../logic/use-search-form";
 import { cn } from "@/lib/utils";
 import type { SearchResultItem } from "@/lib/search-types";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
-interface SearchBarProps {
+export interface SearchBarProps {
   worldId: string;
   onResultClick?: (result: SearchResultItem) => void;
   className?: string;
@@ -20,36 +22,24 @@ interface SearchBarProps {
 export function SearchBar({ worldId, onResultClick, className }: SearchBarProps) {
   const {
     isOpen,
-    query,
-    setQuery,
     results,
     isLoading,
     error,
     activeTab,
     setActiveTab,
     suggestions,
-    setSuggestions,
     showSuggestions,
-    setShowSuggestions,
     highlightedIndex,
-    setHighlightedIndex,
+    setShowSuggestions,
     openSearch,
     closeSearch,
-    clearSearch,
     setResults,
     setLoading,
     setError,
+    setSuggestions,
   } = useSearchStore();
 
-  const inputRef = useRef<HTMLInputElement>(null);
-  const debouncedQuery = useDebounce(query, 300);
-
-  // Focus input when search opens
-  useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isOpen]);
+  const debouncedQuery = useDebounce(useSearchStore((state) => state.query), 300);
 
   // Perform search when debounced query changes
   useEffect(() => {
@@ -90,6 +80,8 @@ export function SearchBar({ worldId, onResultClick, className }: SearchBarProps)
 
   // Fetch suggestions when query changes
   useEffect(() => {
+    const query = useSearchStore.getState().query;
+
     const fetchSuggestions = async () => {
       if (!query || query.length < 2) {
         setSuggestions([]);
@@ -112,75 +104,7 @@ export function SearchBar({ worldId, onResultClick, className }: SearchBarProps)
     };
 
     fetchSuggestions();
-  }, [query, worldId, setSuggestions, setShowSuggestions]);
-
-  // Handle keyboard navigation
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      // Close on Escape
-      if (e.key === "Escape") {
-        e.preventDefault();
-        closeSearch();
-        return;
-      }
-
-      // Navigate suggestions
-      if (showSuggestions && suggestions.length > 0) {
-        if (e.key === "ArrowDown") {
-          e.preventDefault();
-          setHighlightedIndex(
-            highlightedIndex < suggestions.length - 1 ? highlightedIndex + 1 : highlightedIndex
-          );
-        } else if (e.key === "ArrowUp") {
-          e.preventDefault();
-          setHighlightedIndex(highlightedIndex > 0 ? highlightedIndex - 1 : 0);
-        } else if (e.key === "Enter" && highlightedIndex >= 0) {
-          e.preventDefault();
-          const suggestion = suggestions[highlightedIndex];
-          setQuery(suggestion);
-          setShowSuggestions(false);
-          setHighlightedIndex(-1);
-        }
-      }
-
-      // Navigate tabs with Tab
-      if (e.key === "Tab" && !e.shiftKey) {
-        const tabs: Array<"all" | "pins" | "lore"> = ["all", "pins", "lore"];
-        const currentIndex = tabs.indexOf(activeTab);
-        const nextTab = tabs[(currentIndex + 1) % tabs.length];
-        setActiveTab(nextTab);
-      }
-    },
-    [
-      showSuggestions,
-      suggestions,
-      highlightedIndex,
-      activeTab,
-      closeSearch,
-      setQuery,
-      setShowSuggestions,
-      setHighlightedIndex,
-      setActiveTab,
-    ]
-  );
-
-  // Handle input change
-  const handleInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      setQuery(value);
-      setHighlightedIndex(-1);
-    },
-    [setQuery, setHighlightedIndex]
-  );
-
-  // Handle clear
-  const handleClear = useCallback(() => {
-    clearSearch();
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [clearSearch]);
+  }, [worldId, setSuggestions, setShowSuggestions]);
 
   // Handle result click
   const handleResultClick = useCallback(
@@ -196,12 +120,21 @@ export function SearchBar({ worldId, onResultClick, className }: SearchBarProps)
   // Handle suggestion click
   const handleSuggestionClick = useCallback(
     (suggestion: string) => {
-      setQuery(suggestion);
+      useSearchStore.getState().setQuery(suggestion);
       setShowSuggestions(false);
     },
-    [setQuery, setShowSuggestions]
+    [setShowSuggestions]
   );
 
+  // Use search form hook for input handling
+  const { inputRef, query, handleKeyDown, handleInputChange, handleClear } = useSearchForm({
+    worldId,
+    onClear: () => {
+      // Optional: Additional clear logic if needed
+    },
+  });
+
+  // Render closed state
   if (!isOpen) {
     return (
       <Button
@@ -219,6 +152,7 @@ export function SearchBar({ worldId, onResultClick, className }: SearchBarProps)
     );
   }
 
+  // Render open state
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 px-4">
       {/* Backdrop */}
@@ -231,56 +165,22 @@ export function SearchBar({ worldId, onResultClick, className }: SearchBarProps)
       {/* Search panel */}
       <div className="relative w-full max-w-2xl bg-background-card border border-border-ornate rounded-lg shadow-xl overflow-hidden">
         {/* Search input */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-border-subtle">
-          <Search className="w-5 h-5 text-text-muted flex-shrink-0" />
-          <Input
-            ref={inputRef}
-            type="text"
-            value={query}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            placeholder="Search pins and lore..."
-            className="flex-1 bg-transparent border-none outline-none text-text-primary placeholder:text-text-muted"
-            aria-label="Search"
-            autoComplete="off"
-          />
-
-          {isLoading && <Loader2 className="w-5 h-5 animate-spin text-accent-gold" />}
-
-          {query && !isLoading && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleClear}
-              aria-label="Clear search"
-            >
-              <X className="w-5 h-5" />
-            </Button>
-          )}
-
-          <kbd className="px-1.5 py-0.5 bg-background-elevated border border-border-subtle rounded text-xs text-text-muted">
-            Esc
-          </kbd>
-        </div>
+        <SearchInput
+          inputRef={inputRef}
+          query={query}
+          isLoading={isLoading}
+          onKeyDown={handleKeyDown}
+          onInputChange={handleInputChange}
+          onClear={handleClear}
+        />
 
         {/* Suggestions dropdown */}
-        {showSuggestions && suggestions.length > 0 && !results && (
-          <div className="max-h-64 overflow-y-auto border-b border-border-subtle">
-            {suggestions.map((suggestion, index) => (
-              <Button
-                key={index}
-                variant="ghost"
-                onClick={() => handleSuggestionClick(suggestion)}
-                className={cn(
-                  "w-full justify-start text-left px-4 py-2 hover:bg-background-card-hover",
-                  highlightedIndex === index && "bg-background-card-hover"
-                )}
-              >
-                <Search className="w-4 h-4 mr-2 text-text-muted" />
-                {suggestion}
-              </Button>
-            ))}
-          </div>
+        {showSuggestions && !results && (
+          <SearchSuggestions
+            suggestions={suggestions}
+            highlightedIndex={highlightedIndex}
+            onSuggestionClick={handleSuggestionClick}
+          />
         )}
 
         {/* Results */}

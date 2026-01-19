@@ -28,11 +28,11 @@ export const FormTextAreaField: FC<FormTextAreaFieldProps> = ({
         placeholder={placeholder}
         rows={rows}
         disabled={disabled}
-        className={`rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 resize-none ${
-          error ? "border-red-500" : "border-slate-200"
+        className={`rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-interactive-focus disabled:opacity-50 resize-none bg-background-input ${
+          error ? "border-status-error" : "border-input"
         }`}
       />
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && <p className="text-xs text-status-error">{error}</p>}
     </div>
   );
 };

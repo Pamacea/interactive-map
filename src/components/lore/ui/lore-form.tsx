@@ -119,8 +119,8 @@ export function LoreForm({ worldId, lore, onSuccess }: LoreFormProps) {
   };
 
   return (
-    <div className="p-4 bg-background-elevated border border-border-base rounded-sm">
-      <div className="flex items-center justify-between mb-4">
+    <div className="flex flex-col gap-4 p-4 bg-background-elevated border border-border-base rounded-sm">
+      <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-text-secondary">
           {isEditing ? "Edit Lore Entry" : "New Lore Entry"}
         </h3>
@@ -134,7 +134,7 @@ export function LoreForm({ worldId, lore, onSuccess }: LoreFormProps) {
         </Button>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         {/* Error message */}
         {error && (
           <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-sm">
@@ -143,7 +143,7 @@ export function LoreForm({ worldId, lore, onSuccess }: LoreFormProps) {
         )}
 
         {/* Title */}
-        <div>
+        <div className="flex flex-col gap-1">
           <Label htmlFor="lore-title">
             Title <span className="text-red-500">*</span>
           </Label>
@@ -155,22 +155,21 @@ export function LoreForm({ worldId, lore, onSuccess }: LoreFormProps) {
             placeholder="Enter title..."
             disabled={isSubmitting}
             maxLength={200}
-            className="mt-1"
           />
-          <p className="text-xs text-text-muted mt-1">
+          <p className="text-xs text-text-muted">
             {title.length} / 200 characters
           </p>
         </div>
 
         {/* Category */}
-        <div>
+        <div className="flex flex-col gap-1">
           <Label htmlFor="lore-category">Category</Label>
           <Select
             value={category}
             onValueChange={(value) => setCategory(value as LoreCategory)}
             disabled={isSubmitting}
           >
-            <SelectTrigger id="lore-category" className="mt-1">
+            <SelectTrigger id="lore-category">
               <SelectValue placeholder="Select a category" />
             </SelectTrigger>
             <SelectContent>
@@ -184,7 +183,7 @@ export function LoreForm({ worldId, lore, onSuccess }: LoreFormProps) {
         </div>
 
         {/* Content */}
-        <div>
+        <div className="flex flex-col gap-1">
           <Label htmlFor="lore-content">
             Content <span className="text-red-500">*</span>
           </Label>
@@ -196,9 +195,9 @@ export function LoreForm({ worldId, lore, onSuccess }: LoreFormProps) {
             rows={8}
             disabled={isSubmitting}
             maxLength={50000}
-            className="mt-1 resize-y"
+            className="resize-y"
           />
-          <p className="text-xs text-text-muted mt-1">
+          <p className="text-xs text-text-muted">
             {content.length} / 50,000 characters
           </p>
         </div>
@@ -255,10 +254,10 @@ export function LoreForm({ worldId, lore, onSuccess }: LoreFormProps) {
             className="h-9 px-4 bg-accent-gold text-white hover:bg-accent-gold/90"
           >
             {isSubmitting ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              <div className="flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
                 Saving...
-              </>
+              </div>
             ) : (
               <>{isEditing ? "Update" : "Create"}</>
             )}

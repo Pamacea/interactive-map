@@ -43,8 +43,8 @@ export const FormColorPicker: FC<FormColorPickerProps> = ({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}
-          className={`flex-1 h-10 rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
-            error ? "border-red-500" : "border-slate-200"
+          className={`flex-1 h-10 rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-interactive-focus disabled:opacity-50 bg-background-input ${
+            error ? "border-status-error" : "border-input"
           }`}
         />
       </div>
@@ -57,14 +57,14 @@ export const FormColorPicker: FC<FormColorPickerProps> = ({
             disabled={disabled}
             className={`w-8 h-8 rounded border-2 transition-all ${
               value.toLowerCase() === color.toLowerCase()
-                ? "border-blue-500 scale-110"
-                : "border-slate-300"
+                ? "border-interactive-primary scale-110"
+                : "border-hover"
             } disabled:opacity-50`}
             style={{ backgroundColor: color }}
           />
         ))}
       </div>
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && <p className="text-xs text-status-error">{error}</p>}
     </div>
   );
 };

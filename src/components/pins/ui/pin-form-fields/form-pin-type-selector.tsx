@@ -43,14 +43,14 @@ export const FormPinTypeSelector: FC<FormPinTypeSelectorProps> = ({
     return (
       <div className="grid gap-2">
         <label className="text-sm font-medium leading-none">
-          Pin Type <span className="text-red-500 ml-1">*</span>
+          Pin Type <span className="text-status-error ml-1">*</span>
         </label>
         <select
           value={value}
           onChange={(e) => onChange(e.target.value as (typeof PinType)[keyof typeof PinType])}
           disabled={disabled}
-          className={`h-10 rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
-            error ? "border-red-500" : "border-slate-200"
+          className={`h-10 rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-interactive-focus disabled:opacity-50 bg-background-input ${
+            error ? "border-status-error" : "border-input"
           }`}
         >
           {PIN_TYPE_OPTIONS.map((option) => (
@@ -59,7 +59,7 @@ export const FormPinTypeSelector: FC<FormPinTypeSelectorProps> = ({
             </option>
           ))}
         </select>
-        {error && <p className="text-xs text-red-500">{error}</p>}
+        {error && <p className="text-xs text-status-error">{error}</p>}
       </div>
     );
   }
@@ -69,7 +69,7 @@ export const FormPinTypeSelector: FC<FormPinTypeSelectorProps> = ({
   return (
     <div className="grid gap-2">
       <label className="text-sm font-medium leading-none">
-        Pin Type <span className="text-red-500 ml-1">*</span>
+        Pin Type <span className="text-status-error ml-1">*</span>
       </label>
       <div className="grid grid-cols-3 gap-2">
         {PIN_TYPE_OPTIONS.map((option) => {
@@ -82,8 +82,8 @@ export const FormPinTypeSelector: FC<FormPinTypeSelectorProps> = ({
               disabled={disabled}
               className={`flex flex-col items-center gap-2 p-3 rounded-md border transition-all ${
                 value === option.value
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-slate-200 hover:border-slate-300"
+                  ? "border-interactive-primary bg-interactive-selected"
+                  : "border-input hover:border-hover"
               } disabled:opacity-50`}
             >
               <OptIcon className="w-5 h-5" />
@@ -92,7 +92,7 @@ export const FormPinTypeSelector: FC<FormPinTypeSelectorProps> = ({
           );
         })}
       </div>
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && <p className="text-xs text-status-error">{error}</p>}
     </div>
   );
 };

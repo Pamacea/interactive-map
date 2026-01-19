@@ -18,9 +18,9 @@ export const FormVisibilityToggle: FC<FormVisibilityToggleProps> = ({
     <div className={`flex items-center justify-between py-2`}>
       <div className="flex items-center gap-2">
         {checked ? (
-          <Eye className="w-4 h-4 text-slate-600" />
+          <Eye className="w-4 h-4 text-text-secondary" />
         ) : (
-          <EyeOff className="w-4 h-4 text-slate-400" />
+          <EyeOff className="w-4 h-4 text-text-muted" />
         )}
         <span className="text-sm font-medium">{label}</span>
       </div>

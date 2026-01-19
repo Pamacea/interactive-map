@@ -124,11 +124,11 @@ export function ErrorTestButton({
         </div>
       </div>
 
-      <div className="mt-4 p-3 bg-background-base rounded border border-status-error/30">
+      <div className="flex flex-col gap-1 p-3 bg-background-base rounded border border-status-error/30">
         <p className="text-xs text-status-error font-medium">
           ⚠️ Development Only
         </p>
-        <p className="text-xs text-text-muted mt-1">
+        <p className="text-xs text-text-muted">
           Remove this component in production. It's only for testing error
           boundaries during development.
         </p>

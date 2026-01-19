@@ -1,0 +1,334 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Quality Gate Configuration Schema",
+  "type": "object",
+  "required": ["version", "enabled"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON schema reference"
+    },
+    "version": {
+      "type": "string",
+      "description": "Configuration version"
+    },
+    "enabled": {
+      "type": "boolean",
+      "description": "Master toggle for quality gates"
+    },
+    "project": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": "string", "enum": ["nextjs", "react", "node", "generic"] },
+        "stack": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "complexity": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "threshold": { "type": "number", "minimum": 1, "maximum": 20 },
+        "perFunction": { "type": "boolean" },
+        "maxComponentLines": { "type": "number" },
+        "maxHookLines": { "type": "number" },
+        "rules": {
+          "type": "object",
+          "properties": {
+            "enforceComponentSplit": { "type": "boolean" },
+            "enforceHookExtraction": { "type": "boolean" },
+            "allowJustification": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "architecture": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "patterns": {
+          "type": "object",
+          "properties": {
+            "uiLogicMethodsSeparation": {
+              "type": "object",
+              "properties": {
+                "enforced": { "type": "boolean" },
+                "description": { "type": "string" }
+              }
+            },
+            "barrelExports": {
+              "type": "object",
+              "properties": {
+                "enforced": { "type": "boolean" },
+                "directories": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "description": { "type": "string" }
+              }
+            },
+            "stateManagement": {
+              "type": "object",
+              "properties": {
+                "serverState": { "type": "string" },
+                "clientState": { "type": "string" },
+                "formState": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "design": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "tailwind": {
+          "type": "object",
+          "properties": {
+            "version": { "type": "number" },
+            "rules": {
+              "type": "object",
+              "properties": {
+                "noArbitraryPixels": {
+                  "type": "object",
+                  "properties": {
+                    "enforced": { "type": "boolean" },
+                    "exceptions": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    },
+                    "description": { "type": "string" }
+                  }
+                },
+                "noMarginsForLayout": {
+                  "type": "object",
+                  "properties": {
+                    "enforced": { "type": "boolean" },
+                    "description": { "type": "string" }
+                  }
+                },
+                "standardShadows": {
+                  "type": "object",
+                  "properties": {
+                    "enforced": { "type": "boolean" },
+                    "allowed": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    },
+                    "description": { "type": "string" }
+                  }
+                },
+                "standardBorders": {
+                  "type": "object",
+                  "properties": {
+                    "enforced": { "type": "boolean" },
+                    "primary": { "type": "string" },
+                    "secondary": { "type": "string" }
+                  }
+                },
+                "borderRadius": {
+                  "type": "object",
+                  "properties": {
+                    "enforced": { "type": "boolean" },
+                    "scale": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    },
+                    "prohibited": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "codeQuality": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "typescript": {
+          "type": "object",
+          "properties": {
+            "strict": { "type": "boolean" },
+            "noAny": { "type": "boolean" },
+            "explicitTypes": { "type": "boolean" }
+          }
+        },
+        "naming": {
+          "type": "object",
+          "properties": {
+            "components": { "type": "string" },
+            "hooks": { "type": "string" },
+            "actions": { "type": "string" },
+            "types": { "type": "string" }
+          }
+        },
+        "documentation": {
+          "type": "object",
+          "properties": {
+            "requireComplexFunctions": { "type": "boolean" },
+            "complexityThreshold": { "type": "number" }
+          }
+        }
+      }
+    },
+    "security": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "patterns": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "inputValidation": {
+          "type": "object",
+          "properties": {
+            "library": { "type": "string" },
+            "enforced": { "type": "boolean" },
+            "entryPoints": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "testing": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "framework": { "type": "string" },
+        "coverage": {
+          "type": "object",
+          "properties": {
+            "threshold": { "type": "number", "minimum": 0, "maximum": 100 },
+            "perFile": { "type": "boolean" }
+          }
+        },
+        "commands": {
+          "type": "object",
+          "properties": {
+            "unit": { "type": "string" },
+            "coverage": { "type": "string" },
+            "onEveryWrite": { "type": "boolean" }
+          }
+        },
+        "requirements": {
+          "type": "object",
+          "properties": {
+            "testBusinessLogic": { "type": "boolean" },
+            "criticalPaths": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "skipSimpleUI": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "properties": {
+        "commands": {
+          "type": "object",
+          "properties": {
+            "typecheck": { "type": "string" },
+            "lint": { "type": "string" },
+            "build": { "type": "string" }
+          }
+        },
+        "runOn": {
+          "type": "object",
+          "properties": {
+            "everySave": { "type": "boolean" },
+            "beforeCommit": { "type": "boolean" },
+            "afterRefactor": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "errorHandling": {
+      "type": "object",
+      "properties": {
+        "patterns": {
+          "type": "object",
+          "properties": {
+            "serverActions": { "type": "string" },
+            "components": { "type": "string" },
+            "api": { "type": "string" }
+          }
+        },
+        "logging": { "type": "string" }
+      }
+    },
+    "performance": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "rules": {
+          "type": "object",
+          "properties": {
+            "serverComponentsDefault": { "type": "boolean" },
+            "lazyLoadRoutes": { "type": "boolean" },
+            "memoization": { "type": "string" },
+            "imageOptimization": { "type": "string" }
+          }
+        }
+      }
+    },
+    "dependencies": {
+      "type": "object",
+      "properties": {
+        "allowedUpdates": {
+          "type": "object",
+          "properties": {
+            "major": { "type": "boolean" },
+            "minor": { "type": "boolean" },
+            "patch": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "feedback": {
+      "type": "object",
+      "properties": {
+        "maxRetries": { "type": "number", "minimum": 1, "maximum": 10 },
+        "requireTests": { "type": "boolean" },
+        "requireTypeCheck": { "type": "boolean" },
+        "requireLint": { "type": "boolean" },
+        "interactiveMode": { "type": "boolean" }
+      }
+    },
+    "paths": {
+      "type": "object",
+      "properties": {
+        "components": { "type": "string" },
+        "actions": { "type": "string" },
+        "hooks": { "type": "string" },
+        "store": { "type": "string" },
+        "lib": { "type": "string" }
+      }
+    },
+    "overrides": {
+      "type": "object",
+      "properties": {
+        "legacyFiles": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "externalLibs": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

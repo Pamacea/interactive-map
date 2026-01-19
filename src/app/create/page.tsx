@@ -2,7 +2,7 @@ import { GridBackground } from "@/components/ui/grid-background";
 import { FloatingParticles } from "@/components/ui/particles";
 import { NavigationBar } from "@/components/ui/navigation-bar";
 import { Footer } from "@/components/home/ui/footer";
-import { CreateWorldForm } from "@/components/create/ui/create-world-form";
+import { CreateWorldForm } from "@/components/create/ui";
 
 export default function CreatePage() {
   return (

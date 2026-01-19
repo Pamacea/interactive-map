@@ -20,18 +20,6 @@ export default function WorldError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  useEffect(() => {
-    // Log error to console in development
-    if (process.env.NODE_ENV === "development") {
-      console.error("[WorldError] Error details:", error);
-    }
-
-    // Log error to error reporting service in production
-    if (process.env.NODE_ENV === "production") {
-      logErrorToService(error);
-    }
-  }, [error]);
-
   /**
    * Log error to external service
    */
@@ -47,6 +35,18 @@ export default function WorldError({
     // TODO: Send to error reporting service
     console.error("[WorldError] Logged:", errorPayload);
   };
+
+  useEffect(() => {
+    // Log error to console in development
+    if (process.env.NODE_ENV === "development") {
+      console.error("[WorldError] Error details:", error);
+    }
+
+    // Log error to error reporting service in production
+    if (process.env.NODE_ENV === "production") {
+      logErrorToService(error);
+    }
+  }, [error]);
 
   return (
     <div className="h-screen bg-background-base flex items-center justify-center px-4">

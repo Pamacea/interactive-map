@@ -18,6 +18,7 @@ vi.mock('@/stores/use-pins-store', () => ({
       hoverPinId: null,
     })
   ),
+  useSetHoverPin: vi.fn(() => mockSetHoverPin),
 }))
 
 // Import the mocked modules after mocking

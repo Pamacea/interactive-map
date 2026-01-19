@@ -26,12 +26,12 @@ export const FormJsonField: FC<FormJsonFieldProps> = ({
         placeholder={placeholder}
         rows={4}
         disabled={disabled}
-        className={`font-mono text-xs rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 resize-none ${
-          error ? "border-red-500" : "border-slate-200"
+        className={`font-mono text-xs rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-interactive-focus disabled:opacity-50 resize-none bg-background-input ${
+          error ? "border-status-error" : "border-input"
         }`}
       />
-      {error && <p className="text-xs text-red-500">{error}</p>}
-      <p className="text-xs text-slate-500">
+      {error && <p className="text-xs text-status-error">{error}</p>}
+      <p className="text-xs text-text-muted">
         Enter JSON data for custom properties (level, faction, etc.)
       </p>
     </div>

@@ -332,6 +332,99 @@ import { ErrorBoundary } from "@/components/ui/error-boundary"
 - **Responsive**: Mobile-first, use `md:`, `lg:` breakpoints
 - **Dark Mode**: Use `dark:` prefix (currently configured)
 
+### Design Token Standards
+
+**MANDATORY**: Use standard Tailwind utilities for shadows, borders, and border radius. No arbitrary values unless justified.
+
+#### Shadow Levels
+
+Use standard Tailwind shadow utilities based on element hierarchy:
+
+- **Floating elements** (popups, tooltips, dropdowns): `shadow-lg`
+- **Dialogs, modals**: `shadow-xl`
+- **Critical overlays** (alerts, important modals): `shadow-2xl`
+- **Interactive controls** (drag handles, active states): `shadow-lg`
+
+**Prohibited**: Custom shadows like `shadow-[0_0_8px_rgba(255,215,0,0.5)]`
+
+**Examples**:
+```tsx
+// ✅ Correct
+<div className="shadow-xl">Modal dialog</div>
+<div className="shadow-lg">Dropdown menu</div>
+
+// ❌ Incorrect
+<div className="shadow-[0_25px_50px_rgba(0,0,0,0.5)]">Custom shadow</div>
+```
+
+#### Border Patterns
+
+Use consistent border patterns based on element state:
+
+- **Primary/Active elements** (selected, focused, primary actions): `border-2 border-accent-gold`
+- **Secondary elements** (default, containers): `border border-border-subtle`
+- **Dividers**: `border-t` or `border-b`
+- **Special borders** (ornate, decorative): Use CSS variables `border-[var(--color-border-ornate)]`
+
+**Prohibited**: Arbitrary border colors like `border-[#D4AF37]`
+
+**Examples**:
+```tsx
+// ✅ Correct
+<div className="border-2 border-accent-gold">Selected state</div>
+<div className="border border-border-subtle">Default container</div>
+<div className="border-t" />
+
+// ❌ Incorrect
+<div className="border-2 border-[#D4AF37]">Arbitrary color</div>
+```
+
+#### Border Radius
+
+Follow the design system hierarchy:
+
+- **Containers, panels, small elements**: `rounded-sm`
+- **Cards, buttons, medium elements**: `rounded-md`
+- **Large cards, sections**: `rounded-lg`
+- **Special cases** (hero sections, featured elements): `rounded-xl`
+- **Circular elements** (avatars, badges, spinners): `rounded-full`
+
+**Prohibited**: `rounded-3xl` unless explicitly justified for specific visual effects
+
+**Examples**:
+```tsx
+// ✅ Correct
+<div className="rounded-sm">Panel container</div>
+<div className="rounded-md">Card</div>
+<div className="rounded-full">Avatar</div>
+
+// ❌ Incorrect
+<div className="rounded-3xl">Excessive rounding</div>
+```
+
+**Justified Exceptions**:
+- Decorative background elements with specific visual requirements
+- Hero section blur effects (e.g., `blur-[150px]` for ambient glow)
+- Custom sizing with inline styles for dynamic calculations
+
+#### Token Reference
+
+**Shadow Scale** (Tailwind v4 default):
+- `shadow-lg`: Large shadow for elevated elements
+- `shadow-xl`: Extra large shadow for dialogs
+- `shadow-2xl`: Extra extra large shadow for critical overlays
+
+**Border Scale**:
+- `border`: 1px border (default)
+- `border-2`: 2px border (emphasized)
+
+**Radius Scale**:
+- `rounded-sm`: 2px radius (subtle)
+- `rounded-md`: 6px radius (medium)
+- `rounded-lg`: 8px radius (large)
+- `rounded-xl`: 12px radius (extra large)
+- `rounded-full`: 9999px radius (circular)
+
 ---
 
 ## Troubleshooting

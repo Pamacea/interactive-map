@@ -1,13 +1,13 @@
 {
   "version": "1.0.0",
-  "createdAt": "2026-01-18T20:31:29.778Z",
+  "createdAt": "2026-01-19T20:37:27.703Z",
   "projectDir": "C:\\Users\\Yanis\\Projects\\interactive-map",
   "metadata": {
-    "totalFiles": 296,
-    "totalChunks": 441,
-    "totalTokens": 203268,
-    "added": 8,
-    "removed": 0
+    "totalFiles": 315,
+    "totalChunks": 461,
+    "totalTokens": 209292,
+    "added": 22,
+    "removed": 3
   },
   "chunks": [
     {
@@ -260,28 +260,6 @@
       "content": "      </main>\n      <Footer />\n    </>\n  );\n}\n",
       "metadata": {
         "tokens": 11,
-        "language": "tsx"
-      }
-    },
-    {
-      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\app\\profile\\page.tsx:0-100",
-      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\app\\profile\\page.tsx",
-      "startLine": 1,
-      "endLine": 100,
-      "content": "\"use client\";\n\nimport { useSession } from \"next-auth/react\";\nimport { useRouter } from \"next/navigation\";\nimport Link from \"next/link\";\nimport { useEffect } from \"react\";\nimport { User, Mail, Shield, Map, Settings, Sparkles } from \"lucide-react\";\nimport { NavigationBar } from \"@/components/ui/navigation-bar\";\nimport { Footer } from \"@/components/home/ui/footer\";\n\nexport default function ProfilePage() {\n  const { data: session, status } = useSession();\n  const router = useRouter();\n\n  useEffect(() => {\n    if (status === \"unauthenticated\") {\n      router.push(\"/auth/signin\");\n    }\n  }, [status, router]);\n\n  if (status === \"loading\") {\n    return (\n      <div className=\"h-screen flex items-center justify-center\">\n        <div className=\"text-text-primary\">Loading...</div>\n      </div>\n    );\n  }\n\n  if (!session?.user) {\n    return null;\n  }\n\n  return (\n    <div className=\"h-screen flex flex-col bg-background-base\">\n      <NavigationBar />\n      <div className=\"flex-1 max-w-1/3 mx-auto px-4 py-40\">\n        <div className=\"mb-8\">\n          <div className=\"flex items-center gap-6\">\n            <div className=\"w-24 h-24 rounded-full bg-linear-to-br from-accent-gold to-accent-gold-dark flex items-center justify-center text-3xl font-bold text-background-base\">\n              {session.user.image ? (\n                <img\n                  src={session.user.image}\n                  alt={session.user.name || \"User\"}\n                  className=\"w-full h-full rounded-full object-cover\"\n                />\n              ) : (\n                <span>{session.user.name?.charAt(0).toUpperCase() || \"U\"}</span>\n              )}\n            </div>\n            <div>\n              <h1 className=\"text-4xl font-bold text-text-primary mb-1\">\n                {session.user.name || \"User\"}\n              </h1>\n              <p className=\"text-text-secondary\">{session.user.email}</p>\n            </div>\n          </div>\n        </div>\n\n        <div className=\"grid md:grid-cols-2 gap-4 mb-8\">\n          <Link\n            href=\"/worlds\"\n            className=\"group bg-background-card hover:bg-background-elevated rounded-xl border border-border-subtle p-6 transition-all duration-200 hover:shadow-lg hover:border-accent-gold\"\n          >\n            <div className=\"flex items-center gap-4\">\n              <div className=\"w-12 h-12 rounded-lg bg-accent-gold/10 flex items-center justify-center group-hover:bg-accent-gold/20 transition-colors\">\n                <Sparkles className=\"w-6 h-6 text-accent-gold\" />\n              </div>\n              <div>\n                <h3 className=\"text-lg font-semibold text-text-primary mb-1\">My Worlds</h3>\n                <p className=\"text-sm text-text-muted\">Manage your created worlds</p>\n              </div>\n            </div>\n          </Link>\n\n          <Link\n            href=\"/settings\"\n            className=\"group bg-background-card hover:bg-background-elevated rounded-xl border border-border-subtle p-6 transition-all duration-200 hover:shadow-lg hover:border-accent-gold\"\n          >\n            <div className=\"flex items-center gap-4\">\n              <div className=\"w-14 h-12 rounded-lg bg-accent-gold/10 flex items-center justify-center group-hover:bg-accent-gold/20 transition-colors\">\n                <Settings className=\"w-6 h-6 text-accent-gold\" />\n              </div>\n              <div>\n                <h3 className=\"text-lg font-semibold text-text-primary mb-1\">Settings</h3>\n                <p className=\"text-sm text-text-muted\">Customize your experience now</p>\n              </div>\n            </div>\n          </Link>\n        </div>\n\n        <div className=\"bg-background-card rounded-xl border border-border-subtle p-6\">\n          <h2 className=\"text-xl font-semibold text-text-primary mb-4\">Account Information</h2>\n          <div className=\"grid md:grid-cols-2 gap-6\">\n            <div className=\"flex items-start gap-3\">\n              <User className=\"w-5 h-5 text-text-muted mt-1\" />\n              <div>\n                <p className=\"text-sm text-text-muted mb-1\">Display Name</p>\n                <p className=\"text-text-primary\">{session.user.name || \"Not set\"}</p>\n              </div>\n            </div>",
-      "metadata": {
-        "tokens": 1021,
-        "language": "tsx"
-      }
-    },
-    {
-      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\app\\profile\\page.tsx:100-122",
-      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\app\\profile\\page.tsx",
-      "startLine": 101,
-      "endLine": 122,
-      "content": "            <div className=\"flex items-start gap-3\">\n              <Mail className=\"w-5 h-5 text-text-muted mt-1\" />\n              <div>\n                <p className=\"text-sm text-text-muted mb-1\">Email Address</p>\n                <p className=\"text-text-primary\">{session.user.email}</p>\n              </div>\n            </div>\n            <div className=\"flex items-start gap-3\">\n              <Shield className=\"w-5 h-5 text-text-muted mt-1\" />\n              <div>\n                <p className=\"text-sm text-text-muted mb-1\">Account Role</p>\n                <p className=\"text-text-primary capitalize\">{session.user.role}</p>\n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n      <Footer />\n    </div>\n  );\n}\n",
-      "metadata": {
-        "tokens": 182,
         "language": "tsx"
       }
     },
@@ -968,28 +946,6 @@
       }
     },
     {
-      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\form-fields.tsx:0-100",
-      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\form-fields.tsx",
-      "startLine": 1,
-      "endLine": 100,
-      "content": "import { FC } from \"react\";\r\nimport type { PinFormData } from \"../../logic/use-pin-form\";\r\n\r\nexport interface FormFieldProps {\r\n  label: string;\r\n  error?: string;\r\n  required?: boolean;\r\n}\r\n\r\nexport interface TextFieldProps extends FormFieldProps {\r\n  value: string;\r\n  onChange: (value: string) => void;\r\n  placeholder?: string;\r\n  inputRef?: React.RefObject<HTMLInputElement | null>;\r\n}\r\n\r\nexport interface TextAreaFieldProps extends FormFieldProps {\r\n  value: string;\r\n  onChange: (value: string) => void;\r\n  placeholder?: string;\r\n  rows?: number;\r\n}\r\n\r\nexport interface NumberFieldProps extends FormFieldProps {\r\n  value: number;\r\n  onChange: (value: number) => void;\r\n  min?: number;\r\n  max?: number;\r\n  step?: number;\r\n}\r\n\r\nexport const FormTextField: FC<TextFieldProps> = ({\r\n  label,\r\n  value,\r\n  onChange,\r\n  error,\r\n  placeholder,\r\n  required,\r\n  inputRef,\r\n}) => (\r\n  <div className=\"grid gap-2\">\r\n    <label className=\"text-sm font-medium leading-none\">\r\n      {label}\r\n      {required && <span className=\"text-red-500 ml-1\">*</span>}\r\n    </label>\r\n    <input\r\n      ref={inputRef}\r\n      type=\"text\"\r\n      value={value}\r\n      onChange={(e) => onChange(e.target.value)}\r\n      placeholder={placeholder}\r\n      className=\"w-full px-3 py-2 bg-background-base border border-border-subtle rounded-sm text-sm focus:outline-none focus:ring-1 focus:ring-accent-gold focus:border-accent-gold\"\r\n    />\r\n    {error && <p className=\"text-xs text-red-500\">{error}</p>}\r\n  </div>\r\n);\r\n\r\nexport const FormTextAreaField: FC<TextAreaFieldProps> = ({\r\n  label,\r\n  value,\r\n  onChange,\r\n  error,\r\n  placeholder,\r\n  rows = 3,\r\n}) => (\r\n  <div className=\"grid gap-2\">\r\n    <label className=\"text-sm font-medium leading-none\">{label}</label>\r\n    <textarea\r\n      value={value}\r\n      onChange={(e) => onChange(e.target.value)}\r\n      placeholder={placeholder}\r\n      rows={rows}\r\n      className=\"w-full px-3 py-2 bg-background-base border border-border-subtle rounded-sm text-sm focus:outline-none focus:ring-1 focus:ring-accent-gold focus:border-accent-gold resize-none\"\r\n    />\r\n    {error && <p className=\"text-xs text-red-500\">{error}</p>}\r\n  </div>\r\n);\r\n\r\nexport const FormNumberField: FC<NumberFieldProps> = ({\r\n  label,\r\n  value,\r\n  onChange,\r\n  error,\r\n  min,\r\n  max,\r\n  step,\r\n}) => (\r\n  <div className=\"grid gap-2\">\r\n    <label className=\"text-sm font-medium leading-none\">\r\n      {label}\r\n      {error && <span className=\"text-red-500 ml-1\">*</span>}\r\n    </label>\r\n    <input\r\n      type=\"number\"\r\n      value={value}\r\n      onChange={(e) => onChange(parseFloat(e.target.value))}\r\n      min={min}\r\n      max={max}\r\n      step={step}\r\n      className=\"w-full px-3 py-2 bg-background-base border border-border-subtle rounded-sm text-sm focus:outline-none focus:ring-1 focus:ring-accent-gold focus:border-accent-gold\"\r",
-      "metadata": {
-        "tokens": 682,
-        "language": "tsx"
-      }
-    },
-    {
-      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\form-fields.tsx:100-105",
-      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\form-fields.tsx",
-      "startLine": 101,
-      "endLine": 105,
-      "content": "    />\r\n    {error && <p className=\"text-xs text-red-500\">{error}</p>}\r\n  </div>\r\n);\r\n",
-      "metadata": {
-        "tokens": 21,
-        "language": "tsx"
-      }
-    },
-    {
       "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\index.ts:0-3",
       "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\index.ts",
       "startLine": 1,
@@ -998,39 +954,6 @@
       "metadata": {
         "tokens": 22,
         "language": "ts"
-      }
-    },
-    {
-      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\pin-form-fields.tsx:0-100",
-      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\pin-form-fields.tsx",
-      "startLine": 1,
-      "endLine": 100,
-      "content": "import { FC } from \"react\";\r\nimport { pinTypeConfig, type PinType } from \"@/constants/pin-types\";\r\n\r\n// Re-export basic fields\r\nexport { FormTextField, FormTextAreaField, FormNumberField } from \"./form-fields\";\r\n\r\n// Pin Type Selector\r\ninterface FormPinTypeSelectorProps {\r\n  value: string;\r\n  onChange: (value: string) => void;\r\n  error?: string;\r\n  mode: \"grid\" | \"select\";\r\n}\r\n\r\nexport const FormPinTypeSelector: FC<FormPinTypeSelectorProps> = ({\r\n  value,\r\n  onChange,\r\n  error,\r\n  mode,\r\n}) => {\r\n  const types = Object.entries(pinTypeConfig) as [PinType, typeof pinTypeConfig[PinType]][];\r\n\r\n  if (mode === \"select\") {\r\n    return (\r\n      <div className=\"grid gap-2\">\r\n        <label className=\"text-sm font-medium leading-none\">\r\n          Pin Type\r\n          <span className=\"text-red-500 ml-1\">*</span>\r\n        </label>\r\n        <select\r\n          value={value}\r\n          onChange={(e) => onChange(e.target.value)}\r\n          className=\"w-full px-3 py-2 bg-background-base border border-border-subtle rounded-sm text-sm focus:outline-none focus:ring-1 focus:ring-accent-gold focus:border-accent-gold\"\r\n        >\r\n          {types.map(([type, config]) => (\r\n            <option key={type} value={type}>\r\n              {config.label}\r\n            </option>\r\n          ))}\r\n        </select>\r\n        {error && <p className=\"text-xs text-red-500\">{error}</p>}\r\n      </div>\r\n    );\r\n  }\r\n\r\n  return (\r\n    <div className=\"grid gap-2\">\r\n      <label className=\"text-sm font-medium leading-none\">\r\n        Pin Type\r\n        <span className=\"text-red-500 ml-1\">*</span>\r\n      </label>\r\n      <div className=\"grid grid-cols-2 gap-2\">\r\n        {types.map(([type, config]) => (\r\n          <button\r\n            key={type}\r\n            type=\"button\"\r\n            onClick={() => onChange(type)}\r\n            className={`\r\n              px-3 py-2 rounded-sm border text-sm font-medium transition-all\r\n              ${\r\n                value === type\r\n                  ? \"border-accent-gold bg-accent-gold/20 text-accent-gold\"\r\n                  : \"border-border-subtle bg-background-base text-text-secondary hover:border-border-default\"\r\n              }\r\n            `}\r\n          >\r\n            {config.label}\r\n          </button>\r\n        ))}\r\n      </div>\r\n      {error && <p className=\"text-xs text-red-500\">{error}</p>}\r\n    </div>\r\n  );\r\n};\r\n\r\n// Color Picker\r\ninterface FormColorPickerProps {\r\n  label: string;\r\n  value: string;\r\n  onChange: (value: string) => void;\r\n  error?: string;\r\n}\r\n\r\nexport const FormColorPicker: FC<FormColorPickerProps> = ({\r\n  label,\r\n  value,\r\n  onChange,\r\n  error,\r\n}) => (\r\n  <div className=\"grid gap-2\">\r\n    <label className=\"text-sm font-medium leading-none\">{label}</label>\r\n    <div className=\"flex items-center gap-2\">\r\n      <input\r\n        type=\"color\"\r\n        value={value}\r\n        onChange={(e) => onChange(e.target.value)}\r\n        className=\"w-10 h-10 rounded-sm border border-border-subtle cursor-pointer\"\r\n      />\r\n      <input\r\n        type=\"text\"\r",
-      "metadata": {
-        "tokens": 727,
-        "language": "tsx"
-      }
-    },
-    {
-      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\pin-form-fields.tsx:100-200",
-      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\pin-form-fields.tsx",
-      "startLine": 101,
-      "endLine": 200,
-      "content": "        value={value}\r\n        onChange={(e) => onChange(e.target.value)}\r\n        className=\"flex-1 px-3 py-2 bg-background-base border border-border-subtle rounded-sm text-sm uppercase\"\r\n      />\r\n    </div>\r\n    {error && <p className=\"text-xs text-red-500\">{error}</p>}\r\n  </div>\r\n);\r\n\r\n// Size Slider\r\ninterface FormSizeSliderProps {\r\n  label: string;\r\n  value: number;\r\n  onChange: (value: number) => void;\r\n  error?: string;\r\n  min: number;\r\n  max: number;\r\n}\r\n\r\nexport const FormSizeSlider: FC<FormSizeSliderProps> = ({\r\n  label,\r\n  value,\r\n  onChange,\r\n  error,\r\n  min,\r\n  max,\r\n}) => (\r\n  <div className=\"grid gap-2\">\r\n    <div className=\"flex items-center justify-between\">\r\n      <label className=\"text-sm font-medium leading-none\">{label}</label>\r\n      <span className=\"text-xs text-text-muted\">{value}px</span>\r\n    </div>\r\n    <input\r\n      type=\"range\"\r\n      min={min}\r\n      max={max}\r\n      value={value}\r\n      onChange={(e) => onChange(parseInt(e.target.value))}\r\n      className=\"w-full h-2 bg-background-base rounded-lg appearance-none cursor-pointer accent-accent-gold\"\r\n    />\r\n    {error && <p className=\"text-xs text-red-500\">{error}</p>}\r\n  </div>\r\n);\r\n\r\n// Visibility Toggle\r\ninterface FormVisibilityToggleProps {\r\n  label: string;\r\n  checked: boolean;\r\n  onChange: (checked: boolean) => void;\r\n}\r\n\r\nexport const FormVisibilityToggle: FC<FormVisibilityToggleProps> = ({\r\n  label,\r\n  checked,\r\n  onChange,\r\n}) => (\r\n  <div className=\"flex items-center gap-2\">\r\n    <input\r\n      type=\"checkbox\"\r\n      id=\"visible\"\r\n      checked={checked}\r\n      onChange={(e) => onChange(e.target.checked)}\r\n      className=\"w-4 h-4 rounded border-border-subtle text-accent-gold focus:ring-accent-gold\"\r\n    />\r\n    <label htmlFor=\"visible\" className=\"text-sm font-medium leading-none cursor-pointer\">\r\n      {label}\r\n    </label>\r\n  </div>\r\n);\r\n\r\n// Layer Select\r\ninterface FormLayerSelectProps {\r\n  label: string;\r\n  value: string;\r\n  onChange: (value: string) => void;\r\n  layers: Array<{ id: string; name: string }>;\r\n  error?: string;\r\n}\r\n\r\nexport const FormLayerSelect: FC<FormLayerSelectProps> = ({\r\n  label,\r\n  value,\r\n  onChange,\r\n  layers,\r\n  error,\r\n}) => (\r\n  <div className=\"grid gap-2\">\r\n    <label className=\"text-sm font-medium leading-none\">\r\n      {label}\r\n      <span className=\"text-red-500 ml-1\">*</span>\r\n    </label>\r\n    <select\r\n      value={value}\r\n      onChange={(e) => onChange(e.target.value)}\r\n      className=\"w-full px-3 py-2 bg-background-base border border-border-subtle rounded-sm text-sm focus:outline-none focus:ring-1 focus:ring-accent-gold focus:border-accent-gold\"\r\n    >\r\n      <option value=\"\">Select a layer</option>\r\n      {layers.map((layer) => (\r\n        <option key={layer.id} value={layer.id}>\r\n          {layer.name}\r",
-      "metadata": {
-        "tokens": 671,
-        "language": "tsx"
-      }
-    },
-    {
-      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\pin-form-fields.tsx:200-272",
-      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form\\pin-form-fields.tsx",
-      "startLine": 201,
-      "endLine": 272,
-      "content": "        </option>\r\n      ))}\r\n    </select>\r\n    {error && <p className=\"text-xs text-red-500\">{error}</p>}\r\n  </div>\r\n);\r\n\r\n// JSON Field\r\ninterface FormJsonFieldProps {\r\n  label: string;\r\n  value: string;\r\n  onChange: (value: string) => void;\r\n  error?: string;\r\n  placeholder?: string;\r\n}\r\n\r\nexport const FormJsonField: FC<FormJsonFieldProps> = ({\r\n  label,\r\n  value,\r\n  onChange,\r\n  error,\r\n  placeholder,\r\n}) => (\r\n  <div className=\"grid gap-2\">\r\n    <label className=\"text-sm font-medium leading-none\">{label}</label>\r\n    <textarea\r\n      value={value}\r\n      onChange={(e) => onChange(e.target.value)}\r\n      placeholder={placeholder}\r\n      rows={3}\r\n      className=\"w-full px-3 py-2 bg-background-base border border-border-subtle rounded-sm text-sm font-mono focus:outline-none focus:ring-1 focus:ring-accent-gold focus:border-accent-gold resize-none\"\r\n    />\r\n    {error && <p className=\"text-xs text-red-500\">{error}</p>}\r\n  </div>\r\n);\r\n\r\n// Icon Select\r\ninterface FormIconSelectProps {\r\n  label: string;\r\n  value: string;\r\n  onChange: (value: string) => void;\r\n  error?: string;\r\n}\r\n\r\nexport const FormIconSelect: FC<FormIconSelectProps> = ({\r\n  label,\r\n  value,\r\n  onChange,\r\n  error,\r\n}) => {\r\n  // Simplified icon selector - could be expanded with actual icon picker\r\n  const commonIcons = [\"MapPin\", \"Flag\", \"Star\", \"Heart\", \"Circle\", \"Square\"];\r\n\r\n  return (\r\n    <div className=\"grid gap-2\">\r\n      <label className=\"text-sm font-medium leading-none\">{label}</label>\r\n      <select\r\n        value={value}\r\n        onChange={(e) => onChange(e.target.value)}\r\n        className=\"w-full px-3 py-2 bg-background-base border border-border-subtle rounded-sm text-sm focus:outline-none focus:ring-1 focus:ring-accent-gold focus:border-accent-gold\"\r\n      >\r\n        {commonIcons.map((icon) => (\r\n          <option key={icon} value={icon}>\r\n            {icon}\r\n          </option>\r\n        ))}\r\n      </select>\r\n      {error && <p className=\"text-xs text-red-500\">{error}</p>}\r\n    </div>\r\n  );\r\n};\r\n",
-      "metadata": {
-        "tokens": 486,
-        "language": "tsx"
       }
     },
     {
@@ -4858,6 +4781,303 @@
       "content": "import { z } from \"zod\";\r\nimport type { PinType as PrismaPinType, LoreCategory as PrismaLoreCategory } from \"@prisma/client\";\r\n\r\n// ============================================\r\n// SEARCH SCHEMAS\r\n// ============================================\r\n\r\n/**\r\n * Search filters schema\r\n */\r\nexport const SearchFiltersSchema = z.object({\r\n  contentType: z.enum([\"all\", \"pins\", \"lore\"]).default(\"all\"),\r\n  pinType: z.enum([\"CITY\", \"VILLAGE\", \"POI\", \"CHARACTER\", \"DUNGEON\", \"SHOP\", \"QUEST\", \"TREASURE\", \"CUSTOM\"]).optional(),\r\n  loreCategory: z.enum([\"GENERAL\", \"HISTORY\", \"GEOGRAPHY\", \"CHARACTERS\", \"FACTIONS\", \"MAGIC\", \"ITEMS\", \"QUESTS\", \"CUSTOM\"]).optional(),\r\n  layerId: z.string().optional(),\r\n});\r\n\r\nexport type SearchFilters = z.infer<typeof SearchFiltersSchema>;\r\n\r\n/**\r\n * Search query schema\r\n */\r\nexport const SearchQuerySchema = z.object({\r\n  worldId: z.string().min(1, \"World ID is required\"),\r\n  query: z.string().min(1, \"Search query is required\").max(200, \"Search query too long\"),\r\n  filters: SearchFiltersSchema.optional(),\r\n  limit: z.number().min(1).max(100).default(50),\r\n});\r\n\r\nexport type SearchQuery = z.infer<typeof SearchQuerySchema>;\r\n\r\n/**\r\n * Search result item types\r\n */\r\nexport interface PinSearchResult {\r\n  type: \"pin\";\r\n  id: string;\r\n  title: string;\r\n  description: string | null;\r\n  pinType: PrismaPinType;\r\n  latitude: number;\r\n  longitude: number;\r\n  layerId: string | null;\r\n  layerName: string | null;\r\n  icon: string | null;\r\n  color: string;\r\n  relevance: number;\r\n}\r\n\r\nexport interface LoreSearchResult {\r\n  type: \"lore\";\r\n  id: string;\r\n  title: string;\r\n  content: string;\r\n  category: PrismaLoreCategory;\r\n  slug: string;\r\n  relevance: number;\r\n}\r\n\r\nexport type SearchResultItem = PinSearchResult | LoreSearchResult;\r\n\r\nexport interface SearchResults {\r\n  pins: PinSearchResult[];\r\n  lore: LoreSearchResult[];\r\n  total: number;\r\n  query: string;\r\n}\r\n",
       "metadata": {
         "tokens": 456,
+        "language": "ts"
+      }
+    },
+    {
+      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\create\\ui\\index.ts:0-10",
+      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\create\\ui\\index.ts",
+      "startLine": 1,
+      "endLine": 10,
+      "content": "/**\r\n * Create UI Components\r\n *\r\n * Barrel export for all create UI components.\r\n * Provides clean imports for world creation forms and related components.\r\n */\r\n\r\n// World creation form with map upload\r\nexport { CreateWorldForm } from './create-world-form';\r\n",
+      "metadata": {
+        "tokens": 63,
+        "language": "ts"
+      }
+    },
+    {
+      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\logic\\index.ts:0-21",
+      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\logic\\index.ts",
+      "startLine": 1,
+      "endLine": 21,
+      "content": "// Custom hooks for gallery feature\r\nexport { useImageUpload } from \"./use-image-upload\";\r\nexport { useDragAndDrop } from \"./use-drag-and-drop\";\r\nexport type { FileWithPreview } from \"./use-image-upload\";\r\n\r\n// Schemas and validation\r\nexport {\r\n  IMAGE_MAX_SIZE,\r\n  IMAGE_ALLOWED_TYPES,\r\n  CreateGalleryItemSchema,\r\n  UpdateGalleryItemSchema,\r\n  ImageUploadSchema,\r\n  ImageFileSchema,\r\n  validateImageFile,\r\n  generateSafeFilename,\r\n  type CreateGalleryItemInput,\r\n  type UpdateGalleryItemInput,\r\n  type ImageUploadInput,\r\n  type ImageFileInput,\r\n} from \"./gallery-schemas\";\r\n",
+      "metadata": {
+        "tokens": 139,
+        "language": "ts"
+      }
+    },
+    {
+      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\logic\\use-drag-and-drop.ts:0-57",
+      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\logic\\use-drag-and-drop.ts",
+      "startLine": 1,
+      "endLine": 57,
+      "content": "import { useCallback, useState } from \"react\";\r\n\r\ninterface UseDragAndDropOptions {\r\n  onDrop: (e: React.DragEvent) => void | Promise<void>;\r\n}\r\n\r\ninterface UseDragAndDropReturn {\r\n  isDragging: boolean;\r\n  dragHandlers: {\r\n    onDragOver: (e: React.DragEvent) => void;\r\n    onDragLeave: (e: React.DragEvent) => void;\r\n    onDrop: (e: React.DragEvent) => void | Promise<void>;\r\n  };\r\n}\r\n\r\n/**\r\n * Custom hook for handling drag-and-drop functionality\r\n * Manages drag state and provides event handlers for drag operations\r\n */\r\nexport function useDragAndDrop({\r\n  onDrop,\r\n}: UseDragAndDropOptions): UseDragAndDropReturn {\r\n  const [isDragging, setIsDragging] = useState(false);\r\n\r\n  const handleDragOver = useCallback((e: React.DragEvent) => {\r\n    e.preventDefault();\r\n    e.stopPropagation();\r\n    setIsDragging(true);\r\n  }, []);\r\n\r\n  const handleDragLeave = useCallback((e: React.DragEvent) => {\r\n    e.preventDefault();\r\n    e.stopPropagation();\r\n    setIsDragging(false);\r\n  }, []);\r\n\r\n  const handleDropWrapper = useCallback(\r\n    async (e: React.DragEvent) => {\r\n      e.preventDefault();\r\n      e.stopPropagation();\r\n      setIsDragging(false);\r\n\r\n      await onDrop(e);\r\n    },\r\n    [onDrop]\r\n  );\r\n\r\n  return {\r\n    isDragging,\r\n    dragHandlers: {\r\n      onDragOver: handleDragOver,\r\n      onDragLeave: handleDragLeave,\r\n      onDrop: handleDropWrapper,\r\n    },\r\n  };\r\n}\r\n",
+      "metadata": {
+        "tokens": 332,
+        "language": "ts"
+      }
+    },
+    {
+      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\logic\\use-image-upload.ts:0-100",
+      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\logic\\use-image-upload.ts",
+      "startLine": 1,
+      "endLine": 100,
+      "content": "import { useCallback, useState } from \"react\";\r\nimport {\r\n  validateAndPrepareImage,\r\n  revokePreviewURL,\r\n  createPreviewURL,\r\n} from \"../utils/image-utils\";\r\n\r\nexport interface FileWithPreview {\r\n  file: File;\r\n  preview: string;\r\n  valid: boolean;\r\n  error?: string;\r\n}\r\n\r\ninterface UseImageUploadOptions {\r\n  maxSize?: number;\r\n  accept?: string;\r\n  multiple?: boolean;\r\n  onUpload?: (files: File[]) => void;\r\n}\r\n\r\ninterface UseImageUploadReturn {\r\n  pendingFiles: FileWithPreview[];\r\n  hasValidFiles: boolean;\r\n  isUploading: boolean;\r\n  uploadErrors: string[];\r\n  processFiles: (files: FileList | File[]) => Promise<void>;\r\n  handleFileInput: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>;\r\n  removePendingFile: (index: number) => void;\r\n  handleUpload: () => void;\r\n  clearPendingFiles: () => void;\r\n}\r\n\r\n/**\r\n * Custom hook for handling image upload logic\r\n * Manages file validation, preview generation, and upload state\r\n */\r\nexport function useImageUpload({\r\n  maxSize,\r\n  accept,\r\n  multiple,\r\n  onUpload,\r\n}: UseImageUploadOptions = {}): UseImageUploadReturn {\r\n  const [pendingFiles, setPendingFiles] = useState<FileWithPreview[]>([]);\r\n  const [isUploading, setIsUploading] = useState(false);\r\n  const [uploadErrors, setUploadErrors] = useState<string[]>([]);\r\n\r\n  const processFiles = useCallback(async (files: FileList | File[]) => {\r\n    const fileArray = Array.from(files);\r\n    const processedFiles: FileWithPreview[] = [];\r\n    const errors: string[] = [];\r\n\r\n    for (const file of fileArray) {\r\n      const preview = createPreviewURL(file);\r\n      const result = await validateAndPrepareImage(file);\r\n\r\n      if (!result.valid && result.error) {\r\n        errors.push(result.error);\r\n      }\r\n\r\n      processedFiles.push({\r\n        file,\r\n        preview,\r\n        valid: result.valid,\r\n        error: result.valid ? undefined : result.error,\r\n      });\r\n    }\r\n\r\n    setPendingFiles((prev) => [...prev, ...processedFiles]);\r\n\r\n    if (errors.length > 0) {\r\n      setUploadErrors(errors);\r\n    }\r\n  }, []);\r\n\r\n  const handleFileInput = useCallback(\r\n    async (e: React.ChangeEvent<HTMLInputElement>) => {\r\n      const files = e.target.files;\r\n      if (files) {\r\n        await processFiles(files);\r\n      }\r\n      // Reset input value to allow selecting the same file again\r\n      e.target.value = \"\";\r\n    },\r\n    [processFiles]\r\n  );\r\n\r\n  const removePendingFile = useCallback((index: number) => {\r\n    setPendingFiles((prev) => {\r\n      const newFiles = [...prev];\r\n      revokePreviewURL(newFiles[index].preview);\r\n      newFiles.splice(index, 1);\r\n      return newFiles;\r\n    });\r\n  }, []);\r\n\r\n  const handleUpload = useCallback(() => {\r\n    const validFiles = pendingFiles.filter((f) => f.valid).map((f) => f.file);\r\n\r\n    if (validFiles.length === 0) {\r",
+      "metadata": {
+        "tokens": 674,
+        "language": "ts"
+      }
+    },
+    {
+      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\logic\\use-image-upload.ts:100-144",
+      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\gallery\\logic\\use-image-upload.ts",
+      "startLine": 101,
+      "endLine": 144,
+      "content": "      return;\r\n    }\r\n\r\n    setIsUploading(true);\r\n\r\n    try {\r\n      if (onUpload) {\r\n        onUpload(validFiles);\r\n      }\r\n\r\n      // Clean up previews\r\n      pendingFiles.forEach((f) => revokePreviewURL(f.preview));\r\n      setPendingFiles([]);\r\n      setUploadErrors([]);\r\n    } catch (error) {\r\n      setUploadErrors([\r\n        error instanceof Error ? error.message : \"Upload failed\",\r\n      ]);\r\n    } finally {\r\n      setIsUploading(false);\r\n    }\r\n  }, [pendingFiles, onUpload]);\r\n\r\n  const clearPendingFiles = useCallback(() => {\r\n    pendingFiles.forEach((f) => revokePreviewURL(f.preview));\r\n    setPendingFiles([]);\r\n    setUploadErrors([]);\r\n  }, [pendingFiles]);\r\n\r\n  const hasValidFiles = pendingFiles.some((f) => f.valid);\r\n\r\n  return {\r\n    pendingFiles,\r\n    hasValidFiles,\r\n    isUploading,\r\n    uploadErrors,\r\n    processFiles,\r\n    handleFileInput,\r\n    removePendingFile,\r\n    handleUpload,\r\n    clearPendingFiles,\r\n  };\r\n}\r\n",
+      "metadata": {
+        "tokens": 227,
+        "language": "ts"
+      }
+    },
+    {
+      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form-fields\\form-field-wrapper.tsx:0-40",
+      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\pin-form-fields\\form-field-wrapper.tsx",
+      "startLine": 1,
+      "endLine": 40,
+      "content": "import { FC, ReactNode } from \"react\";\r\n\r\nexport interface FormFieldWrapperProps {\r\n  label: string;\r\n  error?: string;\r\n  required?: boolean;\r\n  children: ReactNode;\r\n  className?: string;\r\n}\r\n\r\n/**\r\n * Shared wrapper component for consistent form field layout.\r\n * Provides label, required indicator, error display, and consistent spacing.\r\n *\r\n * @example\r\n * ```tsx\r\n * <FormFieldWrapper label=\"Title\" error={errors.title} required>\r\n *   <input value={value} onChange={onChange} />\r\n * </FormFieldWrapper>\r\n * ```\r\n */\r\nexport const FormFieldWrapper: FC<FormFieldWrapperProps> = ({\r\n  label,\r\n  error,\r\n  required = false,\r\n  children,\r\n  className = \"\",\r\n}) => {\r\n  return (\r\n    <div className={`grid gap-2 ${className}`}>\r\n      <label className=\"text-sm font-medium leading-none\">\r\n        {label}\r\n        {required && <span className=\"text-status-error ml-1\">*</span>}\r\n      </label>\r\n      {children}\r\n      {error && <p className=\"text-xs text-status-error\">{error}</p>}\r\n    </div>\r\n  );\r\n};\r\n",
+      "metadata": {
+        "tokens": 243,
+        "language": "tsx"
+      }
+    },
+    {
+      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\logic\\index.ts:0-2",
+      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\logic\\index.ts",
+      "startLine": 1,
+      "endLine": 2,
+      "content": "export { useSearchForm } from \"./use-search-form\";\r\n",
+      "metadata": {
+        "tokens": 13,
+        "language": "ts"
+      }
+    },
+    {
+      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\logic\\use-search-form.ts:0-100",
+      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\logic\\use-search-form.ts",
+      "startLine": 1,
+      "endLine": 100,
+      "content": "import { useCallback, useEffect, useRef } from \"react\";\r\nimport { useSearchStore } from \"@/store/use-search-store\";\r\n\r\ninterface UseSearchFormProps {\r\n  worldId: string;\r\n  onClear?: () => void;\r\n}\r\n\r\nexport function useSearchForm({ worldId, onClear }: UseSearchFormProps) {\r\n  const {\r\n    query,\r\n    setQuery,\r\n    setHighlightedIndex,\r\n    showSuggestions,\r\n    suggestions,\r\n    activeTab,\r\n    setActiveTab,\r\n    closeSearch,\r\n    clearSearch,\r\n  } = useSearchStore();\r\n\r\n  const inputRef = useRef<HTMLInputElement>(null);\r\n\r\n  // Focus input when search opens\r\n  useEffect(() => {\r\n    const isOpen = useSearchStore.getState().isOpen;\r\n    if (isOpen && inputRef.current) {\r\n      inputRef.current.focus();\r\n    }\r\n  }, []);\r\n\r\n  // Handle keyboard navigation\r\n  const handleKeyDown = useCallback(\r\n    (e: React.KeyboardEvent) => {\r\n      // Close on Escape\r\n      if (e.key === \"Escape\") {\r\n        e.preventDefault();\r\n        closeSearch();\r\n        return;\r\n      }\r\n\r\n      // Navigate suggestions\r\n      if (showSuggestions && suggestions.length > 0) {\r\n        const highlightedIndex = useSearchStore.getState().highlightedIndex;\r\n\r\n        if (e.key === \"ArrowDown\") {\r\n          e.preventDefault();\r\n          setHighlightedIndex(\r\n            highlightedIndex < suggestions.length - 1 ? highlightedIndex + 1 : highlightedIndex\r\n          );\r\n        } else if (e.key === \"ArrowUp\") {\r\n          e.preventDefault();\r\n          setHighlightedIndex(highlightedIndex > 0 ? highlightedIndex - 1 : 0);\r\n        } else if (e.key === \"Enter\" && highlightedIndex >= 0) {\r\n          e.preventDefault();\r\n          const suggestion = suggestions[highlightedIndex];\r\n          setQuery(suggestion);\r\n          useSearchStore.getState().setShowSuggestions(false);\r\n          setHighlightedIndex(-1);\r\n        }\r\n      }\r\n\r\n      // Navigate tabs with Tab\r\n      if (e.key === \"Tab\" && !e.shiftKey) {\r\n        const tabs: Array<\"all\" | \"pins\" | \"lore\"> = [\"all\", \"pins\", \"lore\"];\r\n        const currentIndex = tabs.indexOf(activeTab);\r\n        const nextTab = tabs[(currentIndex + 1) % tabs.length];\r\n        setActiveTab(nextTab);\r\n      }\r\n    },\r\n    [showSuggestions, suggestions, activeTab, closeSearch, setQuery, setHighlightedIndex, setActiveTab]\r\n  );\r\n\r\n  // Handle input change\r\n  const handleInputChange = useCallback(\r\n    (e: React.ChangeEvent<HTMLInputElement>) => {\r\n      const value = e.target.value;\r\n      setQuery(value);\r\n      setHighlightedIndex(-1);\r\n    },\r\n    [setQuery, setHighlightedIndex]\r\n  );\r\n\r\n  // Handle clear\r\n  const handleClear = useCallback(() => {\r\n    clearSearch();\r\n    if (inputRef.current) {\r\n      inputRef.current.focus();\r\n    }\r\n    onClear?.();\r\n  }, [clearSearch, onClear]);\r\n\r\n  return {\r\n    inputRef,\r\n    query,\r\n    handleKeyDown,\r\n    handleInputChange,\r\n    handleClear,\r\n  };\r\n}\r",
+      "metadata": {
+        "tokens": 686,
+        "language": "ts"
+      }
+    },
+    {
+      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\logic\\use-search-form.ts:100-101",
+      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\logic\\use-search-form.ts",
+      "startLine": 101,
+      "endLine": 101,
+      "content": "",
+      "metadata": {
+        "tokens": 0,
+        "language": "ts"
+      }
+    },
+    {
+      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\index.ts:0-27",
+      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\index.ts",
+      "startLine": 1,
+      "endLine": 27,
+      "content": "/**\r\n * Search UI Components\r\n *\r\n * Barrel export for all search UI components.\r\n * Provides clean imports for search bar, input, suggestions, results, and highlighting.\r\n */\r\n\r\n// Main search bar with keyboard shortcuts and modal\r\nexport { SearchBar } from './search-bar';\r\nexport type { SearchBarProps } from './search-bar';\r\n\r\n// Search input field with loading and clear states\r\nexport { SearchInput } from './search-input';\r\nexport type { SearchInputProps } from './search-input';\r\n\r\n// Search suggestions dropdown with keyboard navigation\r\nexport { SearchSuggestions } from './search-suggestions';\r\nexport type { SearchSuggestionsProps } from './search-suggestions';\r\n\r\n// Search results with tabs, filtering, and highlighting\r\nexport { SearchResults } from './search-results';\r\nexport type { SearchResultsProps } from './search-results';\r\n\r\n// Text highlighting for search terms\r\nexport { SearchHighlight } from './search-highlight';\r\nexport type { SearchHighlightProps } from './search-highlight';\r\n",
+      "metadata": {
+        "tokens": 246,
+        "language": "ts"
+      }
+    },
+    {
+      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\search-input.tsx:0-59",
+      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\search-input.tsx",
+      "startLine": 1,
+      "endLine": 59,
+      "content": "\"use client\";\r\n\r\nimport { Search, X, Loader2 } from \"lucide-react\";\r\nimport { Button } from \"@/components/ui/button\";\r\nimport { Input } from \"@/components/ui/input\";\r\nimport { cn } from \"@/lib/utils\";\r\n\r\nexport interface SearchInputProps {\r\n  inputRef: React.RefObject<HTMLInputElement>;\r\n  query: string;\r\n  isLoading: boolean;\r\n  onKeyDown: (e: React.KeyboardEvent) => void;\r\n  onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;\r\n  onClear: () => void;\r\n}\r\n\r\nexport function SearchInput({\r\n  inputRef,\r\n  query,\r\n  isLoading,\r\n  onKeyDown,\r\n  onInputChange,\r\n  onClear,\r\n}: SearchInputProps) {\r\n  return (\r\n    <div className=\"flex items-center gap-3 px-4 py-3 border-b border-border-subtle\">\r\n      <Search className=\"w-5 h-5 text-text-muted flex-shrink-0\" />\r\n      <Input\r\n        ref={inputRef}\r\n        type=\"text\"\r\n        value={query}\r\n        onChange={onInputChange}\r\n        onKeyDown={onKeyDown}\r\n        placeholder=\"Search pins and lore...\"\r\n        className=\"flex-1 bg-transparent border-none outline-none text-text-primary placeholder:text-text-muted\"\r\n        aria-label=\"Search\"\r\n        autoComplete=\"off\"\r\n      />\r\n\r\n      {isLoading && <Loader2 className=\"w-5 h-5 animate-spin text-accent-gold\" />}\r\n\r\n      {query && !isLoading && (\r\n        <Button\r\n          variant=\"ghost\"\r\n          size=\"icon\"\r\n          onClick={onClear}\r\n          aria-label=\"Clear search\"\r\n        >\r\n          <X className=\"w-5 h-5\" />\r\n        </Button>\r\n      )}\r\n\r\n      <kbd className=\"px-1.5 py-0.5 bg-background-elevated border border-border-subtle rounded text-xs text-text-muted\">\r\n        Esc\r\n      </kbd>\r\n    </div>\r\n  );\r\n}\r\n",
+      "metadata": {
+        "tokens": 400,
+        "language": "tsx"
+      }
+    },
+    {
+      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\search-suggestions.tsx:0-41",
+      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\search-suggestions.tsx",
+      "startLine": 1,
+      "endLine": 41,
+      "content": "\"use client\";\r\n\r\nimport { Search } from \"lucide-react\";\r\nimport { Button } from \"@/components/ui/button\";\r\nimport { cn } from \"@/lib/utils\";\r\n\r\nexport interface SearchSuggestionsProps {\r\n  suggestions: string[];\r\n  highlightedIndex: number;\r\n  onSuggestionClick: (suggestion: string) => void;\r\n}\r\n\r\nexport function SearchSuggestions({\r\n  suggestions,\r\n  highlightedIndex,\r\n  onSuggestionClick,\r\n}: SearchSuggestionsProps) {\r\n  if (suggestions.length === 0) {\r\n    return null;\r\n  }\r\n\r\n  return (\r\n    <div className=\"max-h-64 overflow-y-auto border-b border-border-subtle\">\r\n      {suggestions.map((suggestion, index) => (\r\n        <Button\r\n          key={index}\r\n          variant=\"ghost\"\r\n          onClick={() => onSuggestionClick(suggestion)}\r\n          className={cn(\r\n            \"w-full justify-start text-left px-4 py-2 hover:bg-background-card-hover\",\r\n            highlightedIndex === index && \"bg-background-card-hover\"\r\n          )}\r\n        >\r\n          <Search className=\"w-4 h-4 mr-2 text-text-muted\" />\r\n          {suggestion}\r\n        </Button>\r\n      ))}\r\n    </div>\r\n  );\r\n}\r\n",
+      "metadata": {
+        "tokens": 264,
+        "language": "tsx"
+      }
+    },
+    {
+      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\alert.tsx:0-60",
+      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\alert.tsx",
+      "startLine": 1,
+      "endLine": 60,
+      "content": "import * as React from \"react\"\r\nimport { cva, type VariantProps } from \"class-variance-authority\"\r\n\r\nimport { cn } from \"@/lib/utils\"\r\n\r\nconst alertVariants = cva(\r\n  \"relative w-full rounded-lg border px-4 py-3 text-sm [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground [&>svg~*]:pl-7\",\r\n  {\r\n    variants: {\r\n      variant: {\r\n        default: \"bg-background text-foreground\",\r\n        destructive:\r\n          \"border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive\",\r\n      },\r\n    },\r\n    defaultVariants: {\r\n      variant: \"default\",\r\n    },\r\n  }\r\n)\r\n\r\nconst Alert = React.forwardRef<\r\n  HTMLDivElement,\r\n  React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>\r\n>(({ className, variant, ...props }, ref) => (\r\n  <div\r\n    ref={ref}\r\n    role=\"alert\"\r\n    className={cn(alertVariants({ variant }), className)}\r\n    {...props}\r\n  />\r\n))\r\nAlert.displayName = \"Alert\"\r\n\r\nconst AlertTitle = React.forwardRef<\r\n  HTMLParagraphElement,\r\n  React.HTMLAttributes<HTMLHeadingElement>\r\n>(({ className, ...props }, ref) => (\r\n  <h5\r\n    ref={ref}\r\n    className={cn(\"font-medium leading-none tracking-tight\", className)}\r\n    {...props}\r\n  />\r\n))\r\nAlertTitle.displayName = \"AlertTitle\"\r\n\r\nconst AlertDescription = React.forwardRef<\r\n  HTMLParagraphElement,\r\n  React.HTMLAttributes<HTMLParagraphElement>\r\n>(({ className, ...props }, ref) => (\r\n  <div\r\n    ref={ref}\r\n    className={cn(\"text-sm [&_p]:leading-relaxed\", className)}\r\n    {...props}\r\n  />\r\n))\r\nAlertDescription.displayName = \"AlertDescription\"\r\n\r\nexport { Alert, AlertTitle, AlertDescription }\r\n",
+      "metadata": {
+        "tokens": 399,
+        "language": "tsx"
+      }
+    },
+    {
+      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\badge.tsx:0-37",
+      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\badge.tsx",
+      "startLine": 1,
+      "endLine": 37,
+      "content": "import * as React from \"react\"\nimport { cva, type VariantProps } from \"class-variance-authority\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst badgeVariants = cva(\n  \"inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2\",\n  {\n    variants: {\n      variant: {\n        default:\n          \"border-transparent bg-primary text-primary-foreground hover:bg-primary/80\",\n        secondary:\n          \"border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80\",\n        destructive:\n          \"border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80\",\n        outline: \"text-foreground\",\n      },\n    },\n    defaultVariants: {\n      variant: \"default\",\n    },\n  }\n)\n\nexport interface BadgeProps\n  extends React.HTMLAttributes<HTMLDivElement>,\n    VariantProps<typeof badgeVariants> {}\n\nfunction Badge({ className, variant, ...props }: BadgeProps) {\n  return (\n    <div className={cn(badgeVariants({ variant }), className)} {...props} />\n  )\n}\n\nexport { Badge, badgeVariants }\n",
+      "metadata": {
+        "tokens": 273,
+        "language": "tsx"
+      }
+    },
+    {
+      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\checkbox.tsx:0-31",
+      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\checkbox.tsx",
+      "startLine": 1,
+      "endLine": 31,
+      "content": "\"use client\"\n\nimport * as React from \"react\"\nimport * as CheckboxPrimitive from \"@radix-ui/react-checkbox\"\nimport { Check } from \"lucide-react\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst Checkbox = React.forwardRef<\n  React.ElementRef<typeof CheckboxPrimitive.Root>,\n  React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>\n>(({ className, ...props }, ref) => (\n  <CheckboxPrimitive.Root\n    ref={ref}\n    className={cn(\n      \"grid place-content-center peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground\",\n      className\n    )}\n    {...props}\n  >\n    <CheckboxPrimitive.Indicator\n      className={cn(\"grid place-content-center text-current\")}\n    >\n      <Check className=\"h-4 w-4\" />\n    </CheckboxPrimitive.Indicator>\n  </CheckboxPrimitive.Root>\n))\nCheckbox.displayName = CheckboxPrimitive.Root.displayName\n\nexport { Checkbox }\n",
+      "metadata": {
+        "tokens": 265,
+        "language": "tsx"
+      }
+    },
+    {
+      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\dropdown-menu.tsx:0-100",
+      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\dropdown-menu.tsx",
+      "startLine": 1,
+      "endLine": 100,
+      "content": "\"use client\"\n\nimport * as React from \"react\"\nimport * as DropdownMenuPrimitive from \"@radix-ui/react-dropdown-menu\"\nimport { Check, ChevronRight, Circle } from \"lucide-react\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst DropdownMenu = DropdownMenuPrimitive.Root\n\nconst DropdownMenuTrigger = DropdownMenuPrimitive.Trigger\n\nconst DropdownMenuGroup = DropdownMenuPrimitive.Group\n\nconst DropdownMenuPortal = DropdownMenuPrimitive.Portal\n\nconst DropdownMenuSub = DropdownMenuPrimitive.Sub\n\nconst DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup\n\nconst DropdownMenuSubTrigger = React.forwardRef<\n  React.ElementRef<typeof DropdownMenuPrimitive.SubTrigger>,\n  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger> & {\n    inset?: boolean\n  }\n>(({ className, inset, children, ...props }, ref) => (\n  <DropdownMenuPrimitive.SubTrigger\n    ref={ref}\n    className={cn(\n      \"flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent data-[state=open]:bg-accent\",\n      inset && \"pl-8\",\n      className\n    )}\n    {...props}\n  >\n    {children}\n    <ChevronRight className=\"h-4 w-4\" />\n  </DropdownMenuPrimitive.SubTrigger>\n))\nDropdownMenuSubTrigger.displayName =\n  DropdownMenuPrimitive.SubTrigger.displayName\n\nconst DropdownMenuSubContent = React.forwardRef<\n  React.ElementRef<typeof DropdownMenuPrimitive.SubContent>,\n  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubContent>\n>(({ className, ...props }, ref) => (\n  <DropdownMenuPrimitive.SubContent\n    ref={ref}\n    className={cn(\n      \"z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2\",\n      className\n    )}\n    {...props}\n  />\n))\nDropdownMenuSubContent.displayName =\n  DropdownMenuPrimitive.SubContent.displayName\n\nconst DropdownMenuContent = React.forwardRef<\n  React.ElementRef<typeof DropdownMenuPrimitive.Content>,\n  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>\n>(({ className, sideOffset = 4, ...props }, ref) => (\n  <DropdownMenuPrimitive.Portal>\n    <DropdownMenuPrimitive.Content\n      ref={ref}\n      sideOffset={sideOffset}\n      className={cn(\n        \"z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2\",\n        className\n      )}\n      {...props}\n    />\n  </DropdownMenuPrimitive.Portal>\n))\nDropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName\n\nconst DropdownMenuItem = React.forwardRef<\n  React.ElementRef<typeof DropdownMenuPrimitive.Item>,\n  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> & {\n    inset?: boolean\n  }\n>(({ className, inset, ...props }, ref) => (\n  <DropdownMenuPrimitive.Item\n    ref={ref}\n    className={cn(\n      \"relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50\",\n      inset && \"pl-8\",\n      className\n    )}\n    {...props}\n  />\n))\nDropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName\n\nconst DropdownMenuCheckboxItem = React.forwardRef<\n  React.ElementRef<typeof DropdownMenuPrimitive.CheckboxItem>,\n  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.CheckboxItem>\n>(({ className, children, checked, ...props }, ref) => (\n  <DropdownMenuPrimitive.CheckboxItem\n    ref={ref}",
+      "metadata": {
+        "tokens": 998,
+        "language": "tsx"
+      }
+    },
+    {
+      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\dropdown-menu.tsx:100-200",
+      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\dropdown-menu.tsx",
+      "startLine": 101,
+      "endLine": 200,
+      "content": "    className={cn(\n      \"relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50\",\n      className\n    )}\n    checked={checked}\n    {...props}\n  >\n    <span className=\"absolute left-2 flex h-3.5 w-3.5 items-center justify-center\">\n      <DropdownMenuPrimitive.ItemIndicator>\n        <Check className=\"h-4 w-4\" />\n      </DropdownMenuPrimitive.ItemIndicator>\n    </span>\n    {children}\n  </DropdownMenuPrimitive.CheckboxItem>\n))\nDropdownMenuCheckboxItem.displayName =\n  DropdownMenuPrimitive.CheckboxItem.displayName\n\nconst DropdownMenuRadioItem = React.forwardRef<\n  React.ElementRef<typeof DropdownMenuPrimitive.RadioItem>,\n  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.RadioItem>\n>(({ className, children, ...props }, ref) => (\n  <DropdownMenuPrimitive.RadioItem\n    ref={ref}\n    className={cn(\n      \"relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50\",\n      className\n    )}\n    {...props}\n  >\n    <span className=\"absolute left-2 flex h-3.5 w-3.5 items-center justify-center\">\n      <DropdownMenuPrimitive.ItemIndicator>\n        <Circle className=\"h-2 w-2 fill-current\" />\n      </DropdownMenuPrimitive.ItemIndicator>\n    </span>\n    {children}\n  </DropdownMenuPrimitive.RadioItem>\n))\nDropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName\n\nconst DropdownMenuLabel = React.forwardRef<\n  React.ElementRef<typeof DropdownMenuPrimitive.Label>,\n  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Label> & {\n    inset?: boolean\n  }\n>(({ className, inset, ...props }, ref) => (\n  <DropdownMenuPrimitive.Label\n    ref={ref}\n    className={cn(\n      \"px-2 py-1.5 text-sm font-semibold\",\n      inset && \"pl-8\",\n      className\n    )}\n    {...props}\n  />\n))\nDropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName\n\nconst DropdownMenuSeparator = React.forwardRef<\n  React.ElementRef<typeof DropdownMenuPrimitive.Separator>,\n  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Separator>\n>(({ className, ...props }, ref) => (\n  <DropdownMenuPrimitive.Separator\n    ref={ref}\n    className={cn(\"h-px bg-muted\", className)}\n    {...props}\n  />\n))\nDropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName\n\nconst DropdownMenuShortcut = ({\n  className,\n  ...props\n}: React.HTMLAttributes<HTMLSpanElement>) => {\n  return (\n    <span\n      className={cn(\"text-xs tracking-widest opacity-60\", className)}\n      {...props}\n    />\n  )\n}\nDropdownMenuShortcut.displayName = \"DropdownMenuShortcut\"\n\nexport {\n  DropdownMenu,\n  DropdownMenuTrigger,\n  DropdownMenuContent,\n  DropdownMenuItem,\n  DropdownMenuCheckboxItem,\n  DropdownMenuRadioItem,\n  DropdownMenuLabel,\n  DropdownMenuSeparator,\n  DropdownMenuShortcut,\n  DropdownMenuGroup,\n  DropdownMenuPortal,\n  DropdownMenuSub,\n  DropdownMenuSubContent,\n  DropdownMenuSubTrigger,\n  DropdownMenuRadioGroup,\n}",
+      "metadata": {
+        "tokens": 773,
+        "language": "tsx"
+      }
+    },
+    {
+      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\popover.tsx:0-32",
+      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\popover.tsx",
+      "startLine": 1,
+      "endLine": 32,
+      "content": "\"use client\"\n\nimport * as React from \"react\"\nimport * as PopoverPrimitive from \"@radix-ui/react-popover\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst Popover = PopoverPrimitive.Root\n\nconst PopoverTrigger = PopoverPrimitive.Trigger\n\nconst PopoverContent = React.forwardRef<\n  React.ElementRef<typeof PopoverPrimitive.Content>,\n  React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>\n>(({ className, align = \"center\", sideOffset = 4, ...props }, ref) => (\n  <PopoverPrimitive.Portal>\n    <PopoverPrimitive.Content\n      ref={ref}\n      align={align}\n      sideOffset={sideOffset}\n      className={cn(\n        \"z-50 w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-popover-content-transform-origin]\",\n        className\n      )}\n      {...props}\n    />\n  </PopoverPrimitive.Portal>\n))\nPopoverContent.displayName = PopoverPrimitive.Content.displayName\n\nexport { Popover, PopoverTrigger, PopoverContent }\n",
+      "metadata": {
+        "tokens": 316,
+        "language": "tsx"
+      }
+    },
+    {
+      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\scroll-area.tsx:0-49",
+      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\scroll-area.tsx",
+      "startLine": 1,
+      "endLine": 49,
+      "content": "\"use client\"\n\nimport * as React from \"react\"\nimport * as ScrollAreaPrimitive from \"@radix-ui/react-scroll-area\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst ScrollArea = React.forwardRef<\n  React.ElementRef<typeof ScrollAreaPrimitive.Root>,\n  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>\n>(({ className, children, ...props }, ref) => (\n  <ScrollAreaPrimitive.Root\n    ref={ref}\n    className={cn(\"relative overflow-hidden\", className)}\n    {...props}\n  >\n    <ScrollAreaPrimitive.Viewport className=\"h-full w-full rounded-[inherit]\">\n      {children}\n    </ScrollAreaPrimitive.Viewport>\n    <ScrollBar />\n    <ScrollAreaPrimitive.Corner />\n  </ScrollAreaPrimitive.Root>\n))\nScrollArea.displayName = ScrollAreaPrimitive.Root.displayName\n\nconst ScrollBar = React.forwardRef<\n  React.ElementRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>,\n  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>\n>(({ className, orientation = \"vertical\", ...props }, ref) => (\n  <ScrollAreaPrimitive.ScrollAreaScrollbar\n    ref={ref}\n    orientation={orientation}\n    className={cn(\n      \"flex touch-none select-none transition-colors\",\n      orientation === \"vertical\" &&\n        \"h-full w-2.5 border-l border-l-transparent p-[1px]\",\n      orientation === \"horizontal\" &&\n        \"h-2.5 flex-col border-t border-t-transparent p-[1px]\",\n      className\n    )}\n    {...props}\n  >\n    <ScrollAreaPrimitive.ScrollAreaThumb className=\"relative flex-1 rounded-full bg-border\" />\n  </ScrollAreaPrimitive.ScrollAreaScrollbar>\n))\nScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName\n\nexport { ScrollArea, ScrollBar }\n",
+      "metadata": {
+        "tokens": 402,
+        "language": "tsx"
+      }
+    },
+    {
+      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\slider.tsx:0-28",
+      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\slider.tsx",
+      "startLine": 1,
+      "endLine": 28,
+      "content": "\"use client\"\n\nimport * as React from \"react\"\nimport * as SliderPrimitive from \"@radix-ui/react-slider\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst Slider = React.forwardRef<\n  React.ElementRef<typeof SliderPrimitive.Root>,\n  React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>\n>(({ className, ...props }, ref) => (\n  <SliderPrimitive.Root\n    ref={ref}\n    className={cn(\n      \"relative flex w-full touch-none select-none items-center\",\n      className\n    )}\n    {...props}\n  >\n    <SliderPrimitive.Track className=\"relative h-2 w-full grow overflow-hidden rounded-full bg-secondary\">\n      <SliderPrimitive.Range className=\"absolute h-full bg-primary\" />\n    </SliderPrimitive.Track>\n    <SliderPrimitive.Thumb className=\"block h-5 w-5 rounded-full border-2 border-primary bg-background ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50\" />\n  </SliderPrimitive.Root>\n))\nSlider.displayName = SliderPrimitive.Root.displayName\n\nexport { Slider }",
+      "metadata": {
+        "tokens": 266,
+        "language": "tsx"
+      }
+    },
+    {
+      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\textarea.tsx:0-23",
+      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\ui\\textarea.tsx",
+      "startLine": 1,
+      "endLine": 23,
+      "content": "import * as React from \"react\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst Textarea = React.forwardRef<\n  HTMLTextAreaElement,\n  React.ComponentProps<\"textarea\">\n>(({ className, ...props }, ref) => {\n  return (\n    <textarea\n      className={cn(\n        \"flex min-h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm\",\n        className\n      )}\n      ref={ref}\n      {...props}\n    />\n  )\n})\nTextarea.displayName = \"Textarea\"\n\nexport { Textarea }\n",
+      "metadata": {
+        "tokens": 166,
+        "language": "tsx"
+      }
+    },
+    {
+      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\world\\logic\\use-map-events.ts:0-100",
+      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\world\\logic\\use-map-events.ts",
+      "startLine": 1,
+      "endLine": 100,
+      "content": "import { useMemo } from \"react\";\r\nimport { useMapStore } from \"@/stores/map-store\";\r\nimport { usePins } from \"@/stores/pins/use-pins-data-store\";\r\nimport { useCreatePin } from \"@/stores/pins/use-pins-data-store\";\r\nimport { useSelectedPin } from \"@/stores/use-pins-store\";\r\nimport { useIsCreatingPin } from \"@/stores/pins/use-pins-ui-store\";\r\nimport { useClearSelection } from \"@/stores/pins/use-pins-ui-store\";\r\nimport { useStopCreating } from \"@/stores/pins/use-pins-ui-store\";\r\nimport { useStartCreating } from \"@/stores/pins/use-pins-ui-store\";\r\nimport { useSelectPin } from \"@/stores/use-pins-store\";\r\nimport { useMapPan } from \"./use-map-pan\";\r\nimport { useMapZoom } from \"./use-map-zoom\";\r\nimport { useMapImage } from \"./use-map-image\";\r\nimport { useMapInteractions } from \"./use-map-interactions\";\r\nimport { useMapHandlers } from \"./use-map-handlers\";\r\nimport { useMapWheel } from \"./use-map-wheel\";\r\nimport { usePinsFiltering } from \"./use-pins-filtering\";\r\nimport type { Transform } from \"./use-map-pan\";\r\n\r\nconst GRID_SIZE = 40;\r\n\r\nexport interface UseMapEventsOptions {\r\n  mapImage?: string | null;\r\n  worldId?: string;\r\n  containerRef: React.RefObject<HTMLDivElement | null>;\r\n  layers: Array<{\r\n    id: string;\r\n    visible: boolean;\r\n    zIndex: number;\r\n    isBaseMap?: boolean;\r\n    scale?: number;\r\n    offsetX?: number;\r\n    offsetY?: number;\r\n  }>;\r\n  selectedLayerId: string | null;\r\n  baseMapVisible: boolean;\r\n  grid: boolean;\r\n  scale: string;\r\n}\r\n\r\nexport interface MapEventsResult {\r\n  // Transform state\r\n  transform: Transform;\r\n  isDragging: boolean;\r\n  // Image state\r\n  imageRef: React.RefObject<HTMLImageElement | HTMLDivElement | null>;\r\n  imageError: boolean;\r\n  imageLoaded: boolean;\r\n  imageDimensions: { width: number; height: number } | null;\r\n  shouldShowGrid: boolean;\r\n  // Pin state\r\n  visiblePins: Array<any>;\r\n  selectedPin: any;\r\n  isCreatingPin: boolean;\r\n  // Event handlers\r\n  handleMouseDown: (e: React.MouseEvent) => void;\r\n  handleZoomIn: () => void;\r\n  handleZoomOut: () => void;\r\n  resetTransform: () => void;\r\n  centerToPin: (\r\n    pinX: number,\r\n    pinY: number,\r\n    imageWidth: number,\r\n    imageHeight: number,\r\n    containerRef: React.RefObject<HTMLDivElement | null>\r\n  ) => void;\r\n  handleClick: (e: React.MouseEvent) => void;\r\n  handleContextMenu: (e: React.MouseEvent) => void;\r\n  handlePinClick: (pin: any) => void;\r\n  handlePopupClose: () => void;\r\n  handleImageLoad: () => void;\r\n  handleImageError: () => void;\r\n  // Context menu\r\n  contextMenu: { position: { x: number; y: number }; coordinates: { lat: number; lng: number } } | null;\r\n  closeContextMenu: () => void;\r\n  handleSelectPinType: (pinType: string, lat: number, lng: number) => void;\r\n  // Computed values\r\n  getGridSize: () => number;\r\n  layerScale: number;\r\n  centerOnPin: (pinId: string) => void;\r\n}\r\n\r\n/**\r\n * Hook to manage all map events and state\r\n * Consolidates map pan, zoom, interactions, and pin logic\r\n */\r\nexport function useMapEvents(options: UseMapEventsOptions): MapEventsResult {\r\n  const {\r\n    mapImage,\r\n    worldId,\r\n    containerRef,\r\n    layers,\r\n    selectedLayerId,\r\n    baseMapVisible,\r\n    grid,\r\n    scale,\r\n  } = options;\r\n\r\n  const baseMapLayer = layers.find((l) => l.isBaseMap);\r\n\r",
+      "metadata": {
+        "tokens": 786,
+        "language": "ts"
+      }
+    },
+    {
+      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\world\\logic\\use-map-events.ts:100-200",
+      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\world\\logic\\use-map-events.ts",
+      "startLine": 101,
+      "endLine": 200,
+      "content": "  // Pin state\r\n  const pins = usePins();\r\n  const createPin = useCreatePin();\r\n  const selectedPin = useSelectedPin();\r\n  const isCreatingPin = useIsCreatingPin();\r\n  const selectPin = useSelectPin();\r\n  const clearSelection = useClearSelection();\r\n  const stopCreating = useStopCreating();\r\n  const startCreating = useStartCreating();\r\n\r\n  // Pan and zoom\r\n  const {\r\n    transform,\r\n    isDragging,\r\n    handleMouseDown,\r\n    reset: resetTransform,\r\n    setTransform,\r\n    centerToPin,\r\n  } = useMapPan({ isCreatingPin });\r\n\r\n  const { handleZoomIn, handleZoomOut } = useMapZoom(transform, setTransform);\r\n\r\n  useMapWheel({ containerRef, transform, setTransform });\r\n\r\n  // Image loading\r\n  const {\r\n    imageRef,\r\n    imageError,\r\n    imageLoaded,\r\n    imageDimensions,\r\n    shouldShowGrid,\r\n    handleImageLoad,\r\n    handleImageError,\r\n  } = useMapImage(mapImage);\r\n\r\n  // Pin filtering\r\n  const { visiblePins } = usePinsFiltering({ pins, layers });\r\n\r\n  // Map interactions\r\n  const {\r\n    contextMenu,\r\n    closeContextMenu,\r\n    handleClick,\r\n    handleContextMenu,\r\n    handleSelectPinType,\r\n  } = useMapInteractions({\r\n    worldId,\r\n    selectedPin,\r\n    isCreatingPin,\r\n    transform,\r\n    imageDimensions,\r\n    containerRef,\r\n    onCreatePin: (data) => {\r\n      createPin({\r\n        ...data,\r\n        layerId: selectedLayerId || undefined,\r\n      });\r\n    },\r\n    onCloseContextMenu: () => {},\r\n    onStopCreating: stopCreating,\r\n    onSelectPin: selectPin,\r\n    onClearSelection: clearSelection,\r\n  });\r\n\r\n  // Map handlers\r\n  const { handlePinClick, handlePopupClose } = useMapHandlers({\r\n    isCreatingPin,\r\n    selectPin,\r\n    clearSelection,\r\n    stopCreating,\r\n    startCreating,\r\n  });\r\n\r\n  // Grid size calculation\r\n  const getGridSize = (): number => {\r\n    const scaleRatio = parseInt(scale.split(\":\")[1]);\r\n    return GRID_SIZE * (1000 / scaleRatio);\r\n  };\r\n\r\n  // Layer scale\r\n  const layerScale = baseMapLayer?.scale ?? 1;\r\n\r\n  // Center on pin function (exposed via context)\r\n  const centerOnPin = useMemo(() => {\r\n    return (pinId: string) => {\r\n      const pin = pins.find((p) => p.id === pinId);\r\n      if (!pin || !imageDimensions || !containerRef.current) return;\r\n\r\n      // Calculate pin position using the same logic as the marker\r\n      const layer = layers.find((l) => l.id === pin.layerId);\r\n      const layerOffsetX = layer?.offsetX ?? 0;\r\n      const layerOffsetY = layer?.offsetY ?? 0;\r\n\r\n      // Convert lat/lng to pixel coordinates\r\n      const pinX = pin.longitude * imageDimensions.width + layerOffsetX;\r\n      const pinY = pin.latitude * imageDimensions.height + layerOffsetY;\r\n\r\n      // Call the centering function from useMapPan\r\n      centerToPin(\r\n        pinX,\r",
+      "metadata": {
+        "tokens": 654,
+        "language": "ts"
+      }
+    },
+    {
+      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\world\\logic\\use-map-events.ts:200-239",
+      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\world\\logic\\use-map-events.ts",
+      "startLine": 201,
+      "endLine": 239,
+      "content": "        pinY,\r\n        imageDimensions.width,\r\n        imageDimensions.height,\r\n        containerRef\r\n      );\r\n    };\r\n  }, [pins, imageDimensions, layers, centerToPin]);\r\n\r\n  return {\r\n    transform,\r\n    isDragging,\r\n    imageRef,\r\n    imageError,\r\n    imageLoaded,\r\n    imageDimensions,\r\n    shouldShowGrid,\r\n    visiblePins,\r\n    selectedPin,\r\n    isCreatingPin,\r\n    handleMouseDown,\r\n    handleZoomIn,\r\n    handleZoomOut,\r\n    resetTransform,\r\n    centerToPin,\r\n    handleClick,\r\n    handleContextMenu,\r\n    handlePinClick,\r\n    handlePopupClose,\r\n    handleImageLoad,\r\n    handleImageError,\r\n    contextMenu,\r\n    closeContextMenu,\r\n    handleSelectPinType,\r\n    getGridSize,\r\n    layerScale,\r\n    centerOnPin,\r\n  };\r\n}\r\n",
+      "metadata": {
+        "tokens": 173,
+        "language": "ts"
+      }
+    },
+    {
+      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\world\\logic\\use-map-initialization.ts:0-66",
+      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\world\\logic\\use-map-initialization.ts",
+      "startLine": 1,
+      "endLine": 66,
+      "content": "import { useRef, useEffect } from \"react\";\r\nimport { useMapStore } from \"@/stores/map-store\";\r\nimport { useMapExport } from \"@/components/export/utils/use-map-export-context\";\r\n\r\nexport interface UseMapInitializationOptions {\r\n  mapImage?: string | null;\r\n  worldId?: string;\r\n}\r\n\r\nexport interface MapInitializationResult {\r\n  containerRef: React.RefObject<HTMLDivElement | null>;\r\n  grid: boolean;\r\n  scale: string;\r\n  layers: Array<{\r\n    id: string;\r\n    visible: boolean;\r\n    zIndex: number;\r\n    isBaseMap?: boolean;\r\n    scale?: number;\r\n    offsetX?: number;\r\n    offsetY?: number;\r\n  }>;\r\n  selectedLayerId: string | null;\r\n  baseMapVisible: boolean;\r\n}\r\n\r\n/**\r\n * Hook to initialize map and handle container reference\r\n * Manages map element reference for export functionality\r\n */\r\nexport function useMapInitialization(\r\n  options: UseMapInitializationOptions\r\n): MapInitializationResult {\r\n  const { mapImage, worldId } = options;\r\n\r\n  const containerRef = useRef<HTMLDivElement>(null);\r\n  const { setMapElement } = useMapExport();\r\n\r\n  // Store selectors\r\n  const grid = useMapStore((state) => state.grid);\r\n  const scale = useMapStore((state) => state.scale);\r\n  const layers = useMapStore((state) => state.layers);\r\n  const selectedLayerId = useMapStore((state) => state.selectedLayerId);\r\n  const baseMapVisible = useMapStore((state) => state.baseMapVisible);\r\n\r\n  // Update map element reference for export\r\n  useEffect(() => {\r\n    if (containerRef.current) {\r\n      setMapElement(containerRef.current);\r\n    }\r\n\r\n    return () => {\r\n      setMapElement(null);\r\n    };\r\n  }, [setMapElement]);\r\n\r\n  return {\r\n    containerRef,\r\n    grid,\r\n    scale,\r\n    layers,\r\n    selectedLayerId,\r\n    baseMapVisible,\r\n  };\r\n}\r\n",
+      "metadata": {
+        "tokens": 418,
+        "language": "ts"
+      }
+    },
+    {
+      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\world\\ui\\map-layers.tsx:0-79",
+      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\world\\ui\\map-layers.tsx",
+      "startLine": 1,
+      "endLine": 79,
+      "content": "import { type ReactNode } from \"react\";\r\nimport type { PinWithLayer } from \"../../logic/use-pins-filtering\";\r\nimport { MapPinsWrapper } from \"./map-canvas/map-pins-wrapper\";\r\nimport { MapLayersIndicator } from \"./map-layers-indicator\";\r\nimport type { Transform } from \"../../logic/use-map-pan\";\r\n\r\ninterface MapLayersProps {\r\n  baseMapVisible: boolean;\r\n  visiblePins: PinWithLayer[];\r\n  selectedPin: PinWithLayer | null;\r\n  imageDimensions: { width: number; height: number } | null;\r\n  layerScale: number;\r\n  mapImage: string;\r\n  transform: Transform;\r\n  imageRef: React.RefObject<HTMLImageElement | HTMLDivElement | null>;\r\n  onPinClick: (pin: PinWithLayer) => void;\r\n  onPopupClose: () => void;\r\n  onImageLoad: () => void;\r\n  onImageError: () => void;\r\n  showGrid: boolean;\r\n  gridSize: number;\r\n  visibleLayers: Array<{\r\n    id: string;\r\n    visible: boolean;\r\n    zIndex: number;\r\n    isBaseMap?: boolean;\r\n    scale?: number;\r\n    offsetX?: number;\r\n    offsetY?: number;\r\n  }>;\r\n  children?: ReactNode;\r\n}\r\n\r\n/**\r\n * Component to render map layers and pins\r\n * Handles layer visibility, z-indexing, and pin rendering\r\n */\r\nexport function MapLayers({\r\n  baseMapVisible,\r\n  visiblePins,\r\n  selectedPin,\r\n  imageDimensions,\r\n  layerScale,\r\n  mapImage,\r\n  transform,\r\n  imageRef,\r\n  onPinClick,\r\n  onPopupClose,\r\n  onImageLoad,\r\n  onImageError,\r\n  showGrid,\r\n  gridSize,\r\n  visibleLayers,\r\n  children,\r\n}: MapLayersProps) {\r\n  return (\r\n    <>\r\n      <MapPinsWrapper\r\n        baseMapVisible={baseMapVisible}\r\n        visiblePins={visiblePins}\r\n        selectedPin={selectedPin}\r\n        imageDimensions={imageDimensions}\r\n        layerScale={layerScale}\r\n        mapImage={mapImage}\r\n        transform={transform}\r\n        imageRef={imageRef}\r\n        onPinClick={onPinClick}\r\n        onPopupClose={onPopupClose}\r\n        onImageLoad={onImageLoad}\r\n        onImageError={onImageError}\r\n        showGrid={showGrid}\r\n        gridSize={gridSize}\r\n      />\r\n      <MapLayersIndicator layers={visibleLayers} />\r\n      {children}\r\n    </>\r\n  );\r\n}\r\n",
+      "metadata": {
+        "tokens": 493,
+        "language": "tsx"
+      }
+    },
+    {
+      "id": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\types\\shims.d.ts:0-22",
+      "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\types\\shims.d.ts",
+      "startLine": 1,
+      "endLine": 22,
+      "content": "declare module 'clsx' {\n  export type ClassValue = string | number | boolean | undefined | null | Record<string, any> | ClassValue[];\n  export function clsx(...inputs: ClassValue[]): string;\n}\n\ndeclare module 'tailwind-merge' {\n  export function twMerge(...inputs: any[]): string;\n}\n\ndeclare module 'class-variance-authority' {\n  export interface VariantProps<T> {\n    variant?: T;\n    size?: T;\n  }\n  export function cva(base: string, config: any): any;\n  export type { VariantProps };\n}\n\ndeclare module 'lucide-react' {\n  import { LucideIcon } from 'lucide-react';\n  export * from 'lucide-react';\n}",
+      "metadata": {
+        "tokens": 145,
         "language": "ts"
       }
     }

@@ -111,7 +111,7 @@ export function LoreCard({ lore, isSelected, onSelect, categoryLabel }: LoreCard
       `}
     >
       {/* Header */}
-      <div className="flex items-start gap-2 mb-2">
+      <div className="flex items-start gap-2">
         <div className="flex-shrink-0 w-8 h-8 rounded-sm bg-accent-gold/20 flex items-center justify-center">
           <BookOpen className="w-4 h-4 text-accent-gold" />
         </div>
@@ -123,7 +123,7 @@ export function LoreCard({ lore, isSelected, onSelect, categoryLabel }: LoreCard
           `}>
             {lore.title}
           </h3>
-          <div className="flex items-center gap-2 mt-0.5">
+          <div className="flex items-center gap-2">
             <Badge variant="outline" className="text-xs px-1.5 py-0">
               {categoryLabel}
             </Badge>
@@ -157,7 +157,7 @@ export function LoreCard({ lore, isSelected, onSelect, categoryLabel }: LoreCard
       </div>
 
       {/* Content preview */}
-      <p className="text-xs text-text-muted line-clamp-3 mb-2">
+      <p className="text-xs text-text-muted line-clamp-3">
         {contentPreview}
       </p>
 

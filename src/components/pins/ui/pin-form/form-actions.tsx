@@ -48,9 +48,9 @@ export const FormActions: FC<FormActionsProps> = ({
         variant="secondary"
         onClick={onDelete}
         disabled={isSubmitting}
-        className="ml-auto bg-red-600 hover:bg-red-700 text-white"
+        className="bg-red-600 hover:bg-red-700 text-white"
       >
-        <X className="w-4 h-4 mr-2" />
+        <X className="w-4 h-4" />
         Delete
       </Button>
     )}

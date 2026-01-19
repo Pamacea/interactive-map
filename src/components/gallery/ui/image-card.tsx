@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/card";
 import type { GalleryItemWithRelations } from "@/types/gallery.type";
 
-interface ImageCardProps {
+export interface ImageCardProps {
   image: GalleryItemWithRelations;
   isSelected?: boolean;
   onSelect?: () => void;
@@ -118,24 +118,30 @@ export function ImageCard({
                 e.stopPropagation();
                 onEdit?.();
               }}>
-                <Edit2 className="w-4 h-4 mr-2" />
-                Edit
+                <div className="flex items-center gap-2">
+                  <Edit2 className="w-4 h-4" />
+                  Edit
+                </div>
               </DropdownMenuItem>
 
               <DropdownMenuItem onClick={(e) => {
                 e.stopPropagation();
                 onLinkToPin?.();
               }}>
-                <Link2 className="w-4 h-4 mr-2" />
-                Link to Pin
+                <div className="flex items-center gap-2">
+                  <Link2 className="w-4 h-4" />
+                  Link to Pin
+                </div>
               </DropdownMenuItem>
 
               <DropdownMenuItem onClick={(e) => {
                 e.stopPropagation();
                 onLinkToLore?.();
               }}>
-                <FileImage className="w-4 h-4 mr-2" />
-                Link to Lore
+                <div className="flex items-center gap-2">
+                  <FileImage className="w-4 h-4" />
+                  Link to Lore
+                </div>
               </DropdownMenuItem>
 
               <DropdownMenuSeparator />
@@ -147,8 +153,10 @@ export function ImageCard({
                 }}
                 className="text-red-600 focus:text-red-600"
               >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Delete
+                <div className="flex items-center gap-2">
+                  <Trash2 className="w-4 h-4" />
+                  Delete
+                </div>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

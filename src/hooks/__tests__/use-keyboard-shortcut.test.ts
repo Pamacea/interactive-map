@@ -35,7 +35,7 @@ describe("useKeyboardShortcut", () => {
     const handler = vi.fn();
     let keydownHandler: ((e: KeyboardEvent) => void) | null = null;
 
-    addEventListenerSpy.mockImplementation((event, listener) => {
+    addEventListenerSpy.mockImplementation((event: string, listener: EventListenerOrEventListenerObject) => {
       if (event === "keydown") {
         keydownHandler = listener as (e: KeyboardEvent) => void;
       }
@@ -67,7 +67,7 @@ describe("useKeyboardShortcut", () => {
     const handler = vi.fn();
     let keydownHandler: ((e: KeyboardEvent) => void) | null = null;
 
-    addEventListenerSpy.mockImplementation((event, listener) => {
+    addEventListenerSpy.mockImplementation((event: string, listener: EventListenerOrEventListenerObject) => {
       if (event === "keydown") {
         keydownHandler = listener as (e: KeyboardEvent) => void;
       }
@@ -99,7 +99,7 @@ describe("useKeyboardShortcut", () => {
     const handler = vi.fn();
     let keydownHandler: ((e: KeyboardEvent) => void) | null = null;
 
-    addEventListenerSpy.mockImplementation((event, listener) => {
+    addEventListenerSpy.mockImplementation((event: string, listener: EventListenerOrEventListenerObject) => {
       if (event === "keydown") {
         keydownHandler = listener as (e: KeyboardEvent) => void;
       }
@@ -131,7 +131,7 @@ describe("useKeyboardShortcut", () => {
     const handler = vi.fn();
     let keydownHandler: ((e: KeyboardEvent) => void) | null = null;
 
-    addEventListenerSpy.mockImplementation((event, listener) => {
+    addEventListenerSpy.mockImplementation((event: string, listener: EventListenerOrEventListenerObject) => {
       if (event === "keydown") {
         keydownHandler = listener as (e: KeyboardEvent) => void;
       }
@@ -175,7 +175,7 @@ describe("useKeyboardShortcut", () => {
     const handler = vi.fn();
     let keydownHandler: ((e: KeyboardEvent) => void) | null = null;
 
-    addEventListenerSpy.mockImplementation((event, listener) => {
+    addEventListenerSpy.mockImplementation((event: string, listener: EventListenerOrEventListenerObject) => {
       if (event === "keydown") {
         keydownHandler = listener as (e: KeyboardEvent) => void;
       }
@@ -228,7 +228,7 @@ describe("useKeyboardShortcut", () => {
     const handler2 = vi.fn();
     let keydownHandler: ((e: KeyboardEvent) => void) | null = null;
 
-    addEventListenerSpy.mockImplementation((event, listener) => {
+    addEventListenerSpy.mockImplementation((event: string, listener: EventListenerOrEventListenerObject) => {
       if (event === "keydown") {
         keydownHandler = listener as (e: KeyboardEvent) => void;
       }
@@ -271,7 +271,7 @@ describe("useKeyboardShortcut", () => {
     const handler = vi.fn();
     let keydownHandler: ((e: KeyboardEvent) => void) | null = null;
 
-    addEventListenerSpy.mockImplementation((event, listener) => {
+    addEventListenerSpy.mockImplementation((event: string, listener: EventListenerOrEventListenerObject) => {
       if (event === "keydown") {
         keydownHandler = listener as (e: KeyboardEvent) => void;
       }
@@ -307,7 +307,7 @@ describe("useKeyboardShortcut", () => {
     const handler = vi.fn();
     let keydownHandler: ((e: KeyboardEvent) => void) | null = null;
 
-    addEventListenerSpy.mockImplementation((event, listener) => {
+    addEventListenerSpy.mockImplementation((event: string, listener: EventListenerOrEventListenerObject) => {
       if (event === "keydown") {
         keydownHandler = listener as (e: KeyboardEvent) => void;
       }
