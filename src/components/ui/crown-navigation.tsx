@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 
 const PUBLIC_NAV_ITEMS = [
+  { href: "/", label: "HOME", glyph: "ᛟ" },
   { href: "/explore", label: "EXPLORE", glyph: "ᛏ" },
 ];
 
