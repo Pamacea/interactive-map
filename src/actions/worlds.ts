@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, unstable_cache, revalidateTag } from "next/cache";
 import { writeFile } from "fs/promises";
 import path from "path";
 import { existsSync } from "fs";
@@ -16,6 +16,20 @@ import {
   getAuthenticatedUser,
   verifyWorldPermission,
 } from "@/lib/server-helpers";
+
+// Cache tags for revalidation
+const CACHE_TAGS = {
+  WORLDS: "worlds",
+  PUBLIC_WORLDS: "public-worlds",
+};
+
+/**
+ * Revalidate public worlds cache
+ */
+function revalidatePublicWorlds() {
+  revalidatePath("/explore");
+  revalidateTag(CACHE_TAGS.PUBLIC_WORLDS);
+}
 
 /**
  * Create a new world
@@ -78,7 +92,7 @@ export async function createWorld(data: {
       },
     });
 
-    revalidatePath("/explore");
+    revalidatePublicWorlds();
     revalidatePath("/worlds");
 
     return { worldId: world.id };
@@ -197,35 +211,76 @@ export async function getWorldWithData(id: string) {
 }
 
 /**
- * Get all public worlds
+ * Get all public worlds with optimized query and caching
+ * @param options - Pagination and sorting options
  * @returns Array of public worlds
  */
-export async function getAllWorlds() {
-  try {
-    const worlds = await prisma.gameWorld.findMany({
-      where: {
-        isPublic: true,
-      },
-      include: {
-        user: {
-          select: {
-            name: true,
-            image: true,
-          },
-        },
-        _count: {
-          select: {
-            pins: true,
-            loreEntries: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+export async function getAllWorlds(options?: {
+  limit?: number;
+  offset?: number;
+  orderBy?: "createdAt" | "updatedAt";
+}) {
+  // Validate and clamp pagination parameters to prevent abuse
+  const limit = Math.min(Math.max(options?.limit ?? 24, 1), 100);
+  const offset = Math.max(options?.offset ?? 0, 0);
+  const orderBy = options?.orderBy ?? "createdAt";
 
-    return worlds;
+  // Use unstable_cache for 60-second caching
+  const getCachedWorlds = unstable_cache(
+    async () => {
+      const worlds = await prisma.gameWorld.findMany({
+        where: {
+          isPublic: true,
+        },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          map: true,
+          isPublic: true,
+          createdAt: true,
+          updatedAt: true,
+          user: {
+            select: {
+              name: true,
+              image: true,
+            },
+          },
+          // Use subquery for counts instead of _count to avoid N+1
+          pins: {
+            select: { id: true },
+          },
+          loreEntries: {
+            select: { id: true },
+          },
+        },
+        orderBy: {
+          [orderBy]: "desc",
+        },
+        take: limit,
+        skip: offset,
+      });
+
+      // Transform counts in-memory (faster than DB-level counts for small datasets)
+      return worlds.map((world) => ({
+        ...world,
+        _count: {
+          pins: world.pins.length,
+          loreEntries: world.loreEntries.length,
+        },
+        pins: undefined,
+        loreEntries: undefined,
+      }));
+    },
+    [CACHE_TAGS.PUBLIC_WORLDS, `${limit}-${offset}-${orderBy}`],
+    {
+      revalidate: 60,
+      tags: [CACHE_TAGS.PUBLIC_WORLDS],
+    }
+  );
+
+  try {
+    return await getCachedWorlds();
   } catch (error) {
     console.error("[getAllWorlds] Failed to fetch worlds:", error);
     return [];

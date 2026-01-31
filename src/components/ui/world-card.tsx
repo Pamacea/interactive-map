@@ -1,11 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
+import { memo } from "react";
 import { ArrowRight, MapPin, BookOpen } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { WorldCardProps, WorldCardContentProps } from "@/types/components.type";
 
-export function WorldCard({
+export const WorldCard = memo(function WorldCard({
   id,
   title,
   description,
@@ -63,9 +64,17 @@ export function WorldCard({
       </Link>
     </Card>
   );
-}
+}, (prevProps, nextProps) => {
+  return (
+    prevProps.id === nextProps.id &&
+    prevProps.title === nextProps.title &&
+    prevProps._count?.pins === nextProps._count?.pins &&
+    prevProps._count?.loreEntries === nextProps._count?.loreEntries &&
+    prevProps.viewMode === nextProps.viewMode
+  );
+});
 
-function CoverImage({ map, title, isPublic, viewMode }: { map?: string | null; title: string; isPublic: boolean; viewMode?: "grid" | "list" }) {
+const CoverImage = memo(function CoverImage({ map, title, isPublic, viewMode }: { map?: string | null; title: string; isPublic: boolean; viewMode?: "grid" | "list" }) {
   if (viewMode === "list") {
     return (
       <div className="relative w-48 h-32 flex-shrink-0 overflow-hidden bg-gradient-to-br from-background-card to-background-elevated">
@@ -74,6 +83,7 @@ function CoverImage({ map, title, isPublic, viewMode }: { map?: string | null; t
             src={map}
             alt={title}
             fill
+            sizes="(max-width: 768px) 192px, 192px"
             className="object-cover"
           />
         ) : (
@@ -95,6 +105,7 @@ function CoverImage({ map, title, isPublic, viewMode }: { map?: string | null; t
           src={map}
           alt={title}
           fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           className="object-cover"
         />
       ) : (
@@ -109,7 +120,7 @@ function CoverImage({ map, title, isPublic, viewMode }: { map?: string | null; t
       )}
     </div>
   );
-}
+});
 
 function Content({ title, description, pinCount, loreCount, author, viewMode }: WorldCardContentProps) {
   return (

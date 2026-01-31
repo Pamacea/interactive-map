@@ -95,6 +95,8 @@ model GameWorld {
   updatedAt   DateTime      @updatedAt
 
   @@index([userId])
+  @@index([isPublic, createdAt])
+  @@index([isPublic, updatedAt])
 }
 
 model WorldMember {
