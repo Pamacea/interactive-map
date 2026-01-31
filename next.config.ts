@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
   experimental: {
@@ -18,10 +19,32 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true, // Temporarily ignore type errors during build
   },
 
-  // Use webpack for better chunk control (Turbopack alternative in Next.js 16)
-  // NOTE: We explicitly use --webpack flag in package.json scripts to force Webpack over Turbopack
-  // This allows manual chunk splitting optimization for MapLibre and other heavy libraries
-  // Turbopack handles code splitting automatically but doesn't support custom splitChunks config yet
+  // Turbopack configuration (default in Next.js 16+)
+  turbopack: {
+    // Set root to prevent workspace inference warnings
+    root: path.resolve(__dirname),
+
+    // Fix Prisma 7 + pnpm + Turbopack module resolution
+    // The browser client tries to import from '.prisma/client/index-browser'
+    // which Turbopack can't resolve with pnpm's virtual store layout
+    resolveAlias: (() => {
+      try {
+        const prismaClientPkg = require.resolve('@prisma/client/package.json');
+        // With pnpm, go up 3 levels from package.json to reach node_modules root
+        const pnpmNodeModulesDir = path.dirname(path.dirname(path.dirname(prismaClientPkg)));
+        return {
+          '.prisma/client': path.join(pnpmNodeModulesDir, '.prisma', 'client'),
+        };
+      } catch {
+        // Fallback if resolution fails during config loading
+        return {};
+      }
+    })(),
+  },
+
+  // Webpack configuration (for local builds with --webpack flag)
+  // NOTE: Vercel uses Turbopack by default (faster builds ~3x)
+  // Local development can use --webpack flag for custom chunk splitting
   webpack: (config, { isServer }) => {
     // Optimize chunk splitting
     config.optimization.splitChunks = {
