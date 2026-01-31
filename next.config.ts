@@ -70,6 +70,26 @@ const nextConfig: NextConfig = {
       },
     };
 
+    // Fix Prisma 7 + pnpm + webpack module resolution
+    // The browser client tries to import from '.prisma/client/index-browser'
+    // which webpack can't resolve with pnpm's virtual store layout
+    //
+    // With pnpm, the structure is:
+    // node_modules/.pnpm/@prisma+client@xxx/node_modules/
+    //   @prisma/client/package.json  <- we start here
+    //   .prisma/client/
+    const path = require('path');
+    const prismaClientPkg = require.resolve('@prisma/client/package.json');
+    // Go up 3 levels from package.json:
+    // 1. from package.json to client/
+    // 2. from client/ to @prisma/
+    // 3. from @prisma/ to node_modules/
+    const pnpmNodeModulesDir = path.dirname(path.dirname(path.dirname(prismaClientPkg)));
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '.prisma/client': path.join(pnpmNodeModulesDir, '.prisma', 'client'),
+    };
+
     // Improve module resolution performance
     config.resolve = {
       ...config.resolve,
