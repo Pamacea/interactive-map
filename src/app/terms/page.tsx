@@ -1,11 +1,23 @@
 import { AppHeader } from "@/components/ui/app-header";
 import { Footer } from "@/components/home/ui/footer";
+import { GridBackground } from "@/components/ui/grid-background";
+import { FloatingParticles } from "@/components/ui/particles";
 
 export default function TermsPage() {
   return (
-    <>
+    <div className="min-h-screen bg-void relative overflow-hidden">
+      {/* Fixed Background Layer */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 bg-grain opacity-[0.04]" aria-hidden="true" />
+        <GridBackground />
+        <FloatingParticles />
+      </div>
+
+      {/* Background Glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-accent-gold/5 rounded-full blur-[150px] pointer-events-none" />
+
       <AppHeader />
-      <main className="min-h-screen bg-void ml-16 sm:ml-20">
+      <main className="min-h-screen ml-16 sm:ml-20 relative z-10">
         {/* Decorative header */}
         <div className="border-b border-iron pt-16">
           <div className="max-w-3/5 mx-auto px-6 py-16 sm:py-20">
@@ -141,9 +153,14 @@ export default function TermsPage() {
           </div>
         </div>
       </main>
-      <div className="ml-16 sm:ml-20">
+      <div className="ml-16 sm:ml-20 relative z-10">
+        <div className="flex items-center gap-4 py-8 border-t border-iron">
+          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-accent-gold/30 to-transparent" />
+          <span className="text-accent-gold-dark opacity-30">ᛟ</span>
+          <div className="h-px flex-1 bg-gradient-to-l from-transparent via-accent-gold/30 to-transparent" />
+        </div>
         <Footer />
       </div>
-    </>
+    </div>
   );
 }

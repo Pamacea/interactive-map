@@ -67,7 +67,7 @@ export default function WorldError({
           <p className="text-text-secondary">
             We encountered an error while loading this world. This might be due to:
           </p>
-          <ul className="text-left text-text-muted space-y-2 max-w-md mx-auto">
+          <ul className="text-left text-text-muted space-y-2 max-w-3/5 mx-auto">
             <li className="flex gap-2">
               <span className="text-accent-gold">•</span>
               <span>Missing or corrupted world data</span>

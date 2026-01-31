@@ -70,7 +70,7 @@ export function ExportDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md bg-background-card border-border-subtle">
+      <DialogContent className="max-w-3/5 bg-background-card border-border-subtle">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold text-text-primary">Export Map</DialogTitle>
           <DialogDescription className="text-sm text-text-muted mt-1">

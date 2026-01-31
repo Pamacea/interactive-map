@@ -23,7 +23,7 @@ export function Toast({ toast, onHide }: ToastProps) {
   return (
     <div
       id="toast-notification"
-      className="fixed top-4 right-4 z-[9999] min-w-80 max-w-md animate-in fade-in duration-200"
+      className="fixed top-4 right-4 z-[9999] min-w-80 max-w-3/5 animate-in fade-in duration-200"
     >
       <div
         className={`flex items-start gap-3 px-4 py-3 rounded-lg border shadow-lg ${

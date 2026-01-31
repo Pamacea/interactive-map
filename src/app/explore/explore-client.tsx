@@ -1,6 +1,7 @@
 "use client";
 
-import { ExploreHeader } from "@/components/explore/ui/explore-header";
+import { useState } from "react";
+import { Search } from "lucide-react";
 import { FilterSidebar } from "@/components/explore/ui/filter-sidebar";
 import { ResultsHeader } from "@/components/explore/ui/results-header";
 import { WorldsGrid } from "@/components/explore/ui/worlds-grid";
@@ -21,11 +22,38 @@ export function ExploreClient({ initialWorlds }: { initialWorlds: GameWorld[] })
     toggleShowFilters,
   } = useExploreFilters();
 
+  const [searchQuery, setSearchQuery] = useState(filters.query);
+
   const filteredWorlds = filterWorlds({ worlds: initialWorlds, query: filters.query });
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSearch({ query: searchQuery });
+  };
 
   return (
     <>
-      <ExploreHeader onSearch={handleSearch} />
+      {/* Search Bar */}
+      <div className="px-4 pt-4 pb-2">
+        <form onSubmit={handleSearchSubmit} className="max-w-3/5 mx-auto">
+          <div className="relative">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by world name, description, or creator..."
+              className="w-full h-12 pl-12 pr-32 rounded border border-iron bg-obsidian/60 text-bone placeholder:text-bone-dark/50 focus:border-accent-gold focus:outline-none transition-colors"
+            />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-bone-dark" strokeWidth={1.5} />
+            <button
+              type="submit"
+              className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 rounded bg-accent-gold text-background-base text-sm font-display font-medium hover:bg-accent-gold/90 transition-colors"
+            >
+              Search
+            </button>
+          </div>
+        </form>
+      </div>
 
       <main className="px-4 py-8">
         <div className="max-w-4/5 mx-auto grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 lg:gap-8">

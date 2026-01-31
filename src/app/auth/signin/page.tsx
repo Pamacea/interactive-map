@@ -4,6 +4,9 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { CrownButton } from "@/components/ui/crown-button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { LogIn, Crown } from "lucide-react";
+import { GridBackground } from "@/components/ui/grid-background";
+import { FloatingParticles } from "@/components/ui/particles";
 
 export default function SignInPage() {
   const [isLoading, setIsLoading] = useState<string | null>(null);
@@ -22,27 +25,47 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-void p-4">
-      {/* Grain Overlay */}
-      <div className="fixed inset-0 bg-grain opacity-[0.04] pointer-events-none" aria-hidden="true" />
+    <div className="min-h-screen flex items-center justify-center bg-void p-4 relative overflow-hidden">
+      {/* Fixed Background Layer */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 bg-grain opacity-[0.04]" aria-hidden="true" />
+        <GridBackground />
+        <FloatingParticles />
+      </div>
 
-      <div className="w-full max-w-3/5 bg-obsidian border border-iron rounded-sm p-6 sm:p-8 shadow-lg relative z-10">
-        {/* Decorative runes */}
-        <div className="absolute top-4 left-4 text-accent-gold-dark opacity-30 text-sm">ᛟ</div>
-        <div className="absolute top-4 right-4 text-accent-gold-dark opacity-30 text-sm">ᛞ</div>
-        <div className="absolute bottom-4 left-4 text-accent-gold-dark opacity-30 text-sm">ᛃ</div>
-        <div className="absolute bottom-4 right-4 text-accent-gold-dark opacity-30 text-sm">ᛊ</div>
+      {/* Background Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-accent-gold/5 rounded-full blur-[120px] pointer-events-none" />
+
+      {/* Main Card */}
+      <div className="w-full max-w-3/5 bg-obsidian/80 backdrop-blur-md border border-iron rounded-lg p-6 sm:p-10 shadow-xl relative z-10 animate-oath-reveal">
+        {/* Decorative Corner Runes */}
+        <div className="absolute top-4 left-4 text-accent-gold-dark opacity-30 text-sm animate-rune-glow">ᛟ</div>
+        <div className="absolute top-4 right-4 text-accent-gold-dark opacity-30 text-sm animate-rune-glow" style={{ animationDelay: "1s" }}>ᛞ</div>
+        <div className="absolute bottom-4 left-4 text-accent-gold-dark opacity-30 text-sm animate-rune-glow" style={{ animationDelay: "2s" }}>ᛃ</div>
+        <div className="absolute bottom-4 right-4 text-accent-gold-dark opacity-30 text-sm animate-rune-glow" style={{ animationDelay: "3s" }}>ᛊ</div>
 
         <div className="space-y-6 text-center relative z-10">
+          {/* Crown Icon */}
+          <div className="text-5xl text-accent-gold/20 mb-4 flex justify-center">
+            <Crown className="w-12 h-12 sm:w-16 sm:h-16 mx-auto" strokeWidth={1} />
+          </div>
+
+          {/* Decorative Lines */}
+          <div className="flex items-center justify-center gap-4">
+            <div className="h-px w-12 bg-gradient-to-r from-transparent via-accent-gold/50 to-accent-gold" />
+            <span className="text-accent-gold-dark opacity-50 text-lg animate-rune-glow">ᛟ</span>
+            <div className="h-px w-12 bg-gradient-to-l from-transparent via-accent-gold/50 to-accent-gold" />
+          </div>
+
           {/* Title */}
           <div className="space-y-2">
             <p className="font-display text-xs tracking-[0.4em] text-bone-dark">
               ENTER THE REALM
             </p>
-            <h1 className="font-display-ornate text-4xl text-accent-gold tracking-wider">
+            <h1 className="font-display-ornate text-4xl sm:text-5xl text-accent-gold tracking-wider">
               GENESIS
             </h1>
-            <p className="font-fell text-bone-dark">
+            <p className="font-fell text-bone-dark text-sm">
               Sign in to craft your world
             </p>
           </div>
@@ -58,7 +81,7 @@ export default function SignInPage() {
           <div className="space-y-3 pt-4">
             <CrownButton
               onClick={() => handleSignIn("github")}
-              variant="iron"
+              variant="gold"
               size="lg"
               className="w-full flex items-center justify-center"
               disabled={isLoading !== null}
@@ -122,7 +145,7 @@ export default function SignInPage() {
           </div>
 
           {/* Terms */}
-          <p className="font-fell text-sm text-bone-dark/70 pt-4 border-t border-iron/50">
+          <p className="font-fell text-xs text-bone-dark/70 pt-4 border-t border-iron/50">
             By signing in, you agree to our{" "}
             <a href="/terms" className="text-accent-gold hover:underline">
               Terms of Service
@@ -132,6 +155,13 @@ export default function SignInPage() {
               Privacy Policy
             </a>
           </p>
+
+          {/* Bottom Seal */}
+          <div className="pt-4 flex justify-center">
+            <div className="w-12 h-12 border border-accent-gold-dark/50 rounded-full flex items-center justify-center">
+              <LogIn className="w-5 h-5 text-accent-gold-dark" strokeWidth={1} />
+            </div>
+          </div>
         </div>
       </div>
     </div>

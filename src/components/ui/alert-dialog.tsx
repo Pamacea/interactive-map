@@ -82,7 +82,7 @@ const AlertDialogContent = ({
           }
         }}
         className={cn(
-          "relative rounded-sm shadow-2xl p-6 w-full max-w-md sm: z-[100] animate-in fade-in zoom-in-95",
+          "relative rounded-sm shadow-2xl p-6 w-full max-w-3/5 sm: z-[100] animate-in fade-in zoom-in-95",
           "bg-[var(--color-background-card)] border-2 border-[var(--color-accent-gold)]",
           className
         )}

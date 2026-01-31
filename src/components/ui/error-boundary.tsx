@@ -100,7 +100,7 @@ export class ErrorBoundary extends React.Component<
       // Default error UI
       return (
         <div className="flex items-center justify-center min-h-screen bg-background-base px-4">
-          <div className="max-w-md w-full space-y-6 text-center">
+          <div className="max-w-3/5 w-full space-y-6 text-center">
             {/* Error Icon */}
             <div className="flex justify-center">
               <div className="relative">
@@ -174,7 +174,7 @@ export function DefaultErrorFallback({
 }) {
   return (
     <div className="flex items-center justify-center min-h-screen bg-background-base px-4">
-      <div className="max-w-md w-full space-y-6 text-center">
+      <div className="max-w-3/5 w-full space-y-6 text-center">
         <div className="flex justify-center">
           <AlertCircle className="w-16 h-16 text-accent-gold" />
         </div>

@@ -26,7 +26,7 @@ export function DialogWrapper({
       onClick={onClose}
     >
       <div
-        className="bg-background-elevated border border-border-base rounded-lg shadow-lg max-w-md w-full mx-4 animate-in zoom-in-95 duration-200"
+        className="bg-background-elevated border border-border-base rounded-lg shadow-lg max-w-3/5 w-full mx-4 animate-in zoom-in-95 duration-200"
         onClick={handleContentClick}
       >
         <div className="flex items-center justify-between px-4 py-3 border-b border-border-base">
