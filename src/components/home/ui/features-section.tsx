@@ -35,58 +35,49 @@ const features = [
 
 export function FeaturesSection() {
   return (
-    <section className="relative py-20 sm:py-32 px-4 bg-linear-to-b from-background-base to-background-elevated border-b-2 border-b-accent-gold">
-      <div className="absolute inset-0 bg-[linear-linear(rgba(212,175,55,0.02)_1px,transparent_1px),linear-linear(90deg,rgba(212,175,55,0.02)_1px,transparent_1px)] bg-size-[100px_100px]" />
-      <div className="relative max-w-2/3 mx-auto flex flex-col items-center">
-        <FeaturesHeader />
-        <FeaturesGrid />
+    <section id="oath" className="py-16 sm:py-20 px-4 bg-obsidian border-t border-b border-iron">
+      <div className="max-w-3/5 mx-auto">
+        {/* Header */}
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-display-ornate text-accent-gold tracking-wide mb-4">
+            Everything You Need
+          </h2>
+          <p className="text-sm sm:text-base text-bone-dark font-fell italic">
+            Powerful tools for world builders, game masters, and fantasy creators
+          </p>
+        </div>
+
+        {/* Features Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-12">
+          {features.map((feature, index) => (
+            <div
+              key={index}
+              className="flex items-start gap-4 p-4 sm:p-6 border border-iron rounded-sm hover:border-accent-gold/50 transition-colors bg-void/30"
+            >
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-sm bg-accent-gold/10 flex items-center justify-center shrink-0">
+                <feature.icon className="w-5 h-5 sm:w-6 sm:h-6 text-accent-gold" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-base sm:text-lg font-display-ornate font-semibold text-bone mb-2">
+                  {feature.title}
+                </h3>
+                <p className="text-xs sm:text-sm text-bone-dark leading-relaxed font-fell">
+                  {feature.description}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Seal */}
+        <div className="flex justify-center">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 border-2 border-accent-gold-dark rounded-full flex items-center justify-center">
+            <span className="font-display text-[0.4rem] sm:text-[0.45rem] tracking-widest text-accent-gold-dark text-center">
+              GENESIS
+            </span>
+          </div>
+        </div>
       </div>
     </section>
-  );
-}
-
-function FeaturesHeader() {
-  return (
-    <div className="text-center mb-12 sm:mb-16">
-      <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-text-primary mb-4">
-        Everything You Need to{" "}
-        <span className="bg-linear-to-r from-accent-gold to-accent-gold-light bg-clip-text text-transparent">
-          Build
-        </span>
-      </h2>
-      <p className="text-base sm:text-lg text-text-secondary mx-auto">
-        Powerful tools for world builders, game masters, and fantasy creators.
-      </p>
-    </div>
-  );
-}
-
-function FeaturesGrid() {
-  return (
-    <div className="w-full">
-      <div className="flex flex-col divide-y divide-border-subtle">
-        {features.map((feature, index) => (
-          <FeatureItem key={index} {...feature} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function FeatureItem({ icon: Icon, title, description }: typeof features[0]) {
-  return (
-    <div className="flex items-start gap-6 py-8 hover:bg-muted/50 transition-colors duration-200 -mx-4 px-4 rounded-sm">
-      <div className="w-12 h-12 rounded-sm bg-linear-to-br from-accent-gold/20 to-accent-gold/5 flex items-center justify-center shrink-0">
-        <Icon className="w-6 h-6 text-accent-gold" />
-      </div>
-      <div className="flex-1 pt-1">
-        <h3 className="text-lg sm:text-xl font-display font-semibold text-text-primary mb-2">
-          {title}
-        </h3>
-        <p className="text-sm sm:text-base text-text-secondary leading-relaxed">
-          {description}
-        </p>
-      </div>
-    </div>
   );
 }

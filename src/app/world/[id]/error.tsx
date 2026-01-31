@@ -50,7 +50,7 @@ export default function WorldError({
 
   return (
     <div className="h-screen bg-background-base flex items-center justify-center px-4">
-      <div className="max-w-lg w-full space-y-6">
+      <div className=" w-full space-y-6">
         {/* Error Icon with Animation */}
         <div className="flex justify-center">
           <div className="relative">

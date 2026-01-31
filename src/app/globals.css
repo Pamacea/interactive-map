@@ -1,26 +1,10 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@400;700;900&family=IM+Fell+English:ital@0;1&display=swap');
 
 @theme {
   /* ============================================
      COLOR SYSTEM
-     ============================================
-
-     This color system provides consistent theming
-     across the entire application using CSS variables.
-
-     USAGE:
-     - Theme colors: Use CSS variables (bg-background-base)
-     - Functional colors: Can use Tailwind defaults (text-red-500)
-     - Custom colors: Define new variables here
-
-     CATEGORIES:
-     1. Background - Surface colors
-     2. Border - Edge/line colors
-     3. Text - Typography colors
-     4. Accent - Theme highlights (gold-based)
-     5. Interactive - UI feedback colors
-     6. Status - Semantic colors (success, error, etc.)
-  ============================================ */
+     ============================================ */
 
   /* Background Colors */
   --color-background-base: #0a0e13;
@@ -29,15 +13,26 @@
   --color-background-card-hover: #222b33;
   --color-background-overlay: rgba(10, 14, 19, 0.95);
   --color-background-input: #1a2228;
-  --color-background-skeleton: #334155; /* Slate-700 equivalent */
+  --color-background-skeleton: #334155;
+
+  /* Crown of Ashes Colors */
+  --color-void: #0a0908;
+  --color-obsidian: #121210;
+  --color-stone: #1a1915;
+  --color-iron: #2a2820;
+  --color-bone: #d4c5a9;
+  --color-bone-dark: #9a8b6f;
+  --color-blood: #6b1010;
+  --color-blood-bright: #8b0000;
+  --color-parchment: #f4e4bc;
 
   /* Border Colors */
   --color-border-subtle: rgba(255, 255, 255, 0.08);
   --color-border-default: rgba(255, 255, 255, 0.12);
   --color-border-ornate: rgba(212, 175, 55, 0.3);
   --color-border-glow: rgba(212, 175, 55, 0.15);
-  --color-border-input: rgba(255, 255, 255, 0.15); /* Slate-200 equivalent for dark mode */
-  --color-border-hover: rgba(255, 255, 255, 0.2); /* Slate-300 equivalent for dark mode */
+  --color-border-input: rgba(255, 255, 255, 0.15);
+  --color-border-hover: rgba(255, 255, 255, 0.2);
 
   /* Text Colors */
   --color-text-primary: #e8e6e3;
@@ -50,11 +45,11 @@
   --color-accent-gold-light: #f4d47c;
   --color-accent-gold-dark: #b8931f;
 
-  /* Interactive Colors (for focus, selection, etc.) */
-  --color-interactive-primary: #3b82f6; /* Blue-500 */
-  --color-interactive-primary-hover: #2563eb; /* Blue-600 */
-  --color-interactive-focus: #3b82f6; /* Blue-500 for focus rings */
-  --color-interactive-selected: #eff6ff; /* Blue-50 for selected states */
+  /* Interactive Colors */
+  --color-interactive-primary: #3b82f6;
+  --color-interactive-primary-hover: #2563eb;
+  --color-interactive-focus: #3b82f6;
+  --color-interactive-selected: #eff6ff;
 
   /* Pin Type Colors */
   --color-pin-city: #c9a227;
@@ -80,71 +75,29 @@
   --color-rarity-epic: #9b59b6;
   --color-rarity-legendary: #d4af37;
 
-  /* Status Colors (Semantic) */
+  /* Status Colors */
   --color-status-success: #2ecc71;
-  --color-status-success-dark: #16a34a; /* Green-600 */
+  --color-status-success-dark: #16a34a;
   --color-status-warning: #f39c12;
-  --color-status-warning-light: #f59e0b; /* Amber-500 */
+  --color-status-warning-light: #f59e0b;
   --color-status-error: #e74c3c;
-  --color-status-error-dark: #dc2626; /* Red-600 */
+  --color-status-error-dark: #dc2626;
   --color-status-info: #3498db;
 
-  /* Particle/Decoration Colors */
-  --color-particle-purple: #a855f7; /* Purple-500 */
-  --color-particle-blue: #60a5fa; /* Blue-400 */
-  --color-particle-emerald: #34d399; /* Emerald-400 */
-  --color-particle-amber: #fbbf24; /* Amber-400 */
-  --color-particle-rose: #fb7185; /* Rose-400 */
-  --color-particle-cyan: #22d3ee; /* Cyan-400 */
-  --color-particle-violet: #a78bfa; /* Violet-400 */
-
-  /* ============================================
-     USAGE GUIDELINES
-     ============================================
-
-     1. THEME COLORS (Always use CSS variables):
-        - Backgrounds: bg-background-base, bg-background-elevated, etc.
-        - Borders: border-border-subtle, border-border-default, etc.
-        - Text: text-text-primary, text-text-secondary, text-text-muted
-        - Accents: bg-accent-gold, text-accent-gold-light
-
-     2. INTERACTIVE STATES:
-        - Focus: ring-interactive-focus
-        - Selected: bg-interactive-selected, border-interactive-primary
-        - Hover: border-hover
-        - Primary actions: bg-interactive-primary
-
-     3. STATUS/SEMANTIC COLORS:
-        - Success: text-status-success, bg-status-success
-        - Warning: text-status-warning, bg-status-warning-light
-        - Error: text-status-error, border-status-error
-        - Info: text-status-info
-
-     4. FUNCTIONAL COLORS (Can use Tailwind defaults):
-        - Functional colors like red-500, green-600, etc. are OK for:
-          * Specific functional purposes (alerts, badges)
-          * Third-party components
-          * When semantic meaning is more important than theme
-
-     5. WHEN TO ADD NEW VARIABLES:
-        - Add a new CSS variable when:
-          * The color is part of the theme (gold accent, backgrounds)
-          * The color will be used in multiple components
-          * The color might need to be changed globally later
-        - Use direct Tailwind colors when:
-          * The color is functional (success/error states)
-          * The color is used in one place only
-          * The color has standard semantic meaning
-
-     6. NAMING CONVENTIONS:
-        - Format: --color-[category]-[variant]
-        - Categories: background, border, text, accent, interactive, status, particle, pin, faction, rarity
-        - Use descriptive names: "elevated" not "dark", "subtle" not "light-gray"
-  ============================================ */
+  /* Particle Colors */
+  --color-particle-purple: #a855f7;
+  --color-particle-blue: #60a5fa;
+  --color-particle-emerald: #34d399;
+  --color-particle-amber: #fbbf24;
+  --color-particle-rose: #fb7185;
+  --color-particle-cyan: #22d3ee;
+  --color-particle-violet: #a78bfa;
 
   /* Font Families */
   --font-display: 'Cinzel', 'Times New Roman', serif;
+  --font-display-ornate: 'Cinzel Decorative', serif;
   --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-fell: 'IM Fell English', serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
   /* Spacing */
@@ -171,7 +124,6 @@
     border-color: var(--color-border-subtle);
   }
 
-
   body {
     background-color: var(--color-background-base);
     color: var(--color-text-primary);
@@ -191,22 +143,14 @@
     color: var(--color-accent-gold-light);
   }
 
+  /* Hide scrollbar */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 0;
+    display: none;
   }
 
-  ::-webkit-scrollbar-track {
-    background-color: var(--color-background-base);
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background-color: var(--color-background-elevated);
-    border-radius: 9999px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background-color: var(--color-border-ornate);
+  html {
+    scrollbar-width: none;
   }
 
   :focus-visible {
@@ -231,5 +175,14 @@
 
   .border-ornate {
     border: 1px solid var(--color-border-ornate);
+  }
+
+  /* Crown of Ashes Utilities */
+  .bg-grain {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
+
+  .cursor-crosshair {
+    cursor: crosshair;
   }
 }

@@ -54,7 +54,7 @@ export default function GlobalError({
     <html lang="en" suppressHydrationWarning>
       <body className="bg-background-base text-text-primary antialiased">
         <div className="min-h-screen flex items-center justify-center px-4">
-          <div className="max-w-xl w-full space-y-8">
+          <div className=" w-full space-y-8">
             {/* Critical Error Icon */}
             <div className="flex justify-center">
               <div className="relative">

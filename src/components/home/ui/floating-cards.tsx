@@ -22,15 +22,35 @@ const cards: FloatingCard[] = [
   { id: 5, size: 160, x: 0, y: 0, rotation: 5, speedX: 0.15, speedY: 0.4, rotationSpeed: 0.35 },
 ];
 
+interface CardPosition {
+  id: number;
+  x: number;
+  y: number;
+  rotation: number;
+}
+
 export function FloatingCards() {
-  const [positions, setPositions] = useState(() =>
+  const [positions, setPositions] = useState<CardPosition[]>(() =>
     cards.map((card) => ({
       id: card.id,
-      x: (Math.random() - 0.5) * 100,
-      y: (Math.random() - 0.5) * 100,
+      x: 0,
+      y: 0,
       rotation: card.rotation,
     }))
   );
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+    setPositions(
+      cards.map((card) => ({
+        id: card.id,
+        x: (Math.random() - 0.5) * 100,
+        y: (Math.random() - 0.5) * 100,
+        rotation: card.rotation,
+      }))
+    );
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -61,7 +81,7 @@ export function FloatingCards() {
   }, []);
 
   return (
-    <div className="relative w-full aspect-square max-w-lg mx-auto">
+    <div className="relative w-full aspect-square  mx-auto">
       <div className="absolute inset-0 bg-accent-gold/10 rounded-xl blur-3xl" />
 
       {cards.map((card, index) => {
@@ -73,8 +93,8 @@ export function FloatingCards() {
             key={card.id}
             className={`absolute rounded-lg bg-gradient-to-br from-background-card via-background-elevated to-background-card border border-border-subtle overflow-hidden transition-all duration-75 ease-linear will-change-transform ${isMain ? "shadow-2xl" : "shadow-xl"}`}
             style={{
-              width: card.size,
-              height: card.size,
+              width: `${card.size}px`,
+              height: `${card.size}px`,
               left: `calc(50% - ${card.size / 2}px + ${pos.x}px)`,
               top: `calc(50% - ${card.size / 2}px + ${pos.y}px)`,
               transform: `rotate(${pos.rotation}deg)`,

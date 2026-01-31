@@ -163,7 +163,7 @@ export function SearchBar({ worldId, onResultClick, className }: SearchBarProps)
       />
 
       {/* Search panel */}
-      <div className="relative w-full max-w-2xl bg-background-card border border-border-ornate rounded-lg shadow-xl overflow-hidden">
+      <div className="relative w-full  bg-background-card border border-border-ornate rounded-lg shadow-xl overflow-hidden">
         {/* Search input */}
         <SearchInput
           inputRef={inputRef}
