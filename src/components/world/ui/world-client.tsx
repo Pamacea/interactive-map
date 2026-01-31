@@ -1,7 +1,7 @@
 "use client";
 
-import { Suspense, useCallback } from "react";
-import { MapCanvas } from "@/components/world/ui/map-canvas";
+/* eslint-disable simple-import-sort/imports */
+import { Suspense, useCallback, lazy, memo } from "react";
 import { Sidebar } from "@/components/world/ui/sidebar";
 import { WorldNavigation } from "@/components/world/ui/world-navigation";
 import { AutosaveIndicator } from "@/components/world/ui/autosave-indicator";
@@ -23,6 +23,15 @@ import type { Pin } from "@/types/pin.type";
 import type { LoreEntry } from "@/types/lore.type";
 import type { SearchResultItem } from "@/lib/search-types";
 
+// Dynamic import for MapCanvas to avoid SSR and reduce initial bundle size
+// This prevents MapLibre GL (1MB+) from being included in server bundle
+// Note: Skeleton components must NOT be lazy-loaded as they need to render immediately
+const MapCanvas = lazy(() =>
+  import("@/components/world/ui/map-canvas").then((mod) => ({
+    default: mod.MapCanvas,
+  }))
+);
+
 interface WorldClientProps {
   world: OptimizedWorld;
   pins: Pin[];
@@ -30,7 +39,7 @@ interface WorldClientProps {
   isAuthenticated: boolean;
 }
 
-export function WorldClient({ world, pins, loreEntries, isAuthenticated }: WorldClientProps) {
+export const WorldClient = memo(function WorldClient({ world, pins, loreEntries, isAuthenticated }: WorldClientProps) {
   // Initialize layers from world data (handle undefined from Prisma)
   useWorldInitialization(world.layers ?? null);
 
@@ -99,11 +108,13 @@ export function WorldClient({ world, pins, loreEntries, isAuthenticated }: World
     <ErrorBoundary>
       <MapExportProvider>
         <div className="h-screen bg-background-base flex flex-col">
-          <WorldNavigation
-            worldTitle={world.title}
-            worldId={world.id}
-            onSearchResultClick={handleSearchResultClick}
-          />
+          <Suspense fallback={<div className="h-16 bg-background-card border-b border-border-subtle" />}>
+            <WorldNavigation
+              worldTitle={world.title}
+              worldId={world.id}
+              onSearchResultClick={handleSearchResultClick}
+            />
+          </Suspense>
           <div className="flex flex-1 overflow-hidden">
             <ErrorBoundary
               fallback={
@@ -141,11 +152,13 @@ export function WorldClient({ world, pins, loreEntries, isAuthenticated }: World
                   <MapCanvas mapImage={world.map} worldId={world.id} />
                 </Suspense>
               </ErrorBoundary>
-              <AutosaveIndicator status={status} />
+              <Suspense fallback={null}>
+                <AutosaveIndicator status={status} />
+              </Suspense>
             </main>
           </div>
         </div>
       </MapExportProvider>
     </ErrorBoundary>
   );
-}
+});

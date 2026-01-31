@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, memo } from "react";
 import { Check, X } from "lucide-react";
 import { updateWorldTitle } from "@/actions/worlds";
 
@@ -11,7 +11,7 @@ interface SidebarHeaderProps {
   onTitleUpdate?: (newTitle: string) => void;
 }
 
-export function SidebarHeader({ title, worldId, isCollapsed, onTitleUpdate }: SidebarHeaderProps) {
+export const SidebarHeader = memo(function SidebarHeader({ title, worldId, isCollapsed, onTitleUpdate }: SidebarHeaderProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(title);
   const [isSaving, setIsSaving] = useState(false);
@@ -127,4 +127,4 @@ export function SidebarHeader({ title, worldId, isCollapsed, onTitleUpdate }: Si
       )}
     </div>
   );
-}
+});

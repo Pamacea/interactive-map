@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { PinContextMenu } from "@/components/pins/ui/pin-context-menu";
 import { useMapInitialization } from "../logic/use-map-initialization";
 import { useMapEvents } from "../logic/use-map-events";
@@ -16,7 +17,7 @@ export interface MapCanvasProps {
   worldId?: string;
 }
 
-export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
+export const MapCanvas = memo(function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
   // Initialize map and get container ref
   const { containerRef, grid, scale, layers, selectedLayerId, baseMapVisible } =
     useMapInitialization({ mapImage, worldId });
@@ -123,4 +124,4 @@ export function MapCanvas({ mapImage, worldId }: MapCanvasProps) {
       </MapContainer>
     </MapCenterProvider>
   );
-}
+});

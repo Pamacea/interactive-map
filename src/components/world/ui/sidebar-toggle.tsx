@@ -1,11 +1,12 @@
 import { Menu, X } from "lucide-react";
+import { memo } from "react";
 
 interface SidebarToggleProps {
   isOpen: boolean;
   onToggle: () => void;
 }
 
-export function SidebarToggle({ isOpen, onToggle }: SidebarToggleProps) {
+export const SidebarToggle = memo(function SidebarToggle({ isOpen, onToggle }: SidebarToggleProps) {
   return (
     <button
       onClick={onToggle}
@@ -22,4 +23,4 @@ export function SidebarToggle({ isOpen, onToggle }: SidebarToggleProps) {
       )}
     </button>
   );
-}
+});

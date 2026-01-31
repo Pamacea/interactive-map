@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, type ReactNode } from "react";
+import { forwardRef, memo, type ReactNode } from "react";
 
 interface MapContainerProps {
   isCreatingPin: boolean;
@@ -12,19 +12,20 @@ interface MapContainerProps {
   children: ReactNode;
 }
 
-export const MapContainer = forwardRef<HTMLDivElement, MapContainerProps>(
-  (
-    {
-      isCreatingPin,
-      isDragging,
-      showContextMenu,
-      onMouseDown,
-      onClick,
-      onContextMenu,
-      children,
-    },
-    ref
-  ) => {
+export const MapContainer = memo(
+  forwardRef<HTMLDivElement, MapContainerProps>(
+    (
+      {
+        isCreatingPin,
+        isDragging,
+        showContextMenu,
+        onMouseDown,
+        onClick,
+        onContextMenu,
+        children,
+      },
+      ref
+    ) => {
     return (
       <div
         ref={ref}
@@ -43,6 +44,7 @@ export const MapContainer = forwardRef<HTMLDivElement, MapContainerProps>(
       </div>
     );
   }
+  )
 );
 
 MapContainer.displayName = "MapContainer";

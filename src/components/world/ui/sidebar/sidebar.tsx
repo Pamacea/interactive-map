@@ -1,6 +1,6 @@
 "use client";
 
-import { ForwardedRef, forwardRef } from "react";
+import { ForwardedRef, forwardRef, useCallback, useMemo } from "react";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import { SidebarHeader } from "../sidebar-header";
 import { ResizeHandle } from "../resize-handle";
@@ -64,9 +64,15 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(
       handleIconClick: handleIconClickState,
     } = useSidebarState(initialPins);
 
-    const handleIconClick = (section: "layers" | "filters" | "properties" | "pins" | "lore" | "gallery") => {
-      handleIconClickState(section, onToggle);
-    };
+    const handleIconClick = useCallback(
+      (section: "layers" | "filters" | "properties" | "pins" | "lore" | "gallery") => {
+        handleIconClickState(section, onToggle);
+      },
+      [handleIconClickState, onToggle]
+    );
+
+    // Stable empty function for onTitleUpdate since title updates are handled via URL params
+    const handleTitleUpdate = useMemo(() => () => {}, []);
 
     return (
       <div
@@ -86,7 +92,7 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(
           {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
         </button>
 
-        <SidebarHeader title={title} worldId={worldId} isCollapsed={isCollapsed} onTitleUpdate={() => {}} />
+        <SidebarHeader title={title} worldId={worldId} isCollapsed={isCollapsed} onTitleUpdate={handleTitleUpdate} />
 
         {isCollapsed ? (
           <SidebarCollapsed

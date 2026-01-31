@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type ReactNode } from "react";
+import { useRef, memo, type ReactNode } from "react";
 import type { PinWithLayer } from "../../logic/use-pins-filtering";
 import { MapImage } from "../map-image";
 import { PinsRenderer } from "../pins-renderer";
@@ -23,7 +23,7 @@ interface MapPinsWrapperProps {
   gridSize: number;
 }
 
-export function MapPinsWrapper({
+export const MapPinsWrapper = memo(function MapPinsWrapper({
   baseMapVisible,
   visiblePins,
   selectedPin,
@@ -91,4 +91,6 @@ export function MapPinsWrapper({
       )}
     </div>
   );
-}
+});
+
+MapPinsWrapper.displayName = "MapPinsWrapper";

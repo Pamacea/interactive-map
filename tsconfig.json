@@ -12,7 +12,11 @@
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "node",
-    "moduleSuffixes": [".ts", ".tsx", ".d.ts"],
+    "moduleSuffixes": [
+      ".ts",
+      ".tsx",
+      ".d.ts"
+    ],
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",

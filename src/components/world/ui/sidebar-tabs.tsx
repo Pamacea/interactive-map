@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, memo } from "react";
 import { Layers, Settings2, Filter, Image } from "lucide-react";
 
 type TabValue = "layers" | "filters" | "properties" | "gallery";
@@ -17,7 +17,7 @@ const tabs = [
   { value: "gallery" as TabValue, label: "Gallery", icon: Image },
 ];
 
-export function SidebarTabs({ activeTab, onTabChange }: SidebarTabsProps) {
+export const SidebarTabs = memo(function SidebarTabs({ activeTab, onTabChange }: SidebarTabsProps) {
   const handleTabChange = useCallback(
     (tab: TabValue) => {
       onTabChange(tab);
@@ -34,7 +34,7 @@ export function SidebarTabs({ activeTab, onTabChange }: SidebarTabsProps) {
         break;
       case "ArrowRight":
         e.preventDefault();
-        const nextIndex = index === tabs.length - 1 ? 0 : index + 1;
+        const nextIndex = tabs.length - 1 === 0 ? 0 : index + 1;
         onTabChange(tabs[nextIndex].value);
         break;
       case "Home":
@@ -83,4 +83,6 @@ export function SidebarTabs({ activeTab, onTabChange }: SidebarTabsProps) {
       })}
     </div>
   );
-}
+});
+
+SidebarTabs.displayName = "SidebarTabs";

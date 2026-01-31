@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { memo, type ReactNode } from "react";
 import type { PinWithLayer } from "../../logic/use-pins-filtering";
 import { MapPinsWrapper } from "./map-canvas/map-pins-wrapper";
 import { MapLayersIndicator } from "./map-layers-indicator";
@@ -35,7 +35,7 @@ interface MapLayersProps {
  * Component to render map layers and pins
  * Handles layer visibility, z-indexing, and pin rendering
  */
-export function MapLayers({
+export const MapLayers = memo(function MapLayers({
   baseMapVisible,
   visiblePins,
   selectedPin,
@@ -75,4 +75,6 @@ export function MapLayers({
       {children}
     </>
   );
-}
+});
+
+MapLayers.displayName = "MapLayers";
