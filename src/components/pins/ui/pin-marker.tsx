@@ -83,6 +83,9 @@ export function PinMarker({
     isLocked: isLayerLocked,
     onSelectPin: selectPin,
     onUpdatePin: updatePin,
+    // Pass actual rendered position (with layer offsets) for correct drag offset
+    renderedX: position.x,
+    renderedY: position.y,
   });
 
   // Event handling (hover, event capture)

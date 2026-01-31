@@ -5,6 +5,7 @@ import type { PinWithLayer } from "../../logic/use-pins-filtering";
 import { MapImage } from "../map-image";
 import { PinsRenderer } from "../pins-renderer";
 import { SelectedPinPopup } from "../selected-pin-popup";
+import { useMapStore } from "@/stores/map-store";
 
 interface MapPinsWrapperProps {
   baseMapVisible: boolean;
@@ -39,6 +40,9 @@ export const MapPinsWrapper = memo(function MapPinsWrapper({
   showGrid,
   gridSize,
 }: MapPinsWrapperProps) {
+  // Get layers for popup positioning
+  const layers = useMapStore((state) => state.layers);
+
   if (!imageDimensions) return null;
 
   const pinsRenderer = (
@@ -67,6 +71,8 @@ export const MapPinsWrapper = memo(function MapPinsWrapper({
           <SelectedPinPopup
             selectedPin={selectedPin}
             onClose={onPopupClose}
+            imageDimensions={imageDimensions}
+            layers={layers}
           />
         )}
       </MapImage>
@@ -87,6 +93,8 @@ export const MapPinsWrapper = memo(function MapPinsWrapper({
         <SelectedPinPopup
           selectedPin={selectedPin}
           onClose={onPopupClose}
+          imageDimensions={imageDimensions}
+          layers={layers}
         />
       )}
     </div>

@@ -63,11 +63,67 @@ const config: Config = {
           error: "var(--color-status-error)",
           info: "var(--color-status-info)",
         },
+        // Crown of Ashes colors (from CSS vars)
+        void: "var(--color-void)",
+        obsidian: "var(--color-obsidian)",
+        stone: "var(--color-stone)",
+        iron: "var(--color-iron)",
+        bone: {
+          DEFAULT: "var(--color-bone)",
+          dark: "var(--color-bone-dark)",
+        },
+        blood: {
+          DEFAULT: "var(--color-blood)",
+          bright: "var(--color-blood-bright)",
+        },
+        parchment: "var(--color-parchment)",
       },
       fontFamily: {
         display: "var(--font-display)",
+        "display-ornate": "var(--font-display-ornate)",
         body: "var(--font-body)",
+        fell: "var(--font-fell)",
         mono: "var(--font-mono)",
+      },
+      animation: {
+        "rune-glow": "rune-glow 4s ease-in-out infinite",
+        "crown-float": "crown-float 6s ease-in-out infinite",
+        "seal-pulse": "seal-pulse 3s ease-in-out infinite",
+        "drip": "drip 3s ease-in infinite",
+        "blood-pulse": "blood-pulse 2s ease-in-out infinite",
+        "void-fade": "void-fade 0.5s forwards",
+        "oath-reveal": "oath-reveal 1s forwards",
+      },
+      keyframes: {
+        "rune-glow": {
+          "0%, 100%": { opacity: "0.3", textShadow: "none" },
+          "50%": { opacity: "0.8", textShadow: "0 0 10px #c9a227" },
+        },
+        "crown-float": {
+          "0%, 100%": { transform: "translateY(0) rotate(0)" },
+          "50%": { transform: "translateY(-10px) rotate(2deg)" },
+        },
+        "seal-pulse": {
+          "0%, 100%": { boxShadow: "0 0 0 0 rgba(201, 162, 39, 0.3)" },
+          "50%": { boxShadow: "0 0 0 20px rgba(201, 162, 39, 0)" },
+        },
+        drip: {
+          "0%": { height: "0", opacity: "0" },
+          "50%": { height: "80px", opacity: "1" },
+          "100%": { height: "80px", opacity: "0", transform: "translateY(50px)" },
+        },
+        "blood-pulse": {
+          "0%, 100%": { opacity: "1", transform: "translateY(0)" },
+          "50%": { opacity: "0.7", transform: "translateY(-5px)" },
+        },
+        "void-fade": {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
+        },
+        "oath-reveal": {
+          from: { opacity: "0", transform: "translateY(20px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
       },
       spacing: {
         xxs: "var(--spacing-xxs)",

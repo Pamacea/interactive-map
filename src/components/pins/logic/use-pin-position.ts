@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import type { Pin } from "@prisma/client";
+import { usePinScreenCoordinates } from "./use-pin-screen-coordinates";
 
 /**
  * Position calculation hook for pin markers
@@ -37,49 +38,42 @@ export function usePinPosition(
     locked?: boolean;
   }>
 ) {
+  // Get base position from shared hook
+  const basePosition = usePinScreenCoordinates({
+    pin,
+    imageDimensions,
+    layers,
+  });
+
   // Memoized position calculation to avoid recalculating on every render
   const position = useMemo(() => {
-    // Find the layer this pin belongs to (if any)
-    const layer = pin.layerId
-      ? layers.find((layer) => layer.id === pin.layerId) ?? null
-      : null;
+    // Use drag position if dragging, otherwise use pin's stored position
+    let x = basePosition.x;
+    let y = basePosition.y;
+    let latitude = basePosition.latitude;
+    let longitude = basePosition.longitude;
 
-    // Extract layer offset for position calculation (null-safe)
-    const layerOffsetX = layer?.offsetX ?? 0;
-    const layerOffsetY = layer?.offsetY ?? 0;
-
-    // Use original image dimensions if provided (from MapImage), otherwise use fallback
-    // Note: mapWidth/mapHeight are passed via imageDimensions for consistency
-    const actualWidth = imageDimensions?.width ?? 0;
-    const actualHeight = imageDimensions?.height ?? 0;
-
-    // Convert lat/lng to pixel coordinates (percentage of ORIGINAL image dimensions)
-    // Using drag position if dragging, otherwise use pin's stored position
-    const latitude = dragPosition
-      ? dragPosition.y / actualHeight
-      : pin.latitude;
-    const longitude = dragPosition
-      ? dragPosition.x / actualWidth
-      : pin.longitude;
-
-    // Position is fixed relative to map image (percentage-based)
-    // No transform applied here - the parent map container handles pan/zoom
-    // Apply layer offset to the final position
-    const x = longitude * actualWidth + layerOffsetX;
-    const y = latitude * actualHeight + layerOffsetY;
+    if (dragPosition) {
+      // During drag, use the drag position directly (already in pixels)
+      x = dragPosition.x;
+      y = dragPosition.y;
+      // Recalculate lat/lng from drag position
+      latitude = dragPosition.y / basePosition.actualHeight;
+      longitude = dragPosition.x / basePosition.actualWidth;
+    }
 
     return {
       x,
       y,
-      actualWidth,
-      actualHeight,
-      layer,
-      layerOffsetX,
-      layerOffsetY,
+      actualWidth: basePosition.actualWidth,
+      actualHeight: basePosition.actualHeight,
+      layer: basePosition.layer,
+      layerOffsetX: basePosition.layerOffsetX,
+      layerOffsetY: basePosition.layerOffsetY,
       latitude,
       longitude,
     };
-  }, [pin, dragPosition, imageDimensions, layers]);
+  }, [basePosition, dragPosition]);
 
   return position;
 }

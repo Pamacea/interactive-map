@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { Pin } from "@prisma/client";
 import { PinType } from "@/types/pin.type";
 import { eventManager } from "@/lib/event-manager";
+import { mouseToMapCoordinates } from "@/components/pins/logic/use-pin-screen-coordinates";
 
 export interface ContextMenuState {
   position: { x: number; y: number };
@@ -69,17 +70,11 @@ export function useMapInteractions(options: UseMapInteractionsOptions) {
 
     // Deselect pin when clicking on empty space (left button only)
     if (e.button === 0 && selectedPin) {
-      const rect = containerRef.current?.getBoundingClientRect();
-      if (!rect) return;
-
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
       // Check if click is not on a pin marker
       // (Pin markers have their own click handlers)
       onClearSelection?.();
     }
-  }, [contextMenu, selectedPin, containerRef, onCloseContextMenu, onClearSelection]);
+  }, [contextMenu, selectedPin, onClearSelection]);
 
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -89,33 +84,22 @@ export function useMapInteractions(options: UseMapInteractionsOptions) {
       return;
     }
 
-    // Get screen coordinates
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    // Use shared coordinate calculation
+    const coords = mouseToMapCoordinates(
+      e.clientX,
+      e.clientY,
+      rect,
+      transform,
+      imageDimensions
+    );
 
-    // Guard against division by zero
-    if (transform.scale <= 0) {
-      return;
-    }
-
-    if (imageDimensions.width === 0 || imageDimensions.height === 0) {
-      return;
-    }
-
-    // Convert to map coordinates (0-1 range)
-    const adjustedX = (x - transform.translateX) / transform.scale;
-    const adjustedY = (y - transform.translateY) / transform.scale;
-
-    const lng = adjustedX / imageDimensions.width;
-    const lat = adjustedY / imageDimensions.height;
-
-    if (!isMountedRef.current) {
+    if (!coords || !isMountedRef.current) {
       return;
     }
 
     setContextMenu({
       position: { x: e.clientX, y: e.clientY },
-      coordinates: { lat, lng },
+      coordinates: { lat: coords.lat, lng: coords.lng },
     });
   }, [containerRef, transform, imageDimensions]);
 

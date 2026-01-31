@@ -23,6 +23,28 @@ export interface UsePinDragConfig {
   onSelectPin?: (pinId: string) => void;
   /** Callback to update pin in Zustand store (optimistic update) */
   onUpdatePin?: (pinId: string, updates: { latitude: number; longitude: number }) => void;
+  /** Actual rendered X position (with layer offsets applied) */
+  renderedX?: number;
+  /** Actual rendered Y position (with layer offsets applied) */
+  renderedY?: number;
+}
+
+/**
+ * Refs to store the latest callback dependencies
+ * This prevents the cleanup effect from re-running when dependencies change
+ */
+interface DragRefs {
+  scale: number;
+  mapWidth: number;
+  mapHeight: number;
+  pinId: string;
+  onUpdatePin: UsePinDragConfig["onUpdatePin"];
+  onSelectPin: UsePinDragConfig["onSelectPin"];
+  latitude: number;
+  longitude: number;
+  renderedX: number | undefined;
+  renderedY: number | undefined;
+  isLocked: boolean;
 }
 
 /**
@@ -76,6 +98,8 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
     isLocked = false,
     onSelectPin,
     onUpdatePin,
+    renderedX,
+    renderedY,
   } = config;
 
   // Drag state
@@ -94,18 +118,59 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
   const hasMovedDuringDragRef = useRef(false);
   const lastKnownPositionRef = useRef<{ latitude: number; longitude: number } | null>(null);
 
+  // Ref to store the latest config values - prevents cleanup effect from re-running
+  // Initialize with current values
+  const configRef = useRef<DragRefs>({
+    scale,
+    mapWidth,
+    mapHeight,
+    pinId,
+    onUpdatePin,
+    onSelectPin,
+    latitude,
+    longitude,
+    renderedX,
+    renderedY,
+    isLocked,
+  });
+
+  // Update config ref on each render using an effect to avoid linter error
+  useEffect(() => {
+    configRef.current = {
+      scale,
+      mapWidth,
+      mapHeight,
+      pinId,
+      onUpdatePin,
+      onSelectPin,
+      latitude,
+      longitude,
+      renderedX,
+      renderedY,
+      isLocked,
+    };
+  });
+
+  // Refs to store the latest handler functions
+  // This allows handleMouseUp to reference handleMouseMove before it's declared
+  const handleMouseMoveRef = useRef<(e: MouseEvent) => void>(() => {});
+  const handleMouseUpRef = useRef<(e: MouseEvent) => Promise<void>>(async () => {});
+
   /**
    * Mouse move handler - attached to window during drag
+   * Uses refs to avoid dependency changes
    */
   const handleMouseMove = useCallback((e: MouseEvent) => {
+    const config = configRef.current;
+
     // Initialize drag on first significant movement
     if (!dragStartPos.current || !dragOffset.current) {
       return;
     }
 
     // Calculate delta in screen coordinates (adjusted for scale)
-    const deltaX = (e.clientX - dragStartPos.current.x) / scale;
-    const deltaY = (e.clientY - dragStartPos.current.y) / scale;
+    const deltaX = (e.clientX - dragStartPos.current.x) / config.scale;
+    const deltaY = (e.clientY - dragStartPos.current.y) / config.scale;
 
     // Check if movement is significant (> 3 pixels to account for small movements)
     const hasSignificantMovement = Math.abs(deltaX) > 3 || Math.abs(deltaY) > 3;
@@ -126,20 +191,20 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
     }
 
     // Calculate new position: current mouse position minus offset (both adjusted for scale)
-    let newX = (e.clientX / scale) - dragOffset.current.x;
-    let newY = (e.clientY / scale) - dragOffset.current.y;
+    let newX = (e.clientX / config.scale) - dragOffset.current.x;
+    let newY = (e.clientY / config.scale) - dragOffset.current.y;
 
     // Clamp to map boundaries
-    newX = Math.max(0, Math.min(mapWidth, newX));
-    newY = Math.max(0, Math.min(mapHeight, newY));
+    newX = Math.max(0, Math.min(config.mapWidth, newX));
+    newY = Math.max(0, Math.min(config.mapHeight, newY));
 
     // Convert to lat/lng (0-1 range) and update store IMMEDIATELY (optimistic update)
-    const newLatitude = newY / mapHeight;
-    const newLongitude = newX / mapWidth;
+    const newLatitude = newY / config.mapHeight;
+    const newLongitude = newX / config.mapWidth;
 
     // Update Zustand store in real-time so popup can follow
-    if (onUpdatePin) {
-      onUpdatePin(pinId, {
+    if (config.onUpdatePin) {
+      config.onUpdatePin(config.pinId, {
         latitude: newLatitude,
         longitude: newLongitude,
       });
@@ -149,19 +214,22 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
     const newPosition = { x: newX, y: newY };
     dragPositionRef.current = newPosition;
     setDragPosition(newPosition);
-  }, [scale, mapWidth, mapHeight, pinId, onUpdatePin]);
+  }, []); // Empty deps - uses configRef instead
 
   /**
    * Mouse up handler - attached to window during drag
+   * Uses refs to avoid dependency changes
    */
-  const handleMouseUp = useCallback(async (e: MouseEvent) => {
+  const handleMouseUp = useCallback(async (_e: MouseEvent) => {
+    const config = configRef.current;
+
     // Only proceed with drag logic if we were actually dragging
     if (!isDraggingRef.current) {
       dragStartPos.current = null;
       dragOffset.current = null;
       // Clean up listeners even if we didn't drag
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("mousemove", handleMouseMoveRef.current);
+      window.removeEventListener("mouseup", handleMouseUpRef.current);
       return;
     }
 
@@ -169,27 +237,27 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
     setIsDragging(false);
 
     // Clean up listeners after drag completes
-    window.removeEventListener("mousemove", handleMouseMove);
-    window.removeEventListener("mouseup", handleMouseUp);
+    window.removeEventListener("mousemove", handleMouseMoveRef.current);
+    window.removeEventListener("mouseup", handleMouseUpRef.current);
 
     // If we have a drag position and actually moved, save to database
     const currentDragPosition = dragPositionRef.current;
     if (currentDragPosition && hasMovedDuringDragRef.current) {
       // Convert pixel position to map coordinates (0-1 range)
-      const newLatitude = Math.max(0, Math.min(1, currentDragPosition.y / mapHeight));
-      const newLongitude = Math.max(0, Math.min(1, currentDragPosition.x / mapWidth));
+      const newLatitude = Math.max(0, Math.min(1, currentDragPosition.y / config.mapHeight));
+      const newLongitude = Math.max(0, Math.min(1, currentDragPosition.x / config.mapWidth));
 
       // Store position for potential rollback
-      const rollbackPosition = lastKnownPositionRef.current || { latitude, longitude };
+      const rollbackPosition = lastKnownPositionRef.current || { latitude: config.latitude, longitude: config.longitude };
 
       // CRITICAL FIX: Cancel any pending sync request for this pin
       // This prevents race conditions when dragging rapidly
-      pinSyncQueue.cancelPendingRequest(pinId);
+      pinSyncQueue.cancelPendingRequest(config.pinId);
 
       // CRITICAL FIX: Update Zustand store FIRST (optimistic update)
       // This prevents race condition where TanStack Query refetch overwrites new position
-      if (onUpdatePin) {
-        onUpdatePin(pinId, {
+      if (config.onUpdatePin) {
+        config.onUpdatePin(config.pinId, {
           latitude: newLatitude,
           longitude: newLongitude,
         });
@@ -199,12 +267,12 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
       lastKnownPositionRef.current = { latitude: newLatitude, longitude: newLongitude };
 
       // Register new sync request and get abort controller
-      const abortController = pinSyncQueue.registerRequest(pinId, rollbackPosition);
+      const abortController = pinSyncQueue.registerRequest(config.pinId, rollbackPosition);
 
       // Then update database in background
       // Zustand is now source of truth, DB sync happens asynchronously
       try {
-        await updatePinPosition(pinId, newLatitude, newLongitude);
+        await updatePinPosition(config.pinId, newLatitude, newLongitude);
 
         // Check if request was cancelled (user dragged again)
         if (abortController.signal.aborted) {
@@ -213,7 +281,7 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
 
         // Success: mark request as completed
         pinSyncQueue.markCompleted(pinId);
-      } catch (error) {
+      } catch {
         // Check if request was aborted (expected when user drags again)
         if (abortController.signal.aborted) {
           return;
@@ -222,8 +290,8 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
         // Real error occurred: rollback and notify user
 
         // Rollback to last known position
-        if (onUpdatePin && rollbackPosition) {
-          onUpdatePin(pinId, rollbackPosition);
+        if (config.onUpdatePin && rollbackPosition) {
+          config.onUpdatePin(config.pinId, rollbackPosition);
           lastKnownPositionRef.current = rollbackPosition;
         }
 
@@ -234,7 +302,7 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
         );
 
         // Mark as completed (failed)
-        pinSyncQueue.markCompleted(pinId);
+        pinSyncQueue.markCompleted(config.pinId);
       }
 
       // Clear drag position
@@ -246,14 +314,17 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
     dragOffset.current = null;
     // Note: Don't reset hasMovedDuringDrag here, as handleClick needs it
     // It will be reset on next mouseDown
-  }, [mapWidth, mapHeight, pinId, latitude, longitude, onUpdatePin, showToast]);
+  }, [showToast, pinId]); // showToast and pinId as deps, everything else from configRef
 
   /**
    * Mouse down handler - attach to pin element
+   * Uses refs to avoid dependency changes
    */
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    const config = configRef.current;
+
     // Prevent dragging if layer is locked
-    if (isLocked) {
+    if (config.isLocked) {
       return;
     }
 
@@ -265,9 +336,9 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
     e.preventDefault();
     e.stopPropagation();
 
-    // Convert pin's current position to pixels (accounting for scale)
-    const pinPixelX = longitude * mapWidth;
-    const pinPixelY = latitude * mapHeight;
+    // Use rendered position if provided (includes layer offsets), otherwise calculate from lat/lng
+    const pinPixelX = config.renderedX ?? config.longitude * config.mapWidth;
+    const pinPixelY = config.renderedY ?? config.latitude * config.mapHeight;
 
     // Store initial mouse position
     dragStartPos.current = {
@@ -278,8 +349,8 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
     // Calculate offset: distance from mouse to pin (in scaled coordinates)
     // This ensures the pin doesn't "jump" to the mouse position on drag start
     dragOffset.current = {
-      x: (e.clientX / scale) - pinPixelX,
-      y: (e.clientY / scale) - pinPixelY,
+      x: (e.clientX / config.scale) - pinPixelX,
+      y: (e.clientY / config.scale) - pinPixelY,
     };
 
     // DON'T set isDragging yet - wait for actual mouse movement
@@ -288,24 +359,32 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
     hasMovedDuringDragRef.current = false;
 
     // Select pin on drag start
-    if (onSelectPin) {
-      onSelectPin(pinId);
+    if (config.onSelectPin) {
+      config.onSelectPin(config.pinId);
     }
 
     // Add window-level event listeners for drag continuation
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseup", handleMouseUp);
-  }, [isLocked, pinId, latitude, longitude, mapWidth, mapHeight, scale, onSelectPin, handleMouseMove, handleMouseUp]);
+  }, []); // Empty deps - uses configRef
+
+  // Update handler refs whenever the callbacks change
+  // This allows handleMouseUp to reference handleMouseMove
+  useEffect(() => {
+    handleMouseMoveRef.current = handleMouseMove;
+    handleMouseUpRef.current = handleMouseUp;
+  }); // eslint-disable-line react-hooks/exhaustive-deps -- Only updating refs, intentionally no deps
 
   // Cleanup: Cancel any pending sync requests on unmount
+  // Note: Uses refs to handlers, so no dependency issues
   useEffect(() => {
     return () => {
       pinSyncQueue.cancelPendingRequest(pinId);
       // Clean up any dangling event listeners
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("mousemove", handleMouseMoveRef.current);
+      window.removeEventListener("mouseup", handleMouseUpRef.current);
     };
-  }, [pinId, handleMouseMove, handleMouseUp]);
+  }, [pinId]); // Only pinId as dependency - handlers accessed via refs
 
   return {
     isDragging,
