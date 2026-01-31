@@ -1,4 +1,5 @@
 import { SlidersHorizontal } from "lucide-react";
+import { memo } from "react";
 import { cn } from "@/lib/utils";
 
 interface FilterSidebarProps {
@@ -8,7 +9,7 @@ interface FilterSidebarProps {
   onClearAll: () => void;
 }
 
-export function FilterSidebar({ showFilters, activeFilters, onToggleFilter, onClearAll }: FilterSidebarProps) {
+export const FilterSidebar = memo(function FilterSidebar({ showFilters, activeFilters, onToggleFilter, onClearAll }: FilterSidebarProps) {
   return (
     <aside
       className={cn(
@@ -24,9 +25,9 @@ export function FilterSidebar({ showFilters, activeFilters, onToggleFilter, onCl
       <WorldSizeFilter />
     </aside>
   );
-}
+});
 
-function FilterHeader({ activeFilters, onClearAll }: { activeFilters: string[]; onClearAll: () => void }) {
+const FilterHeader = memo(function FilterHeader({ activeFilters, onClearAll }: { activeFilters: string[]; onClearAll: () => void }) {
   return (
     <div className="flex items-center justify-between pb-6">
       <div className="flex items-center gap-2">
@@ -45,9 +46,9 @@ function FilterHeader({ activeFilters, onClearAll }: { activeFilters: string[]; 
       )}
     </div>
   );
-}
+});
 
-function ContentTypeFilter({ onToggle, activeFilters }: { onToggle: (filter: string) => void; activeFilters: string[] }) {
+const ContentTypeFilter = memo(function ContentTypeFilter({ onToggle, activeFilters }: { onToggle: (filter: string) => void; activeFilters: string[] }) {
   const filters = [
     { label: "Cities & Settlements", value: "cities" },
     { label: "Dungeons & Instances", value: "dungeons" },
@@ -73,9 +74,9 @@ function ContentTypeFilter({ onToggle, activeFilters }: { onToggle: (filter: str
       </div>
     </div>
   );
-}
+});
 
-function FactionFilter({ onToggle, activeFilters }: { onToggle: (filter: string) => void; activeFilters: string[] }) {
+const FactionFilter = memo(function FactionFilter({ onToggle, activeFilters }: { onToggle: (filter: string) => void; activeFilters: string[] }) {
   const filters = [
     { label: "Light & Divine", value: "light", color: "bg-faction-light" },
     { label: "Dark & Shadow", value: "dark", color: "bg-faction-dark" },
@@ -94,7 +95,6 @@ function FactionFilter({ onToggle, activeFilters }: { onToggle: (filter: string)
           <FactionCheckbox
             key={filter.value}
             label={filter.label}
-            value={filter.value}
             color={filter.color}
             checked={activeFilters.includes(filter.value)}
             onChange={() => onToggle(filter.value)}
@@ -103,9 +103,9 @@ function FactionFilter({ onToggle, activeFilters }: { onToggle: (filter: string)
       </div>
     </div>
   );
-}
+});
 
-function WorldSizeFilter() {
+const WorldSizeFilter = memo(function WorldSizeFilter() {
   const sizes = ["Small (< 50 pins)", "Medium (50-200)", "Large (200+)"];
 
   return (
@@ -129,13 +129,14 @@ function WorldSizeFilter() {
       </div>
     </div>
   );
-}
+});
 
-function FilterCheckbox({ label, value, checked, onChange }: { label: string; value: string; checked: boolean; onChange: () => void }) {
+const FilterCheckbox = memo(function FilterCheckbox({ label, value, checked, onChange }: { label: string; value: string; checked: boolean; onChange: () => void }) {
   return (
     <label className="flex items-center gap-3 cursor-pointer group">
       <input
         type="checkbox"
+        name={value}
         checked={checked}
         onChange={onChange}
         className="w-4 h-4 rounded-md border-border-subtle text-accent-gold focus:ring-accent-gold focus:ring-offset-0"
@@ -145,9 +146,9 @@ function FilterCheckbox({ label, value, checked, onChange }: { label: string; va
       </span>
     </label>
   );
-}
+});
 
-function FactionCheckbox({ label, value, color, checked, onChange }: { label: string; value: string; color: string; checked: boolean; onChange: () => void }) {
+const FactionCheckbox = memo(function FactionCheckbox({ label, color, checked, onChange }: { label: string; color: string; checked: boolean; onChange: () => void }) {
   return (
     <label className="flex items-center gap-3 cursor-pointer group">
       <input
@@ -162,4 +163,4 @@ function FactionCheckbox({ label, value, color, checked, onChange }: { label: st
       </span>
     </label>
   );
-}
+});

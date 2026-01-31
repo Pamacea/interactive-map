@@ -1,4 +1,5 @@
 import { Filter, Grid3X3, List, X } from "lucide-react";
+import { memo } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -13,7 +14,7 @@ interface ResultsHeaderProps {
   onClearAllFilters: () => void;
 }
 
-export function ResultsHeader({
+export const ResultsHeader = memo(function ResultsHeader({
   filteredCount,
   viewMode,
   showFilters,
@@ -25,13 +26,13 @@ export function ResultsHeader({
 }: ResultsHeaderProps) {
   return (
     <div className="flex items-center justify-between gap-4">
-      <ResultsCount count={filteredCount} activeFilters={activeFilters} onToggleFilter={onToggleFilter} onClearAll={onClearAllFilters} />
+      <ResultsCount count={filteredCount} activeFilters={activeFilters} onToggleFilter={onToggleFilter} />
       <Actions viewMode={viewMode} showFilters={showFilters} onViewModeChange={onViewModeChange} onToggleFilters={onToggleFilters} />
     </div>
   );
-}
+});
 
-function ResultsCount({ count, activeFilters, onToggleFilter, onClearAll }: { count: number; activeFilters: string[]; onToggleFilter: (filter: string) => void; onClearAll: () => void }) {
+const ResultsCount = memo(function ResultsCount({ count, activeFilters, onToggleFilter }: { count: number; activeFilters: string[]; onToggleFilter: (filter: string) => void }) {
   return (
     <div>
       <p className="text-base text-text-secondary">
@@ -46,9 +47,9 @@ function ResultsCount({ count, activeFilters, onToggleFilter, onClearAll }: { co
       )}
     </div>
   );
-}
+});
 
-function ActiveFilterBadge({ filter, onRemove }: { filter: string; onRemove: () => void }) {
+const ActiveFilterBadge = memo(function ActiveFilterBadge({ filter, onRemove }: { filter: string; onRemove: () => void }) {
   return (
     <button
       onClick={onRemove}
@@ -58,18 +59,18 @@ function ActiveFilterBadge({ filter, onRemove }: { filter: string; onRemove: () 
       <X className="w-3 h-3" />
     </button>
   );
-}
+});
 
-function Actions({ viewMode, showFilters, onViewModeChange, onToggleFilters }: { viewMode: "grid" | "list"; showFilters: boolean; onViewModeChange: (mode: "grid" | "list") => void; onToggleFilters: () => void }) {
+const Actions = memo(function Actions({ viewMode, showFilters, onViewModeChange, onToggleFilters }: { viewMode: "grid" | "list"; showFilters: boolean; onViewModeChange: (mode: "grid" | "list") => void; onToggleFilters: () => void }) {
   return (
     <div className="flex items-center gap-3">
       <FilterToggleButton show={showFilters} onToggle={onToggleFilters} />
       <ViewModeToggle currentMode={viewMode} onModeChange={onViewModeChange} />
     </div>
   );
-}
+});
 
-function FilterToggleButton({ show, onToggle }: { show: boolean; onToggle: () => void }) {
+const FilterToggleButton = memo(function FilterToggleButton({ show, onToggle }: { show: boolean; onToggle: () => void }) {
   return (
     <Button
       variant="ghost"
@@ -83,9 +84,9 @@ function FilterToggleButton({ show, onToggle }: { show: boolean; onToggle: () =>
       <Filter className="w-4 h-4" />
     </Button>
   );
-}
+});
 
-function ViewModeToggle({ currentMode, onModeChange }: { currentMode: "grid" | "list"; onModeChange: (mode: "grid" | "list") => void }) {
+const ViewModeToggle = memo(function ViewModeToggle({ currentMode, onModeChange }: { currentMode: "grid" | "list"; onModeChange: (mode: "grid" | "list") => void }) {
   return (
     <div className="flex items-center bg-background-card rounded-lg border border-border-subtle">
       <ViewModeButton mode="grid" currentMode={currentMode} onModeChange={onModeChange}>
@@ -96,9 +97,9 @@ function ViewModeToggle({ currentMode, onModeChange }: { currentMode: "grid" | "
       </ViewModeButton>
     </div>
   );
-}
+});
 
-function ViewModeButton({ mode, currentMode, onModeChange, children }: { mode: "grid" | "list"; currentMode: "grid" | "list"; onModeChange: (mode: "grid" | "list") => void; children: React.ReactNode }) {
+const ViewModeButton = memo(function ViewModeButton({ mode, currentMode, onModeChange, children }: { mode: "grid" | "list"; currentMode: "grid" | "list"; onModeChange: (mode: "grid" | "list") => void; children: React.ReactNode }) {
   const isActive = mode === currentMode;
   return (
     <button
@@ -113,4 +114,4 @@ function ViewModeButton({ mode, currentMode, onModeChange, children }: { mode: "
       {children}
     </button>
   );
-}
+});

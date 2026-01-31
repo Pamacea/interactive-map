@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface Particle {
   x: number;
@@ -9,19 +9,22 @@ interface Particle {
   vy: number;
   size: number;
   opacity: number;
-  color: string;
+  rune: string;
 }
 
-// Reduced particle count for better performance (was 500)
-const PARTICLE_COUNT = 100;
-// Throttle frame updates for performance (update every 2 frames)
-const FRAME_THROTTLE = 2;
+// Runes nordiques pour l'effet fantasy
+const RUNES = ["ᛟ", "ᛞ", "ᛃ", "ᛊ", "ᛇ", "ᛒ", "ᛘ", "ᛏ", "ᛖ", "ᛜ", "ᛣ"];
+
+const PARTICLE_COUNT = 30;
+const FRAME_THROTTLE = 3;
+const ANIMATION_DELAY = 500;
 
 export function FloatingParticles() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particlesRef = useRef<Particle[]>([]);
   const animationRef = useRef<number | undefined>(undefined);
   const frameRef = useRef(0);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -40,61 +43,53 @@ export function FloatingParticles() {
 
     const particles: Particle[] = [];
 
-    const colors = [
-      "212, 175, 55",
-      "168, 85, 247",
-      "96, 165, 250",
-      "52, 211, 153",
-      "251, 191, 36",
-      "251, 113, 133",
-      "34, 211, 238",
-      "139, 92, 246"
-    ];
-
     for (let i = 0; i < PARTICLE_COUNT; i++) {
-      const color = colors[Math.floor(Math.random() * colors.length)];
       particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3,
-        size: Math.random() * 2 + 1,
-        opacity: Math.random() * 0.4 + 0.1,
-        color,
+        vx: (Math.random() - 0.5) * 0.2,
+        vy: (Math.random() - 0.5) * 0.2,
+        size: Math.random() * 6 + 4,
+        opacity: Math.random() * 0.5 + 0.3,
+        rune: RUNES[Math.floor(Math.random() * RUNES.length)],
       });
     }
 
     particlesRef.current = particles;
 
-    const animate = () => {
-      frameRef.current++;
+    const startTimer = setTimeout(() => {
+      setIsVisible(true);
+      const animate = () => {
+        frameRef.current++;
 
-      // Only update every FRAME_THROTTLE frames for performance
-      if (frameRef.current % FRAME_THROTTLE === 0) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (frameRef.current % FRAME_THROTTLE === 0) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        particles.forEach((particle) => {
-          particle.x += particle.vx;
-          particle.y += particle.vy;
+          particles.forEach((particle) => {
+            particle.x += particle.vx;
+            particle.y += particle.vy;
 
-          if (particle.x < 0) particle.x = canvas.width;
-          if (particle.x > canvas.width) particle.x = 0;
-          if (particle.y < 0) particle.y = canvas.height;
-          if (particle.y > canvas.height) particle.y = 0;
+            if (particle.x < 0) particle.x = canvas.width;
+            if (particle.x > canvas.width) particle.x = 0;
+            if (particle.y < 0) particle.y = canvas.height;
+            if (particle.y > canvas.height) particle.y = 0;
 
-          ctx.beginPath();
-          ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${particle.color}, ${particle.opacity})`;
-          ctx.fill();
-        });
-      }
+            ctx.font = `${particle.size}px "Cinzel", serif`;
+            ctx.fillStyle = `rgba(212, 175, 55, ${particle.opacity})`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(particle.rune, particle.x, particle.y);
+          });
+        }
 
-      animationRef.current = requestAnimationFrame(animate);
-    };
+        animationRef.current = requestAnimationFrame(animate);
+      };
 
-    animate();
+      animate();
+    }, ANIMATION_DELAY);
 
     return () => {
+      clearTimeout(startTimer);
       window.removeEventListener("resize", resizeCanvas);
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
@@ -106,7 +101,7 @@ export function FloatingParticles() {
     <canvas
       ref={canvasRef}
       className="absolute inset-0 pointer-events-none"
-      style={{ opacity: 0.5, zIndex: 1 }}
+      style={{ opacity: isVisible ? 0.6 : 0, transition: "opacity 0.5s ease-in", zIndex: 1 }}
     />
   );
 }

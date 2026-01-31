@@ -1,4 +1,3 @@
-import { GridBackground } from "@/components/ui/grid-background";
 import { FloatingParticles } from "@/components/ui/particles";
 import { AppHeader } from "@/components/ui/app-header";
 import { Footer } from "@/components/home/ui/footer";
@@ -16,7 +15,6 @@ export default async function ExplorePage() {
     <div className="min-h-screen bg-void relative overflow-hidden">
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-grain opacity-[0.04]" aria-hidden="true" />
-        <GridBackground />
         <FloatingParticles />
       </div>
 

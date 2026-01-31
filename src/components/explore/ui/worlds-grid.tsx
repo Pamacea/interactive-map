@@ -1,4 +1,5 @@
 import { Search } from "lucide-react";
+import { memo } from "react";
 import { WorldCard } from "@/components/ui/world-card";
 import { MetallicButton } from "@/components/ui/metallic-button";
 import { cn } from "@/lib/utils";
@@ -10,7 +11,7 @@ interface WorldsGridProps {
   onClearFilters: () => void;
 }
 
-export function WorldsGrid({ worlds, viewMode, onClearFilters }: WorldsGridProps) {
+export const WorldsGrid = memo(function WorldsGrid({ worlds, viewMode, onClearFilters }: WorldsGridProps) {
   if (worlds.length === 0) {
     return <EmptyState onClearFilters={onClearFilters} />;
   }
@@ -26,9 +27,15 @@ export function WorldsGrid({ worlds, viewMode, onClearFilters }: WorldsGridProps
       ))}
     </div>
   );
-}
+}, (prevProps, nextProps) => {
+  return (
+    prevProps.worlds.length === nextProps.worlds.length &&
+    prevProps.worlds === nextProps.worlds &&
+    prevProps.viewMode === nextProps.viewMode
+  );
+});
 
-function EmptyState({ onClearFilters }: { onClearFilters: () => void }) {
+const EmptyState = memo(function EmptyState({ onClearFilters }: { onClearFilters: () => void }) {
   return (
     <div className="text-center py-16 sm:py-24 flex flex-col items-center gap-6">
       <EmptyStateIcon />
@@ -39,36 +46,36 @@ function EmptyState({ onClearFilters }: { onClearFilters: () => void }) {
       <EmptyStateAction onClearFilters={onClearFilters} />
     </div>
   );
-}
+});
 
-function EmptyStateIcon() {
+const EmptyStateIcon = memo(function EmptyStateIcon() {
   return (
     <div className="inline-flex items-center justify-center w-16 h-16 rounded-lg bg-background-card border border-border-subtle">
       <Search className="w-8 h-8 text-text-muted" />
     </div>
   );
-}
+});
 
-function EmptyStateTitle() {
+const EmptyStateTitle = memo(function EmptyStateTitle() {
   return (
     <h3 className="text-4xl font-display font-semibold text-text-primary">
       No worlds found
     </h3>
   );
-}
+});
 
-function EmptyStateDescription() {
+const EmptyStateDescription = memo(function EmptyStateDescription() {
   return (
     <p className="text-xl text-text-secondary">
       Try adjusting your search or filters to find what you&apos;re looking for.
     </p>
   );
-}
+});
 
-function EmptyStateAction({ onClearFilters }: { onClearFilters: () => void }) {
+const EmptyStateAction = memo(function EmptyStateAction({ onClearFilters }: { onClearFilters: () => void }) {
   return (
     <MetallicButton variant="silver" size="md" onClick={onClearFilters}>
       Clear All Filters
     </MetallicButton>
   );
-}
+});

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, memo, useCallback } from "react";
 import { Search } from "lucide-react";
 import { FilterSidebar } from "@/components/explore/ui/filter-sidebar";
 import { ResultsHeader } from "@/components/explore/ui/results-header";
@@ -9,7 +9,7 @@ import { useExploreFilters } from "@/components/explore/logic/use-explore-filter
 import { filterWorlds } from "@/components/explore/methods/filter-worlds";
 import type { GameWorld } from "@/types/world.type";
 
-export function ExploreClient({ initialWorlds }: { initialWorlds: GameWorld[] }) {
+export const ExploreClient = memo(function ExploreClient({ initialWorlds }: { initialWorlds: GameWorld[] }) {
   const {
     filters,
     activeFilters,
@@ -24,12 +24,20 @@ export function ExploreClient({ initialWorlds }: { initialWorlds: GameWorld[] })
 
   const [searchQuery, setSearchQuery] = useState(filters.query);
 
-  const filteredWorlds = filterWorlds({ worlds: initialWorlds, query: filters.query });
+  // Memoize filtered worlds to prevent unnecessary recalculations
+  const filteredWorlds = useMemo(
+    () => filterWorlds({ worlds: initialWorlds, query: filters.query }),
+    [initialWorlds, filters.query]
+  );
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
+  const handleSearchSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     handleSearch({ query: searchQuery });
-  };
+  }, [searchQuery, handleSearch]);
+
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  }, []);
 
   return (
     <>
@@ -40,7 +48,7 @@ export function ExploreClient({ initialWorlds }: { initialWorlds: GameWorld[] })
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={handleSearchChange}
               placeholder="Search by world name, description, or creator..."
               className="w-full h-12 pl-12 pr-32 rounded border border-iron bg-obsidian/60 text-bone placeholder:text-bone-dark/50 focus:border-accent-gold focus:outline-none transition-colors"
             />
@@ -84,4 +92,4 @@ export function ExploreClient({ initialWorlds }: { initialWorlds: GameWorld[] })
       </main>
     </>
   );
-}
+});
