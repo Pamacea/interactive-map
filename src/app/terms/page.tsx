@@ -1,6 +1,5 @@
 import { AppHeader } from "@/components/ui/app-header";
 import { Footer } from "@/components/home/ui/footer";
-import { GridBackground } from "@/components/ui/grid-background";
 import { FloatingParticles } from "@/components/ui/particles";
 
 export default function TermsPage() {
@@ -9,7 +8,6 @@ export default function TermsPage() {
       {/* Fixed Background Layer */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-grain opacity-[0.04]" aria-hidden="true" />
-        <GridBackground />
         <FloatingParticles />
       </div>
 

@@ -5,7 +5,6 @@ import { signIn } from "next-auth/react";
 import { CrownButton } from "@/components/ui/crown-button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { LogIn, Crown } from "lucide-react";
-import { GridBackground } from "@/components/ui/grid-background";
 import { FloatingParticles } from "@/components/ui/particles";
 
 export default function SignInPage() {
@@ -29,7 +28,6 @@ export default function SignInPage() {
       {/* Fixed Background Layer */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-grain opacity-[0.04]" aria-hidden="true" />
-        <GridBackground />
         <FloatingParticles />
       </div>
 

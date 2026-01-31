@@ -6,7 +6,6 @@ import { useEffect } from "react";
 import { Settings as SettingsIcon, Bell, Lock, Globe, Crown } from "lucide-react";
 import { AppHeader } from "@/components/ui/app-header";
 import { Footer } from "@/components/home/ui/footer";
-import { GridBackground } from "@/components/ui/grid-background";
 import { FloatingParticles } from "@/components/ui/particles";
 
 export default function SettingsPage() {
@@ -24,7 +23,6 @@ export default function SettingsPage() {
       <div className="h-screen flex items-center justify-center bg-void ml-16 sm:ml-20 relative">
         <div className="fixed inset-0 z-0 pointer-events-none">
           <div className="absolute inset-0 bg-grain opacity-[0.04]" aria-hidden="true" />
-          <GridBackground />
         </div>
         <div className="relative z-10 flex flex-col items-center gap-4">
           <div className="text-4xl text-accent-gold/30 animate-rune-glow">ᛟ</div>
@@ -70,7 +68,6 @@ export default function SettingsPage() {
       {/* Fixed Background Layer */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-grain opacity-[0.04]" aria-hidden="true" />
-        <GridBackground />
         <FloatingParticles />
       </div>
 

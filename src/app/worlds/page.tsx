@@ -10,7 +10,6 @@ import { AppHeader } from "@/components/ui/app-header";
 import { Footer } from "@/components/home/ui/footer";
 import { WorldCard } from "@/components/ui/world-card";
 import { SkeletonGrid } from "@/components/ui/skeleton";
-import { GridBackground } from "@/components/ui/grid-background";
 import { FloatingParticles } from "@/components/ui/particles";
 import { useMyWorlds } from "@/components/worlds/logic/use-my-worlds";
 
@@ -30,7 +29,6 @@ export default function MyWorldsPage() {
       <div className="h-screen flex items-center justify-center bg-void ml-16 sm:ml-20 relative">
         <div className="fixed inset-0 z-0 pointer-events-none">
           <div className="absolute inset-0 bg-grain opacity-[0.04]" aria-hidden="true" />
-          <GridBackground />
         </div>
         <div className="relative z-10 flex flex-col items-center gap-4">
           <div className="text-4xl text-accent-gold/30 animate-rune-glow">ᛟ</div>
@@ -49,7 +47,6 @@ export default function MyWorldsPage() {
       {/* Fixed Background Layer */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-grain opacity-[0.04]" aria-hidden="true" />
-        <GridBackground />
         <FloatingParticles />
       </div>
 
@@ -58,7 +55,7 @@ export default function MyWorldsPage() {
 
       <AppHeader />
 
-      <div className="flex flex-col justify-center items-center ml-16 sm:ml-20 px-4 pt-24 pb-16 sm:pt-28 sm:pb-20 z-10 border border-yellow-500">
+      <div className="flex flex-col justify-center items-center ml-16 sm:ml-20 px-4 pt-24 pb-16 sm:pt-28 sm:pb-20 z-10">
         {/* Ornate Header */}
         <div className="flex flex-col items-center text-center mb-12 sm:mb-16">
           {/* Crown Symbol */}
@@ -90,14 +87,16 @@ export default function MyWorldsPage() {
           
           
           {/* Stats Bar */}
-          <div className="flex items-center justify-center gap-8 sm:gap-16 mb-8 py-4 px-8 border-y border-iron bg-obsidian/30 rounded-lg">
+          <div className="flex items-center justify-center gap-16 py-4 px-8">
           {/* Create Button */}
           <Link href="/create">
-            <CrownButton variant="gold" size="lg">
+            <CrownButton variant="gold" size="md">
               <Plus className="w-4 h-4" />
               Forge New World
             </CrownButton>
           </Link>
+          <div className="flex items-center justify-center gap-8 sm:gap-16 py-4 px-4  ">
+            
             <div className="text-center">
               <div className="text-2xl sm:text-3xl font-display-ornate text-accent-gold">{worlds.length}</div>
               <div className="text-xs text-bone-dark uppercase tracking-wider">Worlds</div>
@@ -109,6 +108,7 @@ export default function MyWorldsPage() {
               </div>
               <div className="text-xs text-bone-dark uppercase tracking-wider">Locations</div>
             </div>
+          </div>
           </div>
         </div>
 
