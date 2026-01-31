@@ -2,10 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 
-const NAV_ITEMS = [
-  { href: "/worlds", label: "MY WORLDS", glyph: "ᚦ" },
+const PUBLIC_NAV_ITEMS = [
   { href: "/explore", label: "EXPLORE", glyph: "ᛏ" },
+];
+
+const PROTECTED_NAV_ITEMS = [
+  { href: "/worlds", label: "MY WORLDS", glyph: "ᚦ" },
   { href: "/create", label: "CREATE", glyph: "ᚨ" },
   { href: "/settings", label: "SETTINGS", glyph: "ᛗ" },
 ];
@@ -16,20 +20,20 @@ interface CrownNavigationProps {
 
 export function CrownNavigation({ homeLink = true }: CrownNavigationProps) {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const isAuthenticated = !!session;
 
-  const navItems = homeLink
-    ? [{ href: "/", label: "HOME", glyph: "ᛟ" }, ...NAV_ITEMS]
-    : NAV_ITEMS;
+  const visibleNavItems = [...PUBLIC_NAV_ITEMS, ...(isAuthenticated ? PROTECTED_NAV_ITEMS : [])];
+  const navItems = homeLink ? [{ href: "/", label: "HOME", glyph: "ᛟ" }, ...visibleNavItems] : visibleNavItems;
 
   return (
     <nav className="fixed left-0 top-0 bottom-0 w-16 sm:w-20 z-40 bg-gradient-to-b from-obsidian to-transparent border-r border-iron flex flex-col items-center justify-between py-8">
-      {/* Top Rune */}
       <div className="text-2xl text-accent-gold-dark opacity-50 animate-rune-glow">ᛟ</div>
 
-      {/* Navigation Items */}
       <div className="flex flex-col gap-12">
         {navItems.map((item) => {
           const isActive = pathname === item.href || (item.href !== "/" && pathname?.startsWith(item.href + "/"));
+
           return (
             <Link
               key={item.href}
@@ -49,7 +53,6 @@ export function CrownNavigation({ homeLink = true }: CrownNavigationProps) {
         })}
       </div>
 
-      {/* Bottom Rune */}
       <div className="text-2xl text-accent-gold-dark opacity-50 animate-rune-glow">ᛞ</div>
     </nav>
   );
