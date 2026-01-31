@@ -6,7 +6,6 @@ import { useSession, signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 
 const menuItems = [
-  { href: "/profile", label: "Profile", rune: "ᛃ" },
   { href: "/worlds", label: "My Worlds", rune: "ᚦ" },
   { href: "/settings", label: "Settings", rune: "ᛗ" },
 ];
