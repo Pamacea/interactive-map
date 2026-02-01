@@ -140,7 +140,7 @@ export function PinEditForm({
             <button
               type="button"
               onClick={() => setShowDeleteConfirm(false)}
-              className="px-3 py-1.5 text-sm bg-white border border-red-300 rounded-md hover:bg-red-50 transition-colors"
+              className="px-3 py-1.5 text-sm bg-white border border-red-300 rounded-sm hover:bg-red-50 transition-colors"
             >
               Cancel
             </button>
@@ -148,7 +148,7 @@ export function PinEditForm({
               type="button"
               onClick={handleDelete}
               disabled={isDeleting}
-              className="px-3 py-1.5 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50"
+              className="px-3 py-1.5 text-sm bg-red-600 text-white rounded-sm hover:bg-red-700 transition-colors disabled:opacity-50"
             >
               {isDeleting ? "Deleting..." : "Yes, delete it"}
             </button>

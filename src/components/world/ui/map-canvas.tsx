@@ -4,7 +4,6 @@ import { memo } from "react";
 import { PinContextMenu } from "@/components/pins/ui/pin-context-menu";
 import { useMapInitialization } from "../logic/use-map-initialization";
 import { useMapEvents } from "../logic/use-map-events";
-import { ZoomControls } from "./zoom-controls";
 import { PlacementIndicator } from "./placement-indicator";
 import { MapContainer } from "./map-canvas/map-container";
 import { MapTransformLayer } from "./map-canvas/map-transform-layer";
@@ -103,13 +102,6 @@ export const MapCanvas = memo(function MapCanvas({ mapImage, worldId }: MapCanva
             )}
           </MapContent>
         </MapTransformLayer>
-
-        <ZoomControls
-          scale={transform.scale}
-          onZoomIn={handleZoomIn}
-          onZoomOut={handleZoomOut}
-          onReset={resetTransform}
-        />
 
         <PlacementIndicator show={isCreatingPin && !contextMenu} />
 

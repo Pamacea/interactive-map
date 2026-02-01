@@ -80,7 +80,15 @@ export function useContextMenuPosition({
 
   React.useEffect(() => {
     const handleContextMenu = (event: MouseEvent) => {
-      event.preventDefault();
+      // Only prevent context menu inside the menu itself
+      // Let clicks outside pass through so the map can handle them
+      if (
+        menuRef.current &&
+        menuRef.current.contains(event.target as Node)
+      ) {
+        event.preventDefault();
+      }
+      // Otherwise, let the event propagate to the map's context menu handler
     };
 
     document.addEventListener("contextmenu", handleContextMenu);

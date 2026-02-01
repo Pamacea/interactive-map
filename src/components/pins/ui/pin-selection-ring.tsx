@@ -21,7 +21,7 @@ export function PinSelectionRing({ size, isSelected }: PinSelectionRingProps) {
 
   return (
     <div
-      className="absolute inset-0 rounded-full animate-pulse"
+      className="absolute inset-0 rounded-sm animate-pulse"
       style={{
         width: `${size + 8}px`,
         height: `${size + 8}px`,

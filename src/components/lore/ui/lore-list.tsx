@@ -1,13 +1,12 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { BookOpen, Badge, Plus, Search, Filter } from "lucide-react";
+import { BookOpen, Plus, Search } from "lucide-react";
 import { useLoreStore } from "@/stores/use-lore-store";
 import { LoreCategory } from "@/types/lore.type";
 import { LoreCard } from "./lore-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge as ShadcnBadge } from "@/components/ui/badge";
 
 interface LoreListProps {
   worldId: string;
@@ -26,13 +25,10 @@ export function LoreList({ worldId }: LoreListProps) {
   const toggleShowVisibleOnly = useLoreStore((state) => state.toggleShowVisibleOnly);
   const startCreating = useLoreStore((state) => state.startCreating);
 
-  // Local filter state for UI
   const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
 
-  // Filter lore entries based on filters
   const filteredLoreEntries = useMemo(() => {
     return loreEntries.filter((lore) => {
-      // Search term filter
       if (searchTerm) {
         const searchLower = searchTerm.toLowerCase();
         const matchesSearch =
@@ -41,12 +37,10 @@ export function LoreList({ worldId }: LoreListProps) {
         if (!matchesSearch) return false;
       }
 
-      // Category filter
       if (!categoryFilters[lore.category]) {
         return false;
       }
 
-      // Visibility filter
       if (showVisibleOnly && !lore.isVisible) {
         return false;
       }
@@ -55,7 +49,6 @@ export function LoreList({ worldId }: LoreListProps) {
     });
   }, [loreEntries, searchTerm, categoryFilters, showVisibleOnly]);
 
-  // Category labels for display
   const categoryLabels: Record<LoreCategory, string> = {
     GENERAL: "General",
     HISTORY: "History",
@@ -68,7 +61,6 @@ export function LoreList({ worldId }: LoreListProps) {
     CUSTOM: "Custom",
   };
 
-  // Handle search input with debouncing
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setLocalSearchTerm(value);
@@ -81,55 +73,45 @@ export function LoreList({ worldId }: LoreListProps) {
   return (
     <div className="flex flex-col h-full gap-3">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-text-secondary">Lore</h2>
-        <Button
-          size="sm"
-          variant="ghost"
+      <div className="flex items-center justify-between px-1">
+        <h2 className="text-sm font-display font-semibold text-accent-gold">Lore</h2>
+        <button
           onClick={startCreating}
-          className="h-8 px-3 text-accent-gold hover:bg-accent-gold/10"
+          className="p-1.5 text-bone-dark hover:text-accent-gold hover:bg-accent-gold/10 rounded-sm transition-colors"
+          title="Add lore"
         >
           <Plus className="w-4 h-4" />
-          <span>Add</span>
-        </Button>
+        </button>
       </div>
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-bone-dark" />
         <Input
           type="text"
-          placeholder="Search lore..."
+          placeholder="Search..."
           value={localSearchTerm}
           onChange={handleSearchChange}
-          className="pl-9 h-9"
+          className="pl-9 h-8 bg-obsidian/60 border-iron text-bone placeholder:text-bone-dark/50 text-xs focus:border-accent-gold/50"
         />
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-2">
-        <Button
-          size="sm"
-          variant={showVisibleOnly ? "default" : "outline"}
+      <div className="flex items-center gap-2 flex-wrap">
+        <button
           onClick={toggleShowVisibleOnly}
           className={`
-            px-2 py-1 text-xs h-7
+            px-2 py-1 text-xs font-display rounded-sm border transition-colors
             ${showVisibleOnly
-              ? "bg-accent-gold/20 text-accent-gold border-accent-gold/30 hover:bg-accent-gold/30"
-              : ""
+              ? "bg-accent-gold/20 text-accent-gold border-accent-gold/50"
+              : "bg-obsidian/60 text-bone-dark border-iron hover:border-accent-gold/50"
             }
           `}
         >
           Visible Only
-        </Button>
-        <div className="ml-auto">
-          <ShadcnBadge
-            variant="outline"
-            className="text-xs bg-accent-gold/10 text-accent-gold border-accent-gold/30"
-          >
-            {loreCount}
-            {totalCount > loreCount && ` / ${totalCount}`}
-          </ShadcnBadge>
+        </button>
+        <div className="ml-auto text-xs font-display text-accent-gold">
+          {loreCount}/{totalCount}
         </div>
       </div>
 
@@ -138,22 +120,19 @@ export function LoreList({ worldId }: LoreListProps) {
         {Object.entries(categoryLabels).map(([category, label]) => {
           const isEnabled = categoryFilters[category as LoreCategory];
           return (
-            <Button
+            <button
               key={category}
-              size="sm"
-              variant={isEnabled ? "outline" : "ghost"}
               onClick={() => toggleCategoryFilter(category as LoreCategory)}
               className={`
-                px-2 py-1 text-xs h-7
+                px-2 py-1 text-xs font-display rounded-sm border transition-colors
                 ${isEnabled
-                  ? "bg-background-elevated text-text-secondary border-border-base"
-                  : "bg-background-base text-text-muted border-border-base opacity-50"
+                  ? "bg-obsidian/70 text-bone border-iron hover:border-accent-gold/50"
+                  : "bg-void text-bone-dark/50 border-iron/30 opacity-60 hover:opacity-100"
                 }
               `}
-              title={`Filter by ${label}`}
             >
               {label}
-            </Button>
+            </button>
           );
         })}
       </div>
@@ -161,14 +140,9 @@ export function LoreList({ worldId }: LoreListProps) {
       {/* Lore List */}
       {filteredLoreEntries.length === 0 ? (
         <div className="flex-1 flex items-center justify-center px-4 py-8">
-          <div className="flex flex-col items-center gap-1 text-center">
-            <BookOpen className="w-12 h-12 text-text-muted" />
-            <p className="text-sm text-text-muted">No lore entries found</p>
-            <p className="text-xs text-text-muted">
-              {totalCount > 0
-                ? "Try adjusting your filters"
-                : "Create your first lore entry"}
-            </p>
+          <div className="flex flex-col items-center gap-2 text-center">
+            <BookOpen className="w-10 h-10 text-bone-dark/50" />
+            <p className="text-sm text-bone-dark">No lore entries found</p>
           </div>
         </div>
       ) : (

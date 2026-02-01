@@ -51,7 +51,7 @@ export default function MyWorldsPage() {
       </div>
 
       {/* Background Glow Effect */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-accent-gold/5 rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-accent-gold/5 rounded-sm blur-[150px] pointer-events-none" />
 
       <AppHeader />
 
@@ -120,7 +120,7 @@ export default function MyWorldsPage() {
             {/* Error State */}
             <div className="relative">
               <div className="absolute -top-8 -left-8 text-blood/20 text-4xl animate-rune-glow">ᛞ</div>
-              <div className="bg-blood/10 border border-blood/30 rounded-lg p-8 max-w-3/5">
+              <div className="bg-blood/10 border border-blood/30 rounded-sm p-8 max-w-3/5">
                 <AlertCircle className="w-16 h-16 text-blood mx-auto mb-4" />
                 <h3 className="font-display text-xl text-bone mb-2">Error loading worlds</h3>
                 <p className="font-fell text-bone-dark">{error}</p>
@@ -137,7 +137,7 @@ export default function MyWorldsPage() {
               <div className="absolute -bottom-16 -left-16 text-accent-gold-dark opacity-20 text-4xl animate-rune-glow" style={{ animationDelay: "2s" }}>ᛃ</div>
               <div className="absolute -bottom-16 -right-16 text-accent-gold-dark opacity-20 text-4xl animate-rune-glow" style={{ animationDelay: "3s" }}>ᛊ</div>
 
-              <div className="bg-obsidian/60 backdrop-blur-sm border border-iron rounded-lg p-12 text-center max-w-3/5 hover:border-accent-gold/50 transition-all duration-300">
+              <div className="bg-obsidian/60 backdrop-blur-sm border border-iron rounded-sm p-12 text-center max-w-3/5 hover:border-accent-gold/50 transition-all duration-300">
                 {/* Floating Sparkles */}
                 <Sparkles className="w-20 h-20 text-accent-gold mx-auto mb-6 animate-crown-float" />
 

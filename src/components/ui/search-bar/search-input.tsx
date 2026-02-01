@@ -45,7 +45,7 @@ export function SearchInput({
       className={cn(
         "relative",
         "bg-background-card",
-        "rounded-md border",
+        "rounded-sm border",
         "transition-all duration-200",
         isFocused
           ? "border-accent-gold shadow-glow-subtle"

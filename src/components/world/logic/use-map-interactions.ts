@@ -77,8 +77,6 @@ export function useMapInteractions(options: UseMapInteractionsOptions) {
   }, [contextMenu, selectedPin, onClearSelection]);
 
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) {
       return;
@@ -96,6 +94,9 @@ export function useMapInteractions(options: UseMapInteractionsOptions) {
     if (!coords || !isMountedRef.current) {
       return;
     }
+
+    // Only prevent default if we can show the context menu
+    e.preventDefault();
 
     setContextMenu({
       position: { x: e.clientX, y: e.clientY },

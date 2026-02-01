@@ -26,10 +26,8 @@ export function PinContextMenu({
     onClose,
   });
 
-  // Focus trap to keep keyboard navigation within the menu
   useFocusTrap(true, menuRef as React.RefObject<HTMLElement>);
 
-  // Close on Escape key
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -55,17 +53,21 @@ export function PinContextMenu({
       aria-label="Create pin menu"
       aria-orientation="vertical"
       className={cn(
-        "fixed z-50 min-w-52 rounded-sm border border-border-subtle",
-        "bg-background-card shadow-xl p-1",
-        "animate-in fade-in zoom-in-95 duration-200",
-        "data-[state=open]:animate-in data-[state=closed]:animate-out",
-        "data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
+        "fixed z-50 min-w-52 rounded-sm border border-iron",
+        "bg-obsidian/90 backdrop-blur-md shadow-xl overflow-hidden",
+        "animate-in fade-in zoom-in-95 duration-200"
       )}
       style={{
         left: adjustedPosition.x,
         top: adjustedPosition.y,
       }}
     >
+      {/* Ornate gold corners */}
+      <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-accent-gold/40 pointer-events-none" />
+      <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-accent-gold/40 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-accent-gold/40 pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-accent-gold/40 pointer-events-none" />
+
       <PinMenuHeader />
 
       <div role="none" className="py-1">
@@ -79,15 +81,15 @@ export function PinContextMenu({
         ))}
       </div>
 
-      <div role="none" className="my-1 border-t border-border-subtle" />
+      <div role="none" className="my-1 border-t border-iron/50 mx-2" />
 
       <button
         onClick={onClose}
         role="menuitem"
         className={cn(
-          "w-full flex items-center justify-center px-3 py-2 rounded-sm",
-          "text-sm font-medium text-text-muted",
-          "hover:text-text-primary hover:bg-background-elevated",
+          "w-full flex items-center justify-center px-3 py-2 rounded-sm mx-1 mb-1",
+          "text-sm font-display font-medium text-bone-dark",
+          "hover:text-accent-gold hover:bg-obsidian",
           "transition-all duration-150",
           "focus:outline-none focus:ring-2 focus:ring-accent-gold/50"
         )}

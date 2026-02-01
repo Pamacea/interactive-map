@@ -70,7 +70,7 @@ export function BaseMapLayerItem({
   );
 
   return (
-    <div className="group relative rounded-sm bg-background-elevated overflow-hidden">
+    <div className="group relative rounded-sm bg-obsidian/70 border border-iron/50 overflow-hidden hover:border-accent-gold/30 transition-colors">
       <LayerHeader
         mapImage={mapImage}
         isVisible={isVisible}

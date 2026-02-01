@@ -75,7 +75,7 @@ export function ImageUploadZone({
           />
 
           <div className="flex flex-col items-center justify-center text-center space-y-3">
-            <div className="w-16 h-16 bg-background-elevated rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 bg-background-elevated rounded-sm flex items-center justify-center">
               <Upload className="w-8 h-8 text-accent-gold" />
             </div>
 
@@ -127,7 +127,7 @@ export function ImageUploadZone({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="absolute top-2 right-2 h-8 w-8 bg-black/60 hover:bg-black/80 text-white rounded-full"
+                    className="absolute top-2 right-2 h-8 w-8 bg-black/60 hover:bg-black/80 text-white rounded-sm"
                     onClick={() => removePendingFile(index)}
                   >
                     <X className="w-4 h-4" />

@@ -29,7 +29,7 @@ export function FileUploadPreview({
 
   return (
     <div className="space-y-3">
-      <div className={`${previewClassName} overflow-hidden rounded-md bg-background-base`}>
+      <div className={`${previewClassName} overflow-hidden rounded-sm bg-background-base`}>
         <img
           src={previewUrl}
           alt="Preview"

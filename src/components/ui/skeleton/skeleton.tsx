@@ -18,10 +18,10 @@ export function Skeleton({
       className={cn(
         "animate-pulse bg-background-skeleton",
         {
-          "rounded-md": variant === "default",
+          "rounded-sm": variant === "default",
           "rounded-sm": variant === "text",
-          "rounded-full": variant === "circular",
-          "rounded-lg": variant === "rounded",
+          "rounded-sm": variant === "circular",
+          "rounded-sm": variant === "rounded",
         },
         className
       )}

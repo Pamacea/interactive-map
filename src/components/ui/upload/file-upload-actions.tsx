@@ -23,14 +23,14 @@ export function FileUploadActions({
       <button
         onClick={onCancel}
         disabled={isUploading}
-        className="px-4 py-2 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-background-hover rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="px-4 py-2 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-background-hover rounded-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Cancel
       </button>
       <button
         onClick={onUpload}
         disabled={!hasFile || isUploading}
-        className="px-4 py-2 text-sm font-medium bg-accent-gold text-text-primary rounded-md hover:bg-accent-gold/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+        className="px-4 py-2 text-sm font-medium bg-accent-gold text-text-primary rounded-sm hover:bg-accent-gold/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
       >
         {isUploading ? (
           <>

@@ -35,7 +35,7 @@ export function LayerHeader({
       </button>
 
       {/* Layer Color Indicator */}
-      <div className="w-2 h-2 rounded-full bg-accent-gold" />
+      <div className="w-2 h-2 rounded-sm bg-accent-gold" />
 
       {/* Thumbnail/Preview */}
       <div className="w-12 h-12 rounded-sm bg-background-base border border-border-tertiary overflow-hidden flex-shrink-0">

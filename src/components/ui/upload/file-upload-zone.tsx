@@ -39,7 +39,7 @@ export function FileUploadZone({
     <div
       onDragOver={onDragOver}
       onDrop={onDrop}
-      className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+      className={`relative border-2 border-dashed rounded-sm p-6 text-center transition-colors ${
         previewUrl
           ? "border-border-base bg-background-base"
           : "border-border-subtle hover:border-accent-gold hover:bg-background-hover cursor-pointer"
@@ -57,7 +57,7 @@ export function FileUploadZone({
 
       {children || (
         <div className="space-y-2">
-          <div className="w-12 h-12 mx-auto flex items-center justify-center rounded-full bg-background-base">
+          <div className="w-12 h-12 mx-auto flex items-center justify-center rounded-sm bg-background-base">
             {isUploading ? (
               <SkeletonSpinner size="sm" />
             ) : (

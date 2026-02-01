@@ -106,7 +106,7 @@ export function NavigationBar() {
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  "block px-3 py-2 rounded-md text-sm font-display font-medium transition-colors",
+                  "block px-3 py-2 rounded-sm text-sm font-display font-medium transition-colors",
                   pathname === link.href
                     ? "bg-accent-gold/10 text-accent-gold"
                     : "text-text-secondary hover:text-text-primary hover:bg-background-card"

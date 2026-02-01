@@ -86,7 +86,7 @@ export function ExportDialog({
               <div className="space-y-2">
                 <button
                   onClick={() => handleFormatChange("png")}
-                  className={`w-full flex items-center gap-3 rounded-md border p-3 transition-colors text-left ${
+                  className={`w-full flex items-center gap-3 rounded-sm border p-3 transition-colors text-left ${
                     format === "png"
                       ? "border-accent-gold bg-accent-gold/10"
                       : "border-border-subtle hover:bg-background-hover"
@@ -100,13 +100,13 @@ export function ExportDialog({
                     </div>
                   </div>
                   {format === "png" && (
-                    <div className="w-4 h-4 rounded-full bg-accent-gold flex-shrink-0" />
+                    <div className="w-4 h-4 rounded-sm bg-accent-gold flex-shrink-0" />
                   )}
                 </button>
 
                 <button
                   onClick={() => handleFormatChange("pdf")}
-                  className={`w-full flex items-center gap-3 rounded-md border p-3 transition-colors text-left ${
+                  className={`w-full flex items-center gap-3 rounded-sm border p-3 transition-colors text-left ${
                     format === "pdf"
                       ? "border-accent-gold bg-accent-gold/10"
                       : "border-border-subtle hover:bg-background-hover"
@@ -120,13 +120,13 @@ export function ExportDialog({
                     </div>
                   </div>
                   {format === "pdf" && (
-                    <div className="w-4 h-4 rounded-full bg-accent-gold flex-shrink-0" />
+                    <div className="w-4 h-4 rounded-sm bg-accent-gold flex-shrink-0" />
                   )}
                 </button>
 
                 <button
                   onClick={() => handleFormatChange("json")}
-                  className={`w-full flex items-center gap-3 rounded-md border p-3 transition-colors text-left ${
+                  className={`w-full flex items-center gap-3 rounded-sm border p-3 transition-colors text-left ${
                     format === "json"
                       ? "border-accent-gold bg-accent-gold/10"
                       : "border-border-subtle hover:bg-background-hover"
@@ -140,7 +140,7 @@ export function ExportDialog({
                     </div>
                   </div>
                   {format === "json" && (
-                    <div className="w-4 h-4 rounded-full bg-accent-gold flex-shrink-0" />
+                    <div className="w-4 h-4 rounded-sm bg-accent-gold flex-shrink-0" />
                   )}
                 </button>
               </div>
@@ -173,7 +173,7 @@ export function ExportDialog({
 
             {/* Error Message */}
             {error && (
-              <div className="rounded-md bg-red-500/10 border border-red-500 p-3">
+              <div className="rounded-sm bg-red-500/10 border border-red-500 p-3">
                 <p className="text-sm text-red-500">{error}</p>
               </div>
             )}

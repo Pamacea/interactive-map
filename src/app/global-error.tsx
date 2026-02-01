@@ -58,7 +58,7 @@ export default function GlobalError({
             {/* Critical Error Icon */}
             <div className="flex justify-center">
               <div className="relative">
-                <div className="absolute inset-0 bg-status-error/30 rounded-full blur-2xl animate-pulse" />
+                <div className="absolute inset-0 bg-status-error/30 rounded-sm blur-2xl animate-pulse" />
                 <div className="relative w-24 h-24 text-6xl flex items-center justify-center text-status-error">
                   ⚠️
                 </div>
@@ -78,7 +78,7 @@ export default function GlobalError({
 
             {/* Error Details (Development Only) */}
             {process.env.NODE_ENV === "development" && (
-              <details className="bg-background-card rounded-md border border-border-subtle p-6">
+              <details className="bg-background-card rounded-sm border border-border-subtle p-6">
                 <summary className="cursor-pointer text-sm text-text-secondary hover:text-accent-gold transition-colors font-medium">
                   Technical Details (Development Only)
                 </summary>
@@ -128,7 +128,7 @@ export default function GlobalError({
             </div>
 
             {/* Support Information */}
-            <div className="bg-background-card rounded-md border border-border-subtle p-6 text-center space-y-3">
+            <div className="bg-background-card rounded-sm border border-border-subtle p-6 text-center space-y-3">
               <p className="text-sm text-text-secondary">
                 This error has been logged and our team has been notified.
               </p>

@@ -104,7 +104,7 @@ export class ErrorBoundary extends React.Component<
             {/* Error Icon */}
             <div className="flex justify-center">
               <div className="relative">
-                <div className="absolute inset-0 bg-accent-gold/20 rounded-full blur-xl animate-pulse" />
+                <div className="absolute inset-0 bg-accent-gold/20 rounded-sm blur-xl animate-pulse" />
                 <AlertCircle className="relative w-20 h-20 text-accent-gold" />
               </div>
             </div>
@@ -121,7 +121,7 @@ export class ErrorBoundary extends React.Component<
 
             {/* Error Details (Development Only) */}
             {process.env.NODE_ENV === "development" && this.state.error?.stack && (
-              <details className="text-left bg-background-card rounded-md border border-border-subtle p-4">
+              <details className="text-left bg-background-card rounded-sm border border-border-subtle p-4">
                 <summary className="cursor-pointer text-sm text-text-secondary hover:text-accent-gold transition-colors">
                   Error Details
                 </summary>

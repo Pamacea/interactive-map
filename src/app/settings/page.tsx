@@ -72,7 +72,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Background Glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-accent-gold/5 rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-accent-gold/5 rounded-sm blur-[150px] pointer-events-none" />
 
       <AppHeader />
 
@@ -104,7 +104,7 @@ export default function SettingsPage() {
           {settingsOptions.map((option, index) => (
             <div
               key={index}
-              className="group relative bg-obsidian/60 backdrop-blur-sm border border-iron rounded-md p-6 hover:border-accent-gold/50 hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+              className="group relative bg-obsidian/60 backdrop-blur-sm border border-iron rounded-sm p-6 hover:border-accent-gold/50 hover:-translate-y-1 transition-all duration-300 cursor-pointer"
             >
               {/* Corner Rune */}
               <span className="absolute top-2 right-2 text-accent-gold-dark opacity-20 text-xs">

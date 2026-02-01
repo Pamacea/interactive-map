@@ -22,6 +22,7 @@ interface MapState {
   grid: boolean;
   snap: boolean;
   scale: ScaleOption;
+  zoom: number;
   layers: Layer[];
   selectedLayerId: string | null;
 
@@ -34,6 +35,10 @@ interface MapState {
   setGrid: (value: boolean) => void;
   setSnap: (value: boolean) => void;
   setScale: (value: ScaleOption) => void;
+  setZoom: (value: number) => void;
+  zoomIn: () => void;
+  zoomOut: () => void;
+  resetZoom: () => void;
   setLayers: (layers: Layer[]) => void;
   setSelectedLayerId: (layerId: string | null) => void;
 
@@ -59,6 +64,7 @@ const initialState = {
   grid: false,
   snap: false,
   scale: "1:1000" as ScaleOption,
+  zoom: 1.0,
   layers: [
     {
       id: "base-map",
@@ -279,6 +285,11 @@ export const useMapStore = create<MapState>()(
           };
         }),
 
+      setZoom: (value: number) => set({ zoom: Math.max(0.1, Math.min(5, value)) }),
+      zoomIn: () => set((state) => ({ zoom: Math.min(state.zoom * 1.2, 5) })),
+      zoomOut: () => set((state) => ({ zoom: Math.max(state.zoom / 1.2, 0.1) })),
+      resetZoom: () => set((state) => ({ zoom: 1.0 })),
+
       reset: () => set(initialState),
     }),
     {
@@ -291,6 +302,7 @@ export const useMapStore = create<MapState>()(
 export const useGrid = () => useMapStore((state) => state.grid);
 export const useSnap = () => useMapStore((state) => state.snap);
 export const useScale = () => useMapStore((state) => state.scale);
+export const useZoom = () => useMapStore((state) => state.zoom);
 export const useLayers = () => useMapStore((state) => state.layers);
 export const useSelectedLayerId = () =>
   useMapStore((state) => state.selectedLayerId);

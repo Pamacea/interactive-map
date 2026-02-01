@@ -30,7 +30,7 @@ export const MarkerSelectionRing = memo(function MarkerSelectionRing({ isSelecte
 
   return (
     <div
-      className="absolute inset-0 rounded-full animate-pulse"
+      className="absolute inset-0 rounded-sm animate-pulse"
       style={{
         width: `${pinSize + 8}px`,
         height: `${pinSize + 8}px`,

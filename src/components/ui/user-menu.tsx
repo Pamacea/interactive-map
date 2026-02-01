@@ -53,12 +53,12 @@ export function UserMenu() {
         )}
       >
         {/* Avatar */}
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent-gold to-accent-gold-dark flex items-center justify-center text-sm font-bold text-background-base">
+        <div className="w-8 h-8 rounded-sm bg-gradient-to-br from-accent-gold to-accent-gold-dark flex items-center justify-center text-sm font-bold text-background-base">
           {user.image ? (
             <img
               src={user.image}
               alt={user.name || "User"}
-              className="w-full h-full rounded-full object-cover"
+              className="w-full h-full rounded-sm object-cover"
             />
           ) : (
             <span>{user.name?.charAt(0).toUpperCase() || "U"}</span>

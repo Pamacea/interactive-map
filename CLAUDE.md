@@ -384,10 +384,10 @@ Use consistent border patterns based on element state:
 Follow the design system hierarchy:
 
 - **Containers, panels, small elements**: `rounded-sm`
-- **Cards, buttons, medium elements**: `rounded-md`
-- **Large cards, sections**: `rounded-lg`
-- **Special cases** (hero sections, featured elements): `rounded-xl`
-- **Circular elements** (avatars, badges, spinners): `rounded-full`
+- **Cards, buttons, medium elements**: `rounded-sm`
+- **Large cards, sections**: `rounded-sm`
+- **Special cases** (hero sections, featured elements): `rounded-sm`
+- **Circular elements** (avatars, badges, spinners): `rounded-sm`
 
 **Prohibited**: `rounded-3xl` unless explicitly justified for specific visual effects
 
@@ -395,8 +395,8 @@ Follow the design system hierarchy:
 ```tsx
 // ✅ Correct
 <div className="rounded-sm">Panel container</div>
-<div className="rounded-md">Card</div>
-<div className="rounded-full">Avatar</div>
+<div className="rounded-sm">Card</div>
+<div className="rounded-sm">Avatar</div>
 
 // ❌ Incorrect
 <div className="rounded-3xl">Excessive rounding</div>
@@ -420,10 +420,10 @@ Follow the design system hierarchy:
 
 **Radius Scale**:
 - `rounded-sm`: 2px radius (subtle)
-- `rounded-md`: 6px radius (medium)
-- `rounded-lg`: 8px radius (large)
-- `rounded-xl`: 12px radius (extra large)
-- `rounded-full`: 9999px radius (circular)
+- `rounded-sm`: 6px radius (medium)
+- `rounded-sm`: 8px radius (large)
+- `rounded-sm`: 12px radius (extra large)
+- `rounded-sm`: 9999px radius (circular)
 
 ---
 

@@ -14,13 +14,13 @@ export function AddLayerDialog({
   onCancel,
 }: AddLayerDialogProps) {
   return (
-    <div className="px-3 py-2 rounded-sm bg-background-elevated border border-border-subtle space-y-2">
+    <div className="px-3 py-2 rounded-sm bg-obsidian/70 border border-iron/50 space-y-2">
       <input
         type="text"
         value={newLayerName}
         onChange={(e) => onNameChange(e.target.value)}
         placeholder="Layer name..."
-        className="w-full px-2 py-1.5 text-sm bg-background-base border border-border-subtle rounded-sm focus:outline-none focus:border-accent-gold text-text-primary placeholder:text-text-muted"
+        className="w-full px-2 py-1.5 text-sm bg-void border border-iron rounded-sm focus:outline-none focus:border-accent-gold text-bone placeholder:text-bone-dark/50"
         autoFocus
         onKeyDown={(e) => {
           if (e.key === "Enter") onAdd();
@@ -30,13 +30,13 @@ export function AddLayerDialog({
       <div className="flex gap-2">
         <button
           onClick={onAdd}
-          className="flex-1 px-2 py-1 text-xs bg-accent-gold text-background-base rounded-sm hover:bg-accent-gold/90 transition-colors"
+          className="flex-1 px-2 py-1 text-xs bg-accent-gold text-void rounded-sm hover:bg-accent-gold/90 transition-colors font-display"
         >
           Create
         </button>
         <button
           onClick={onCancel}
-          className="flex-1 px-2 py-1 text-xs bg-background-base border border-border-subtle text-text-secondary rounded-sm hover:bg-background-elevated transition-colors"
+          className="flex-1 px-2 py-1 text-xs bg-void border border-iron text-bone-dark rounded-sm hover:bg-obsidian transition-colors font-display"
         >
           Cancel
         </button>

@@ -14,8 +14,8 @@ export function DescriptionTextarea({
   onChange,
 }: DescriptionTextareaProps) {
   return (
-    <div className="px-3 py-2 rounded-sm bg-background-elevated border border-border-subtle">
-      <label className="block text-xs text-text-muted mb-1.5">
+    <div className="px-3 py-2.5 bg-obsidian/60 border-x border-b border-iron/50">
+      <label className="block text-xs font-display text-bone-dark mb-2 uppercase tracking-wide">
         Description
       </label>
       <textarea
@@ -42,7 +42,7 @@ export function DescriptionTextarea({
         }}
         disabled={disabled}
         rows={3}
-        className="w-full bg-transparent text-sm text-text-primary placeholder:text-text-muted/50 focus:outline-none resize-none disabled:opacity-50"
+        className="w-full bg-void/50 border border-iron/30 rounded px-3 py-2 text-sm text-bone placeholder:text-bone-dark/40 focus:outline-none focus:border-accent-gold/50 focus:ring-1 focus:ring-accent-gold/30 transition-all resize-none disabled:opacity-50 font-fell"
         placeholder="Enter pin description..."
         maxLength={5000}
       />

@@ -119,7 +119,7 @@ const WorldSizeFilter = memo(function WorldSizeFilter() {
             <input
               type="radio"
               name="size"
-              className="w-4 h-4 border-border-subtle text-accent-gold focus:ring-accent-gold focus:ring-offset-0 rounded-md"
+              className="w-4 h-4 border-border-subtle text-accent-gold focus:ring-accent-gold focus:ring-offset-0 rounded-sm"
             />
             <span className="text-sm text-text-secondary group-hover:text-text-primary transition-colors">
               {size}
@@ -139,7 +139,7 @@ const FilterCheckbox = memo(function FilterCheckbox({ label, value, checked, onC
         name={value}
         checked={checked}
         onChange={onChange}
-        className="w-4 h-4 rounded-md border-border-subtle text-accent-gold focus:ring-accent-gold focus:ring-offset-0"
+        className="w-4 h-4 rounded-sm border-border-subtle text-accent-gold focus:ring-accent-gold focus:ring-offset-0"
       />
       <span className="text-sm text-text-secondary group-hover:text-text-primary transition-colors">
         {label}
@@ -155,9 +155,9 @@ const FactionCheckbox = memo(function FactionCheckbox({ label, color, checked, o
         type="checkbox"
         checked={checked}
         onChange={onChange}
-        className="w-4 h-4 rounded-md border-border-subtle text-accent-gold focus:ring-accent-gold focus:ring-offset-0"
+        className="w-4 h-4 rounded-sm border-border-subtle text-accent-gold focus:ring-accent-gold focus:ring-offset-0"
       />
-      <div className={`w-3 h-3 rounded-md ${color}`} />
+      <div className={`w-3 h-3 rounded-sm ${color}`} />
       <span className="text-sm text-text-secondary group-hover:text-text-primary transition-colors">
         {label}
       </span>

@@ -190,4 +190,41 @@
   .cursor-crosshair {
     cursor: crosshair;
   }
+
+  /* Fantasy animations */
+  @keyframes rune-glow {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.05); }
+  }
+
+  @keyframes crown-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+
+  @keyframes oath-reveal {
+    from { opacity: 0; transform: translateY(10px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  @keyframes shadow-glow-medium {
+    0%, 100% { box-shadow: 0 0 8px rgba(212, 175, 55, 0.3); }
+    50% { box-shadow: 0 0 16px rgba(212, 175, 55, 0.5); }
+  }
+
+  .animate-rune-glow {
+    animation: rune-glow 3s ease-in-out infinite;
+  }
+
+  .animate-crown-float {
+    animation: crown-float 3s ease-in-out infinite;
+  }
+
+  .animate-oath-reveal {
+    animation: oath-reveal 0.6s ease-out forwards;
+  }
+
+  .shadow-glow-medium {
+    box-shadow: 0 0 12px rgba(212, 175, 55, 0.4);
+  }
 }

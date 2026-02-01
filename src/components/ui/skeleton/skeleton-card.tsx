@@ -21,7 +21,7 @@ export function SkeletonCard({
   className = "",
 }: SkeletonCardProps) {
   return (
-    <div className={`bg-background-card border border-border-subtle rounded-lg p-4 ${className}`}>
+    <div className={`bg-background-card border border-border-subtle rounded-sm p-4 ${className}`}>
       {showAvatar && (
         <div className="flex items-center gap-3 mb-3">
           <Skeleton variant="circular" className="w-10 h-10" />

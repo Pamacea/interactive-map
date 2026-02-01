@@ -23,7 +23,7 @@ export function SkeletonSpinner({
   return (
     <div
       className={cn(
-        "border-border-base border-t-accent-gold rounded-full animate-spin",
+        "border-border-base border-t-accent-gold rounded-sm animate-spin",
         sizeClasses[size],
         className
       )}

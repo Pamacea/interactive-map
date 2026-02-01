@@ -29,7 +29,7 @@ export function ResizeHandle({ onResizeStart, isResizing }: ResizeHandleProps) {
           }`}
         >
           <div
-            className={`p-1.5 rounded-md transition-all duration-200 ${
+            className={`p-1.5 rounded-sm transition-all duration-200 ${
               isResizing
                 ? "bg-accent-gold/20 shadow-lg"
                 : "bg-transparent group-hover:bg-background-elevated/80"

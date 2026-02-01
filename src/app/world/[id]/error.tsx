@@ -54,7 +54,7 @@ export default function WorldError({
         {/* Error Icon with Animation */}
         <div className="flex justify-center">
           <div className="relative">
-            <div className="absolute inset-0 bg-status-error/20 rounded-full blur-xl animate-pulse" />
+            <div className="absolute inset-0 bg-status-error/20 rounded-sm blur-xl animate-pulse" />
             <AlertCircle className="relative w-20 h-20 text-status-error" />
           </div>
         </div>
@@ -85,7 +85,7 @@ export default function WorldError({
 
         {/* Error Details (Development Only) */}
         {process.env.NODE_ENV === "development" && (
-          <details className="bg-background-card rounded-md border border-border-subtle p-4">
+          <details className="bg-background-card rounded-sm border border-border-subtle p-4">
             <summary className="cursor-pointer text-sm text-text-secondary hover:text-accent-gold transition-colors font-medium">
               Technical Details (Development)
             </summary>

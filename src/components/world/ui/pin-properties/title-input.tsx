@@ -14,8 +14,8 @@ export function TitleInput({
   onChange,
 }: TitleInputProps) {
   return (
-    <div className="px-3 py-2 rounded-sm bg-background-elevated border border-border-subtle">
-      <label className="block text-xs text-text-muted mb-1.5">Title</label>
+    <div className="px-3 py-2.5 bg-obsidian/60 border-x border-b border-iron/50">
+      <label className="block text-xs font-display text-bone-dark mb-2 uppercase tracking-wide">Title</label>
       <input
         type="text"
         value={value}
@@ -30,7 +30,6 @@ export function TitleInput({
           if (trimmedTitle.length > 0 && trimmedTitle !== externalValue) {
             onUpdate(trimmedTitle);
           } else if (trimmedTitle.length === 0) {
-            // Reset to externalValue if empty
             onChange(externalValue);
           }
         }}
@@ -38,13 +37,12 @@ export function TitleInput({
           if (e.key === "Enter") {
             e.currentTarget.blur();
           } else if (e.key === "Escape") {
-            // Reset to externalValue on Escape
             onChange(externalValue);
             e.currentTarget.blur();
           }
         }}
         disabled={disabled}
-        className="w-full bg-transparent text-sm text-text-primary placeholder:text-text-muted/50 focus:outline-none disabled:opacity-50"
+        className="w-full bg-void/50 border border-iron/30 rounded px-3 py-2 text-sm text-bone placeholder:text-bone-dark/40 focus:outline-none focus:border-accent-gold/50 focus:ring-1 focus:ring-accent-gold/30 transition-all disabled:opacity-50 font-fell"
         placeholder="Enter pin title..."
         maxLength={200}
       />

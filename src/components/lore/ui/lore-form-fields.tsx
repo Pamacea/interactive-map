@@ -10,14 +10,14 @@ interface LoreFormHeaderProps {
 export function LoreFormHeader({ isEditing, onClose }: LoreFormHeaderProps) {
   return (
     <div className="flex items-center justify-between">
-      <h3 className="text-lg font-semibold text-text-secondary">
-        {isEditing ? "Edit Lore Entry" : "New Lore Entry"}
+      <h3 className="text-sm font-display font-semibold text-bone">
+        {isEditing ? "Edit Lore" : "New Lore"}
       </h3>
       <Button
         size="sm"
         variant="ghost"
         onClick={onClose}
-        className="h-8 w-8 p-0"
+        className="h-7 w-7 p-0 text-bone-dark hover:text-accent-gold hover:bg-obsidian/50"
       >
         <X className="w-4 h-4" />
       </Button>
@@ -33,8 +33,8 @@ export function LoreFormError({ error }: LoreFormErrorProps) {
   if (!error) return null;
 
   return (
-    <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-sm">
-      <p className="text-sm text-red-500">{error}</p>
+    <div className="p-3 bg-blood/20 border border-blood/50 rounded-sm">
+      <p className="text-sm text-bone">{error}</p>
     </div>
   );
 }

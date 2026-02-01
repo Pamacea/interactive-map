@@ -33,7 +33,7 @@ export function AutosaveIndicator({ status }: AutosaveIndicatorProps) {
       case "unsaved":
         return (
           <div
-            className="h-2 w-2 rounded-full bg-status-warning-light"
+            className="h-2 w-2 rounded-sm bg-status-warning-light"
             title={statusText}
           />
         );
@@ -41,7 +41,7 @@ export function AutosaveIndicator({ status }: AutosaveIndicatorProps) {
       case "saving":
         return (
           <div
-            className="h-3 w-3 animate-spin rounded-full border-2 border-interactive-primary border-t-transparent"
+            className="h-3 w-3 animate-spin rounded-sm border-2 border-interactive-primary border-t-transparent"
             title={statusText}
           />
         );

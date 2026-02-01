@@ -6,20 +6,20 @@ interface CoordinatesDisplayProps {
 
 export function CoordinatesDisplay({ pin }: CoordinatesDisplayProps) {
   return (
-    <div className="px-3 py-2 rounded-sm bg-background-elevated border border-border-subtle">
-      <label className="block text-xs text-text-muted mb-1.5">
+    <div className="px-3 py-2.5 bg-obsidian/60 border-x border-b border-iron/50">
+      <label className="block text-xs font-display text-bone-dark mb-2 uppercase tracking-wide">
         Coordinates
       </label>
       <div className="grid grid-cols-2 gap-2">
-        <div className="bg-background-base rounded px-2 py-1.5">
-          <span className="text-xs text-text-muted block">Lat</span>
-          <span className="text-xs font-mono text-accent-gold">
+        <div className="bg-void/50 rounded px-2.5 py-2 border border-iron/30">
+          <span className="text-xs text-bone-dark/70 block mb-0.5">Lat</span>
+          <span className="text-xs font-mono text-accent-gold font-semibold">
             {pin.latitude.toFixed(4)}
           </span>
         </div>
-        <div className="bg-background-base rounded px-2 py-1.5">
-          <span className="text-xs text-text-muted block">Lng</span>
-          <span className="text-xs font-mono text-accent-gold">
+        <div className="bg-void/50 rounded px-2.5 py-2 border border-iron/30">
+          <span className="text-xs text-bone-dark/70 block mb-0.5">Lng</span>
+          <span className="text-xs font-mono text-accent-gold font-semibold">
             {pin.longitude.toFixed(4)}
           </span>
         </div>

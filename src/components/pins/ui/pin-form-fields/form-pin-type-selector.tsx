@@ -49,7 +49,7 @@ export const FormPinTypeSelector: FC<FormPinTypeSelectorProps> = ({
           value={value}
           onChange={(e) => onChange(e.target.value as (typeof PinType)[keyof typeof PinType])}
           disabled={disabled}
-          className={`h-10 rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-interactive-focus disabled:opacity-50 bg-background-input ${
+          className={`h-10 rounded-sm border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-interactive-focus disabled:opacity-50 bg-background-input ${
             error ? "border-status-error" : "border-input"
           }`}
         >
@@ -80,7 +80,7 @@ export const FormPinTypeSelector: FC<FormPinTypeSelectorProps> = ({
               type="button"
               onClick={() => onChange(option.value)}
               disabled={disabled}
-              className={`flex flex-col items-center gap-2 p-3 rounded-md border transition-all ${
+              className={`flex flex-col items-center gap-2 p-3 rounded-sm border transition-all ${
                 value === option.value
                   ? "border-interactive-primary bg-interactive-selected"
                   : "border-input hover:border-hover"

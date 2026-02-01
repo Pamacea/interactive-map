@@ -50,7 +50,7 @@ const EmptyState = memo(function EmptyState({ onClearFilters }: { onClearFilters
 
 const EmptyStateIcon = memo(function EmptyStateIcon() {
   return (
-    <div className="inline-flex items-center justify-center w-16 h-16 rounded-lg bg-background-card border border-border-subtle">
+    <div className="inline-flex items-center justify-center w-16 h-16 rounded-sm bg-background-card border border-border-subtle">
       <Search className="w-8 h-8 text-text-muted" />
     </div>
   );

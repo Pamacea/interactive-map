@@ -1,0 +1,17 @@
+{
+  "workflow": "predator",
+  "task": "Optimize explore page performance - reduce compile and render times to under 50ms, limit database queries",
+  "flags": {
+    "auto": true,
+    "examine": true,
+    "pr": false,
+    "max_attempts": "unlimited"
+  },
+  "state": {
+    "current_step": "INIT",
+    "issues_found": [],
+    "files_created": [],
+    "files_modified": []
+  },
+  "start_time": "2025-01-31T18:30:00Z"
+}

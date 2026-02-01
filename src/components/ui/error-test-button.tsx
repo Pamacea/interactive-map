@@ -59,7 +59,7 @@ export function ErrorTestButton({
   };
 
   return (
-    <div className="space-y-4 p-6 bg-background-card rounded-md border border-border-subtle">
+    <div className="space-y-4 p-6 bg-background-card rounded-sm border border-border-subtle">
       <h3 className="text-lg font-display font-semibold text-text-primary">
         Error Boundary Tests
       </h3>

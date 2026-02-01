@@ -1,0 +1,250 @@
+{
+  "title": "Genesis Platform - Comprehensive Refactoring for Simplification",
+  "version": "1.0.0",
+  "created": "2025-01-18",
+  "objective": "Refactor all components and stores to remove complexity, eliminate arbitrary pixel values, enforce consistent design patterns, and improve maintainability",
+  "scope": {
+    "includes": [
+      "All UI components",
+      "State management stores",
+      "Layout and spacing patterns",
+      "Design system consistency"
+    ],
+    "excludes": [
+      "Database schema changes",
+      "API modifications",
+      "Feature additions"
+    ]
+  },
+  "principles": [
+    "Follow Tailwind CSS best practices (gap-* over margin, standard spacing scale)",
+    "Component composition over monolithic components (>200 lines split required)",
+    "Consistent design tokens (shadows, borders, rounding)",
+    "Maintain ui/logic/methods separation",
+    "No arbitrary pixel values (use Tailwind scale or CSS variables)"
+  ],
+  "user_stories": [
+    {
+      "id": "US-001",
+      "title": "Eliminate Arbitrary Pixel Values in Layouts",
+      "priority": 1,
+      "severity": "HIGH",
+      "agent": "builder:builder",
+      "status": "completed",
+      "passes": true,
+      "description": "Replace all hardcoded pixel values with standard Tailwind spacing scale or CSS variables",
+      "acceptance_criteria": [
+        "No w-[280px], h-[80px], min-w-[320px] patterns remain",
+        "All widths use Tailwind scale (w-80, w-96, etc.)",
+        "All heights use Tailwind scale (h-20, h-24, etc.)",
+        "Responsive sizing preferred over fixed values"
+      ],
+      "files": [
+        "src/components/explore/ui/filter-sidebar.tsx",
+        "src/components/pins/ui/pin-popup.tsx",
+        "src/components/ui/textarea.tsx",
+        "src/components/gallery/ui/image-lightbox.tsx",
+        "src/components/pins/ui/pin-context-menu.tsx",
+        "src/components/ui/toast.tsx"
+      ]
+    },
+    {
+      "id": "US-002",
+      "title": "Break Down Monolithic Search Component",
+      "priority": 1,
+      "severity": "HIGH",
+      "agent": "builder:builder",
+      "status": "completed",
+      "passes": true,
+      "description": "Split search-bar.tsx (301 lines) into smaller, focused components following ui/logic pattern",
+      "acceptance_criteria": [
+        "SearchInput component handles input field only",
+        "SearchResults component displays results",
+        "SearchSuggestions component handles autocomplete",
+        "Each component <100 lines",
+        "State management extracted to hooks/store",
+        "Barrel export created in search/ui/"
+      ],
+      "files": [
+        "src/components/search/ui/search-bar.tsx",
+        "src/components/search/ui/search-results.tsx"
+      ]
+    },
+    {
+      "id": "US-003",
+      "title": "Split Large Pin Form Component",
+      "priority": 1,
+      "severity": "HIGH",
+      "agent": "builder:builder",
+      "status": "completed",
+      "passes": true,
+      "description": "Break down pin-form-fields.tsx (271 lines) into modular, reusable field components",
+      "acceptance_criteria": [
+        "Each form field in separate component",
+        "Components use shared field wrapper pattern",
+        "Validation logic consistent across all fields",
+        "Barrel export created in pin-form/"
+      ],
+      "files": [
+        "src/components/pins/ui/pin-form/pin-form-fields.tsx"
+      ]
+    },
+    {
+      "id": "US-004",
+      "title": "Refactor Map Canvas Component",
+      "priority": 2,
+      "severity": "HIGH",
+      "agent": "builder:builder",
+      "status": "completed",
+      "passes": true,
+      "description": "Simplify map-canvas.tsx (231 lines) by extracting logic into hooks and sub-components",
+      "acceptance_criteria": [
+        "Map initialization logic in custom hook",
+        "Layer management in separate component",
+        "Event handling in dedicated hook",
+        "Main component <150 lines"
+      ],
+      "files": [
+        "src/components/world/ui/map-canvas.tsx"
+      ]
+    },
+    {
+      "id": "US-005",
+      "title": "Simplify Image Upload Zone",
+      "priority": 2,
+      "severity": "MEDIUM",
+      "agent": "builder:builder",
+      "status": "completed",
+      "passes": true,
+      "description": "Extract upload logic from image-upload-zone.tsx (228 lines) into custom hooks",
+      "acceptance_criteria": [
+        "Upload logic in use-image-upload hook",
+        "Drag-and-drop logic separate",
+        "UI component focuses on presentation",
+        "Component <100 lines"
+      ],
+      "files": [
+        "src/components/gallery/ui/image-upload-zone.tsx"
+      ]
+    },
+    {
+      "id": "US-006",
+      "title": "Eliminate Margin Usage Across Codebase",
+      "priority": 2,
+      "severity": "MEDIUM",
+      "agent": "simplifier:smite-simplifier",
+      "status": "completed",
+      "passes": true,
+      "description": "Replace all margin classes (mt-*, mb-*, ml-*, mr-*) with gap-* utilities in parent containers",
+      "acceptance_criteria": [
+        "No margin classes used for layout spacing",
+        "All spacing uses gap-* in flex/grid containers",
+        "Padding only used for internal component spacing",
+        "Consistent spacing patterns throughout"
+      ],
+      "files": [
+        "src/components/**/*.tsx"
+      ]
+    },
+    {
+      "id": "US-007",
+      "title": "Standardize Design Tokens",
+      "priority": 2,
+      "severity": "MEDIUM",
+      "agent": "simplifier:smite-simplifier",
+      "status": "completed",
+      "passes": true,
+      "description": "Create consistent patterns for shadows, borders, and border radius across all components",
+      "acceptance_criteria": [
+        "Standard shadow levels defined (lg, xl, 2xl)",
+        "Border patterns consistent (border for secondary, border-2 for primary)",
+        "Border radius follows design system (sm for containers, md for cards)",
+        "Document patterns in CLAUDE.md"
+      ],
+      "files": [
+        "src/components/**/*.tsx"
+      ]
+    },
+    {
+      "id": "US-008",
+      "title": "Refactor Search Store Complexity",
+      "priority": 3,
+      "severity": "MEDIUM",
+      "agent": "simplifier:smite-simplifier",
+      "status": "completed",
+      "passes": true,
+      "description": "Simplify use-search-store.ts by eliminating redundant state reset logic",
+      "acceptance_criteria": [
+        "Single reset utility function",
+        "No duplicated state clearing patterns",
+        "Consistent selector pattern",
+        "Reduced store complexity"
+      ],
+      "files": [
+        "src/store/use-search-store.ts"
+      ]
+    },
+    {
+      "id": "US-009",
+      "title": "Add Barrel Exports to All Feature Directories",
+      "priority": 3,
+      "severity": "LOW",
+      "agent": "builder:builder",
+      "status": "completed",
+      "passes": true,
+      "description": "Create index.ts files in all component directories for proper tree-shaking",
+      "acceptance_criteria": [
+        "index.ts in gallery/ui/",
+        "index.ts in search/ui/",
+        "index.ts in create/ui/",
+        "All exports properly typed",
+        "Imports use barrel exports"
+      ],
+      "files": [
+        "src/components/gallery/ui/",
+        "src/components/search/ui/",
+        "src/components/create/ui/"
+      ]
+    },
+    {
+      "id": "US-010",
+      "title": "Standardize Color Theming Approach",
+      "priority": 3,
+      "severity": "LOW",
+      "agent": "simplifier:smite-simplifier",
+      "status": "completed",
+      "passes": true,
+      "description": "Consolidate color usage to use CSS variables consistently instead of mixed approaches",
+      "acceptance_criteria": [
+        "All theme colors use CSS variables",
+        "Direct Tailwind color classes removed where appropriate",
+        "Consistent variable naming",
+        "Documented in globals.css"
+      ],
+      "files": [
+        "src/app/globals.css",
+        "src/components/**/*.tsx"
+      ]
+    }
+  ],
+  "definition_of_done": [
+    "All user stories completed and verified",
+    "No arbitrary pixel values remain in codebase",
+    "All components follow ui/logic/methods pattern",
+    "All components <200 lines (unless justified)",
+    "No margin classes used for layout",
+    "Consistent design tokens applied",
+    "Barrel exports in all feature directories",
+    "All tests passing",
+    "TypeScript compilation successful",
+    "No linting errors",
+    "Documentation updated in CLAUDE.md"
+  ],
+  "testing_strategy": {
+    "unit_tests": "Run existing test suite after each refactoring",
+    "type_check": "npm run typecheck after each user story",
+    "lint_check": "npm run lint after each user story",
+    "manual_testing": "Verify UI renders correctly in browser"
+  },
+  "rollback_plan": "Git commits after each user story for easy rollback"
+}

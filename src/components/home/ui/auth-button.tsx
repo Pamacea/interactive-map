@@ -46,12 +46,12 @@ export function AuthButton() {
             onClick={() => setIsOpen(!isOpen)}
             className="flex items-center gap-2 px-3 py-2 transition-all duration-200 hover:bg-accent-gold/10"
           >
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-accent-gold to-accent-gold-dark flex items-center justify-center text-xs font-display-ornate font-bold text-void border border-accent-gold/30">
+            <div className="w-7 h-7 rounded-sm bg-gradient-to-br from-accent-gold to-accent-gold-dark flex items-center justify-center text-xs font-display-ornate font-bold text-void border border-accent-gold/30">
               {user.image ? (
                 <img
                   src={user.image}
                   alt={user.name || "User"}
-                  className="w-full h-full rounded-full object-cover"
+                  className="w-full h-full rounded-sm object-cover"
                 />
               ) : (
                 <span>{user.name?.charAt(0).toUpperCase() || "U"}</span>
@@ -90,7 +90,7 @@ export function AuthButton() {
                       </span>
                       <span className="font-display text-xs tracking-wider">{item.label}</span>
                       {/* Hover effect indicator */}
-                      <span className="absolute right-2 w-1 h-1 bg-accent-gold/0 group-hover:bg-accent-gold/50 rounded-full transition-all duration-200" />
+                      <span className="absolute right-2 w-1 h-1 bg-accent-gold/0 group-hover:bg-accent-gold/50 rounded-sm transition-all duration-200" />
                     </Link>
                   ))}
                 </div>
@@ -113,7 +113,7 @@ export function AuthButton() {
                   >
                     <span className="text-blood/50 group-hover:text-blood text-sm font-display-ornate">ᛚ</span>
                     <span className="font-display text-xs tracking-wider">DEPART</span>
-                    <span className="absolute right-3 w-1 h-1 bg-blood/0 group-hover:bg-blood/50 rounded-full transition-all duration-200" />
+                    <span className="absolute right-3 w-1 h-1 bg-blood/0 group-hover:bg-blood/50 rounded-sm transition-all duration-200" />
                   </button>
                 </div>
 

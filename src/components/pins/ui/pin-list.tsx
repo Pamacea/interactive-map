@@ -127,7 +127,7 @@ export function PinList({ worldId }: PinListProps) {
               >
                 {/* Pin Icon */}
                 <div
-                  className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
+                  className="flex-shrink-0 w-8 h-8 rounded-sm flex items-center justify-center"
                   style={{ backgroundColor: pin.color }}
                 >
                   <PinIcon className="w-4 h-4 text-white" />

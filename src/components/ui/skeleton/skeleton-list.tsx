@@ -19,7 +19,7 @@ export function SkeletonList({
   return (
     <div className={cn("space-y-3", className)}>
       {Array.from({ length: items }).map((_, i) => (
-        <div key={i} className="flex items-center gap-3 p-3 border border-border-subtle rounded-lg">
+        <div key={i} className="flex items-center gap-3 p-3 border border-border-subtle rounded-sm">
           {showAvatar && (
             <Skeleton variant="circular" className="w-10 h-10 flex-shrink-0" />
           )}

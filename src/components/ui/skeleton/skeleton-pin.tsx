@@ -18,7 +18,7 @@ export function SkeletonPin({
   className = "",
 }: SkeletonPinProps) {
   return (
-    <div className={`bg-background-card border border-border-subtle rounded-lg p-3 ${className}`}>
+    <div className={`bg-background-card border border-border-subtle rounded-sm p-3 ${className}`}>
       {showIcon && (
         <div className="flex items-center gap-2 mb-2">
           <Skeleton variant="rounded" className="w-6 h-6" />

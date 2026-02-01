@@ -37,7 +37,7 @@ export function HeroSection() {
     <section id="throne" className="flex flex-col items-center justify-center px-4 py-16 sm:py-20">
       {/* Background glow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200px] h-[100px] bg-accent-gold/5 rounded-full blur-[100px]" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200px] h-[100px] bg-accent-gold/5 rounded-sm blur-[100px]" />
       </div>
 
       {/* Crown Symbol */}

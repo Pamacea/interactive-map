@@ -26,7 +26,7 @@ export function DialogWrapper({
       onClick={onClose}
     >
       <div
-        className="bg-background-elevated border border-border-base rounded-lg shadow-lg max-w-3/5 w-full mx-4 animate-in zoom-in-95 duration-200"
+        className="bg-background-elevated border border-border-base rounded-sm shadow-lg max-w-3/5 w-full mx-4 animate-in zoom-in-95 duration-200"
         onClick={handleContentClick}
       >
         <div className="flex items-center justify-between px-4 py-3 border-b border-border-base">
@@ -34,7 +34,7 @@ export function DialogWrapper({
           <button
             onClick={onClose}
             disabled={disabled}
-            className="p-1 hover:bg-background-hover rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-1 hover:bg-background-hover rounded-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <X className="w-4 h-4 text-text-muted" />
           </button>

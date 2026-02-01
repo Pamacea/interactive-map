@@ -32,7 +32,7 @@ export const FormNumberField: FC<FormNumberFieldProps> = ({
         max={max}
         step={step}
         disabled={disabled}
-        className={`h-10 rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-interactive-focus disabled:opacity-50 bg-background-input ${
+        className={`h-10 rounded-sm border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-interactive-focus disabled:opacity-50 bg-background-input ${
           error ? "border-status-error" : "border-input"
         }`}
       />

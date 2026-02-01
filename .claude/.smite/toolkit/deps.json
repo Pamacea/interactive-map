@@ -1,14 +1,14 @@
 {
   "version": "1.0.0",
-  "createdAt": "2026-01-19T20:37:27.882Z",
+  "createdAt": "2026-01-20T13:11:07.874Z",
   "projectDir": "C:\\Users\\Yanis\\Projects\\interactive-map",
   "metadata": {
-    "totalNodes": 315,
-    "totalEdges": 767,
+    "totalNodes": 326,
+    "totalEdges": 801,
     "circularDeps": 0,
-    "deadCode": 515,
-    "added": 22,
-    "removed": 3
+    "deadCode": 535,
+    "added": 0,
+    "removed": 0
   },
   "graph": {
     "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\actions\\pins.ts": {
@@ -5238,6 +5238,191 @@
         "exports": 0,
         "lines": 22
       }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\ui\\lore-form-actions.tsx": {
+      "imports": [
+        "lucide-react",
+        "@/components/ui/button"
+      ],
+      "exports": [
+        "LoreFormActions"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 2,
+        "exports": 1,
+        "lines": 48
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\ui\\lore-form-fields.tsx": {
+      "imports": [
+        "lucide-react",
+        "@/components/ui/button",
+        "@/types/lore.type"
+      ],
+      "exports": [
+        "LoreFormHeader",
+        "LoreFormError",
+        "CATEGORIES"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 3,
+        "exports": 3,
+        "lines": 55
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\ui\\lore-form-inputs.tsx": {
+      "imports": [
+        "@/components/ui/input",
+        "@/components/ui/textarea",
+        "@/components/ui/label",
+        "@/components/ui/checkbox",
+        "./lore-form-fields",
+        "@/types/lore.type"
+      ],
+      "exports": [
+        "LoreFormFields"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 6,
+        "exports": 1,
+        "lines": 212
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\logic\\use-icon-picker-navigation.ts": {
+      "imports": [
+        "react"
+      ],
+      "exports": [
+        "useIconPickerNavigation"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 1,
+        "exports": 1,
+        "lines": 42
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\logic\\use-popup-title-edit.ts": {
+      "imports": [
+        "react",
+        "@/stores/use-pins-store"
+      ],
+      "exports": [
+        "usePopupTitleEdit"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 2,
+        "exports": 1,
+        "lines": 86
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\delete-confirm-dialog.tsx": {
+      "imports": [],
+      "exports": [
+        "DeleteConfirmDialog"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 0,
+        "exports": 1,
+        "lines": 58
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\icon-picker-parts.tsx": {
+      "imports": [
+        "lucide-react",
+        "@/lib/utils"
+      ],
+      "exports": [
+        "IconPickerHeader",
+        "IconPickerSearch",
+        "IconPickerFooter"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 2,
+        "exports": 3,
+        "lines": 66
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\popup-header-parts.tsx": {
+      "imports": [
+        "lucide-react",
+        "@/components/ui/button",
+        "@/components/ui/input",
+        "@/constants/pin-types",
+        "../utils/pin-popup-utils"
+      ],
+      "exports": [
+        "PopupTypeIcon",
+        "PopupTitleDisplay",
+        "PopupTitleEdit"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 5,
+        "exports": 3,
+        "lines": 120
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\search-result-item.tsx": {
+      "imports": [
+        "react",
+        "lucide-react",
+        "./search-highlight",
+        "@/lib/search-types",
+        "@/lib/utils",
+        "@/components/ui/button",
+        "@/components/ui/badge"
+      ],
+      "exports": [
+        "SearchResultItem"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 7,
+        "exports": 1,
+        "lines": 119
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\search-states.tsx": {
+      "imports": [
+        "lucide-react",
+        "@/lib/utils"
+      ],
+      "exports": [
+        "SearchEmptyState",
+        "SearchLoadingState",
+        "SearchErrorState",
+        "SearchNoResults"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 2,
+        "exports": 4,
+        "lines": 77
+      }
+    },
+    "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\search-tabs.tsx": {
+      "imports": [
+        "lucide-react",
+        "@/lib/utils",
+        "@/components/ui/button",
+        "@/components/ui/badge"
+      ],
+      "exports": [
+        "SearchTabs"
+      ],
+      "importedBy": [],
+      "stats": {
+        "imports": 4,
+        "exports": 1,
+        "lines": 75
+      }
     }
   },
   "issues": {
@@ -7302,6 +7487,86 @@
       {
         "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\world\\ui\\map-layers.tsx",
         "export": "MapLayers"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\ui\\lore-form-actions.tsx",
+        "export": "LoreFormActions"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\ui\\lore-form-fields.tsx",
+        "export": "LoreFormHeader"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\ui\\lore-form-fields.tsx",
+        "export": "LoreFormError"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\ui\\lore-form-fields.tsx",
+        "export": "CATEGORIES"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\lore\\ui\\lore-form-inputs.tsx",
+        "export": "LoreFormFields"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\logic\\use-icon-picker-navigation.ts",
+        "export": "useIconPickerNavigation"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\logic\\use-popup-title-edit.ts",
+        "export": "usePopupTitleEdit"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\delete-confirm-dialog.tsx",
+        "export": "DeleteConfirmDialog"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\icon-picker-parts.tsx",
+        "export": "IconPickerHeader"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\icon-picker-parts.tsx",
+        "export": "IconPickerSearch"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\icon-picker-parts.tsx",
+        "export": "IconPickerFooter"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\popup-header-parts.tsx",
+        "export": "PopupTypeIcon"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\popup-header-parts.tsx",
+        "export": "PopupTitleDisplay"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\pins\\ui\\popup-header-parts.tsx",
+        "export": "PopupTitleEdit"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\search-result-item.tsx",
+        "export": "SearchResultItem"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\search-states.tsx",
+        "export": "SearchEmptyState"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\search-states.tsx",
+        "export": "SearchLoadingState"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\search-states.tsx",
+        "export": "SearchErrorState"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\search-states.tsx",
+        "export": "SearchNoResults"
+      },
+      {
+        "file": "C:\\Users\\Yanis\\Projects\\interactive-map\\src\\components\\search\\ui\\search-tabs.tsx",
+        "export": "SearchTabs"
       }
     ]
   }

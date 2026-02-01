@@ -3,6 +3,7 @@
 /* eslint-disable simple-import-sort/imports */
 import { Suspense, useCallback, lazy, memo, useEffect } from "react";
 import { MapSkeleton } from "@/components/world/ui/map-skeleton";
+import { FloatingParticles } from "@/components/ui/particles";
 import { useWorldInitialization } from "@/components/world/logic/use-world-initialization";
 import { useAutosavePreparation } from "@/components/world/logic/use-autosave-preparation";
 import { useAutosave } from "@/hooks/use-autosave";
@@ -151,12 +152,21 @@ export const WorldClient = memo(function WorldClient({
   return (
     <ErrorBoundary>
       <MapExportProvider>
-        <div className="h-screen bg-background-base relative">
+        <div className="h-screen bg-void relative overflow-hidden">
+          {/* Fantasy background effects */}
+          <div className="fixed inset-0 z-0 pointer-events-none">
+            <div className="absolute inset-0 bg-grain opacity-[0.04]" aria-hidden="true" />
+            <FloatingParticles />
+          </div>
+
+          {/* Ambient glow effect */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-accent-gold/5 rounded-sm blur-[150px] pointer-events-none" />
+
           {/* Map canvas takes full screen */}
           <ErrorBoundary
             fallback={
-              <div className="h-full flex items-center justify-center bg-background-base">
-                <p className="text-text-secondary">Map canvas failed to load</p>
+              <div className="h-full flex items-center justify-center bg-void">
+                <p className="text-bone-dark">Map canvas failed to load</p>
               </div>
             }
           >

@@ -32,10 +32,10 @@ export default function SignInPage() {
       </div>
 
       {/* Background Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-accent-gold/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-accent-gold/5 rounded-sm blur-[120px] pointer-events-none" />
 
       {/* Main Card */}
-      <div className="w-full max-w-3/5 bg-obsidian/80 backdrop-blur-md border border-iron rounded-lg p-6 sm:p-10 shadow-xl relative z-10 animate-oath-reveal">
+      <div className="w-full max-w-3/5 bg-obsidian/80 backdrop-blur-md border border-iron rounded-sm p-6 sm:p-10 shadow-xl relative z-10 animate-oath-reveal">
         {/* Decorative Corner Runes */}
         <div className="absolute top-4 left-4 text-accent-gold-dark opacity-30 text-sm animate-rune-glow">ᛟ</div>
         <div className="absolute top-4 right-4 text-accent-gold-dark opacity-30 text-sm animate-rune-glow" style={{ animationDelay: "1s" }}>ᛞ</div>
@@ -156,7 +156,7 @@ export default function SignInPage() {
 
           {/* Bottom Seal */}
           <div className="pt-4 flex justify-center">
-            <div className="w-12 h-12 border border-accent-gold-dark/50 rounded-full flex items-center justify-center">
+            <div className="w-12 h-12 border border-accent-gold-dark/50 rounded-sm flex items-center justify-center">
               <LogIn className="w-5 h-5 text-accent-gold-dark" strokeWidth={1} />
             </div>
           </div>

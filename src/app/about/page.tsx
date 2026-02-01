@@ -57,7 +57,7 @@ export default function AboutPage() {
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="bg-obsidian/40 border border-iron rounded-lg p-6 hover:border-accent-gold/50 transition-all text-center"
+                className="bg-obsidian/40 border border-iron rounded-sm p-6 hover:border-accent-gold/50 transition-all text-center"
               >
                 <div className="w-12 h-12 rounded bg-accent-gold/10 flex items-center justify-center mx-auto mb-4">
                   <feature.icon className="w-6 h-6 text-accent-gold" strokeWidth={1.5} />
@@ -114,7 +114,7 @@ export default function AboutPage() {
 
           {/* Seal */}
           <div className="flex justify-center mt-20">
-            <div className="w-20 h-20 border-2 border-accent-gold-dark rounded-full flex items-center justify-center animate-seal-pulse">
+            <div className="w-20 h-20 border-2 border-accent-gold-dark rounded-sm flex items-center justify-center animate-seal-pulse">
               <span className="font-display text-[0.5rem] tracking-widest text-accent-gold-dark text-center">
                 GENESIS
               </span>

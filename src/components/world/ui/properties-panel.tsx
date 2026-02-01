@@ -10,6 +10,7 @@ import { MapPropertiesSection } from "./map-properties-section";
 import { usePropertiesPanel } from "../logic/use-properties-panel";
 import { eventManager } from "@/lib/event-manager";
 import { useEffect } from "react";
+import { MapPin } from "lucide-react";
 
 export function PropertiesPanel() {
   const grid = useGrid();
@@ -42,27 +43,19 @@ export function PropertiesPanel() {
         />
       ) : (
         <section className="space-y-3">
-          <div className="flex items-center gap-2 px-3 py-2 rounded-sm bg-background-elevated border border-border-subtle">
-            <svg
-              className="w-4 h-4 text-text-muted"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span className="text-xs font-display font-medium text-text-secondary uppercase tracking-wider">
+          <div className="relative flex items-center gap-2 px-3 py-2.5 rounded-t-md bg-stone/50 border-2 border-t border-x border-accent-gold/50 border-b-iron/50">
+            <MapPin className="w-4 h-4 text-accent-gold/60" />
+            <span className="text-xs font-display font-semibold text-accent-gold uppercase tracking-widest">
               Pin Properties
             </span>
+            <div className="ml-auto flex items-center gap-1">
+              <span className="text-accent-gold/30 text-xs">ᛟ</span>
+            </div>
+            <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent-gold/30 to-transparent" />
           </div>
-          <div className="px-3 py-4 rounded-sm bg-background-elevated border border-border-subtle text-center">
-            <p className="text-sm text-text-muted">No pin selected</p>
-            <p className="text-xs text-text-muted/70 mt-1">
+          <div className="px-3 py-6 rounded-b-md bg-obsidian/60 border-x border-b border-iron/50 text-center">
+            <p className="text-sm text-bone-dark font-fell">No pin selected</p>
+            <p className="text-xs text-bone-dark/60 mt-2 font-fell">
               Click a pin on the map to edit its properties
             </p>
           </div>

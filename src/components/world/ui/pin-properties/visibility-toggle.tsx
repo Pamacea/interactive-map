@@ -13,11 +13,11 @@ export function VisibilityToggle({
 }: VisibilityToggleProps) {
   return (
     <div
-      className={`flex items-center justify-between px-3 py-2 rounded-sm bg-background-elevated transition-colors ${
+      className={`flex items-center justify-between px-3 py-2.5 bg-obsidian/60 border-x border-b border-iron/50 transition-colors ${
         disabled ? "opacity-50" : ""
-      } border border-border-subtle`}
+      }`}
     >
-      <span className="text-sm text-text-secondary">Visible</span>
+      <span className="text-sm text-bone-dark font-fell">Visible</span>
       <Switch
         checked={isVisible}
         onCheckedChange={onUpdate}

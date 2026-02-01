@@ -77,15 +77,15 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(
     return (
       <div
         ref={ref}
-        className={`relative h-full flex flex-col bg-background-card border-r border-border-subtle ${
+        className={`relative h-full flex flex-col bg-obsidian/80 backdrop-blur-md border-r border-iron ${
           isResizing ? "" : "transition-all duration-300 ease-in-out"
         }`}
         style={{ width: isCollapsed ? 70 : width }}
       >
-        {/* Toggle Button */}
+        {/* Toggle Button with fantasy styling */}
         <button
           onClick={onToggle}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-20 h-12 w-4 -translate-x-1/2 rounded-md bg-background-card/90 backdrop-blur-sm border border-border-subtle text-text-muted hover:text-accent-gold hover:border-accent-gold/50 hover:bg-accent-gold/10 transition-all duration-200 flex items-center justify-center shadow-sm"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-20 h-12 w-4 -translate-x-1/2 rounded-sm bg-obsidian/90 backdrop-blur-md border border-iron text-bone-dark/60 hover:text-accent-gold hover:border-accent-gold/50 hover:bg-accent-gold/10 transition-all duration-200 flex items-center justify-center shadow-lg"
           aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >

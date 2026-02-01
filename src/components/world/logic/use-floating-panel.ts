@@ -62,7 +62,7 @@ export function useFloatingPanel({
 
   // Drag handlers
   const handleDragStart = useCallback(
-    (e: React.MouseEvent) => {
+    (e: React.PointerEvent) => {
       // Only left mouse button
       if (e.button !== 0) return;
 
@@ -76,15 +76,21 @@ export function useFloatingPanel({
       bringToFront(panelId);
       onDragStart?.();
 
-      // Capture pointer
-      (e.target as HTMLElement).setPointerCapture(e.pointerId);
+      // Capture pointer on currentTarget (the element with the handler)
+      const target = e.currentTarget as HTMLElement;
+      try {
+        target.setPointerCapture(e.pointerId);
+      } catch {
+        // Pointer capture might fail if pointer is already released
+        // Fall back to document-level event listeners which are already set up
+      }
     },
     [panelState.position, panelId, bringToFront, onDragStart]
   );
 
   // Resize handlers
   const handleResizeStart = useCallback(
-    (e: React.MouseEvent, direction: DragState["resizeDirection"]) => {
+    (e: React.PointerEvent, direction: DragState["resizeDirection"]) => {
       // Only left mouse button
       if (e.button !== 0) return;
 
@@ -99,8 +105,14 @@ export function useFloatingPanel({
       bringToFront(panelId);
       onResizeStart?.();
 
-      // Capture pointer
-      (e.target as HTMLElement).setPointerCapture(e.pointerId);
+      // Capture pointer on currentTarget (the element with the handler)
+      const target = e.currentTarget as HTMLElement;
+      try {
+        target.setPointerCapture(e.pointerId);
+      } catch {
+        // Pointer capture might fail if pointer is already released
+        // Fall back to document-level event listeners which are already set up
+      }
     },
     [panelState.position, panelState.size, panelId, bringToFront, onResizeStart]
   );
@@ -231,11 +243,11 @@ export function useFloatingPanel({
     isResizing: dragState.isResizing,
     handlePanelClick,
     dragHandleProps: {
-      onMouseDown: handleDragStart,
+      onPointerDown: handleDragStart,
       style: { cursor: dragState.isDragging ? "grabbing" : "grab" },
     },
     resizeHandleProps: {
-      se: (e: React.MouseEvent) => handleResizeStart(e, "se"),
+      se: (e: React.PointerEvent) => handleResizeStart(e, "se"),
     },
     collapseProps: {
       onClick: toggleCollapse,

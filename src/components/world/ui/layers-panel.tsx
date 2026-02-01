@@ -56,7 +56,7 @@ export function LayersPanel({ worldId, worldLayers = [], mapImage }: LayersPanel
       <div className="flex items-center justify-end">
         <button
           onClick={handleOpenAddDialog}
-          className="flex items-center gap-1.5 text-xs text-accent-gold hover:text-accent-gold/80 transition-colors"
+          className="flex items-center gap-1.5 text-xs text-accent-gold hover:text-accent-gold/80 transition-colors font-display tracking-wide"
         >
           <Plus className="w-3 h-3" />
           Add Layer
@@ -83,7 +83,7 @@ export function LayersPanel({ worldId, worldLayers = [], mapImage }: LayersPanel
 
       <div className="space-y-1.5">
         {layers.length === 0 ? (
-          <div className="px-3 py-6 text-center text-text-muted text-sm">
+          <div className="px-3 py-6 text-center text-bone-dark text-sm font-fell">
             No layers yet. Create one to get started.
           </div>
         ) : (

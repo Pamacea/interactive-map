@@ -53,7 +53,7 @@ const ActiveFilterBadge = memo(function ActiveFilterBadge({ filter, onRemove }: 
   return (
     <button
       onClick={onRemove}
-      className="flex items-center gap-1 px-3 py-1.5 bg-accent-gold/10 border border-accent-gold/30 rounded-lg text-sm text-accent-gold hover:bg-accent-gold/20 transition-colors"
+      className="flex items-center gap-1 px-3 py-1.5 bg-accent-gold/10 border border-accent-gold/30 rounded-sm text-sm text-accent-gold hover:bg-accent-gold/20 transition-colors"
     >
       {filter}
       <X className="w-3 h-3" />
@@ -77,7 +77,7 @@ const FilterToggleButton = memo(function FilterToggleButton({ show, onToggle }: 
       size="sm"
       onClick={onToggle}
       className={cn(
-        "lg:hidden rounded-md",
+        "lg:hidden rounded-sm",
         show && "bg-accent-gold/10 text-accent-gold"
       )}
     >
@@ -88,7 +88,7 @@ const FilterToggleButton = memo(function FilterToggleButton({ show, onToggle }: 
 
 const ViewModeToggle = memo(function ViewModeToggle({ currentMode, onModeChange }: { currentMode: "grid" | "list"; onModeChange: (mode: "grid" | "list") => void }) {
   return (
-    <div className="flex items-center bg-background-card rounded-lg border border-border-subtle">
+    <div className="flex items-center bg-background-card rounded-sm border border-border-subtle">
       <ViewModeButton mode="grid" currentMode={currentMode} onModeChange={onModeChange}>
         <Grid3X3 className="w-4 h-4" />
       </ViewModeButton>

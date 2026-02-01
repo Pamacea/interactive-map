@@ -1,6 +1,6 @@
 "use client";
 
-import { LoreFormHeader, LoreFormError, CATEGORIES } from "./lore-form-fields";
+import { LoreFormHeader, LoreFormError } from "./lore-form-fields";
 import { LoreFormActions } from "./lore-form-actions";
 import { LoreFormFields } from "./lore-form-inputs";
 import { useLoreForm } from "../logic/use-lore-form";
@@ -24,7 +24,7 @@ export function LoreForm({ worldId, lore, onSuccess }: LoreFormProps) {
   } = useLoreForm({ worldId, lore, onSuccess });
 
   return (
-    <div className="flex flex-col gap-4 p-4 bg-background-elevated border border-border-base rounded-sm">
+    <div className="flex flex-col gap-4 p-4 bg-obsidian/70 border border-iron/50 rounded-sm">
       <LoreFormHeader isEditing={isEditing} onClose={handleCancel} />
 
       <div className="flex flex-col gap-4">

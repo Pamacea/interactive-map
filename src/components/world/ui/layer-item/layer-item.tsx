@@ -47,7 +47,7 @@ export function LayerItem({
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="group relative rounded-sm bg-background-elevated overflow-hidden">
+    <div className="group relative rounded-sm bg-obsidian/70 border border-iron/50 overflow-hidden hover:border-accent-gold/30 transition-colors">
       {/* Header Section */}
       <div className="relative">
         <LayerHeader

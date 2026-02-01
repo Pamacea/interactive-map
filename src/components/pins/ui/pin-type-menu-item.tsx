@@ -21,10 +21,6 @@ interface IconWrapperProps {
   style?: React.CSSProperties;
 }
 
-/**
- * Wrapper component to render Lucide icons
- * Declared outside render to satisfy react-hooks/static-components rule
- */
 function IconWrapper({ iconName, className, style }: IconWrapperProps) {
   if (!isLucideIconName(iconName)) {
     return <LucideIcons.MapPin className={className} style={style} />;
@@ -48,9 +44,9 @@ export function PinTypeMenuItem({
       onClick={() => onSelect(type)}
       role="menuitem"
       className={cn(
-        "w-full flex items-center gap-3 px-3 py-2 rounded-sm",
+        "w-full flex items-center gap-3 px-3 py-2 mx-1 rounded-sm",
         "text-left transition-all duration-150",
-        "hover:bg-accent-gold/10 hover:border hover:border-accent-gold/50",
+        "hover:bg-accent-gold/10",
         "group focus:outline-none focus:ring-2 focus:ring-accent-gold/50"
       )}
       title={config.description}
@@ -72,12 +68,12 @@ export function PinTypeMenuItem({
         />
       </div>
 
-      <span className="flex-1 text-sm font-medium text-text-primary group-hover:text-accent-gold">
+      <span className="flex-1 text-sm font-fell font-medium text-bone group-hover:text-accent-gold">
         {config.label}
       </span>
 
       <div
-        className="h-3 w-3 rounded-full shadow-sm"
+        className="h-2 w-2 rounded-sm"
         style={{ backgroundColor: config.color }}
         aria-hidden="true"
       />

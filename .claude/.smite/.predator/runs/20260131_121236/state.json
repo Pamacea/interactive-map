@@ -1,0 +1,18 @@
+{
+  "workflow": "predator",
+  "task": "Refaire entièrement la fonctionnalité des icônes/pins de la carte interactive (bugs critiques)",
+  "flags": {
+    "auto": true,
+    "examine": true,
+    "pr": false,
+    "max_attempts": "unlimited"
+  },
+  "state": {
+    "current_step": "INIT",
+    "issues_found": [],
+    "files_created": [],
+    "files_modified": []
+  },
+  "start_time": "2025-01-31T12:12:36Z",
+  "run_folder": "20260131_121236"
+}

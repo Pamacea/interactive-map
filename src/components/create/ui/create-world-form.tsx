@@ -89,7 +89,7 @@ export function CreateWorldForm() {
         </Label>
         <div className="relative">
           {formData.map ? (
-            <div className="relative h-32 rounded-lg border border-accent-gold/30 bg-obsidian/40 overflow-hidden">
+            <div className="relative h-32 rounded-sm border border-accent-gold/30 bg-obsidian/40 overflow-hidden">
               <div className="absolute inset-0 flex items-center justify-center gap-3">
                 <Upload className="w-6 h-6 text-accent-gold" />
                 <span className="text-sm text-bone">{formData.map.name}</span>
@@ -103,7 +103,7 @@ export function CreateWorldForm() {
               </div>
             </div>
           ) : (
-            <label className="flex items-center justify-center gap-3 h-32 px-4 rounded-lg border-2 border-dashed border-iron bg-obsidian/40 cursor-pointer hover:border-accent-gold/50 hover:bg-obsidian/60 transition-all group">
+            <label className="flex items-center justify-center gap-3 h-32 px-4 rounded-sm border-2 border-dashed border-iron bg-obsidian/40 cursor-pointer hover:border-accent-gold/50 hover:bg-obsidian/60 transition-all group">
               <Upload className="w-6 h-6 text-bone-dark group-hover:text-accent-gold transition-colors" />
               <span className="text-sm text-bone-dark group-hover:text-bone transition-colors">
                 Click to upload your map

@@ -92,10 +92,10 @@ export function ZoomControls({ scale, onZoomIn, onZoomOut, onReset }: ZoomContro
 
   return (
     <div className="absolute bottom-6 right-6 flex flex-row items-center gap-2" role="group" aria-label="Map zoom controls">
-      <div className="bg-background-base/95 backdrop-blur-sm rounded-sm border border-border-subtle shadow-lg px-2 py-1.5 flex items-center gap-1.5">
+      <div className="bg-obsidian/90 backdrop-blur-md rounded-sm border border-iron shadow-xl px-2 py-1.5 flex items-center gap-1.5">
         <button
           onClick={onZoomOut}
-          className="h-5 w-5 flex items-center justify-center text-text-secondary hover:text-accent-gold hover:bg-accent-gold/10 rounded-sm transition-all focus:outline-none focus:ring-2 focus:ring-accent-gold/50"
+          className="h-5 w-5 flex items-center justify-center text-bone-dark hover:text-accent-gold hover:bg-accent-gold/10 rounded-sm transition-all focus:outline-none focus:ring-2 focus:ring-accent-gold/50"
           title="Zoom out"
           aria-label="Zoom out"
           type="button"
@@ -103,21 +103,21 @@ export function ZoomControls({ scale, onZoomIn, onZoomOut, onReset }: ZoomContro
           <Minus className="w-2.5 h-2.5" strokeWidth={2} aria-hidden="true" />
         </button>
 
-        <div className="h-4 w-px bg-border-subtle" aria-hidden="true" />
+        <div className="h-4 w-px bg-iron/50" aria-hidden="true" />
 
         <span
-          className="text-xs font-display font-semibold text-text-primary tabular-nums min-w-[2.5rem] text-center"
+          className="text-xs font-display font-semibold text-bone tabular-nums min-w-[2.5rem] text-center"
           aria-label={`Current zoom level: ${Math.round(scale * 100)} percent`}
           role="status"
         >
           {Math.round(scale * 100)}%
         </span>
 
-        <div className="h-4 w-px bg-border-subtle" aria-hidden="true" />
+        <div className="h-4 w-px bg-iron/50" aria-hidden="true" />
 
         <button
           onClick={onZoomIn}
-          className="h-5 w-5 flex items-center justify-center text-text-secondary hover:text-accent-gold hover:bg-accent-gold/10 rounded-sm transition-all focus:outline-none focus:ring-2 focus:ring-accent-gold/50"
+          className="h-5 w-5 flex items-center justify-center text-bone-dark hover:text-accent-gold hover:bg-accent-gold/10 rounded-sm transition-all focus:outline-none focus:ring-2 focus:ring-accent-gold/50"
           title="Zoom in"
           aria-label="Zoom in"
           type="button"
@@ -125,11 +125,11 @@ export function ZoomControls({ scale, onZoomIn, onZoomOut, onReset }: ZoomContro
           <Plus className="w-2.5 h-2.5" strokeWidth={2} aria-hidden="true" />
         </button>
 
-        <div className="h-4 w-px bg-border-subtle" aria-hidden="true" />
+        <div className="h-4 w-px bg-iron/50" aria-hidden="true" />
 
         <button
           onClick={onReset}
-          className="h-5 w-5 flex items-center justify-center text-text-muted hover:text-accent-gold hover:bg-accent-gold/10 rounded-sm transition-all focus:outline-none focus:ring-2 focus:ring-accent-gold/50"
+          className="h-5 w-5 flex items-center justify-center text-bone-dark hover:text-accent-gold hover:bg-accent-gold/10 rounded-sm transition-all focus:outline-none focus:ring-2 focus:ring-accent-gold/50"
           title="Reset view"
           aria-label="Reset zoom to default"
           type="button"
@@ -138,12 +138,12 @@ export function ZoomControls({ scale, onZoomIn, onZoomOut, onReset }: ZoomContro
         </button>
       </div>
 
-      <div className="h-6 w-px bg-border-subtle" aria-hidden="true" />
+      <div className="h-6 w-px bg-iron/50" aria-hidden="true" />
 
       <div className="relative" ref={triggerRef}>
         <button
           onClick={handleToggleDropdown}
-          className="bg-background-base/95 backdrop-blur-sm rounded-sm border border-border-subtle shadow-lg px-2 py-1 flex items-center gap-1.5 hover:border-accent-gold/30 transition-all focus:outline-none focus:ring-2 focus:ring-accent-gold/50"
+          className="bg-obsidian/90 backdrop-blur-md rounded-sm border border-iron shadow-lg px-2 py-1 flex items-center gap-1.5 hover:border-accent-gold/50 transition-all focus:outline-none focus:ring-2 focus:ring-accent-gold/50"
           title="Change map scale"
           aria-label="Change map scale. Current scale: {mapScale}"
           aria-expanded={scaleDropdownOpen}
@@ -165,7 +165,7 @@ export function ZoomControls({ scale, onZoomIn, onZoomOut, onReset }: ZoomContro
               ref={dropdownRef}
               role="listbox"
               aria-label="Select map scale"
-              className="fixed bg-background-base/95 backdrop-blur-sm border border-border-subtle rounded-sm overflow-hidden shadow-lg z-[9999]"
+              className="fixed bg-obsidian/95 backdrop-blur-md border border-iron rounded-sm overflow-hidden shadow-xl z-[9999]"
               style={{
                 top: `${dropdownPosition.top}px`,
                 left: `${dropdownPosition.left}px`,
@@ -186,7 +186,7 @@ export function ZoomControls({ scale, onZoomIn, onZoomOut, onReset }: ZoomContro
                   className={`w-full px-2 py-1.5 text-left text-xs font-display transition-colors focus:outline-none focus:bg-accent-gold/20 ${
                     mapScale === option
                       ? "bg-accent-gold/20 text-accent-gold font-medium"
-                      : "text-text-secondary hover:bg-background-elevated/80"
+                      : "text-bone-dark hover:bg-obsidian"
                   }`}
                 >
                   {option}

@@ -136,13 +136,13 @@ export function ImageGallery({ worldId, className }: ImageGalleryProps) {
           {isLoading ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center space-y-3">
-                <div className="w-12 h-12 border-4 border-border-base border-t-accent-gold rounded-full animate-spin mx-auto" />
+                <div className="w-12 h-12 border-4 border-border-base border-t-accent-gold rounded-sm animate-spin mx-auto" />
                 <p className="text-text-secondary text-sm">Loading images...</p>
               </div>
             </div>
           ) : filteredGalleryItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center space-y-3">
-              <div className="w-16 h-16 bg-background-elevated rounded-full flex items-center justify-center">
+              <div className="w-16 h-16 bg-background-elevated rounded-sm flex items-center justify-center">
                 <Filter className="w-8 h-8 text-text-muted" />
               </div>
               <div>

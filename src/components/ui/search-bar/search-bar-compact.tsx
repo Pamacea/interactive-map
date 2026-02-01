@@ -15,7 +15,7 @@ export function SearchBarCompact({ className }: SearchBarCompactProps) {
       className={cn(
         "relative flex items-center",
         "bg-background-card",
-        "rounded-md border border-border-subtle",
+        "rounded-sm border border-border-subtle",
         "transition-all duration-300",
         isExpanded ? "w-64" : "w-10",
         className

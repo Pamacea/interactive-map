@@ -71,7 +71,7 @@ export function FeaturesSection() {
 
         {/* Seal */}
         <div className="flex justify-center">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 border-2 border-accent-gold-dark rounded-full flex items-center justify-center">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 border-2 border-accent-gold-dark rounded-sm flex items-center justify-center">
             <span className="font-display text-[0.4rem] sm:text-[0.45rem] tracking-widest text-accent-gold-dark text-center">
               GENESIS
             </span>

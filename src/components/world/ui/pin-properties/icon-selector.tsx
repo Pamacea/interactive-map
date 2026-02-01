@@ -17,10 +17,6 @@ interface IconWrapperProps {
   className?: string;
 }
 
-/**
- * Wrapper component to render Lucide icons
- * Declared outside render to satisfy react-hooks/static-components rule
- */
 function IconWrapper({ iconName, className }: IconWrapperProps) {
   if (!isLucideIconName(iconName)) {
     return <MapPin className={className} />;
@@ -30,6 +26,12 @@ function IconWrapper({ iconName, className }: IconWrapperProps) {
   return <IconComponent className={className} />;
 }
 
+function getPinIcon(iconName: string) {
+  if (!isLucideIconName(iconName)) {
+    return MapPin;
+  }
+  return LucideIcons[iconName] as React.ComponentType<{ className?: string }>;
+}
 
 export function IconSelector({
   currentIcon,
@@ -53,15 +55,15 @@ export function IconSelector({
   });
 
   return (
-    <div className="px-3 py-2 rounded-sm bg-background-elevated border border-border-subtle">
-      <label className="block text-xs text-text-muted mb-1.5">Icon</label>
+    <div className="px-3 py-2.5 bg-obsidian/60 border-x border-b border-iron/50">
+      <label className="block text-xs font-display text-bone-dark mb-2 uppercase tracking-wide">Icon</label>
 
       <div className="relative">
         <button
           type="button"
           onClick={() => setShowDropdown(!showDropdown)}
           disabled={isUpdating}
-          className="w-full flex items-center gap-2 px-2 py-1.5 rounded bg-background-base border border-border-subtle hover:border-accent-gold/50 transition-colors disabled:opacity-50"
+          className="w-full flex items-center gap-2 px-3 py-2 rounded bg-void/50 border border-iron/30 hover:border-accent-gold/50 transition-all disabled:opacity-50"
         >
           {isCustomImage ? (
             <img
@@ -72,36 +74,36 @@ export function IconSelector({
           ) : (
             <IconWrapper iconName={currentIconName} className="w-4 h-4 text-accent-gold" />
           )}
-          <span className="text-sm text-text-primary flex-1 text-left">
+          <span className="text-sm text-bone flex-1 text-left font-fell">
             {isCustomImage
               ? "Custom Icon"
               : PIN_ICONS.find((i) => i.name === currentIcon)?.label ||
                 "Default Icon"}
           </span>
           <ChevronDown
-            className={`w-4 h-4 text-text-muted transition-transform ${
+            className={`w-4 h-4 text-accent-gold/60 transition-transform ${
               showDropdown ? "rotate-180" : ""
             }`}
           />
         </button>
 
         {showDropdown && (
-          <div className="absolute z-50 mt-2 w-full max-h-80 overflow-y-auto rounded-lg bg-background-elevated border border-border-subtle shadow-lg">
-            <div className="sticky top-0 bg-background-elevated border-b border-border-subtle p-2">
+          <div className="absolute z-50 mt-2 w-full max-h-80 overflow-y-auto rounded-sm bg-obsidian/95 backdrop-blur-md border border-iron shadow-xl">
+            <div className="sticky top-0 bg-obsidian/95 border-b border-iron/50 p-3">
               <div className="relative">
-                <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-bone-dark" />
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search icons..."
-                  className="w-full pl-8 pr-8 py-1.5 text-sm bg-background-base border border-border-subtle rounded focus:outline-none focus:ring-1 focus:ring-accent-gold/50"
+                  className="w-full pl-9 pr-8 py-2 text-sm bg-void/50 border border-iron/30 rounded focus:outline-none focus:border-accent-gold/50 focus:ring-1 focus:ring-accent-gold/30 text-bone font-fell"
                 />
                 {searchTerm && (
                   <button
                     type="button"
                     onClick={() => setSearchTerm("")}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-bone-dark hover:text-accent-gold transition-colors"
                     title="Clear search"
                   >
                     <X className="w-4 h-4" />
@@ -110,19 +112,19 @@ export function IconSelector({
               </div>
             </div>
 
-            <div className="p-1">
+            <div className="p-2">
               {filteredIcons.length === 0 ? (
-                <div className="px-2 py-8 text-center">
-                  <Search className="w-8 h-8 text-text-muted mx-auto mb-2 opacity-50" />
-                  <p className="text-sm text-text-muted mb-3">
+                <div className="px-3 py-8 text-center">
+                  <Search className="w-8 h-8 text-bone-dark/60 mx-auto mb-2" />
+                  <p className="text-sm text-bone-dark mb-3 font-fell">
                     No icons found matching &quot;{searchTerm}&quot;
                   </p>
                   <button
                     type="button"
                     onClick={() => setSearchTerm("")}
-                    className="text-sm text-accent-gold hover:underline transition-colors"
+                    className="text-xs font-display text-accent-gold hover:underline transition-colors uppercase tracking-wide"
                   >
-                    Clear search to see all icons
+                    Clear search
                   </button>
                 </div>
               ) : (
@@ -133,9 +135,10 @@ export function IconSelector({
                   if (categoryIcons.length === 0) return null;
 
                   return (
-                    <div key={category} className="mb-2">
-                      <div className="px-2 py-1 text-xs font-semibold text-text-muted uppercase tracking-wider sticky top-0 bg-background-elevated">
-                        {category}
+                    <div key={category} className="mb-3 last:mb-0">
+                      <div className="px-2 py-1 text-xs font-display text-accent-gold/80 uppercase tracking-wider sticky top-0 bg-obsidian/95 flex items-center gap-2">
+                        <span className="flex-1">{category}</span>
+                        <span className="text-accent-gold/30 text-xs">ᛟ</span>
                       </div>
                       {categoryIcons.map((iconOption) => {
                         const IconComponent = getPinIcon(iconOption.name);
@@ -150,14 +153,14 @@ export function IconSelector({
                               setShowDropdown(false);
                               setSearchTerm("");
                             }}
-                            className={`w-full flex items-center gap-2 px-2 py-1.5 rounded text-sm transition-colors ${
+                            className={`w-full flex items-center gap-2 px-2 py-2 rounded text-sm transition-all ${
                               isSelected
-                                ? "bg-accent-gold/20 text-accent-gold"
-                                : "text-text-primary hover:bg-background-base"
+                                ? "bg-accent-gold/20 text-accent-gold border border-accent-gold/30"
+                                : "text-bone hover:bg-void/50"
                             }`}
                           >
                             <IconComponent className="w-4 h-4 flex-shrink-0" />
-                            <span className="flex-1 text-left">
+                            <span className="flex-1 text-left font-fell">
                               {iconOption.label}
                             </span>
                             {isSelected && (
@@ -172,7 +175,7 @@ export function IconSelector({
               )}
             </div>
 
-            <div className="border-t border-border-subtle p-1">
+            <div className="border-t border-iron/50 p-2">
               <button
                 type="button"
                 onClick={() => {
@@ -180,10 +183,10 @@ export function IconSelector({
                   setShowDropdown(false);
                 }}
                 disabled={isUpdating || !canUpload}
-                className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-sm text-text-secondary hover:bg-background-base hover:text-text-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="w-full flex items-center gap-2 px-3 py-2 rounded text-sm text-bone-dark hover:bg-accent-gold/10 hover:text-accent-gold disabled:opacity-50 disabled:cursor-not-allowed transition-all font-fell"
               >
                 <Upload className="w-4 h-4" />
-                <span className="flex-1 text-left">Upload Custom...</span>
+                <span className="flex-1 text-left">Upload Custom Icon...</span>
               </button>
             </div>
           </div>

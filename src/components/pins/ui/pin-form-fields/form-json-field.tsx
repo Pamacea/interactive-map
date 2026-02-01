@@ -26,7 +26,7 @@ export const FormJsonField: FC<FormJsonFieldProps> = ({
         placeholder={placeholder}
         rows={4}
         disabled={disabled}
-        className={`font-mono text-xs rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-interactive-focus disabled:opacity-50 resize-none bg-background-input ${
+        className={`font-mono text-xs rounded-sm border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-interactive-focus disabled:opacity-50 resize-none bg-background-input ${
           error ? "border-status-error" : "border-input"
         }`}
       />
