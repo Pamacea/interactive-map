@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
+import { useMapStore } from "@/stores/map-store";
 
 export interface Transform {
   scale: number;
@@ -14,14 +15,47 @@ export interface UseMapPanOptions {
 
 export function useMapPan(options: UseMapPanOptions = {}) {
   const { isCreatingPin = false, onDragStart, onDragEnd } = options;
+
+  // Read zoom from store
+  const storeZoom = useMapStore((state) => state.zoom);
+  const setStoreZoom = useMapStore((state) => state.setZoom);
+
   const [transform, setTransform] = useState<Transform>({
-    scale: 1,
+    scale: storeZoom,
     translateX: 0,
     translateY: 0,
   });
   const [isDragging, setIsDragging] = useState(false);
   const isDraggingRef = useRef(false);
   const dragStart = useRef({ x: 0, y: 0 });
+  // Ref to track pending scale update to avoid calling setState during render
+  const pendingScaleRef = useRef<number | null>(null);
+
+  // Sync store zoom changes to transform.scale
+  useEffect(() => {
+    setTransform((prev) => ({
+      ...prev,
+      scale: storeZoom,
+    }));
+  }, [storeZoom]);
+
+  const updateTransform = useCallback((updater: (prev: Transform) => Transform) => {
+    setTransform((prev) => {
+      const newTransform = updater(prev);
+      // Schedule store update if scale changed (defer to avoid setState during render)
+      if (newTransform.scale !== prev.scale) {
+        pendingScaleRef.current = newTransform.scale;
+        // Defer the Zustand store update to avoid updating during render
+        Promise.resolve().then(() => {
+          if (pendingScaleRef.current === newTransform.scale) {
+            setStoreZoom(newTransform.scale);
+            pendingScaleRef.current = null;
+          }
+        });
+      }
+      return newTransform;
+    });
+  }, [setStoreZoom]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     // Only allow dragging with left mouse button, not when creating a pin
@@ -69,8 +103,10 @@ export function useMapPan(options: UseMapPanOptions = {}) {
   }, [onDragEnd]);
 
   const reset = useCallback(() => {
-    setTransform({ scale: 1, translateX: 0, translateY: 0 });
-  }, []);
+    const newTransform = { scale: 1, translateX: 0, translateY: 0 };
+    setTransform(newTransform);
+    setStoreZoom(1);
+  }, [setStoreZoom]);
 
   /**
    * Center the map on a specific pin position with smooth animation
@@ -140,7 +176,7 @@ export function useMapPan(options: UseMapPanOptions = {}) {
     isDragging,
     handleMouseDown,
     reset,
-    setTransform,
+    setTransform: updateTransform, // External callers use sync version
     centerToPin,
   };
 }
