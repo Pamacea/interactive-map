@@ -6,7 +6,7 @@ Genesis is a web-based platform for creating and sharing interactive fantasy wor
 
 **Tech Stack**: Next.js 16 (App Router), TypeScript 5.9, Tailwind CSS 4, Prisma ORM, NextAuth.js, MapLibre GL, Zustand, TanStack Query.
 
-**Current Status**: ~45% complete. Core authentication, world CRUD, and map editor with layers are functional. Pins, lore, and gallery schemas exist but lack UI.
+**Current Status**: ~65% complete. See `PROGRESS.md` for detailed feature status.
 
 ---
 
@@ -167,35 +167,12 @@ The pin feature demonstrates the **ui/logic/methods** pattern in action:
 
 ## Features
 
-### Implemented
+See `PROGRESS.md` for detailed feature status and implementation progress.
 
-- **Authentication**: Login, register, session management (NextAuth.js)
-- **World Management**: Create, list, view, edit, delete worlds
-- **World Editor**: Interactive map with MapLibre GL
-- **Layers System**: Add, remove, toggle layers (stored in DB)
-- **Responsive UI**: Mobile-friendly design with Tailwind CSS
-
-### Fully Implemented
-
-- **Pins**: Complete marker system with drag-and-drop, layers support, filtering, and CRUD operations
-  - Interactive drag-and-drop with optimistic updates
-  - Layer support with visibility and lock controls
-  - Advanced filtering by type, search term, and visibility
-  - Zoom-based visibility and size constraints
-  - Custom icons (Lucide or uploaded images)
-  - 98.92% test coverage (64 unit tests)
-
-### Partial (Schema Ready, UI Missing)
-
-- **Lore Entries**: Rich text content linked to map locations
-- **Image Gallery**: Upload and organize images per world
-
-### Future
-
-- **Collaboration**: Multi-user editing, permissions
-- **Search**: Full-text search across worlds
-- **Templates**: Starter world templates
-- **Export**: Export maps as images, PDF, or JSON
+**Quick Overview**:
+- **Fully Implemented**: Authentication, World Management, Pins, Layers, Explore
+- **Partially Implemented**: Lore Entries, Image Gallery (UI exists, needs integration)
+- **Not Started**: Collaboration UI, Search UI, Export UI, Templates
 
 ---
 
