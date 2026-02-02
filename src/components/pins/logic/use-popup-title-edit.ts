@@ -19,9 +19,12 @@ export function usePopupTitleEdit({
   const updatePinServer = useUpdatePinServer();
   const updatePin = useUpdatePin();
 
+  const prevInitialTitleRef = useRef(initialTitle);
   useEffect(() => {
-    if (!isEditing) {
-      setEditedTitle(initialTitle);
+    if (!isEditing && prevInitialTitleRef.current !== initialTitle) {
+      // Defer setState to avoid calling setState synchronously within effect
+      setTimeout(() => setEditedTitle(initialTitle), 0);
+      prevInitialTitleRef.current = initialTitle;
     }
   }, [initialTitle, isEditing]);
 

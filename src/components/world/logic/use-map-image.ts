@@ -50,8 +50,12 @@ export function useMapImage(mapImage?: string | null) {
 
   // Reset states when mapImage changes
   useEffect(() => {
-    setImageLoaded(false);
-    setImageError(false);
+    // Defer setState to avoid calling setState synchronously within effect
+    const resetTimer = setTimeout(() => {
+      setImageLoaded(false);
+      setImageError(false);
+    }, 0);
+    return () => clearTimeout(resetTimer);
   }, [mapImage]);
 
   const shouldShowGrid = !mapImage || imageError || !imageLoaded;

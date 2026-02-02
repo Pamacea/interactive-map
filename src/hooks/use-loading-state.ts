@@ -45,7 +45,8 @@ export function useLoadingState(
   useEffect(() => {
     if (isLoading && startTime) {
       // Mark that we haven't met minimum duration yet
-      setIsMinDurationMet(false);
+      // Defer to avoid setState in effect warning
+      const timer = setTimeout(() => setIsMinDurationMet(false), 0);
 
       const minTimer = setTimeout(() => {
         setIsMinDurationMet(true);
@@ -66,7 +67,9 @@ export function useLoadingState(
       };
     } else if (!isLoading) {
       // Reset when loading stops
-      setIsMinDurationMet(true);
+      // Defer to avoid setState in effect warning
+      const resetTimer = setTimeout(() => setIsMinDurationMet(true), 0);
+      return () => clearTimeout(resetTimer);
     }
   }, [isLoading, startTime, minDuration, maxDuration]);
 

@@ -126,14 +126,14 @@ export function PerformanceMonitor({
 export function FPSCounter() {
   const [fps, setFps] = useState(60);
   const framesRef = useRef(0);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const isInitializedRef = useRef(false);
 
   useEffect(() => {
     if (process.env.NODE_ENV !== 'development') return;
 
     // Initialize lastTime in useEffect to avoid impure call during render
-    if (!isInitialized) {
-      setIsInitialized(true);
+    if (!isInitializedRef.current) {
+      isInitializedRef.current = true;
     }
 
     let rafId: number;

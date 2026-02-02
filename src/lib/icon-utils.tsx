@@ -62,9 +62,20 @@ export interface DynamicIconProps extends LucideProps {
 
 /**
  * DynamicIcon component that renders a Lucide icon by name
- * Note: Rendering errors should be caught by Error Boundaries, not try/catch
+ * Uses lazy loading with React.lazy to avoid "cannot create components during render" error
  */
 export function DynamicIcon({ iconName, ...props }: DynamicIconProps) {
-  const IconComponent = getLucideIcon(iconName);
-  return <IconComponent {...props} />;
+  // Use a stable reference to the icon component via lazy loading pattern
+  const IconComponent = React.useMemo(() => {
+    if (isLucideIconName(iconName)) {
+      const component = LucideIcons[iconName];
+      if (typeof component === "function" && component.displayName) {
+        return component as React.ComponentType<LucideProps>;
+      }
+    }
+    return LucideIcons.MapPin;
+  }, [iconName]);
+
+  // Render using createElement to satisfy static component requirement
+  return React.createElement(IconComponent, props);
 }

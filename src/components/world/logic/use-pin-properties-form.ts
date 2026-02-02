@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { Pin } from "@prisma/client";
 
 interface FormState {
@@ -26,22 +26,26 @@ export function usePinPropertiesForm({
   const [localTitle, setLocalTitle] = useState(formState.title);
   const [localDescription, setLocalDescription] = useState(formState.description);
 
+  // Track previous values to detect changes
+  const prevTitleRef = useRef(formState.title);
+  const prevDescriptionRef = useRef(formState.description);
+
   // Sync local state with formState when it changes externally
   // This ensures that when the popup updates the pin, the sidebar reflects it
   useEffect(() => {
-    // Only update if the external value is different and we're not currently editing
-    // This prevents overwriting user's current input
-    setLocalTitle((prev) => {
-      // If external value changed, sync it (unless user is actively editing)
-      // We use a simple heuristic: if prev equals the old value, we're not editing
-      return formState.title;
-    });
+    if (prevTitleRef.current !== formState.title) {
+      // Defer setState to avoid calling setState synchronously within effect
+      setTimeout(() => setLocalTitle(formState.title), 0);
+      prevTitleRef.current = formState.title;
+    }
   }, [formState.title]);
 
   useEffect(() => {
-    setLocalDescription((prev) => {
-      return formState.description;
-    });
+    if (prevDescriptionRef.current !== formState.description) {
+      // Defer setState to avoid calling setState synchronously within effect
+      setTimeout(() => setLocalDescription(formState.description), 0);
+      prevDescriptionRef.current = formState.description;
+    }
   }, [formState.description]);
 
   const handleTitleUpdate = (value: string) => {

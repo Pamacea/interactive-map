@@ -2,12 +2,55 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Layout } from "@/components/@config/Layout";
+import { siteConfig } from "@/config/site";
+import { WebSiteSchema, OrganizationSchema } from "@/shared/components/seo";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Interactive Map",
-  description: "Advanced interactive map application with geospatial features",
+  title: {
+    default: siteConfig.title,
+    template: `%s | ${siteConfig.name}`,
+  },
+  description: siteConfig.description,
+  keywords: siteConfig.seo.keywords,
+  authors: [{ name: siteConfig.author.name }],
+  creator: siteConfig.author.name,
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteConfig.url,
+    title: siteConfig.name,
+    description: siteConfig.description,
+    siteName: siteConfig.name,
+    images: [
+      {
+        url: siteConfig.ogImage,
+        width: 1200,
+        height: 630,
+        alt: siteConfig.name,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteConfig.name,
+    description: siteConfig.description,
+    creator: siteConfig.seo.twitterCreator,
+    images: [siteConfig.ogImage],
+  },
+  manifest: "/manifest.json",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export default function RootLayout({
@@ -17,6 +60,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <WebSiteSchema />
+        <OrganizationSchema />
+      </head>
       <body className={inter.className} suppressHydrationWarning>
         {/* Skip Link for Keyboard Navigation */}
         <a

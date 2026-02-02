@@ -182,7 +182,6 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
         setIsDragging(true);
       }
       hasMovedDuringDragRef.current = true;
-      setHasMovedDuringDrag(true);
     }
 
     // Only update position if we're actively dragging
@@ -364,8 +363,9 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
     }
 
     // Add window-level event listeners for drag continuation
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
+    // Use refs to avoid dependency issues
+    window.addEventListener("mousemove", handleMouseMoveRef.current);
+    window.addEventListener("mouseup", handleMouseUpRef.current);
   }, []); // Empty deps - uses configRef
 
   // Update handler refs whenever the callbacks change
@@ -373,7 +373,7 @@ export function usePinDrag(config: UsePinDragConfig): UsePinDragReturn {
   useEffect(() => {
     handleMouseMoveRef.current = handleMouseMove;
     handleMouseUpRef.current = handleMouseUp;
-  }); // eslint-disable-line react-hooks/exhaustive-deps -- Only updating refs, intentionally no deps
+  });  
 
   // Cleanup: Cancel any pending sync requests on unmount
   // Note: Uses refs to handlers, so no dependency issues

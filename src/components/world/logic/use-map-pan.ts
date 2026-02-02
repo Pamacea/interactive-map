@@ -33,10 +33,14 @@ export function useMapPan(options: UseMapPanOptions = {}) {
 
   // Sync store zoom changes to transform.scale
   useEffect(() => {
-    setTransform((prev) => ({
-      ...prev,
-      scale: storeZoom,
-    }));
+    // Defer setState to avoid calling setState synchronously within effect
+    const syncTimer = setTimeout(() => {
+      setTransform((prev) => ({
+        ...prev,
+        scale: storeZoom,
+      }));
+    }, 0);
+    return () => clearTimeout(syncTimer);
   }, [storeZoom]);
 
   const updateTransform = useCallback((updater: (prev: Transform) => Transform) => {

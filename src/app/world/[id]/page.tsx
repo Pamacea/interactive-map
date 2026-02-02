@@ -5,6 +5,63 @@ import { auth } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import type { Pin } from "@/types/pin.type";
 import type { LoreEntry } from "@/types/lore.type";
+import type { Metadata } from "next";
+import { siteConfig } from "@/config/site";
+import { CreativeWorkSchema } from "@/shared/components/seo";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const world = await getWorldWithData(id);
+
+  if (!world) {
+    return {
+      title: "World Not Found",
+    };
+  }
+
+  const title = world.title;
+  const description =
+    world.description ||
+    `Explore ${world.title}, an interactive fantasy world map on Genesis.`;
+  const image = world.map
+    ? world.map.startsWith("http")
+      ? world.map
+      : `${siteConfig.url}${world.map}`
+    : `${siteConfig.url}${siteConfig.ogImage}`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      type: "website",
+      title,
+      description,
+      url: `${siteConfig.url}/world/${id}`,
+      images: [
+        {
+          url: image,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+      creator: siteConfig.seo.twitterCreator,
+    },
+    alternates: {
+      canonical: `${siteConfig.url}/world/${id}`,
+    },
+  };
+}
 
 export default async function WorldDetailPage({
   params,
@@ -24,12 +81,36 @@ export default async function WorldDetailPage({
     notFound();
   }
 
+  const imageUrl = world.map
+    ? world.map.startsWith("http")
+      ? world.map
+      : `${siteConfig.url}${world.map}`
+    : `${siteConfig.url}${siteConfig.ogImage}`;
+
   return (
-    <WorldClient
+    <>
+      <CreativeWorkSchema
+        name={world.title}
+        description={world.description || undefined}
+        image={imageUrl}
+        dateCreated={world.createdAt.toISOString()}
+        dateModified={world.updatedAt.toISOString()}
+        author={world.user?.name || siteConfig.author.name}
+        keywords={[
+          "fantasy map",
+          "interactive world",
+          "worldbuilding",
+          "D&D",
+          "RPG",
+          "fantasy world",
+        ]}
+      />
+      <WorldClient
       world={world}
       pins={world.pins as unknown as Pin[]}
       loreEntries={loreEntries as unknown as LoreEntry[]}
       isAuthenticated={!!session?.user}
     />
+    </>
   );
 }

@@ -204,7 +204,7 @@ export function useMapEvents(options: UseMapEventsOptions): MapEventsResult {
         containerRef
       );
     };
-  }, [pins, imageDimensions, layers, centerToPin]);
+  }, [pins, imageDimensions, layers, centerToPin, containerRef]);
 
   return {
     transform,

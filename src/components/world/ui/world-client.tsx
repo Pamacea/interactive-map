@@ -1,6 +1,5 @@
 "use client";
 
-/* eslint-disable simple-import-sort/imports */
 import { Suspense, useCallback, lazy, memo, useEffect } from "react";
 import { MapSkeleton } from "@/components/world/ui/map-skeleton";
 import { FloatingParticles } from "@/components/ui/particles";

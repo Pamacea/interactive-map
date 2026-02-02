@@ -74,7 +74,7 @@ export function useMapInteractions(options: UseMapInteractionsOptions) {
       // (Pin markers have their own click handlers)
       onClearSelection?.();
     }
-  }, [contextMenu, selectedPin, onClearSelection]);
+  }, [contextMenu, selectedPin, onClearSelection, onCloseContextMenu]);
 
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
     const rect = containerRef.current?.getBoundingClientRect();

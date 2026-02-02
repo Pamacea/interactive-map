@@ -4,9 +4,21 @@ import { Footer } from "@/components/home/ui/footer";
 import { ExploreClient } from "./explore-client";
 import { getAllWorlds } from "@/actions/worlds";
 import { Compass } from "lucide-react";
+import type { Metadata } from "next";
+import { siteConfig } from "@/config/site";
 
 // ISR: Revalidate page every 60 seconds
 export const revalidate = 60;
+
+export const metadata: Metadata = {
+  title: "Explore Worlds",
+  description: "Discover thousands of fantasy maps created by worldbuilders worldwide. Find inspiration for your D&D campaigns and creative writing projects.",
+  openGraph: {
+    title: "Explore Fantasy Worlds - Genesis",
+    description: "Discover thousands of fantasy maps created by worldbuilders worldwide.",
+    url: `${siteConfig.url}/explore`,
+  },
+};
 
 export default async function ExplorePage() {
   const allWorlds = await getAllWorlds({ limit: 24 });
