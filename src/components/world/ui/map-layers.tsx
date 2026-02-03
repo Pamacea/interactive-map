@@ -17,6 +17,7 @@ interface MapLayersProps {
   onPopupClose: () => void;
   onImageLoad: () => void;
   onImageError: () => void;
+  onContextMenu?: (e: React.MouseEvent) => void;
   showGrid: boolean;
   gridSize: number;
   visibleLayers: Array<{
@@ -48,6 +49,7 @@ export const MapLayers = memo(function MapLayers({
   onPopupClose,
   onImageLoad,
   onImageError,
+  onContextMenu,
   showGrid,
   gridSize,
   visibleLayers,
@@ -68,6 +70,7 @@ export const MapLayers = memo(function MapLayers({
         onPopupClose={onPopupClose}
         onImageLoad={onImageLoad}
         onImageError={onImageError}
+        onContextMenu={onContextMenu}
         showGrid={showGrid}
         gridSize={gridSize}
       />

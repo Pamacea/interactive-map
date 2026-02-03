@@ -16,6 +16,8 @@ interface Layer {
   scale: number; // Visual scale of layer content (0.5 - 2.0)
   offsetX: number; // Pixel offset from top-left (X axis)
   offsetY: number; // Pixel offset from top-left (Y axis)
+  minZoom: number; // Minimum zoom % for layer visibility (0-200)
+  maxZoom: number; // Maximum zoom % for layer visibility (0-200)
 }
 
 interface MapState {
@@ -49,6 +51,9 @@ interface MapState {
   updateLayerZIndex: (layerId: string, zIndex: number) => void;
   updateLayerScale: (layerId: string, scale: number) => void;
   updateLayerPosition: (layerId: string, offsetX: number, offsetY: number) => void;
+  updateLayerMinZoom: (layerId: string, minZoom: number) => void;
+  updateLayerMaxZoom: (layerId: string, maxZoom: number) => void;
+  resetLayerZoom: (layerId: string) => void;
   addLayer: (layer: Omit<Layer, "id">) => void;
   removeLayer: (layerId: string) => void;
   moveLayerUp: (layerId: string) => void;
@@ -77,6 +82,8 @@ const initialState = {
       scale: 1.0,
       offsetX: 0,
       offsetY: 0,
+      minZoom: 0,
+      maxZoom: 200,
     },
   ] as Layer[],
   selectedLayerId: null as string | null,
@@ -185,9 +192,37 @@ export const useMapStore = create<MapState>()(
           };
         }),
 
+      updateLayerMinZoom: (layerId, minZoom) =>
+        set((state) => ({
+          layers: state.layers.map((layer) =>
+            layer.id === layerId ? { ...layer, minZoom } : layer
+          ),
+        })),
+
+      updateLayerMaxZoom: (layerId, maxZoom) =>
+        set((state) => ({
+          layers: state.layers.map((layer) =>
+            layer.id === layerId ? { ...layer, maxZoom } : layer
+          ),
+        })),
+
+      resetLayerZoom: (layerId) =>
+        set((state) => ({
+          layers: state.layers.map((layer) =>
+            layer.id === layerId ? { ...layer, minZoom: 0, maxZoom: 200 } : layer
+          ),
+        })),
+
       addLayer: (layer) =>
         set((state) => {
-          const newLayer = { ...layer, id: crypto.randomUUID(), offsetX: 0, offsetY: 0 };
+          const newLayer = {
+            ...layer,
+            id: crypto.randomUUID(),
+            offsetX: 0,
+            offsetY: 0,
+            minZoom: layer.minZoom ?? 0,
+            maxZoom: layer.maxZoom ?? 200,
+          };
           const newLayers = [...state.layers, newLayer];
           const newVisibleLayerIds = newLayers
             .filter((l) => l.visible)

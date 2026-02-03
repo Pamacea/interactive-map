@@ -1,12 +1,17 @@
 "use client";
 
+import { lazy, Suspense } from "react";
 import { HeroSection } from "@/components/home/ui/hero-section";
 import { FeaturesSection } from "@/components/home/ui/features-section";
-import { CTASection } from "@/components/home/ui/cta-section";
 import { Footer } from "@/components/home/ui/footer";
 import { AuthButton } from "@/components/home/ui/auth-button";
 import { useCursorTrail } from "@/hooks/use-cursor-trail";
 import { useScrollIndicator } from "@/hooks/use-scroll-indicator";
+
+// Lazy load non-critical sections for better initial load performance
+const CTASection = lazy(() =>
+  import("@/components/home/ui/cta-section").then(m => ({ default: m.CTASection }))
+);
 
 const NAV_ITEMS = [
   { id: "throne", label: "HOME", glyph: "I" },
@@ -15,7 +20,7 @@ const NAV_ITEMS = [
 ];
 
 export default function Home() {
-  useCursorTrail(5);
+  useCursorTrail(3);
   const { activeSection, scrollPercent } = useScrollIndicator();
   const thumbPosition = (scrollPercent / 100) * 80;
 
@@ -86,7 +91,9 @@ export default function Home() {
       <main className="relative pt-16">
         <HeroSection />
         <FeaturesSection />
-        <CTASection />
+        <Suspense fallback={<div className="min-h-[50vh]" />}>
+          <CTASection />
+        </Suspense>
 
         {/* Community Section */}
         <section className="min-h-screen flex items-center justify-center p-6 bg-void">

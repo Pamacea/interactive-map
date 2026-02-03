@@ -95,6 +95,7 @@ export const MapCanvas = memo(function MapCanvas({ mapImage, worldId }: MapCanva
                 onPopupClose={handlePopupClose}
                 onImageLoad={handleImageLoad}
                 onImageError={handleImageError}
+                onContextMenu={handleContextMenu}
                 showGrid={grid}
                 gridSize={getGridSize()}
                 visibleLayers={visibleLayers}

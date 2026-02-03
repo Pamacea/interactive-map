@@ -1,19 +1,26 @@
-import { FloatingParticles } from "@/components/ui/particles";
+import { lazy, Suspense } from "react";
 import { AppHeader } from "@/components/ui/app-header";
 import { Footer } from "@/components/home/ui/footer";
 import { CreateWorldForm } from "@/components/create/ui";
 import { Sparkles } from "lucide-react";
+
+// Lazy load particles for better performance
+const FloatingParticles = lazy(() =>
+  import("@/components/ui/particles").then(m => ({ default: m.FloatingParticles }))
+);
 
 export default function CreatePage() {
   return (
     <div className="min-h-screen bg-void relative overflow-hidden">
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-grain opacity-[0.04]" aria-hidden="true" />
-        <FloatingParticles />
+        <Suspense fallback={null}>
+          <FloatingParticles />
+        </Suspense>
       </div>
 
-      {/* Background Glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-accent-gold/5 rounded-sm blur-[150px] pointer-events-none" />
+      {/* Background Glow - optimized: reduced blur from 150px to 80px */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-accent-gold/5 rounded-sm blur-[80px] pointer-events-none" />
 
       <AppHeader />
 

@@ -8,17 +8,14 @@ const globalForPrisma = globalThis as unknown as {
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  // Explicitly set sslmode=verify-full to prevent security downgrade in pg v9.0.0
+  // Use 'require' instead of 'verify-full' for faster SSL handshake in serverless
   // See: https://www.postgresql.org/docs/current/libpq-ssl.html
-  sslmode: "verify-full",
-  ssl: {
-    rejectUnauthorized: true,
-  },
+  sslmode: "require",
   // Connection pool optimization for serverless environments
-  max: 10,
-  min: 2,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 10000,
+  max: 6,
+  min: 1,
+  idleTimeoutMillis: 10000,
+  connectionTimeoutMillis: 5000,
 });
 const adapter = new PrismaPg(pool);
 

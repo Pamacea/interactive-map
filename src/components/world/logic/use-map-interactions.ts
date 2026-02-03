@@ -77,8 +77,23 @@ export function useMapInteractions(options: UseMapInteractionsOptions) {
   }, [contextMenu, selectedPin, onClearSelection, onCloseContextMenu]);
 
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
+    // Prevent default browser context menu first
+    e.preventDefault();
+    e.stopPropagation();
+
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) {
+      return;
+    }
+
+    // Check if we have valid image dimensions before calculating coordinates
+    if (!imageDimensions || imageDimensions.width <= 0 || imageDimensions.height <= 0) {
+      // Still show context menu even if coordinates calculation fails
+      // The menu will use default coordinates and the pin will be created at (0,0)
+      setContextMenu({
+        position: { x: e.clientX, y: e.clientY },
+        coordinates: { lat: 0.5, lng: 0.5 },
+      });
       return;
     }
 
@@ -91,16 +106,14 @@ export function useMapInteractions(options: UseMapInteractionsOptions) {
       imageDimensions
     );
 
-    if (!coords || !isMountedRef.current) {
+    if (!isMountedRef.current) {
       return;
     }
 
-    // Only prevent default if we can show the context menu
-    e.preventDefault();
-
+    // Use calculated coordinates or fallback to center of map
     setContextMenu({
       position: { x: e.clientX, y: e.clientY },
-      coordinates: { lat: coords.lat, lng: coords.lng },
+      coordinates: coords ? { lat: coords.lat, lng: coords.lng } : { lat: 0.5, lng: 0.5 },
     });
   }, [containerRef, transform, imageDimensions]);
 

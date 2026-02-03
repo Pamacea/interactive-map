@@ -20,6 +20,7 @@ interface MapPinsWrapperProps {
   onPopupClose: () => void;
   onImageLoad: () => void;
   onImageError: () => void;
+  onContextMenu?: (e: React.MouseEvent) => void;
   showGrid: boolean;
   gridSize: number;
 }
@@ -37,6 +38,7 @@ export const MapPinsWrapper = memo(function MapPinsWrapper({
   onPopupClose,
   onImageLoad,
   onImageError,
+  onContextMenu,
   showGrid,
   gridSize,
 }: MapPinsWrapperProps) {
@@ -65,6 +67,7 @@ export const MapPinsWrapper = memo(function MapPinsWrapper({
         layerScale={layerScale}
         onLoad={onImageLoad}
         onError={onImageError}
+        onContextMenu={onContextMenu}
       >
         {pinsRenderer}
         {selectedPin && (

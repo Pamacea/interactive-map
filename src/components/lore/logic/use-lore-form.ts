@@ -114,8 +114,8 @@ export function useLoreForm({
 
       try {
         if (loreEntryId) {
-          // Update existing lore entry
-          await updateLoreEntryServer({
+          // Update existing lore entry and get the result
+          const updatedLore = await updateLoreEntryServer({
             id: loreEntryId,
             title: formData.title.trim(),
             content: formData.content.trim(),
@@ -123,9 +123,12 @@ export function useLoreForm({
             isVisible: formData.isVisible,
             isPublic: formData.isPublic,
           });
+
+          // Call success callback with actual updated data
+          onSuccess?.(updatedLore || (undefined as unknown as LoreEntry));
         } else {
-          // Create new lore entry
-          await createLoreEntry({
+          // Create new lore entry and get the result
+          const createdLore = await createLoreEntry({
             title: formData.title.trim(),
             content: formData.content.trim(),
             category: formData.category,
@@ -134,8 +137,8 @@ export function useLoreForm({
             gameWorldId: worldId,
           });
 
-          // Call success callback without passing result
-          onSuccess?.(undefined as unknown as LoreEntry);
+          // Call success callback with actual created data
+          onSuccess?.(createdLore);
         }
 
         resetForm();

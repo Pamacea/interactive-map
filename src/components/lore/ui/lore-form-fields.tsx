@@ -51,4 +51,10 @@ const CATEGORIES: { value: LoreCategory; label: string }[] = [
   { value: "CUSTOM", label: "Custom" },
 ];
 
+// Create a lookup object for category labels
+export const categoryLabels: Record<LoreCategory, string> = CATEGORIES.reduce(
+  (acc, cat) => ({ ...acc, [cat.value]: cat.label }),
+  {} as Record<LoreCategory, string>
+);
+
 export { CATEGORIES };

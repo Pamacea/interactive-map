@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState, useEffect } from "react";
-import { useFloatingPanelsStore, type FloatingPanelId } from "@/store/use-floating-panels-store";
+import { useFloatingPanelsStore, usePanelState, type FloatingPanelId } from "@/store/use-floating-panels-store";
 
 export interface UseFloatingPanelOptions {
   panelId: FloatingPanelId;
@@ -30,7 +30,7 @@ export function useFloatingPanel({
   onResizeStart,
   onResizeEnd,
 }: UseFloatingPanelOptions) {
-  const panelState = useFloatingPanelsStore((state) => state.panels[panelId]);
+  const panelState = usePanelState(panelId);
   const updatePosition = useFloatingPanelsStore((state) => state.updatePosition);
   const updateSize = useFloatingPanelsStore((state) => state.updateSize);
   const bringToFront = useFloatingPanelsStore((state) => state.bringToFront);

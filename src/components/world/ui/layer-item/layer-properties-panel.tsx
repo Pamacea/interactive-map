@@ -8,6 +8,9 @@ interface LayerPropertiesPanelProps {
   onOpacityChange: (layerId: string, opacity: number) => void;
   onScaleChange?: (layerId: string, scale: number) => void;
   onPositionChange?: (layerId: string, offsetX: number, offsetY: number) => void;
+  onMinZoomChange?: (layerId: string, minZoom: number) => void;
+  onMaxZoomChange?: (layerId: string, maxZoom: number) => void;
+  onZoomReset?: (layerId: string) => void;
 }
 
 export function LayerPropertiesPanel({
@@ -15,6 +18,9 @@ export function LayerPropertiesPanel({
   onOpacityChange,
   onScaleChange,
   onPositionChange,
+  onMinZoomChange,
+  onMaxZoomChange,
+  onZoomReset,
 }: LayerPropertiesPanelProps) {
   return (
     <div className="px-3 pb-3 space-y-3 animate-in fade-in slide-in-from-top-1 duration-200">
@@ -105,6 +111,66 @@ export function LayerPropertiesPanel({
             className="w-full h-1.5 bg-void rounded-sm appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-sm [&::-webkit-slider-thumb]:bg-accent-gold [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-125"
             aria-label={`Layer scale: ${Math.round(layer.scale * 100)}%`}
           />
+        </div>
+      )}
+
+      {/* Zoom Visibility Control */}
+      {(onMinZoomChange || onMaxZoomChange) && (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-bone-dark">Zoom Visibility</span>
+            {onZoomReset && (
+              <button
+                type="button"
+                onClick={() => onZoomReset(layer.id)}
+                className="text-xs text-accent-gold/70 hover:text-accent-gold transition-colors flex items-center gap-1"
+              >
+                <span className="text-accent-gold/40 text-xs">ᛟ</span>
+                Reset
+              </button>
+            )}
+          </div>
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-bone-dark/70">Min Zoom</span>
+              <span className="text-xs font-display font-semibold text-accent-gold">{layer.minZoom}%</span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="200"
+              value={layer.minZoom}
+              onChange={(e) => {
+                const zoom = parseInt(e.target.value);
+                if (onMinZoomChange && zoom < layer.maxZoom) {
+                  onMinZoomChange(layer.id, zoom);
+                }
+              }}
+              className="w-full h-1.5 bg-void rounded-sm appearance-none cursor-pointer accent-accent-gold"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-bone-dark/70">Max Zoom</span>
+              <span className="text-xs font-display font-semibold text-accent-gold">{layer.maxZoom}%</span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="200"
+              value={layer.maxZoom}
+              onChange={(e) => {
+                const zoom = parseInt(e.target.value);
+                if (onMaxZoomChange && zoom > layer.minZoom) {
+                  onMaxZoomChange(layer.id, zoom);
+                }
+              }}
+              className="w-full h-1.5 bg-void rounded-sm appearance-none cursor-pointer accent-accent-gold"
+            />
+          </div>
+          <div className="text-xs text-bone-dark/70">
+            Visible at <span className="text-accent-gold font-semibold">{layer.minZoom}% - {layer.maxZoom}%</span> zoom
+          </div>
         </div>
       )}
 

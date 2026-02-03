@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ArrowRight, Map } from "lucide-react";
 import { CrownButton } from "@/components/ui/crown-button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const stats = [
   { value: "10K+", label: "Worlds" },
@@ -22,7 +22,7 @@ export function HeroSection() {
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  useState(() => {
+  useEffect(() => {
     const interval = setInterval(() => {
       setIsAnimating(true);
       setTimeout(() => {
@@ -31,13 +31,13 @@ export function HeroSection() {
       }, 500);
     }, 8000);
     return () => clearInterval(interval);
-  });
+  }, []);
 
   return (
     <section id="throne" className="flex flex-col items-center justify-center px-4 py-16 sm:py-20">
-      {/* Background glow */}
+      {/* Background glow - optimized: reduced blur from 100px to 60px */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200px] h-[100px] bg-accent-gold/5 rounded-sm blur-[100px]" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200px] h-[100px] bg-accent-gold/5 rounded-sm blur-[60px]" />
       </div>
 
       {/* Crown Symbol */}

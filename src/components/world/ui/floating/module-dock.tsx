@@ -6,6 +6,7 @@ import {
   BookOpen,
   Filter,
   Settings2,
+  Users,
   GripVertical,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -46,6 +47,7 @@ export const ModuleDock = memo(function ModuleDock() {
   const lorePanel = usePanelState("lore");
   const filtersPanel = usePanelState("filters");
   const propertiesPanel = usePanelState("properties");
+  const membersPanel = usePanelState("members");
 
 
   return (
@@ -91,6 +93,12 @@ export const ModuleDock = memo(function ModuleDock() {
             icon={<Settings2 className="w-5 h-5" />}
             label="Properties"
             isActive={propertiesPanel.isVisible}
+          />
+          <DockButton
+            id="members"
+            icon={<Users className="w-5 h-5" />}
+            label="Members"
+            isActive={membersPanel.isVisible}
           />
         </div>
       </div>

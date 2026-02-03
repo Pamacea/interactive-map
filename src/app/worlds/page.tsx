@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense, useMemo } from "react";
 import { Sparkles, Plus, AlertCircle, Crown } from "lucide-react";
 import Link from "next/link";
 import { CrownButton } from "@/components/ui/crown-button";
@@ -10,13 +10,23 @@ import { AppHeader } from "@/components/ui/app-header";
 import { Footer } from "@/components/home/ui/footer";
 import { WorldCard } from "@/components/ui/world-card";
 import { SkeletonGrid } from "@/components/ui/skeleton";
-import { FloatingParticles } from "@/components/ui/particles";
 import { useMyWorlds } from "@/components/worlds/logic/use-my-worlds";
+
+// Lazy load particles for better performance
+const FloatingParticles = lazy(() =>
+  import("@/components/ui/particles").then(m => ({ default: m.FloatingParticles }))
+);
 
 export default function MyWorldsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const { worlds, loading, error } = useMyWorlds();
+
+  // Memoize stats calculation to avoid re-computation on every render
+  const totalPins = useMemo(
+    () => worlds.reduce((sum, w) => sum + (w._count?.pins || 0), 0),
+    [worlds]
+  );
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -47,11 +57,13 @@ export default function MyWorldsPage() {
       {/* Fixed Background Layer */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-grain opacity-[0.04]" aria-hidden="true" />
-        <FloatingParticles />
+        <Suspense fallback={null}>
+          <FloatingParticles />
+        </Suspense>
       </div>
 
-      {/* Background Glow Effect */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-accent-gold/5 rounded-sm blur-[150px] pointer-events-none" />
+      {/* Background Glow Effect - optimized: reduced blur from 150px to 80px */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-accent-gold/5 rounded-sm blur-[80px] pointer-events-none" />
 
       <AppHeader />
 
@@ -104,7 +116,7 @@ export default function MyWorldsPage() {
             <div className="w-px h-8 bg-iron" />
             <div className="text-center">
               <div className="text-2xl sm:text-3xl font-display-ornate text-accent-gold">
-                {worlds.reduce((sum, w) => sum + (w._count?.pins || 0), 0)}
+                {totalPins}
               </div>
               <div className="text-xs text-bone-dark uppercase tracking-wider">Locations</div>
             </div>

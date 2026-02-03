@@ -51,6 +51,10 @@ export function useContextMenuPosition({
 
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      // Ignore right-click (button 2) to allow context menu to open
+      if (event.button === 2) {
+        return;
+      }
       if (
         menuRef.current &&
         !menuRef.current.contains(event.target as Node)

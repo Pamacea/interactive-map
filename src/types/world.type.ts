@@ -34,6 +34,8 @@ export const MapLayerSchema = z.object({
   offsetX: z.number().default(0),
   offsetY: z.number().default(0),
   scale: z.number().default(1.0),
+  minZoom: z.number().default(0),
+  maxZoom: z.number().default(200),
   gameWorldId: z.string().cuid(),
   createdAt: z.date(),
   updatedAt: z.date(),

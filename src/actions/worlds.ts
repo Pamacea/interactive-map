@@ -225,7 +225,7 @@ export async function getAllWorlds(options?: {
   const offset = Math.max(options?.offset ?? 0, 0);
   const orderBy = options?.orderBy ?? "createdAt";
 
-  // Use unstable_cache for 60-second caching
+  // Use unstable_cache for 300-second caching (reduced server load)
   const getCachedWorlds = unstable_cache(
     async () => {
       const worlds = await prisma.gameWorld.findMany({
@@ -246,12 +246,12 @@ export async function getAllWorlds(options?: {
               image: true,
             },
           },
-          // Use subquery for counts instead of _count to avoid N+1
-          pins: {
-            select: { id: true },
-          },
-          loreEntries: {
-            select: { id: true },
+          // Use _count instead of subqueries - much faster, no in-memory transformation
+          _count: {
+            select: {
+              pins: true,
+              loreEntries: true,
+            },
           },
         },
         orderBy: {
@@ -261,20 +261,11 @@ export async function getAllWorlds(options?: {
         skip: offset,
       });
 
-      // Transform counts in-memory (faster than DB-level counts for small datasets)
-      return worlds.map((world) => ({
-        ...world,
-        _count: {
-          pins: world.pins.length,
-          loreEntries: world.loreEntries.length,
-        },
-        pins: undefined,
-        loreEntries: undefined,
-      }));
+      return worlds;
     },
     [CACHE_TAGS.PUBLIC_WORLDS, `${limit}-${offset}-${orderBy}`],
     {
-      revalidate: 60,
+      revalidate: 300,
       tags: [CACHE_TAGS.PUBLIC_WORLDS],
     }
   );
@@ -525,4 +516,236 @@ export async function uploadWorldMap(
       mapUrl: mapPath,
     };
   }, "uploadWorldMap");
+}
+
+/**
+ * Get all members of a world
+ * @param worldId - World ID
+ * @returns Array of world members with user details
+ */
+export async function getWorldMembers(worldId: string) {
+  try {
+    const members = await prisma.worldMember.findMany({
+      where: { gameWorldId: worldId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "asc" },
+    });
+
+    return members;
+  } catch (error) {
+    console.error("[getWorldMembers] Failed to fetch world members:", error);
+    return [];
+  }
+}
+
+/**
+ * Add a member to a world
+ * @param worldId - World ID
+ * @param email - Email of the user to add
+ * @param permission - Permission level (READER, EDITOR, OWNER)
+ * @returns Result with created member or error
+ */
+export async function addWorldMember(
+  worldId: string,
+  email: string,
+  permission: "READER" | "EDITOR" | "OWNER"
+): Promise<Result<any>> {
+  return safeAsync(async () => {
+    const user = await getAuthenticatedUser();
+
+    // Verify the requester has OWNER permission
+    const world = await prisma.gameWorld.findUnique({
+      where: { id: worldId },
+      include: { members: true },
+    });
+
+    if (!world) {
+      throw new ValidationError("World not found");
+    }
+
+    // Check if requester is an owner
+    const requesterMember = world.members.find(
+      (m) => m.userId === user.id && m.permission === "OWNER"
+    );
+
+    if (!requesterMember && world.userId !== user.id) {
+      throw new ValidationError("Only world owners can add members");
+    }
+
+    // Find the user to add by email
+    const userToAdd = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!userToAdd) {
+      throw new ValidationError("User not found. They must have an account first.");
+    }
+
+    // Check if user is already a member
+    const existingMember = world.members.find(
+      (m) => m.userId === userToAdd.id
+    );
+
+    if (existingMember) {
+      throw new ValidationError("User is already a member of this world");
+    }
+
+    // Can't add another owner if requester is not the original creator
+    if (permission === "OWNER" && world.userId !== user.id) {
+      throw new ValidationError("Only the world creator can add other owners");
+    }
+
+    // Add the member
+    const member = await prisma.worldMember.create({
+      data: {
+        gameWorldId: worldId,
+        userId: userToAdd.id,
+        permission,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+      },
+    });
+
+    revalidatePath(`/world/${worldId}`);
+
+    return member;
+  }, "addWorldMember");
+}
+
+/**
+ * Update a member's permission
+ * @param memberId - World member ID
+ * @param permission - New permission level
+ * @returns Result with updated member or error
+ */
+export async function updateWorldMemberPermission(
+  memberId: string,
+  permission: "READER" | "EDITOR" | "OWNER"
+): Promise<Result<any>> {
+  return safeAsync(async () => {
+    const user = await getAuthenticatedUser();
+
+    // Get the member to update
+    const memberToUpdate = await prisma.worldMember.findUnique({
+      where: { id: memberId },
+      include: {
+        world: {
+          include: { members: true },
+        },
+      },
+    });
+
+    if (!memberToUpdate) {
+      throw new ValidationError("Member not found");
+    }
+
+    // Check if requester is an owner
+    const requesterMember = memberToUpdate.world.members.find(
+      (m) => m.userId === user.id && m.permission === "OWNER"
+    );
+
+    if (!requesterMember && memberToUpdate.world.userId !== user.id) {
+      throw new ValidationError("Only world owners can update permissions");
+    }
+
+    // Can't promote to owner unless you're the original creator
+    if (permission === "OWNER" && memberToUpdate.world.userId !== user.id) {
+      throw new ValidationError("Only the world creator can promote to owner");
+    }
+
+    // Can't demote the original creator
+    if (memberToUpdate.userId === memberToUpdate.world.userId && permission !== "OWNER") {
+      throw new ValidationError("Cannot change the world creator's permission");
+    }
+
+    // Update the member
+    const updatedMember = await prisma.worldMember.update({
+      where: { id: memberId },
+      data: { permission },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+      },
+    });
+
+    revalidatePath(`/world/${memberToUpdate.worldId}`);
+
+    return updatedMember;
+  }, "updateWorldMemberPermission");
+}
+
+/**
+ * Remove a member from a world
+ * @param memberId - World member ID
+ * @returns Result with success status or error
+ */
+export async function removeWorldMember(
+  memberId: string
+): Promise<Result<{ memberId: string }>> {
+  return safeAsync(async () => {
+    const user = await getAuthenticatedUser();
+
+    // Get the member to remove
+    const memberToRemove = await prisma.worldMember.findUnique({
+      where: { id: memberId },
+      include: { world: true },
+    });
+
+    if (!memberToRemove) {
+      throw new ValidationError("Member not found");
+    }
+
+    // Check if requester is an owner or is removing themselves
+    const requesterIsOwner = memberToRemove.world.userId === user.id;
+    const requesterIsMemberOwner = await prisma.worldMember.findFirst({
+      where: {
+        gameWorldId: memberToRemove.worldId,
+        userId: user.id,
+        permission: "OWNER",
+      },
+    });
+
+    const isRemovingSelf = memberToRemove.userId === user.id;
+
+    if (!requesterIsOwner && !requesterIsMemberOwner && !isRemovingSelf) {
+      throw new ValidationError("Only world owners can remove members");
+    }
+
+    // Can't remove the world creator
+    if (memberToRemove.userId === memberToRemove.world.userId) {
+      throw new ValidationError("Cannot remove the world creator");
+    }
+
+    // Delete the member
+    await prisma.worldMember.delete({
+      where: { id: memberId },
+    });
+
+    revalidatePath(`/world/${memberToRemove.worldId}`);
+
+    return { memberId };
+  }, "removeWorldMember");
 }

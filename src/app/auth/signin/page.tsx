@@ -1,11 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { CrownButton } from "@/components/ui/crown-button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { LogIn, Crown } from "lucide-react";
-import { FloatingParticles } from "@/components/ui/particles";
+
+// Lazy load particles for better initial render performance
+const FloatingParticles = lazy(() =>
+  import("@/components/ui/particles").then(m => ({ default: m.FloatingParticles }))
+);
 
 export default function SignInPage() {
   const [isLoading, setIsLoading] = useState<string | null>(null);
@@ -28,11 +32,13 @@ export default function SignInPage() {
       {/* Fixed Background Layer */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-grain opacity-[0.04]" aria-hidden="true" />
-        <FloatingParticles />
+        <Suspense fallback={null}>
+          <FloatingParticles />
+        </Suspense>
       </div>
 
-      {/* Background Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-accent-gold/5 rounded-sm blur-[120px] pointer-events-none" />
+      {/* Background Glow - optimized: reduced blur from 120px to 60px */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-accent-gold/5 rounded-sm blur-[60px] pointer-events-none" />
 
       {/* Main Card */}
       <div className="w-full max-w-3/5 bg-obsidian/80 backdrop-blur-md border border-iron rounded-sm p-6 sm:p-10 shadow-xl relative z-10 animate-oath-reveal">

@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useMemo, memo, useCallback } from "react";
+import { useState, useMemo, memo, useCallback, useEffect } from "react";
 import { Search } from "lucide-react";
 import { FilterSidebar } from "@/components/explore/ui/filter-sidebar";
 import { ResultsHeader } from "@/components/explore/ui/results-header";
 import { WorldsGrid } from "@/components/explore/ui/worlds-grid";
 import { useExploreFilters } from "@/components/explore/logic/use-explore-filters";
 import { filterWorlds } from "@/components/explore/methods/filter-worlds";
+import { useDebounce } from "@/hooks/use-debounce";
 import type { GameWorld } from "@/types/world.type";
 
 export const ExploreClient = memo(function ExploreClient({ initialWorlds }: { initialWorlds: GameWorld[] }) {
@@ -23,6 +24,12 @@ export const ExploreClient = memo(function ExploreClient({ initialWorlds }: { in
   } = useExploreFilters();
 
   const [searchQuery, setSearchQuery] = useState(filters.query);
+  const debouncedQuery = useDebounce(searchQuery, 300);
+
+  // Trigger search with debounced query
+  useEffect(() => {
+    handleSearch({ query: debouncedQuery });
+  }, [debouncedQuery, handleSearch]);
 
   // Memoize filtered worlds to prevent unnecessary recalculations
   const filteredWorlds = useMemo(

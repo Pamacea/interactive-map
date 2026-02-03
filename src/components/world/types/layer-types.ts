@@ -9,4 +9,6 @@ export interface Layer {
   scale: number;
   offsetX: number;
   offsetY: number;
+  minZoom: number;
+  maxZoom: number;
 }

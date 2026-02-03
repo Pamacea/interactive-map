@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { Z_INDEX } from "@/constants/z-index";
 
-export type FloatingPanelId = "layers" | "lore" | "filters" | "properties";
+export type FloatingPanelId = "layers" | "lore" | "filters" | "properties" | "members";
 
 export interface FloatingPanelState {
   id: FloatingPanelId;
@@ -59,6 +59,13 @@ const DEFAULT_PANELS: Record<FloatingPanelId, Omit<FloatingPanelState, "zIndex">
     size: { width: 280, height: 300 },
     isCollapsed: false,
   },
+  members: {
+    id: "members",
+    isVisible: false,
+    position: { x: 608, y: 16 },
+    size: { width: 280, height: 350 },
+    isCollapsed: false,
+  },
 };
 
 // Create initial panels with z-index
@@ -67,6 +74,7 @@ const createInitialPanels = (): Record<FloatingPanelId, FloatingPanelState> => (
   lore: { ...DEFAULT_PANELS.lore, zIndex: Z_INDEX.floatingPanel },
   filters: { ...DEFAULT_PANELS.filters, zIndex: Z_INDEX.floatingPanel },
   properties: { ...DEFAULT_PANELS.properties, zIndex: Z_INDEX.floatingPanel },
+  members: { ...DEFAULT_PANELS.members, zIndex: Z_INDEX.floatingPanel },
 });
 
 export const useFloatingPanelsStore = create<FloatingPanelsStore>()(
@@ -173,9 +181,25 @@ export const useFloatingPanelsStore = create<FloatingPanelsStore>()(
   )
 );
 
+// Create memoized default panel states to avoid infinite loop warnings
+const DEFAULT_PANELS_WITH_ZINDEX: Record<FloatingPanelId, FloatingPanelState> = {
+  layers: { ...DEFAULT_PANELS.layers, zIndex: Z_INDEX.floatingPanel },
+  lore: { ...DEFAULT_PANELS.lore, zIndex: Z_INDEX.floatingPanel },
+  filters: { ...DEFAULT_PANELS.filters, zIndex: Z_INDEX.floatingPanel },
+  properties: { ...DEFAULT_PANELS.properties, zIndex: Z_INDEX.floatingPanel },
+  members: { ...DEFAULT_PANELS.members, zIndex: Z_INDEX.floatingPanel },
+};
+
 // Selector hooks for specific panels
+// Note: Use memoized defaultPanel with zIndex as fallback in case store is not hydrated yet
 export const usePanelState = (id: FloatingPanelId) =>
-  useFloatingPanelsStore((state) => state.panels[id]);
+  useFloatingPanelsStore((state) => {
+    const panel = state.panels[id];
+    if (!panel) {
+      return DEFAULT_PANELS_WITH_ZINDEX[id];
+    }
+    return panel;
+  });
 
 export const useTogglePanel = () =>
   useFloatingPanelsStore((state) => state.togglePanel);

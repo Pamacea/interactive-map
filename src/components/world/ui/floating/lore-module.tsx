@@ -4,6 +4,7 @@ import { BookOpen } from "lucide-react";
 import { FloatingPanel } from "./floating-panel";
 import { LoreList } from "@/components/lore/ui/lore-list";
 import { LoreForm } from "@/components/lore/ui/lore-form";
+import { LoreDetail } from "@/components/lore/ui/lore-detail";
 import { useLoreStore } from "@/stores/use-lore-store";
 
 interface LoreModuleProps {
@@ -37,6 +38,8 @@ export function LoreModule({ worldId }: LoreModuleProps) {
             stopEditing();
           }}
         />
+      ) : selectedLore ? (
+        <LoreDetail lore={selectedLore} worldId={worldId} />
       ) : (
         <LoreList worldId={worldId} />
       )}

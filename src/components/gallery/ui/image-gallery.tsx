@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
-import { Search, Filter, Grid3x3, List } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { Search, Filter, Grid3x3, List, Check } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,8 @@ import { ImageCard } from "./image-card";
 import { ImageLightbox } from "./image-lightbox";
 import { ImageUploadZone } from "./image-upload-zone";
 import { useGalleryStore } from "@/stores/use-gallery-store";
+import { useGallery } from "../logic/use-gallery-query";
+import { galleryKeys } from "../logic/use-gallery-query";
 import type { GalleryItemWithRelations } from "@/types/gallery.type";
 
 export interface ImageGalleryProps {
@@ -18,16 +21,19 @@ export interface ImageGalleryProps {
 }
 
 export function ImageGallery({ worldId, className }: ImageGalleryProps) {
+  // TanStack Query for data fetching
+  const { data: galleryItems = [], isLoading: isLoadingQuery, refetch } = useGallery(worldId);
+  const queryClient = useQueryClient();
+
   const galleryStore = useGalleryStore();
 
   const {
+    setGalleryItems,
     filteredGalleryItems,
     searchTerm,
-    isLoading,
     lightboxOpen,
     lightboxIndex,
     setSearchTerm,
-    applyFilters,
     openLightbox,
     closeLightbox,
     nextImage,
@@ -40,10 +46,15 @@ export function ImageGallery({ worldId, className }: ImageGalleryProps) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showUpload, setShowUpload] = useState(false);
 
-  // Apply filters when search term changes
+  // Sync gallery items from TanStack Query to store
   useEffect(() => {
-    applyFilters();
-  }, [searchTerm, applyFilters]);
+    setGalleryItems(galleryItems);
+  }, [galleryItems, setGalleryItems]);
+
+  // Apply filters when search term changes or gallery items update
+  useEffect(() => {
+    galleryStore.applyFilters();
+  }, [searchTerm, galleryItems, galleryStore]);
 
   const handleUpload = async (files: File[]) => {
     for (const file of files) {
@@ -57,6 +68,8 @@ export function ImageGallery({ worldId, className }: ImageGalleryProps) {
       }
     }
     setShowUpload(false);
+    // Refetch gallery items to get fresh data
+    refetch();
   };
 
   const handleImageClick = (index: number) => {
@@ -68,6 +81,8 @@ export function ImageGallery({ worldId, className }: ImageGalleryProps) {
     if (confirm("Are you sure you want to delete this image?")) {
       try {
         await deleteGalleryItemServer(imageId);
+        // Invalidate queries to refresh data
+        queryClient.invalidateQueries({ queryKey: galleryKeys.world(worldId) });
       } catch (error) {
         console.error("Failed to delete image:", error);
       }
@@ -133,7 +148,7 @@ export function ImageGallery({ worldId, className }: ImageGalleryProps) {
       {/* Gallery content */}
       <ScrollArea className="flex-1">
         <div className="p-4">
-          {isLoading ? (
+          {isLoadingQuery ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center space-y-3">
                 <div className="w-12 h-12 border-4 border-border-base border-t-accent-gold rounded-sm animate-spin mx-auto" />

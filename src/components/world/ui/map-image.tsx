@@ -10,6 +10,7 @@ export interface MapImageProps {
   layerScale?: number; // Scale factor for layer content (0.5 - 2.0)
   onLoad: () => void;
   onError: () => void;
+  onContextMenu?: (e: React.MouseEvent) => void;
   children?: React.ReactNode;
 }
 
@@ -22,6 +23,7 @@ export const MapImage: FC<MapImageProps> = ({
   layerScale = 1,
   onLoad,
   onError,
+  onContextMenu,
   children,
 }) => {
   const { width, height } = imageDimensions;
@@ -50,6 +52,7 @@ export const MapImage: FC<MapImageProps> = ({
         }}
         onLoad={onLoad}
         onError={onError}
+        onContextMenu={onContextMenu}
       />
 
       {showGrid && (

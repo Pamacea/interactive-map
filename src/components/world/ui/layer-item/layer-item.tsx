@@ -17,6 +17,9 @@ interface LayerItemProps {
   onOpacityChange: (layerId: string, opacity: number) => void;
   onScaleChange?: (layerId: string, scale: number) => void;
   onPositionChange?: (layerId: string, offsetX: number, offsetY: number) => void;
+  onMinZoomChange?: (layerId: string, minZoom: number) => void;
+  onMaxZoomChange?: (layerId: string, maxZoom: number) => void;
+  onZoomReset?: (layerId: string) => void;
   onMoveUp: (layerId: string) => void;
   onMoveDown: (layerId: string) => void;
   onDeleteConfirm: (layerId: string) => void;
@@ -36,6 +39,9 @@ export function LayerItem({
   onOpacityChange,
   onScaleChange,
   onPositionChange,
+  onMinZoomChange,
+  onMaxZoomChange,
+  onZoomReset,
   onMoveUp,
   onMoveDown,
   onDeleteConfirm,
@@ -88,6 +94,9 @@ export function LayerItem({
           onOpacityChange={onOpacityChange}
           onScaleChange={onScaleChange}
           onPositionChange={onPositionChange}
+          onMinZoomChange={onMinZoomChange}
+          onMaxZoomChange={onMaxZoomChange}
+          onZoomReset={onZoomReset}
         />
       )}
     </div>

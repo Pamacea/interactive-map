@@ -18,6 +18,9 @@ interface LayersPanelProps {
 export function LayersPanel({ worldId, worldLayers = [], mapImage }: LayersPanelProps) {
   const updateLayerScale = useMapStore((state) => state.updateLayerScale);
   const updateLayerPosition = useMapStore((state) => state.updateLayerPosition);
+  const updateLayerMinZoom = useMapStore((state) => state.updateLayerMinZoom);
+  const updateLayerMaxZoom = useMapStore((state) => state.updateLayerMaxZoom);
+  const resetLayerZoom = useMapStore((state) => state.resetLayerZoom);
 
   const {
     layers,
@@ -49,6 +52,18 @@ export function LayersPanel({ worldId, worldLayers = [], mapImage }: LayersPanel
 
   const handlePositionChange = (layerId: string, offsetX: number, offsetY: number) => {
     updateLayerPosition(layerId, offsetX, offsetY);
+  };
+
+  const handleMinZoomChange = (layerId: string, minZoom: number) => {
+    updateLayerMinZoom(layerId, minZoom);
+  };
+
+  const handleMaxZoomChange = (layerId: string, maxZoom: number) => {
+    updateLayerMaxZoom(layerId, maxZoom);
+  };
+
+  const handleZoomReset = (layerId: string) => {
+    resetLayerZoom(layerId);
   };
 
   return (
@@ -113,6 +128,9 @@ export function LayersPanel({ worldId, worldLayers = [], mapImage }: LayersPanel
                 onOpacityChange={handleOpacityChange}
                 onScaleChange={handleScaleChange}
                 onPositionChange={handlePositionChange}
+                onMinZoomChange={handleMinZoomChange}
+                onMaxZoomChange={handleMaxZoomChange}
+                onZoomReset={handleZoomReset}
                 onMoveUp={handleMoveUp}
                 onMoveDown={handleMoveDown}
                 onDeleteConfirm={handleDeleteLayer}

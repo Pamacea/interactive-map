@@ -1,4 +1,8 @@
-import { FloatingParticles } from "@/components/ui/particles";
+import { lazy, Suspense } from "react";
+
+const FloatingParticles = lazy(() =>
+  import("@/components/ui/particles").then(m => ({ default: m.FloatingParticles }))
+);
 import { AppHeader } from "@/components/ui/app-header";
 import { Footer } from "@/components/home/ui/footer";
 import { ExploreClient } from "./explore-client";
@@ -7,8 +11,8 @@ import { Compass } from "lucide-react";
 import type { Metadata } from "next";
 import { siteConfig } from "@/config/site";
 
-// ISR: Revalidate page every 60 seconds
-export const revalidate = 60;
+// ISR: Revalidate page every 5 minutes (300s) - reduced server load
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Explore Worlds",
@@ -27,11 +31,13 @@ export default async function ExplorePage() {
     <div className="min-h-screen bg-void relative overflow-hidden">
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-grain opacity-[0.04]" aria-hidden="true" />
-        <FloatingParticles />
+        <Suspense fallback={null}>
+          <FloatingParticles />
+        </Suspense>
       </div>
 
-      {/* Background Glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-accent-gold/5 rounded-sm blur-[150px] pointer-events-none" />
+      {/* Background Glow - optimized: reduced blur from 150px to 80px */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-accent-gold/5 rounded-sm blur-[80px] pointer-events-none" />
 
       <AppHeader />
 

@@ -1,25 +1,31 @@
 import { useMemo } from "react";
 import type { Pin } from "@prisma/client";
 import { usePinTypeFilters } from "@/stores/use-pins-store";
+import { calculateLayerVisibility } from "@/utils/pin-visibility";
+import type { Transform } from "./use-map-pan";
+import type { MapLayer } from "@/types/world.type";
 
 // Extended type for pins with layer relations (using Prisma types)
 export interface PinWithLayer extends Pin {
-  layer?: {
-    id: string;
-    name: string;
-    isVisible: boolean;
-    zIndex: number;
-  } | null;
+  layer?: MapLayer | null;
 }
 
 export interface UsePinsFilteringOptions {
   pins: PinWithLayer[];
-  layers: Array<{ id: string; visible: boolean; zIndex: number }>;
+  layers: MapLayer[];
+  transform: Transform;
 }
 
-export function usePinsFiltering({ pins, layers }: UsePinsFilteringOptions) {
+export function usePinsFiltering({ pins, layers, transform }: UsePinsFilteringOptions) {
   // Get active filters from store (Record<PinTypeEnum, boolean>)
   const pinFilters = usePinTypeFilters();
+
+  // Get visible layer IDs (considering zoom-based visibility)
+  const visibleLayerIds = useMemo(() => {
+    return layers
+      .filter((layer) => calculateLayerVisibility(layer, transform))
+      .map((layer) => layer.id);
+  }, [layers, transform]);
 
   const visiblePins = useMemo(() => {
     return pins
@@ -31,7 +37,8 @@ export function usePinsFiltering({ pins, layers }: UsePinsFilteringOptions) {
 
         // Check layer visibility from DB (if layer assigned)
         if (pin.layerId && pin.layer) {
-          if (!pin.layer.isVisible) {
+          // Check layer is visible (toggle) AND within zoom range
+          if (!visibleLayerIds.includes(pin.layerId)) {
             return false;
           }
         }
@@ -53,9 +60,10 @@ export function usePinsFiltering({ pins, layers }: UsePinsFilteringOptions) {
         const bZIndex = bLayer?.zIndex ?? 0;
         return aZIndex - bZIndex;
       });
-  }, [pins, layers, pinFilters]);
+  }, [pins, layers, visibleLayerIds, pinFilters]);
 
   return {
     visiblePins,
+    visibleLayerIds,
   };
 }

@@ -20,6 +20,7 @@ import {
   LoreModule,
   FiltersModule,
   PropertiesModule,
+  MembersModule,
 } from "@/components/world/ui/floating";
 import type { OptimizedWorld } from "@/types/world.type";
 import type { Pin } from "@/types/pin.type";
@@ -40,9 +41,16 @@ interface WorldClientProps {
   pins: Pin[];
   loreEntries: LoreEntry[];
   isAuthenticated: boolean;
+  currentUserId?: string;
+  worldOwnerId: string;
 }
 
-function FloatingUI({ world, pins }: { world: OptimizedWorld; pins: Pin[] }) {
+function FloatingUI({ world, pins, currentUserId, worldOwnerId }: {
+  world: OptimizedWorld;
+  pins: Pin[];
+  currentUserId?: string;
+  worldOwnerId: string;
+}) {
   const { getMapElement } = useMapExport();
   const mapElement = getMapElement();
 
@@ -72,6 +80,15 @@ function FloatingUI({ world, pins }: { world: OptimizedWorld; pins: Pin[] }) {
       <FiltersModule />
 
       <PropertiesModule />
+
+      {/* Members module - only show if authenticated */}
+      {currentUserId && (
+        <MembersModule
+          worldId={world.id}
+          worldOwnerId={worldOwnerId}
+          currentUserId={currentUserId}
+        />
+      )}
     </>
   );
 }
@@ -81,6 +98,8 @@ export const WorldClient = memo(function WorldClient({
   pins,
   loreEntries,
   isAuthenticated,
+  currentUserId,
+  worldOwnerId,
 }: WorldClientProps) {
   // Initialize layers from world data (handle undefined from Prisma)
   useWorldInitialization(world.layers ?? null);
@@ -176,7 +195,12 @@ export const WorldClient = memo(function WorldClient({
 
           {/* Floating UI */}
           <Suspense fallback={null}>
-            <FloatingUI world={world} pins={pins} />
+            <FloatingUI
+              world={world}
+              pins={pins}
+              currentUserId={currentUserId}
+              worldOwnerId={worldOwnerId}
+            />
           </Suspense>
 
           {/* Autosave indicator */}

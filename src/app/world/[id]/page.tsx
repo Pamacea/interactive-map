@@ -110,6 +110,8 @@ export default async function WorldDetailPage({
       pins={world.pins as unknown as Pin[]}
       loreEntries={loreEntries as unknown as LoreEntry[]}
       isAuthenticated={!!session?.user}
+      currentUserId={session?.user?.id}
+      worldOwnerId={world.userId}
     />
     </>
   );

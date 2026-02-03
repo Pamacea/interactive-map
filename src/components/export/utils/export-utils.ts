@@ -4,11 +4,30 @@
  * Based on official documentation:
  * - html2canvas: https://github.com/niklasvh/html2canvas
  * - jsPDF: https://github.com/parallax/jsPDF
+ *
+ * PERFORMANCE: Heavy libraries (html2canvas, jsPDF) are lazy-loaded
+ * only when export is actually triggered, reducing initial bundle size.
  */
 
-import html2canvas from "html2canvas";
-import { jsPDF } from "jspdf";
 import type { ExportFormat, WorldExportData } from "@/actions/export";
+
+// Dynamic imports for heavy libraries - only loaded when needed
+let html2canvasModule: typeof import("html2canvas") | null = null;
+let jsPDFModule: typeof import("jspdf") | null = null;
+
+async function getHtml2Canvas() {
+  if (!html2canvasModule) {
+    html2canvasModule = await import("html2canvas");
+  }
+  return html2canvasModule.default;
+}
+
+async function getJsPDF() {
+  if (!jsPDFModule) {
+    jsPDFModule = await import("jspdf");
+  }
+  return jsPDFModule.jsPDF;
+}
 
 /**
  * Export element as PNG image
@@ -21,6 +40,9 @@ export async function exportAsPNG(
   filename: string
 ): Promise<void> {
   try {
+    // Lazy load html2canvas only when needed
+    const html2canvas = await getHtml2Canvas();
+
     // Capture element as canvas using html2canvas
     const canvas = await html2canvas(element, {
       backgroundColor: "#ffffff",
@@ -63,6 +85,10 @@ export async function exportAsPDF(
   filename: string
 ): Promise<void> {
   try {
+    // Lazy load both libraries only when needed
+    const html2canvas = await getHtml2Canvas();
+    const jsPDF = await getJsPDF();
+
     // Capture element as canvas
     const canvas = await html2canvas(element, {
       backgroundColor: "#ffffff",

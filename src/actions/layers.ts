@@ -26,6 +26,8 @@ export async function createLayer(
     offsetX?: number;
     offsetY?: number;
     scale?: number;
+    minZoom?: number;
+    maxZoom?: number;
   }
 ): Promise<Result<any>> {
   return safeAsync(async () => {
@@ -52,6 +54,8 @@ export async function createLayer(
         offsetX: data.offsetX ?? 0,
         offsetY: data.offsetY ?? 0,
         scale: data.scale ?? 1.0,
+        minZoom: data.minZoom ?? 0,
+        maxZoom: data.maxZoom ?? 200,
         gameWorldId: worldId,
       },
     });
@@ -79,6 +83,8 @@ export async function updateLayer(
     offsetX?: number;
     offsetY?: number;
     scale?: number;
+    minZoom?: number;
+    maxZoom?: number;
   }
 ): Promise<Result<any>> {
   return safeAsync(async () => {
@@ -99,6 +105,8 @@ export async function updateLayer(
         ...(data.offsetX !== undefined && { offsetX: data.offsetX }),
         ...(data.offsetY !== undefined && { offsetY: data.offsetY }),
         ...(data.scale !== undefined && { scale: data.scale }),
+        ...(data.minZoom !== undefined && { minZoom: data.minZoom }),
+        ...(data.maxZoom !== undefined && { maxZoom: data.maxZoom }),
       },
     });
 

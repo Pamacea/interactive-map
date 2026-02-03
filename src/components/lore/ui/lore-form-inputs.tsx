@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import { CATEGORIES } from "./lore-form-fields";
 import type { LoreCategory } from "@/types/lore.type";
+import { MarkdownEditor } from "./markdown-editor";
 
 interface LoreFormData {
   title: string;
@@ -47,7 +48,7 @@ export function LoreFormFields({ formData, isSubmitting, updateField }: LoreForm
         disabled={isSubmitting}
       />
 
-      <LoreFormField
+      <MarkdownEditor
         id="lore-content"
         label="Content"
         required
@@ -56,9 +57,8 @@ export function LoreFormFields({ formData, isSubmitting, updateField }: LoreForm
         placeholder="Write your lore entry here... (Markdown supported)"
         disabled={isSubmitting}
         maxLength={50000}
-        rows={8}
-        isTextarea
-        showLength
+        minHeight={200}
+        showPreview
       />
 
       <LoreFormVisibility

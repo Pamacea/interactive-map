@@ -134,7 +134,7 @@ export function useMapEvents(options: UseMapEventsOptions): MapEventsResult {
   } = useMapImage(mapImage);
 
   // Pin filtering
-  const { visiblePins } = usePinsFiltering({ pins, layers });
+  const { visiblePins } = usePinsFiltering({ pins, layers, transform });
 
   // Map interactions
   const {

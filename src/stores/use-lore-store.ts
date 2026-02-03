@@ -51,11 +51,11 @@ interface LoreStore extends LoreUIState, LoreFilters, LoreDataState {
   // Lore CRUD operations (server sync with optimistic updates)
   createLoreEntry: (
     data: Parameters<typeof createLoreAction>[0]
-  ) => Promise<void>;
+  ) => Promise<LoreEntry>;
   deleteLoreEntryServer: (loreId: string) => Promise<void>;
   updateLoreEntryServer: (
     data: Parameters<typeof updateLoreAction>[0]
-  ) => Promise<void>;
+  ) => Promise<LoreEntry | void>;
 
   // Filter actions
   setSearchTerm: (term: string) => void;
@@ -223,15 +223,18 @@ export const useLoreStore = create<LoreStore>()(
           }
 
           // Replace optimistic entry with real one
+          const createdLore = result.data.loreEntry;
           set(
             (state) => ({
               loreEntries: state.loreEntries.map((lore) =>
-                lore.id === tempId ? result.data.loreEntry : lore
+                lore.id === tempId ? createdLore : lore
               ),
             }),
             false,
             "createLoreEntry_success"
           );
+
+          return createdLore;
         } catch (error) {
           // Rollback on error
           set(
@@ -320,15 +323,18 @@ export const useLoreStore = create<LoreStore>()(
           }
 
           // Update with server response
+          const updatedLore = result.data;
           set(
             (state) => ({
               loreEntries: state.loreEntries.map((lore) =>
-                lore.id === data.id ? result.data : lore
+                lore.id === data.id ? updatedLore : lore
               ),
             }),
             false,
             "updateLoreEntry_success"
           );
+
+          return updatedLore;
         } catch (error) {
           // Rollback on error
           if (originalLore) {
