@@ -185,13 +185,13 @@ export function CharacterDetail({ characterId, worldId, characters, onClose }: C
   const equipment = character.equipment as Array<{ name: string; type?: string }> | null;
 
   return (
-    <Card className="p-6 bg-background-card border border-border-subtle">
+    <Card className="p-6 bg-obsidian/80 border border-border-subtle">
       {/* Header */}
       <div className="flex items-start justify-between mb-6">
         <div className="flex items-start gap-4">
           {/* Portrait */}
           {character.portraitUrl ? (
-            <div className="flex-shrink-0 w-20 h-20 rounded-sm overflow-hidden bg-background-elevated border border-border-subtle">
+            <div className="flex-shrink-0 w-20 h-20 rounded-sm overflow-hidden bg-obsidian/60 border border-border-subtle">
               <img
                 src={character.portraitUrl}
                 alt={character.name}
@@ -199,7 +199,7 @@ export function CharacterDetail({ characterId, worldId, characters, onClose }: C
               />
             </div>
           ) : (
-            <div className="flex-shrink-0 w-20 h-20 rounded-sm bg-background-elevated border border-border-subtle flex items-center justify-center">
+            <div className="flex-shrink-0 w-20 h-20 rounded-sm bg-obsidian/60 border border-border-subtle flex items-center justify-center">
               <User className="w-10 h-10 text-text-muted" />
             </div>
           )}
@@ -257,7 +257,7 @@ export function CharacterDetail({ characterId, worldId, characters, onClose }: C
               h-8 w-8 p-0
               ${character.isVisible
                 ? "text-accent-gold hover:bg-accent-gold/10"
-                : "text-text-muted hover:bg-background-elevated"
+                : "text-text-muted hover:bg-obsidian/60"
               }
             `}
             title={character.isVisible ? "Visible" : "Hidden"}
@@ -325,7 +325,7 @@ export function CharacterDetail({ characterId, worldId, characters, onClose }: C
 
       {/* Stats Block */}
       {stats && Object.keys(stats).length > 0 && (
-        <div className="mt-6 p-4 bg-background-elevated border border-border-subtle rounded-sm">
+        <div className="mt-6 p-4 bg-obsidian/60 border border-border-subtle rounded-sm">
           <h3 className="text-sm font-semibold text-text-secondary mb-3 flex items-center gap-2">
             <Shield className="w-4 h-4" />
             Statistics
@@ -394,7 +394,7 @@ export function CharacterDetail({ characterId, worldId, characters, onClose }: C
             {fullCharacter.pinLinks.map((link) => (
               <div
                 key={link.id}
-                className="flex items-center justify-between p-2 bg-background-elevated border border-border-subtle rounded-sm"
+                className="flex items-center justify-between p-2 bg-obsidian/60 border border-border-subtle rounded-sm"
               >
                 <Link
                   href={`/world/${worldId}`}
@@ -430,7 +430,7 @@ export function CharacterDetail({ characterId, worldId, characters, onClose }: C
             {fullCharacter.relationshipsAsSource.map((rel) => (
               <div
                 key={rel.id}
-                className="flex items-center justify-between p-2 bg-background-elevated border border-border-subtle rounded-sm"
+                className="flex items-center justify-between p-2 bg-obsidian/60 border border-border-subtle rounded-sm"
               >
                 <div className="flex-1">
                   <Link

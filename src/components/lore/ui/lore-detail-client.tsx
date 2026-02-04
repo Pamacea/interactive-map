@@ -153,7 +153,7 @@ export function LoreDetailClient({
   return (
     <div className="min-h-screen bg-[var(--color-background-base)]">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-[var(--color-background-card)] border-b border-[var(--color-border-subtle)]">
+      <header className="sticky top-0 z-40 bg-obsidian/80 border-b border-[var(--color-border-subtle)]">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link
             href={`/world/${world.id}`}
@@ -244,7 +244,7 @@ export function LoreDetailClient({
           </div>
 
           {/* Content */}
-          <article className="bg-[var(--color-background-card)] border border-[var(--color-border-subtle)] rounded-sm p-8 mb-8">
+          <article className="bg-obsidian/80 border border-[var(--color-border-subtle)] rounded-sm p-8 mb-8">
             <MarkdownRenderer
               content={processedContent}
               onWikiLinkClick={handleWikiLinkClick}
@@ -253,7 +253,7 @@ export function LoreDetailClient({
 
           {/* Linked Pins */}
           {lore.linkedPins && lore.linkedPins.length > 0 && (
-            <div className="bg-[var(--color-background-card)] border border-[var(--color-border-subtle)] rounded-sm p-6 mb-8">
+            <div className="bg-obsidian/80 border border-[var(--color-border-subtle)] rounded-sm p-6 mb-8">
               <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4 flex items-center gap-2">
                 <MapPin className="w-5 h-5" />
                 Linked Locations
@@ -299,7 +299,7 @@ export function LoreDetailClient({
 
           {/* References (Outgoing) */}
           {(lore.references || []).length > 0 && (
-            <div className="bg-[var(--color-background-card)] border border-[var(--color-border-subtle)] rounded-sm p-4">
+            <div className="bg-obsidian/80 border border-[var(--color-border-subtle)] rounded-sm p-4">
               <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-3 flex items-center gap-2">
                 <Link2 className="w-4 h-4" />
                 See Also
@@ -321,7 +321,7 @@ export function LoreDetailClient({
 
           {/* Back-references (Incoming) */}
           {(lore.referencedBy || []).length > 0 && (
-            <div className="bg-[var(--color-background-card)] border border-[var(--color-border-subtle)] rounded-sm p-4">
+            <div className="bg-obsidian/80 border border-[var(--color-border-subtle)] rounded-sm p-4">
               <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-3">
                 Referenced By
               </h3>

@@ -95,7 +95,7 @@ export const MarkdownEditor = memo(function MarkdownEditor({
               preview: Preview as any,
             },
           }}
-          className="!bg-background-elevated !text-text-primary"
+          className="!bg-obsidian/60 !text-text-primary"
           data-color-mode="dark"
         />
       </div>

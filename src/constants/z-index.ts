@@ -16,7 +16,7 @@ export const Z_INDEX = {
 
   // Floating UI elements
   floatingPanel: 20,
-  activeFloatingPanel: 25,
+  activeFloatingPanel: 35,
   floatingHeader: 30,
   moduleDock: 30,
 
@@ -49,7 +49,7 @@ export const Z_INDEX_CLASSES = {
   map: "z-[1]",
   pin: "z-10",
   floatingPanel: "z-20",
-  activeFloatingPanel: "z-[25]",
+  activeFloatingPanel: "z-[35]",
   floatingHeader: "z-30",
   moduleDock: "z-30",
   dropdown: "z-[40]",

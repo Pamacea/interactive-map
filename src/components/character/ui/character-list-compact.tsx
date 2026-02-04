@@ -1,11 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { User, Plus, Search, Filter, ChevronDown } from "lucide-react";
-import type { Character, CharacterType, CharacterRole } from "@prisma/client";
+import { User, Search, Filter, ChevronDown } from "lucide-react";
+import type { Character, CharacterType } from "@prisma/client";
 import { useCharacterStore } from "@/stores/use-character-store";
 import { CharacterCard } from "./character-card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
@@ -31,13 +30,12 @@ const TYPE_ICONS: Record<CharacterType, string> = {
   CUSTOM: "⭐",
 };
 
-interface CharacterListProps {
+interface CharacterListCompactProps {
   worldId: string;
   characters: Character[];
-  onCreateCharacter?: () => void;
 }
 
-export function CharacterList({ worldId, characters, onCreateCharacter }: CharacterListProps) {
+export function CharacterListCompact({ worldId, characters }: CharacterListCompactProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
 
@@ -52,7 +50,6 @@ export function CharacterList({ worldId, characters, onCreateCharacter }: Charac
     applyFilters,
     filteredCharacters,
     setCharacters,
-    startCreating,
   } = useCharacterStore();
 
   // Update characters when prop changes
@@ -74,51 +71,29 @@ export function CharacterList({ worldId, characters, onCreateCharacter }: Charac
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border-subtle">
-        <div className="flex items-center gap-2">
-          <User className="w-5 h-5 text-accent-gold" />
-          <h2 className="font-display font-semibold text-text-primary">Characters</h2>
-          <Badge variant="outline" className="text-xs">
-            {filteredCharacters.length}
-          </Badge>
-        </div>
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={() => {
-            startCreating();
-            onCreateCharacter?.();
-          }}
-          className="h-8 px-2"
-        >
-          <Plus className="w-4 h-4" />
-        </Button>
-      </div>
-
       {/* Search and Filters */}
-      <div className="px-4 py-2 border-b border-border-subtle">
+      <div className="px-3 py-2">
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-bone-dark" />
           <Input
             type="text"
             placeholder="Search characters..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9 h-8 text-sm bg-obsidian/60 border-border-subtle"
+            className="pl-9 h-8 text-sm bg-obsidian/60 border-iron text-bone placeholder:text-bone-dark/50"
           />
         </div>
 
         {/* Filter Toggle */}
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center gap-2 mt-2 text-xs text-text-muted hover:text-text-secondary transition-colors"
+          className="flex items-center gap-2 mt-2 text-xs text-bone-dark hover:text-bone transition-colors"
         >
           <Filter className="w-3 h-3" />
           <span>Filters</span>
           {activeFilterCount > 0 && (
-            <Badge variant="outline" className="text-xs px-1.5 py-0">
+            <Badge variant="outline" className="text-xs px-1.5 py-0 border-iron/50 text-bone-dark">
               {activeFilterCount}
             </Badge>
           )}
@@ -142,7 +117,7 @@ export function CharacterList({ worldId, characters, onCreateCharacter }: Charac
                       flex items-center gap-1 px-2 py-1 rounded-sm text-xs transition-all
                       ${isActive
                         ? "bg-accent-gold/20 text-accent-gold border border-accent-gold/30"
-                        : "bg-obsidian/60 text-text-muted border border-transparent"
+                        : "bg-obsidian/60 text-bone-dark border border-transparent"
                       }
                     `}
                   >
@@ -160,7 +135,7 @@ export function CharacterList({ worldId, characters, onCreateCharacter }: Charac
                 flex items-center gap-2 px-3 py-1.5 rounded-sm text-xs transition-all
                 ${showVisibleOnly
                   ? "bg-accent-gold/20 text-accent-gold border border-accent-gold/30"
-                  : "bg-obsidian/60 text-text-muted border border-transparent"
+                  : "bg-obsidian/60 text-bone-dark border border-transparent"
                 }
               `}
             >
@@ -172,9 +147,9 @@ export function CharacterList({ worldId, characters, onCreateCharacter }: Charac
       </div>
 
       {/* Character List */}
-      <div className="flex-1 overflow-y-auto px-4 py-2 space-y-2">
+      <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2">
         {filteredCharacters.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-48 text-text-muted">
+          <div className="flex flex-col items-center justify-center h-48 text-bone-dark">
             <User className="w-12 h-12 mb-2 opacity-50" />
             <p className="text-sm">No characters found</p>
             <p className="text-xs mt-1">Create your first character to get started</p>

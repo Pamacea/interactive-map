@@ -47,7 +47,7 @@ export function LoreTableOfContents({ content }: TableOfContentsProps) {
   }
 
   return (
-    <div className="bg-[var(--color-background-card)] border border-[var(--color-border-subtle)] rounded-sm p-4">
+    <div className="bg-obsidian/80 border border-[var(--color-border-subtle)] rounded-sm p-4">
       <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-3">
         Table of Contents
       </h3>

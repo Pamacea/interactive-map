@@ -63,7 +63,7 @@ export function CharacterStatBlock({ character, compact = false }: CharacterStat
 
   if (!stats) {
     return (
-      <Card className="p-3 bg-background-elevated border border-border-subtle">
+      <Card className="p-3 bg-obsidian/60 border border-border-subtle">
         <div className="flex items-center gap-2 text-text-muted text-sm">
           <Shield className="w-4 h-4" />
           <span>No stats defined</span>
@@ -77,7 +77,7 @@ export function CharacterStatBlock({ character, compact = false }: CharacterStat
 
   if (compact) {
     return (
-      <Card className="p-2 bg-background-elevated border border-border-subtle">
+      <Card className="p-2 bg-obsidian/60 border border-border-subtle">
         <div className="flex items-center gap-3 text-xs">
           {STAT_CONFIG.map(({ key, label, icon, color }) => {
             const value = stats[key];
@@ -95,7 +95,7 @@ export function CharacterStatBlock({ character, compact = false }: CharacterStat
   }
 
   return (
-    <Card className="p-4 bg-background-elevated border border-border-subtle">
+    <Card className="p-4 bg-obsidian/60 border border-border-subtle">
       <div className="flex items-center gap-2 mb-3">
         <Shield className="w-4 h-4 text-accent-gold" />
         <h3 className="text-sm font-semibold text-text-secondary">Statistics</h3>
@@ -126,7 +126,7 @@ export function CharacterStatBlock({ character, compact = false }: CharacterStat
                   className={`
                     flex flex-col items-center p-2 rounded-sm border
                     ${value !== undefined
-                      ? "bg-background-card border-border-subtle"
+                      ? "bg-obsidian/80 border-border-subtle"
                       : "border-transparent opacity-30"
                     }
                   `}

@@ -193,7 +193,7 @@ export function CharacterForm({ worldId, character, onSuccess, onCancel }: Chara
   const isEditingForm = isCreating || isEditing || !!character;
 
   return (
-    <Card className="p-4 bg-background-card border border-border-subtle">
+    <Card className="p-4 bg-obsidian/80 border border-border-subtle">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
@@ -264,7 +264,7 @@ export function CharacterForm({ worldId, character, onSuccess, onCancel }: Chara
                   flex flex-col items-center gap-1 p-2 rounded-sm text-xs transition-all
                   ${formData.characterType === type.value
                     ? "bg-accent-gold/20 border border-accent-gold/50"
-                    : "bg-background-elevated border border-transparent hover:border-border-subtle"
+                    : "bg-obsidian/60 border border-transparent hover:border-border-subtle"
                   }
                 `}
                 disabled={isSubmitting}
@@ -285,7 +285,7 @@ export function CharacterForm({ worldId, character, onSuccess, onCancel }: Chara
             id="role"
             value={formData.role}
             onChange={(e) => updateField("role", e.target.value as CharacterRole)}
-            className="mt-1 w-full h-10 px-3 rounded-sm bg-background-elevated border border-border-subtle text-text-secondary text-sm"
+            className="mt-1 w-full h-10 px-3 rounded-sm bg-obsidian/60 border border-border-subtle text-text-secondary text-sm"
             disabled={isSubmitting}
           >
             {ROLES.map((role) => (

@@ -79,7 +79,7 @@ export function LoreLinkPreview({ worldId }: WikiLinkPreviewProps) {
         transform: "translate(-50%, -100%)",
       }}
     >
-      <div className="bg-[var(--color-background-card)] border border-[var(--color-border-subtle)] rounded-sm shadow-xl p-4 max-w-xs">
+      <div className="bg-obsidian/80 border border-[var(--color-border-subtle)] rounded-sm shadow-xl p-4 max-w-xs">
         <a
           href={`/world/${worldId}/lore/${preview.entry.slug}`}
           className="block font-medium text-[var(--color-text-primary)] hover:text-[var(--color-accent-gold)] transition-colors"

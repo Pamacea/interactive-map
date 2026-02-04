@@ -133,7 +133,7 @@ export function CharacterCard({ character, isSelected, onSelect }: CharacterCard
         group relative p-3 transition-all duration-200 cursor-pointer
         ${isSelected
           ? "border-accent-gold/30 bg-accent-gold/10"
-          : "border-transparent hover:bg-background-elevated/80"
+          : "border-transparent hover:bg-obsidian/60"
         }
       `}
     >
@@ -141,7 +141,7 @@ export function CharacterCard({ character, isSelected, onSelect }: CharacterCard
       <div className="flex items-start gap-2">
         {/* Portrait or Icon */}
         {character.portraitUrl ? (
-          <div className="flex-shrink-0 w-10 h-10 rounded-sm overflow-hidden bg-background-elevated">
+          <div className="flex-shrink-0 w-10 h-10 rounded-sm overflow-hidden bg-obsidian/60">
             <img
               src={character.portraitUrl}
               alt={character.name}
@@ -149,7 +149,7 @@ export function CharacterCard({ character, isSelected, onSelect }: CharacterCard
             />
           </div>
         ) : (
-          <div className="flex-shrink-0 w-10 h-10 rounded-sm bg-background-elevated flex items-center justify-center text-lg">
+          <div className="flex-shrink-0 w-10 h-10 rounded-sm bg-obsidian/60 flex items-center justify-center text-lg">
             {typeIcon}
           </div>
         )}
@@ -192,7 +192,7 @@ export function CharacterCard({ character, isSelected, onSelect }: CharacterCard
             flex-shrink-0 h-8 w-8 p-0
             ${character.isVisible
               ? "text-accent-gold hover:bg-accent-gold/10"
-              : "text-text-muted hover:bg-background-elevated"
+              : "text-text-muted hover:bg-obsidian/60"
             }
           `}
           title={character.isVisible ? "Visible" : "Hidden"}

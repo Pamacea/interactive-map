@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { User } from "lucide-react";
 import { FloatingPanel } from "./floating-panel";
-import { CharacterList } from "@/components/character/ui/character-list";
-import { CharacterForm } from "@/components/character/ui/character-form";
-import { CharacterDetail } from "@/components/character/ui/character-detail";
+import { CharacterListCompact } from "@/components/character/ui";
+import { CharacterForm } from "@/components/character/ui";
+import { CharacterDetail } from "@/components/character/ui";
 import { useCharacterStore } from "@/stores/use-character-store";
 import { getCharactersByWorld } from "@/actions/characters";
 import type { Character } from "@prisma/client";
@@ -21,6 +21,7 @@ export function CharactersModule({ worldId }: CharactersModuleProps) {
   const isCreating = useCharacterStore((state) => state.isCreating);
   const isEditing = useCharacterStore((state) => state.isEditing);
   const selectedCharacterId = useCharacterStore((state) => state.selectedCharacterId);
+  const startCreating = useCharacterStore((state) => state.startCreating);
   const stopCreating = useCharacterStore((state) => state.stopCreating);
   const stopEditing = useCharacterStore((state) => state.stopEditing);
   const setCharactersStore = useCharacterStore((state) => state.setCharacters);
@@ -51,9 +52,10 @@ export function CharactersModule({ worldId }: CharactersModuleProps) {
       panelId="characters"
       title="Characters"
       icon={<User className="w-4 h-4" />}
+      onAdd={startCreating}
     >
       {isLoading ? (
-        <div className="flex items-center justify-center h-32 text-text-muted">
+        <div className="flex items-center justify-center h-32 text-bone-dark">
           <div className="animate-spin rounded-full h-6 w-6 border-2 border-accent-gold border-t-transparent" />
         </div>
       ) : isCreating || isEditing ? (
@@ -82,16 +84,7 @@ export function CharactersModule({ worldId }: CharactersModuleProps) {
           onClose={() => useCharacterStore.getState().clearSelection()}
         />
       ) : (
-        <CharacterList
-          worldId={worldId}
-          characters={characters}
-          onCreateCharacter={() => {
-            getCharactersByWorld(worldId).then((data) => {
-              setCharactersState(data);
-              setCharactersStore(data);
-            });
-          }}
-        />
+        <CharacterListCompact worldId={worldId} characters={characters} />
       )}
     </FloatingPanel>
   );

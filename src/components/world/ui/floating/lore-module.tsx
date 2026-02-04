@@ -2,7 +2,7 @@
 
 import { BookOpen } from "lucide-react";
 import { FloatingPanel } from "./floating-panel";
-import { LoreList } from "@/components/lore/ui/lore-list";
+import { LoreListCompact } from "@/components/lore/ui/lore-list-compact";
 import { LoreForm } from "@/components/lore/ui/lore-form";
 import { LoreDetail } from "@/components/lore/ui/lore-detail";
 import { useLoreStore } from "@/stores/use-lore-store";
@@ -18,6 +18,7 @@ export function LoreModule({ worldId }: LoreModuleProps) {
   const loreEntries = useLoreStore((state) => state.loreEntries);
   const stopCreating = useLoreStore((state) => state.stopCreating);
   const stopEditing = useLoreStore((state) => state.stopEditing);
+  const startCreating = useLoreStore((state) => state.startCreating);
 
   const selectedLore = selectedLoreId
     ? loreEntries.find((lore) => lore.id === selectedLoreId)
@@ -28,6 +29,7 @@ export function LoreModule({ worldId }: LoreModuleProps) {
       panelId="lore"
       title="Lore"
       icon={<BookOpen className="w-4 h-4" />}
+      onAdd={startCreating}
     >
       {isCreatingLore || isEditingLore ? (
         <LoreForm
@@ -41,7 +43,7 @@ export function LoreModule({ worldId }: LoreModuleProps) {
       ) : selectedLore ? (
         <LoreDetail lore={selectedLore} worldId={worldId} />
       ) : (
-        <LoreList worldId={worldId} />
+        <LoreListCompact worldId={worldId} />
       )}
     </FloatingPanel>
   );

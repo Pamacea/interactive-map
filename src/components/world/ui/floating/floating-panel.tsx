@@ -1,10 +1,11 @@
 "use client";
 
 import { forwardRef, useMemo } from "react";
-import { X, ChevronDown, GripHorizontal } from "lucide-react";
+import { GripHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useFloatingPanel, type UseFloatingPanelOptions } from "@/components/world/logic/use-floating-panel";
 import { Z_INDEX_CLASSES } from "@/constants/z-index";
+import { PanelHeader } from "../panel";
 
 export interface FloatingPanelProps extends UseFloatingPanelOptions {
   title: string;
@@ -14,6 +15,7 @@ export interface FloatingPanelProps extends UseFloatingPanelOptions {
   showClose?: boolean;
   showCollapse?: boolean;
   showResize?: boolean;
+  onAdd?: () => void;
 }
 
 export const FloatingPanel = forwardRef<HTMLDivElement, FloatingPanelProps>(
@@ -26,6 +28,7 @@ export const FloatingPanel = forwardRef<HTMLDivElement, FloatingPanelProps>(
       showClose = true,
       showCollapse = true,
       showResize = true,
+      onAdd,
       panelId,
       minWidth = 200,
       maxWidth = 800,
@@ -99,50 +102,17 @@ export const FloatingPanel = forwardRef<HTMLDivElement, FloatingPanelProps>(
         <div className="absolute inset-0 bg-crack-pattern opacity-[0.03] pointer-events-none" />
 
         {/* Title bar / Drag handle */}
-        <div
-          {...dragHandleProps}
-          className="relative flex items-center justify-between px-3 py-2 bg-stone/50 border-b border-iron/50 select-none"
-        >
-          <div className="flex items-center gap-2 min-w-0">
-            {icon && <span className="flex-shrink-0 text-accent-gold/80">{icon}</span>}
-            <h2
-              id={`${panelId}-title`}
-              className="text-sm font-display font-semibold text-bone uppercase tracking-wide truncate"
-            >
-              {title}
-            </h2>
-          </div>
-
-          <div className="flex items-center gap-1 flex-shrink-0">
-            {showCollapse && (
-              <button
-                {...collapseProps}
-                type="button"
-                className="p-1 text-bone-dark/60 hover:text-accent-gold hover:bg-accent-gold/10 rounded-sm transition-colors"
-                aria-label={isCollapsed ? "Expand panel" : "Collapse panel"}
-                title={isCollapsed ? "Expand" : "Collapse"}
-              >
-                <ChevronDown
-                  className={cn(
-                    "w-4 h-4 transition-transform",
-                    isCollapsed && "-rotate-90"
-                  )}
-                />
-              </button>
-            )}
-            {showClose && (
-              <button
-                {...closeProps}
-                type="button"
-                className="p-1 text-bone-dark/60 hover:text-blood hover:bg-blood/10 rounded-sm transition-colors"
-                aria-label="Close panel"
-                title="Close"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-        </div>
+        <PanelHeader
+          id={`${panelId}-title`}
+          title={title}
+          icon={icon}
+          variant="floating"
+          isCollapsed={isCollapsed}
+          onToggle={showCollapse ? () => collapseProps.onClick() : undefined}
+          onClose={showClose ? () => closeProps.onClick() : undefined}
+          onAdd={onAdd}
+          dragHandleProps={dragHandleProps}
+        />
 
         {/* Content */}
         {!isCollapsed && (

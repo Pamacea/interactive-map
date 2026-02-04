@@ -35,41 +35,41 @@ const DEFAULT_PANELS: Record<FloatingPanelId, Omit<FloatingPanelState, "zIndex">
     id: "layers",
     isVisible: false,
     position: { x: 16, y: 16 },
-    size: { width: 280, height: 400 },
+    size: { width: 320, height: 450 },
     isCollapsed: false,
   },
   lore: {
     id: "lore",
     isVisible: false,
-    position: { x: 312, y: 16 },
-    size: { width: 280, height: 400 },
+    position: { x: 352, y: 16 },
+    size: { width: 400, height: 550 },
     isCollapsed: false,
   },
   characters: {
     id: "characters",
     isVisible: false,
-    position: { x: 16, y: 432 },
-    size: { width: 280, height: 400 },
+    position: { x: 16, y: 482 },
+    size: { width: 350, height: 500 },
     isCollapsed: false,
   },
   filters: {
     id: "filters",
     isVisible: false,
-    position: { x: 312, y: 432 },
+    position: { x: 376, y: 482 },
     size: { width: 280, height: 300 },
     isCollapsed: false,
   },
   properties: {
     id: "properties",
     isVisible: false,
-    position: { x: 608, y: 432 },
-    size: { width: 280, height: 300 },
+    position: { x: 680, y: 482 },
+    size: { width: 320, height: 400 },
     isCollapsed: false,
   },
   members: {
     id: "members",
     isVisible: false,
-    position: { x: 608, y: 16 },
+    position: { x: 680, y: 16 },
     size: { width: 280, height: 350 },
     isCollapsed: false,
   },
@@ -87,24 +87,24 @@ const getOrInitPanel = (
   if (!defaultPanel) {
     throw new Error(`Unknown panel id: ${id}`);
   }
-  return { ...defaultPanel, zIndex: Z_INDEX.floatingPanel };
+  return { ...defaultPanel, zIndex: Z_INDEX.activeFloatingPanel };
 };
 
-// Create initial panels with z-index
+// Create initial panels with z-index (above header)
 const createInitialPanels = (): Record<FloatingPanelId, FloatingPanelState> => ({
-  layers: { ...DEFAULT_PANELS.layers, zIndex: Z_INDEX.floatingPanel },
-  lore: { ...DEFAULT_PANELS.lore, zIndex: Z_INDEX.floatingPanel },
-  characters: { ...DEFAULT_PANELS.characters, zIndex: Z_INDEX.floatingPanel },
-  filters: { ...DEFAULT_PANELS.filters, zIndex: Z_INDEX.floatingPanel },
-  properties: { ...DEFAULT_PANELS.properties, zIndex: Z_INDEX.floatingPanel },
-  members: { ...DEFAULT_PANELS.members, zIndex: Z_INDEX.floatingPanel },
+  layers: { ...DEFAULT_PANELS.layers, zIndex: Z_INDEX.activeFloatingPanel },
+  lore: { ...DEFAULT_PANELS.lore, zIndex: Z_INDEX.activeFloatingPanel },
+  characters: { ...DEFAULT_PANELS.characters, zIndex: Z_INDEX.activeFloatingPanel },
+  filters: { ...DEFAULT_PANELS.filters, zIndex: Z_INDEX.activeFloatingPanel },
+  properties: { ...DEFAULT_PANELS.properties, zIndex: Z_INDEX.activeFloatingPanel },
+  members: { ...DEFAULT_PANELS.members, zIndex: Z_INDEX.activeFloatingPanel },
 });
 
 export const useFloatingPanelsStore = create<FloatingPanelsStore>()(
   persist(
     (set, get) => ({
       panels: createInitialPanels(),
-      maxZIndex: Z_INDEX.floatingPanel,
+      maxZIndex: Z_INDEX.activeFloatingPanel,
 
       togglePanel: (id) =>
         set((state) => {
@@ -200,7 +200,7 @@ export const useFloatingPanelsStore = create<FloatingPanelsStore>()(
             ...state.panels,
             [id]: {
               ...DEFAULT_PANELS[id],
-              zIndex: Z_INDEX.floatingPanel,
+              zIndex: Z_INDEX.activeFloatingPanel,
             },
           },
         })),
@@ -208,7 +208,7 @@ export const useFloatingPanelsStore = create<FloatingPanelsStore>()(
       resetAll: () =>
         set({
           panels: createInitialPanels(),
-          maxZIndex: Z_INDEX.floatingPanel,
+          maxZIndex: Z_INDEX.activeFloatingPanel,
         }),
     }),
     {
@@ -223,12 +223,12 @@ export const useFloatingPanelsStore = create<FloatingPanelsStore>()(
 
 // Create memoized default panel states to avoid infinite loop warnings
 const DEFAULT_PANELS_WITH_ZINDEX: Record<FloatingPanelId, FloatingPanelState> = {
-  layers: { ...DEFAULT_PANELS.layers, zIndex: Z_INDEX.floatingPanel },
-  lore: { ...DEFAULT_PANELS.lore, zIndex: Z_INDEX.floatingPanel },
-  characters: { ...DEFAULT_PANELS.characters, zIndex: Z_INDEX.floatingPanel },
-  filters: { ...DEFAULT_PANELS.filters, zIndex: Z_INDEX.floatingPanel },
-  properties: { ...DEFAULT_PANELS.properties, zIndex: Z_INDEX.floatingPanel },
-  members: { ...DEFAULT_PANELS.members, zIndex: Z_INDEX.floatingPanel },
+  layers: { ...DEFAULT_PANELS.layers, zIndex: Z_INDEX.activeFloatingPanel },
+  lore: { ...DEFAULT_PANELS.lore, zIndex: Z_INDEX.activeFloatingPanel },
+  characters: { ...DEFAULT_PANELS.characters, zIndex: Z_INDEX.activeFloatingPanel },
+  filters: { ...DEFAULT_PANELS.filters, zIndex: Z_INDEX.activeFloatingPanel },
+  properties: { ...DEFAULT_PANELS.properties, zIndex: Z_INDEX.activeFloatingPanel },
+  members: { ...DEFAULT_PANELS.members, zIndex: Z_INDEX.activeFloatingPanel },
 };
 
 // Selector hooks for specific panels
