@@ -11,13 +11,15 @@ import {
   PinIconSection,
   PinPropertiesSection,
   PinCoordinatesSection,
+  PinCharactersSection,
 } from "./popup-content-sections"
 
 interface PopupContentEnhancedProps {
   pin: Pin
+  worldId?: string
 }
 
-export function PopupContentEnhanced({ pin }: PopupContentEnhancedProps) {
+export function PopupContentEnhanced({ pin, worldId }: PopupContentEnhancedProps) {
   const properties = (pin.properties as Record<string, unknown>) || {}
 
   // Description editing logic
@@ -52,6 +54,9 @@ export function PopupContentEnhanced({ pin }: PopupContentEnhancedProps) {
 
       {/* Properties Section */}
       <PinPropertiesSection properties={properties} />
+
+      {/* Characters Section */}
+      {worldId && <PinCharactersSection pinId={pin.id} worldId={worldId} />}
 
       {/* Coordinates Section */}
       <PinCoordinatesSection pin={pin} />

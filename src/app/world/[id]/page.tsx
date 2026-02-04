@@ -1,10 +1,12 @@
 import { WorldClient } from "@/components/world/ui/world-client";
 import { getWorldWithData } from "@/actions/worlds";
 import { getLoreEntriesByWorld } from "@/actions/lore";
+import { getCharactersByWorld } from "@/actions/characters";
 import { auth } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import type { Pin } from "@/types/pin.type";
 import type { LoreEntry } from "@/types/lore.type";
+import type { Character } from "@prisma/client";
 import type { Metadata } from "next";
 import { siteConfig } from "@/config/site";
 import { CreativeWorkSchema } from "@/shared/components/seo";
@@ -71,9 +73,10 @@ export default async function WorldDetailPage({
   const { id } = await params;
 
   // Fetch everything server-side in parallel
-  const [world, loreEntries, session] = await Promise.all([
+  const [world, loreEntries, characters, session] = await Promise.all([
     getWorldWithData(id),
     getLoreEntriesByWorld(id),
+    getCharactersByWorld(id),
     auth(),
   ]);
 
@@ -109,6 +112,7 @@ export default async function WorldDetailPage({
       world={world}
       pins={world.pins as unknown as Pin[]}
       loreEntries={loreEntries as unknown as LoreEntry[]}
+      characters={characters}
       isAuthenticated={!!session?.user}
       currentUserId={session?.user?.id}
       worldOwnerId={world.userId}

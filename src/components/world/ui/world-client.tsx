@@ -21,10 +21,12 @@ import {
   FiltersModule,
   PropertiesModule,
   MembersModule,
+  CharactersModule,
 } from "@/components/world/ui/floating";
 import type { OptimizedWorld } from "@/types/world.type";
 import type { Pin } from "@/types/pin.type";
 import type { LoreEntry } from "@/types/lore.type";
+import type { Character } from "@prisma/client";
 import type { SearchResultItem } from "@/lib/search-types";
 
 // Dynamic import for MapCanvas to avoid SSR and reduce initial bundle size
@@ -40,6 +42,7 @@ interface WorldClientProps {
   world: OptimizedWorld;
   pins: Pin[];
   loreEntries: LoreEntry[];
+  characters: Character[];
   isAuthenticated: boolean;
   currentUserId?: string;
   worldOwnerId: string;
@@ -77,6 +80,8 @@ function FloatingUI({ world, pins, currentUserId, worldOwnerId }: {
 
       <LoreModule worldId={world.id} />
 
+      <CharactersModule worldId={world.id} />
+
       <FiltersModule />
 
       <PropertiesModule />
@@ -97,6 +102,7 @@ export const WorldClient = memo(function WorldClient({
   world,
   pins,
   loreEntries,
+  characters,
   isAuthenticated,
   currentUserId,
   worldOwnerId,
@@ -202,6 +208,24 @@ export const WorldClient = memo(function WorldClient({
               worldOwnerId={worldOwnerId}
             />
           </Suspense>
+
+          {/* Pass characters to MapCanvas for character popup support */}
+          <script
+            id="world-characters-data"
+            type="application/json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(
+                characters.map((c) => ({
+                  id: c.id,
+                  name: c.name,
+                  portraitUrl: c.portraitUrl,
+                  characterType: c.characterType,
+                  level: c.level,
+                  faction: c.faction,
+                }))
+              ),
+            }}
+          />
 
           {/* Autosave indicator */}
           <Suspense fallback={null}>

@@ -31,6 +31,9 @@ model User {
   loreEntries   LoreEntry[]
   invitesCreated WorldInvite[] @relation("InvitesCreated")
   invitesAccepted WorldInvite[] @relation("InvitesAccepted")
+  presences     UserPresence[] @relation("UserPresences")
+  events        CollaborationEvent[] @relation("UserEvents")
+  characters    Character[]    @relation("CharacterCreator")
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }
@@ -95,6 +98,9 @@ model GameWorld {
   layers      MapLayer[]
   loreEntries LoreEntry[]
   collections GalleryCollection[]
+  presences   UserPresence[] @relation("WorldPresences")
+  events      CollaborationEvent[] @relation("WorldEvents")
+  characters  Character[]    @relation("WorldCharacters")
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
@@ -148,6 +154,63 @@ model WorldInvite {
   @@index([email])
   @@index([status])
   @@index([expiresAt])
+}
+
+// ============================================
+// REAL-TIME COLLABORATION
+// ============================================
+
+model UserPresence {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation("UserPresences", fields: [userId], references: [id], onDelete: Cascade)
+  worldId   String
+  world     GameWorld @relation("WorldPresences", fields: [worldId], references: [id], onDelete: Cascade)
+  sessionId String   // WebSocket/Socket session identifier
+  isActive  Boolean  @default(true)
+  lastSeen  DateTime @default(now())
+  cursorX   Float?   // Normalized cursor position (0-1)
+  cursorY   Float?   // Normalized cursor position (0-1)
+  viewport  Json?    // Current viewport { x, y, zoom, width, height }
+  selectedPinId String? // Currently selected pin
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, worldId, sessionId])
+  @@index([worldId, isActive])
+  @@index([userId])
+  @@index([lastSeen])
+}
+
+enum CollaborationEventType {
+  PIN_CREATED
+  PIN_UPDATED
+  PIN_DELETED
+  PIN_MOVED
+  LAYER_CREATED
+  LAYER_UPDATED
+  LAYER_DELETED
+  LAYER_VISIBILITY_CHANGED
+  USER_JOINED
+  USER_LEFT
+  SELECTION_CHANGED
+}
+
+model CollaborationEvent {
+  id        String                 @id @default(cuid())
+  worldId   String
+  world     GameWorld              @relation("WorldEvents", fields: [worldId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User                   @relation("UserEvents", fields: [userId], references: [id], onDelete: Cascade)
+  eventType CollaborationEventType
+  targetId  String?                // ID of the affected entity
+  targetType String?               // "pin", "layer", etc.
+  eventData  Json?                 // Event-specific data
+  timestamp  DateTime               @default(now())
+
+  @@index([worldId, timestamp])
+  @@index([eventType, targetId])
+  @@index([userId])
 }
 
 // ============================================
@@ -214,6 +277,7 @@ model Pin {
   layer       MapLayer?           @relation(fields: [layerId], references: [id], onDelete: SetNull)
   gallery     GalleryItem[]
   loreLinks   LorePinRelation[]   @relation("PinsToLore")
+  characterLinks CharacterPinRelation[] @relation("CharacterPins")
   createdAt   DateTime            @default(now())
   updatedAt   DateTime            @updatedAt
 
@@ -328,6 +392,8 @@ model GalleryItem {
   pin           Pin?                @relation(fields: [pinId], references: [id], onDelete: Cascade)
   loreEntryId   String?
   loreEntry     LoreEntry?          @relation(fields: [loreEntryId], references: [id], onDelete: Cascade)
+  characterId   String?
+  character     Character?          @relation(fields: [characterId], references: [id], onDelete: Cascade)
   worldId       String?             // Direct world link for unlinked items
   collections   CollectionItem[]    @relation("GalleryItemCollections")
   createdAt     DateTime            @default(now())
@@ -379,27 +445,140 @@ enum MediaType {
 // CHARACTER-SPECIFIC DATA
 // ============================================
 
-// Extension for Pin when pinType = CHARACTER
-// Stored in Pin.properties as JSON, or use separate model
-// Example structure in properties:
-// {
-//   "character": {
-//     "level": 5,
-//     "faction": "Alliance",
-//     "class": "Warrior",
-//     "dialogue": ["Hello traveler!", "What brings you here?"],
-//     "quests": ["quest-id-1", "quest-id-2"],
-//     "shop": true
-//   }
-// }
+enum CharacterType {
+  PLAYER       // Player character / PC
+  NPC          // Non-player character
+  ENEMY        // Hostile creature/NPC
+  MERCHANT     // Shop keeper
+  QUEST_GIVER  // Provides quests
+  COMPANION    // Follower/party member
+  BOSS         // Major enemy
+  CUSTOM       // Custom type
+}
 
-model character {
-  id        String @id @default(cuid())
-  name      String
-  level     Int?
-  faction   String?
-  class     String?
+enum CharacterRole {
+  PROTAGONIST    // Main hero
+  ANTAGONIST     // Main villain
+  SUPPORTING     // Supporting character
+  BACKGROUND     // Background NPC
+  MENTOR         // Teacher/guide
+  ALLY           // Friendly to players
+  NEUTRAL        // Neutral stance
+  HOSTILE        // Enemy to players
+  CUSTOM         // Custom role
+}
 
-  dialogue  Json?  // Array of dialogue strings
-  quests    Json?  // Array of quest IDs
+enum RelationshipType {
+  FAMILY           // Family relationships
+  FRIEND           // Friend
+  ENEMY            // Enemy/rival
+  MENTOR           // Teacher-student
+  COMPANION        // Traveling together
+  ROMANTIC         // Romantic interest
+  ALLY             // Alliance
+  SUBORDINATE      // Master-servant
+  CUSTOM           // Custom relationship
+}
+
+model Character {
+  id              String         @id @default(cuid())
+  name            String
+  shortName       String?        // Nickname or short name for UI
+  characterType   CharacterType  @default(NPC)
+  role            CharacterRole  @default(SUPPORTING)
+
+  // Appearance
+  portraitUrl     String?        // Character portrait image
+  age             Int?
+  gender          String?
+  species         String?        // Human, Elf, Dwarf, etc.
+  height          String?        // Height description
+  build           String?        // Physical build
+
+  // RPG Stats (stored as JSON for flexibility)
+  level           Int?
+  class           String?        // Character class
+  faction         String?        // Faction allegiance
+  stats           Json?          // { strength, dexterity, constitution, intelligence, wisdom, charisma, etc. }
+  skills          Json?          // Array of skill objects { name, level, description }
+  equipment       Json?          // Array of equipment { name, type, description }
+
+  // Personality & Background
+  personality     String?        @db.Text
+  background      String?        @db.Text
+  goals           String?        @db.Text
+  fears           String?        @db.Text
+
+  // Dialogue & Quests
+  dialogue        Json?          // Array of dialogue entries { text, condition, questTrigger }
+  quests          Json?          // Array of quest IDs related to this character
+  shopInventory   Json?          // Shop items if merchant
+
+  // State
+  isVisible       Boolean        @default(true)
+  isPublic        Boolean        @default(true)
+  order           Int            @default(0)
+
+  // Relations
+  userId          String
+  user            User           @relation("CharacterCreator", fields: [userId], references: [id], onDelete: Cascade)
+  gameWorldId     String
+  gameWorld       GameWorld      @relation("WorldCharacters", fields: [gameWorldId], references: [id], onDelete: Cascade)
+
+  // Linked pins (locations associated with character)
+  pinLinks        CharacterPinRelation[] @relation("CharacterPins")
+
+  // Relationships with other characters
+  relationshipsAsSource  CharacterRelationship[] @relation("RelationshipsFrom")
+  relationshipsAsTarget  CharacterRelationship[] @relation("RelationshipsTo")
+
+  // Gallery items (portraits, reference images)
+  gallery         GalleryItem[]
+
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([gameWorldId])
+  @@index([userId])
+  @@index([characterType])
+  @@index([faction])
+  @@index([isVisible, order])
+}
+
+// Character-to-Pin linking (like Lore-Pin linking)
+model CharacterPinRelation {
+  id           String     @id @default(cuid())
+  characterId  String
+  character    Character  @relation("CharacterPins", fields: [characterId], references: [id], onDelete: Cascade)
+  pinId        String
+  pin          Pin        @relation("CharacterPins", fields: [pinId], references: [id], onDelete: Cascade)
+  relationType String     @default("LOCATION") // HOME, WORK, FREQUENTS, DIED_AT, CUSTOM
+  notes        String?    @db.Text // Optional notes about this location
+  order        Int        @default(0)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([characterId, pinId])
+  @@index([characterId])
+  @@index([pinId])
+}
+
+// Relationships between characters
+model CharacterRelationship {
+  id             String           @id @default(cuid())
+  sourceId       String           // The character from whom this relationship originates
+  source         Character        @relation("RelationshipsFrom", fields: [sourceId], references: [id], onDelete: Cascade)
+  targetId       String           // The character being related to
+  target         Character        @relation("RelationshipsTo", fields: [targetId], references: [id], onDelete: Cascade)
+  relationshipType RelationshipType @default(FRIEND)
+  description    String?          @db.Text // Description of the relationship
+  strength       Int?             @default(50) // Relationship strength 0-100
+  isVisible      Boolean          @default(true)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@unique([sourceId, targetId])
+  @@index([sourceId])
+  @@index([targetId])
+  @@index([relationshipType])
 }

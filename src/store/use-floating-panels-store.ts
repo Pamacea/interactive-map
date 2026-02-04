@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { Z_INDEX } from "@/constants/z-index";
 
-export type FloatingPanelId = "layers" | "lore" | "filters" | "properties" | "members";
+export type FloatingPanelId = "layers" | "lore" | "characters" | "filters" | "properties" | "members";
 
 export interface FloatingPanelState {
   id: FloatingPanelId;
@@ -45,17 +45,24 @@ const DEFAULT_PANELS: Record<FloatingPanelId, Omit<FloatingPanelState, "zIndex">
     size: { width: 280, height: 400 },
     isCollapsed: false,
   },
+  characters: {
+    id: "characters",
+    isVisible: false,
+    position: { x: 16, y: 432 },
+    size: { width: 280, height: 400 },
+    isCollapsed: false,
+  },
   filters: {
     id: "filters",
     isVisible: false,
-    position: { x: 16, y: 432 },
+    position: { x: 312, y: 432 },
     size: { width: 280, height: 300 },
     isCollapsed: false,
   },
   properties: {
     id: "properties",
     isVisible: false,
-    position: { x: 312, y: 432 },
+    position: { x: 608, y: 432 },
     size: { width: 280, height: 300 },
     isCollapsed: false,
   },
@@ -68,10 +75,26 @@ const DEFAULT_PANELS: Record<FloatingPanelId, Omit<FloatingPanelState, "zIndex">
   },
 };
 
+// Helper function to safely get or initialize a panel
+const getOrInitPanel = (
+  panels: Record<FloatingPanelId, FloatingPanelState>,
+  id: FloatingPanelId
+): FloatingPanelState => {
+  if (panels[id]) {
+    return panels[id];
+  }
+  const defaultPanel = DEFAULT_PANELS[id];
+  if (!defaultPanel) {
+    throw new Error(`Unknown panel id: ${id}`);
+  }
+  return { ...defaultPanel, zIndex: Z_INDEX.floatingPanel };
+};
+
 // Create initial panels with z-index
 const createInitialPanels = (): Record<FloatingPanelId, FloatingPanelState> => ({
   layers: { ...DEFAULT_PANELS.layers, zIndex: Z_INDEX.floatingPanel },
   lore: { ...DEFAULT_PANELS.lore, zIndex: Z_INDEX.floatingPanel },
+  characters: { ...DEFAULT_PANELS.characters, zIndex: Z_INDEX.floatingPanel },
   filters: { ...DEFAULT_PANELS.filters, zIndex: Z_INDEX.floatingPanel },
   properties: { ...DEFAULT_PANELS.properties, zIndex: Z_INDEX.floatingPanel },
   members: { ...DEFAULT_PANELS.members, zIndex: Z_INDEX.floatingPanel },
@@ -84,71 +107,88 @@ export const useFloatingPanelsStore = create<FloatingPanelsStore>()(
       maxZIndex: Z_INDEX.floatingPanel,
 
       togglePanel: (id) =>
-        set((state) => ({
-          panels: {
-            ...state.panels,
-            [id]: {
-              ...state.panels[id],
-              isVisible: !state.panels[id].isVisible,
-              zIndex: state.panels[id].isVisible ? state.panels[id].zIndex : state.maxZIndex + 1,
-            },
-          },
-          maxZIndex: state.panels[id].isVisible ? state.maxZIndex : state.maxZIndex + 1,
-        })),
-
-      showPanel: (id) =>
         set((state) => {
-          if (state.panels[id].isVisible) return state;
+          const panel = getOrInitPanel(state.panels, id);
           return {
             panels: {
               ...state.panels,
-              [id]: { ...state.panels[id], isVisible: true, zIndex: state.maxZIndex + 1 },
+              [id]: {
+                ...panel,
+                isVisible: !panel.isVisible,
+                zIndex: panel.isVisible ? panel.zIndex : state.maxZIndex + 1,
+              },
+            },
+            maxZIndex: panel.isVisible ? state.maxZIndex : state.maxZIndex + 1,
+          };
+        }),
+
+      showPanel: (id) =>
+        set((state) => {
+          const panel = getOrInitPanel(state.panels, id);
+          if (panel.isVisible) return state;
+          return {
+            panels: {
+              ...state.panels,
+              [id]: { ...panel, isVisible: true, zIndex: state.maxZIndex + 1 },
             },
             maxZIndex: state.maxZIndex + 1,
           };
         }),
 
       hidePanel: (id) =>
-        set((state) => ({
-          panels: {
-            ...state.panels,
-            [id]: { ...state.panels[id], isVisible: false },
-          },
-        })),
+        set((state) => {
+          const panel = getOrInitPanel(state.panels, id);
+          return {
+            panels: {
+              ...state.panels,
+              [id]: { ...panel, isVisible: false },
+            },
+          };
+        }),
 
       updatePosition: (id, position) =>
-        set((state) => ({
-          panels: {
-            ...state.panels,
-            [id]: { ...state.panels[id], position },
-          },
-        })),
+        set((state) => {
+          const panel = getOrInitPanel(state.panels, id);
+          return {
+            panels: {
+              ...state.panels,
+              [id]: { ...panel, position },
+            },
+          };
+        }),
 
       updateSize: (id, size) =>
-        set((state) => ({
-          panels: {
-            ...state.panels,
-            [id]: { ...state.panels[id], size },
-          },
-        })),
+        set((state) => {
+          const panel = getOrInitPanel(state.panels, id);
+          return {
+            panels: {
+              ...state.panels,
+              [id]: { ...panel, size },
+            },
+          };
+        }),
 
       toggleCollapse: (id) =>
-        set((state) => ({
-          panels: {
-            ...state.panels,
-            [id]: { ...state.panels[id], isCollapsed: !state.panels[id].isCollapsed },
-          },
-        })),
+        set((state) => {
+          const panel = getOrInitPanel(state.panels, id);
+          return {
+            panels: {
+              ...state.panels,
+              [id]: { ...panel, isCollapsed: !panel.isCollapsed },
+            },
+          };
+        }),
 
       bringToFront: (id) =>
         set((state) => {
-          const currentZ = state.panels[id].zIndex;
+          const panel = getOrInitPanel(state.panels, id);
+          const currentZ = panel.zIndex;
           if (currentZ >= state.maxZIndex) return state;
           const newZ = state.maxZIndex + 1;
           return {
             panels: {
               ...state.panels,
-              [id]: { ...state.panels[id], zIndex: newZ },
+              [id]: { ...panel, zIndex: newZ },
             },
             maxZIndex: newZ,
           };
@@ -185,6 +225,7 @@ export const useFloatingPanelsStore = create<FloatingPanelsStore>()(
 const DEFAULT_PANELS_WITH_ZINDEX: Record<FloatingPanelId, FloatingPanelState> = {
   layers: { ...DEFAULT_PANELS.layers, zIndex: Z_INDEX.floatingPanel },
   lore: { ...DEFAULT_PANELS.lore, zIndex: Z_INDEX.floatingPanel },
+  characters: { ...DEFAULT_PANELS.characters, zIndex: Z_INDEX.floatingPanel },
   filters: { ...DEFAULT_PANELS.filters, zIndex: Z_INDEX.floatingPanel },
   properties: { ...DEFAULT_PANELS.properties, zIndex: Z_INDEX.floatingPanel },
   members: { ...DEFAULT_PANELS.members, zIndex: Z_INDEX.floatingPanel },

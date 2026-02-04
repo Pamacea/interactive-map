@@ -30,7 +30,7 @@ export function SectionHeader({ pinType }: SectionHeaderProps) {
   const icon = pinTypeOptions.find((opt) => opt.value === pinType)?.icon || "MapPin";
 
   return (
-    <div className="relative flex items-center gap-2 px-3 py-2.5 rounded-t-md bg-stone/50 border-2 border-t border-x border-accent-gold/50 border-b-iron/50">
+    <div className="relative flex items-center gap-2 px-3 py-2.5 bg-stone/50 border-t border-accent-gold/50 border-b-iron/50">
       <IconWrapper iconName={icon} className="w-4 h-4 text-accent-gold" />
       <span className="text-xs font-display font-semibold text-accent-gold uppercase tracking-widest">
         Pin Properties

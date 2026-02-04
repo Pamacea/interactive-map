@@ -4,6 +4,7 @@ export { FloatingHeader } from "./floating-header";
 export { ModuleDock } from "./module-dock";
 export { LayersModule } from "./layers-module";
 export { LoreModule } from "./lore-module";
+export { CharactersModule } from "./characters-module";
 export { FiltersModule } from "./filters-module";
 export { PropertiesModule } from "./properties-module";
 export { MembersModule } from "./members-module";

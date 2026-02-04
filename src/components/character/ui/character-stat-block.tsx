@@ -1,0 +1,171 @@
+"use client";
+
+import { Shield, Heart, Sword, Zap, Brain, Eye, Users } from "lucide-react";
+import type { Character } from "@prisma/client";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+
+interface CharacterStatBlockProps {
+  character: Character;
+  compact?: boolean;
+}
+
+type CharacterStats = {
+  strength?: number;
+  dexterity?: number;
+  constitution?: number;
+  intelligence?: number;
+  wisdom?: number;
+  charisma?: number;
+  health?: number;
+  maxHealth?: number;
+  mana?: number;
+  maxMana?: number;
+  stamina?: number;
+  maxStamina?: number;
+  armorClass?: number;
+  speed?: number;
+  initiative?: number;
+};
+
+const STAT_CONFIG: Array<{
+  key: keyof CharacterStats;
+  label: string;
+  icon: React.ReactNode;
+  color: string;
+}> = [
+  { key: "strength", label: "STR", icon: <Sword className="w-3 h-3" />, color: "text-red-400" },
+  { key: "dexterity", label: "DEX", icon: <Zap className="w-3 h-3" />, color: "text-green-400" },
+  { key: "constitution", label: "CON", icon: <Heart className="w-3 h-3" />, color: "text-orange-400" },
+  { key: "intelligence", label: "INT", icon: <Brain className="w-3 h-3" />, color: "text-blue-400" },
+  { key: "wisdom", label: "WIS", icon: <Eye className="w-3 h-3" />, color: "text-purple-400" },
+  { key: "charisma", label: "CHA", icon: <Users className="w-3 h-3" />, color: "text-pink-400" },
+];
+
+const SECONDARY_STATS: Array<{
+  key: keyof CharacterStats;
+  label: string;
+  icon: React.ReactNode;
+}> = [
+  { key: "health", label: "HP", icon: <Heart className="w-3 h-3 text-red-400" /> },
+  { key: "maxHealth", label: "Max HP", icon: <Heart className="w-3 h-3 text-red-400" /> },
+  { key: "mana", label: "MP", icon: <Zap className="w-3 h-3 text-blue-400" /> },
+  { key: "maxMana", label: "Max MP", icon: <Zap className="w-3 h-3 text-blue-400" /> },
+  { key: "stamina", label: "STA", icon: <Shield className="w-3 h-3 text-green-400" /> },
+  { key: "maxStamina", label: "Max STA", icon: <Shield className="w-3 h-3 text-green-400" /> },
+  { key: "armorClass", label: "AC", icon: <Shield className="w-3 h-3" /> },
+  { key: "speed", label: "SPD", icon: <Zap className="w-3 h-3" /> },
+  { key: "initiative", label: "INIT", icon: <Zap className="w-3 h-3" /> },
+];
+
+export function CharacterStatBlock({ character, compact = false }: CharacterStatBlockProps) {
+  const stats = character.stats as CharacterStats | null;
+
+  if (!stats) {
+    return (
+      <Card className="p-3 bg-background-elevated border border-border-subtle">
+        <div className="flex items-center gap-2 text-text-muted text-sm">
+          <Shield className="w-4 h-4" />
+          <span>No stats defined</span>
+        </div>
+      </Card>
+    );
+  }
+
+  const hasMainStats = STAT_CONFIG.some(({ key }) => stats[key] !== undefined);
+  const hasSecondaryStats = SECONDARY_STATS.some(({ key }) => stats[key] !== undefined);
+
+  if (compact) {
+    return (
+      <Card className="p-2 bg-background-elevated border border-border-subtle">
+        <div className="flex items-center gap-3 text-xs">
+          {STAT_CONFIG.map(({ key, label, icon, color }) => {
+            const value = stats[key];
+            if (value === undefined) return null;
+            return (
+              <div key={key} className={`flex items-center gap-1 ${color}`}>
+                {icon}
+                <span className="font-medium">{value}</span>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="p-4 bg-background-elevated border border-border-subtle">
+      <div className="flex items-center gap-2 mb-3">
+        <Shield className="w-4 h-4 text-accent-gold" />
+        <h3 className="text-sm font-semibold text-text-secondary">Statistics</h3>
+        {character.level && (
+          <Badge variant="outline" className="text-xs">
+            Level {character.level}
+          </Badge>
+        )}
+        {character.class && (
+          <Badge variant="outline" className="text-xs">
+            {character.class}
+          </Badge>
+        )}
+      </div>
+
+      {/* Main Stats */}
+      {hasMainStats && (
+        <div className="mb-4">
+          <div className="grid grid-cols-6 gap-2">
+            {STAT_CONFIG.map(({ key, label, icon, color }) => {
+              const value = stats[key];
+              const modifier = value !== undefined ? Math.floor((value - 10) / 2) : 0;
+              const modifierStr = modifier >= 0 ? `+${modifier}` : `${modifier}`;
+
+              return (
+                <div
+                  key={key}
+                  className={`
+                    flex flex-col items-center p-2 rounded-sm border
+                    ${value !== undefined
+                      ? "bg-background-card border-border-subtle"
+                      : "border-transparent opacity-30"
+                    }
+                  `}
+                >
+                  <div className={`text-text-muted ${value !== undefined ? color : ""}`}>
+                    {icon}
+                  </div>
+                  <span className="text-xs text-text-muted mt-1">{label}</span>
+                  <span className="text-lg font-bold text-text-primary">
+                    {value ?? "-"}
+                  </span>
+                  {value !== undefined && (
+                    <span className={`text-xs ${modifier >= 0 ? "text-green-400" : "text-red-400"}`}>
+                      {modifierStr}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Secondary Stats */}
+      {hasSecondaryStats && (
+        <div className="grid grid-cols-3 gap-2 pt-3 border-t border-border-subtle">
+          {SECONDARY_STATS.map(({ key, label, icon }) => {
+            const value = stats[key];
+            if (value === undefined) return null;
+            return (
+              <div key={key} className="flex items-center gap-2 text-sm">
+                <span className="text-text-muted">{icon}</span>
+                <span className="text-text-muted">{label}:</span>
+                <span className="font-medium text-text-primary">{value}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </Card>
+  );
+}

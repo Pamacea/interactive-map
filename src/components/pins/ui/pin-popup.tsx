@@ -11,6 +11,7 @@ import { useFocusTrap, useFocusReturn } from "@/hooks/accessibility";
 
 interface PinPopupProps {
   pin: Pin;
+  worldId?: string;
   onClose?: () => void;
   onDelete?: () => void;
   onTitleChange?: (newTitle: string) => void;
@@ -18,6 +19,7 @@ interface PinPopupProps {
 
 export function PinPopup({
   pin,
+  worldId,
   onClose,
   onDelete,
   onTitleChange,
@@ -87,7 +89,7 @@ export function PinPopup({
       onMouseUp={stopPropagation}
     >
       <PopupHeader pin={pin} onClose={onClose} onDelete={onDelete} onTitleChange={onTitleChange} />
-      <PopupContentEnhanced pin={pin} />
+      <PopupContentEnhanced pin={pin} worldId={worldId} />
       <PopupArrow />
     </div>
   );

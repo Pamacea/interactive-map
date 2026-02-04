@@ -1,6 +1,6 @@
 # Genesis - Feature Progress Tracker
 
-> Last updated: 2026-02-04 | Overall completion: **~97%**
+> Last updated: 2026-02-04 | Overall completion: **~99%**
 
 ---
 
@@ -8,9 +8,9 @@
 
 | Status | Features |
 |--------|----------|
-| **Fully Implemented** | Auth, Worlds, Pins, Layers, Explore, Search, Export, Lore, Gallery, Invite System |
-| **Partially Implemented** | Collaboration (member management UI complete, real-time features pending) |
-| **Not Started** | Templates, Characters, Advanced Features |
+| **Fully Implemented** | Auth, Worlds, Pins, Layers, Explore, Search, Export, Lore, Gallery, Invite System, Real-time Presence, Characters |
+| **Partially Implemented** | Collaboration (real-time sync pending) |
+| **Not Started** | Templates, Advanced Features |
 
 ---
 
@@ -249,10 +249,11 @@
 ## 3. Basic Implementation Features
 
 ### 3.1 Collaboration System
-**Status**: 70% Complete | **Priority**: High | **Effort**: Large
+**Status**: 90% Complete | **Priority**: High | **Effort**: Large
 
 **What Works**:
 - **Schema**: WorldMember with roles (READER, EDITOR, OWNER), WorldInvite
+- **NEW Schema**: UserPresence, CollaborationEvent (for real-time tracking)
 - **Permission System**: `src/lib/server-helpers.ts`
   - `verifyWorldPermission`, `verifyPinPermission`, etc.
 - **Backend** (`src/actions/worlds.ts`):
@@ -261,18 +262,37 @@
   - `createInvite`, `createShareLink` - Invite generation
   - `acceptInvite`, `declineInvite`, `revokeInvite`, `resendInvite` - Invite management
   - `getPendingInvites`, `getInvitesForUser`, `getInviteByToken` - Invite lookup
+- **NEW Backend** (`src/actions/presence.ts`):
+  - `updatePresence` - Track user presence with cursor/viewport
+  - `getActiveUsers` - Get currently active users
+  - `removePresence` - Clean up on disconnect
+  - `cleanupInactivePresences` - Remove stale presence
+  - `logCollaborationEvent` - Log collaborative actions
+  - `getRecentEvents` - Fetch activity history
+- **NEW Real-time Infrastructure** (`src/lib/pusher.ts`):
+  - Pusher server client configuration
+  - Presence/private channel helpers
+  - Event type definitions
+- **NEW Client Hooks** (`src/hooks/use-pusher-channel.ts`):
+  - `usePresenceChannel` - Subscribe to presence updates
+  - `useRealtimeSubscription` - Subscribe to collaboration events
+- **NEW Presence Components** (`src/components/presence/`):
+  - `PresenceIndicator` - Show online users with avatars
+  - `UserCursor` - Render other users' cursors on map
+  - `CursorFlag` - User name flag on cursor
+  - `usePresence` - Presence state management hook
+  - `useCursorBroadcast` - Cursor broadcasting with debouncing
 - **UI Components** (`src/components/members/`):
   - `members-list.tsx` - Members list with management
 - **Floating Panel**: `src/components/world/ui/floating/members-module.tsx`
 
 **What's Missing**:
-- [ ] Real-time presence indicators (who's viewing/editing)
 - [ ] Real-time editing synchronization (WebSocket/Socket.io)
 - [ ] Conflict resolution for concurrent edits
-- [ ] Activity feed (recent changes)
+- [ ] Activity feed UI (recent changes)
 
 **Tech Considerations**:
-- WebSocket server or Pusher/Ably for real-time
+- Pusher integration for real-time events
 - Operational transformation or CRDT for conflict resolution
 - Notification system for mentions/changes
 
@@ -292,15 +312,40 @@
 ---
 
 ### 4.2 Character System
-**Status**: Schema Only | **Priority**: Low | **Effort**: Large
+**Status**: ✅ Complete | **Priority**: Low | **Effort**: Large
 
-- Character CRUD UI
-- Character stat blocks
-- Character portraits
-- Character-to-pin linking
-- Character relationships/factions
-- Dialogue system (optional)
-- Quest integration (optional)
+- **Schema**: Character, CharacterType, CharacterRole, CharacterPinRelation, CharacterRelationship
+  - 8 character types (PLAYER, NPC, ENEMY, MERCHANT, QUEST_GIVER, COMPANION, BOSS, CUSTOM)
+  - 8 role types (PROTAGONIST, ANTAGONIST, SUPPORTING, BACKGROUND, MENTOR, ALLY, NEUTRAL, HOSTILE)
+  - Character-to-Pin linking (similar to Lore-Pin)
+  - Character-to-Character relationships
+  - Stats, skills, equipment, dialogue, shop inventory (JSON fields)
+- **Backend** (`src/actions/characters.ts`):
+  - `createCharacter`, `updateCharacter`, `deleteCharacter`, `toggleCharacterVisibility`
+  - `getCharactersByWorld`, `getCharactersFiltered`, `getCharacterById`
+  - `linkCharacterToPin`, `unlinkCharacterFromPin`
+  - `getPinsForCharacter`, `getCharactersForPin`
+  - `createCharacterRelationship`, `updateCharacterRelationship`, `deleteCharacterRelationship`
+  - `getCharacterRelationships`, `uploadCharacterPortrait`
+  - `reorderCharacters`
+- **State Management**: `src/stores/use-character-store.ts`
+- **UI Components** (`src/components/character/ui/`):
+  - `character-card.tsx` - Character display card with portrait
+  - `character-list.tsx` - Grid/list view with type/role filters
+  - `character-form.tsx` - Create/edit form with all fields
+  - `character-detail.tsx` - Full detail view with stats, relationships, linked pins
+  - `character-stat-block.tsx` - RPG stat block display
+- **Floating Panel**: `src/components/world/ui/floating/characters-module.tsx`
+- **Pin Popup Integration**: Linked characters shown in pin popup (`src/components/pins/ui/popup-content-sections/pin-characters-section.tsx`)
+- **Features**:
+  - Character CRUD with validation
+  - Type and role filtering
+  - Portrait upload support
+  - Pin-to-Character bi-directional linking
+  - Character-to-Character relationships
+  - Stat blocks with D&D-style stats
+  - Skills, equipment, factions
+  - Dialogue and quest storage (JSON)
 
 ---
 
@@ -331,11 +376,12 @@
 | Search | 0% | Add search tests |
 | Export | 0% | Add export tests |
 | Members | 0% | Add permission tests |
+| Characters | 0% | Add character CRUD tests |
 
 ### 5.2 Performance
 - [x] TanStack Query caching implemented for Gallery
 - [ ] Implement caching for Search results
-- [ ] 
+- [ ] Implement Tanstack Form for all forms.
 - [ ] Optimize map rendering for large worlds
 - [ ] Add pagination for large pin/lore lists
 - [ ] Image optimization and lazy loading
@@ -361,10 +407,12 @@
 - ✅ Gallery (TanStack Query, bulk upload, collections/folders)
 - ✅ Invite system (email invites, shareable links)
 - ✅ Member management UI
+- ✅ Character system (CRUD, stat blocks, portraits, relationships, pin linking)
 
 ### v0.8 - Next Release
-- [ ] Real-time presence indicators
-- [ ] Activity feed
+- [x] Real-time presence indicators
+- [x] Character system complete
+- [ ] Activity feed UI
 - [ ] Test coverage for core features
 - [ ] Performance optimizations
 
@@ -382,12 +430,12 @@
 
 ```
 Core Features     [████████████████████] 100% (Auth, Worlds, Pins, Layers, Explore)
-Content Tools      [████████████████████] 100% (Lore ✅, Gallery ✅, Invites ✅)
-Collaboration      [██████████░░░░░░░░░░░] 65%  (Members UI, real-time pending)
+Content Tools      [████████████████████] 100% (Lore ✅, Gallery ✅, Invites ✅, Characters ✅)
+Collaboration      [███████████████████░░] 90%  (Members UI, Presence ✅, sync pending)
 Search & Export    [████████████████████] 100% (Search ✅, Export ✅)
-Advanced           [░░░░░░░░░░░░░░░░░░░░░] 0%   (Templates, Characters)
+Advanced           [░░░░░░░░░░░░░░░░░░░░░] 5%   (Templates)
 ────────────────────────────────────────────────────────────────────────────────
-Overall            [████████████████████░] 97%
+Overall            [████████████████████░] 99%
 ```
 
 ---

@@ -183,6 +183,7 @@ export async function verifyGalleryPermission(itemId: string, userId: string) {
     include: {
       pin: true,
       loreEntry: true,
+      character: true,
     },
   });
 
@@ -190,7 +191,7 @@ export async function verifyGalleryPermission(itemId: string, userId: string) {
     throw new NotFoundError("Gallery item");
   }
 
-  const worldId = item.pin?.gameWorldId || item.loreEntry?.gameWorldId;
+  const worldId = item.pin?.gameWorldId || item.loreEntry?.gameWorldId || item.character?.gameWorldId;
 
   if (worldId) {
     const world = await prisma.gameWorld.findUnique({
@@ -213,4 +214,37 @@ export async function verifyGalleryPermission(itemId: string, userId: string) {
   }
 
   return item;
+}
+
+/**
+ * Verify user has permission to access a character
+ * @param characterId - Character ID to check
+ * @param userId - User ID to verify
+ * @throws NotFoundError if character not found
+ * @throws AuthorizationError if user lacks permission
+ */
+export async function verifyCharacterPermission(characterId: string, userId: string) {
+  const character = await prisma.character.findUnique({
+    where: { id: characterId },
+  });
+
+  if (!character) {
+    throw new NotFoundError("Character");
+  }
+
+  if (character.userId !== userId) {
+    const member = await prisma.worldMember.findFirst({
+      where: {
+        gameWorldId: character.gameWorldId,
+        userId: userId,
+        permission: { in: ["EDITOR", "OWNER"] },
+      },
+    });
+
+    if (!member) {
+      throw new AuthorizationError("You don't have permission to access this character");
+    }
+  }
+
+  return character;
 }

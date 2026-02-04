@@ -7,6 +7,7 @@ import {
   Filter,
   Settings2,
   Users,
+  User,
   GripVertical,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -45,6 +46,7 @@ function DockButton({ id, icon, label, isActive }: DockButtonProps) {
 export const ModuleDock = memo(function ModuleDock() {
   const layersPanel = usePanelState("layers");
   const lorePanel = usePanelState("lore");
+  const charactersPanel = usePanelState("characters");
   const filtersPanel = usePanelState("filters");
   const propertiesPanel = usePanelState("properties");
   const membersPanel = usePanelState("members");
@@ -81,6 +83,12 @@ export const ModuleDock = memo(function ModuleDock() {
             icon={<BookOpen className="w-5 h-5" />}
             label="Lore"
             isActive={lorePanel.isVisible}
+          />
+          <DockButton
+            id="characters"
+            icon={<User className="w-5 h-5" />}
+            label="Characters"
+            isActive={charactersPanel.isVisible}
           />
           <DockButton
             id="filters"

@@ -25,16 +25,9 @@ export function PinsFilterPanel() {
 
   return (
     <div className="space-y-3" role="region" aria-label="Pin filters panel">
-      {/* Header */}
-      <div className="flex items-center gap-2 px-3 py-2 rounded-sm bg-obsidian/70 border border-iron/50">
-        <Filter className="w-4 h-4 text-accent-gold" aria-hidden="true" />
-        <span className="text-xs font-display font-medium text-accent-gold uppercase tracking-wider">
-          Filters
-        </span>
-      </div>
 
       {/* Global Actions */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 pl-3 pr-32 pt-3">
         <button
           onClick={showAllTypes}
           disabled={allVisible}
