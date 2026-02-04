@@ -20,7 +20,7 @@ export default function SignInPage() {
       setIsLoading(provider);
       setError(null);
       await signIn(provider, { callbackUrl: "/" });
-    } catch (err) {
+    } catch {
       setError("Failed to sign in. Please try again.");
     } finally {
       setIsLoading(null);

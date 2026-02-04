@@ -1,6 +1,6 @@
 # Genesis - Feature Progress Tracker
 
-> Last updated: 2026-02-02 | Overall completion: **~85%**
+> Last updated: 2026-02-04 | Overall completion: **~97%**
 
 ---
 
@@ -8,9 +8,8 @@
 
 | Status | Features |
 |--------|----------|
-| **Fully Implemented** | Auth, Worlds, Pins, Layers, Explore, Search, Export |
-| **Partially Implemented** | Lore (95% - markdown editor complete, pin/linking pending), Gallery (95% - data fetching complete, bulk upload pending) |
-| **Basic Implementation** | Collaboration (member management UI complete, real-time features pending) |
+| **Fully Implemented** | Auth, Worlds, Pins, Layers, Explore, Search, Export, Lore, Gallery, Invite System |
+| **Partially Implemented** | Collaboration (member management UI complete, real-time features pending) |
 | **Not Started** | Templates, Characters, Advanced Features |
 
 ---
@@ -173,109 +172,104 @@
 
 ---
 
-## 2. Partially Implemented Features
+## 2. Fully Implemented Features
 
 ### 2.1 Lore Entries System
-**Status**: 95% Complete | **Priority**: High | **Tests**: None
+**Status**: ✅ Complete | **Priority**: High | **Tests**: None
 
-**What Works**:
-- **Schema**: LoreEntry, LoreCategory (GENERAL, HISTORY, GEOGRAPHY, CHARACTERS, FACTIONS, MAGIC, ITEMS, QUESTS, CUSTOM)
+- **Schema**: LoreEntry, LoreCategory, LorePinRelation, LoreReference
+  - Bi-directional lore-pin linking with relation types
+  - Cross-references between lore entries
 - **Backend** (`src/actions/lore.ts`):
-  - `createLoreEntry`, `updateLoreEntry`, `deleteLoreEntry`
-  - `getLoreEntriesByWorld`, `getLoreEntryBySlug`
-  - `toggleLoreVisibility`
+  - `createLoreEntry`, `updateLoreEntry`, `deleteLoreEntry`, `toggleLoreVisibility`
+  - `getLoreEntryById`, `getLoreEntriesByWorld`, `getLoreEntryBySlug`
+  - **NEW**: `linkLoreToPin`, `unlinkLoreFromPin` - Pin linking
+  - **NEW**: `getPinsForLore`, `getLoreForPin` - Linked data fetching
+  - **NEW**: `createLoreReference`, `deleteLoreReference` - Cross-references
+  - **NEW**: `getLoreReferences`, `getLoreReferencedBy` - Reference traversal
 - **State Management**: `src/stores/use-lore-store.ts` (472 lines)
-  - Optimistic CRUD operations
-  - Filter state (search, categories, visibility)
 - **UI Components** (`src/components/lore/ui/`):
-  - `lore-card.tsx` - Entry display card
-  - `lore-form.tsx` - Create/edit form
-  - `lore-list.tsx` - List view with filters
-  - `lore-detail.tsx` - ✨ NEW Detail view with markdown rendering
-  - `markdown-editor.tsx` - ✨ NEW Markdown editor with live preview
-  - `markdown-renderer.tsx` - ✨ NEW Markdown display component
-  - Category selection and filtering UI
-- **Integration**: Sidebar in world editor via `LoreModule`
-
-**What's Missing**:
-- [ ] Lore-to-pin linking in UI
-- [ ] Cross-referencing between entries
-- [ ] Individual lore entry detail page/route
-- [ ] Test coverage
-
-**Files**:
-- `src/components/lore/` - 15 UI components
-- `src/actions/lore.ts` - Server actions
-- `src/stores/use-lore-store.ts` - State management
+  - `lore-card.tsx`, `lore-form.tsx`, `lore-list.tsx`
+  - `lore-detail.tsx` - Detail view with markdown rendering
+  - `markdown-editor.tsx` - Markdown editor with live preview
+  - `markdown-renderer.tsx` - Markdown display with wiki-link support
+  - **NEW**: `lore-detail-client.tsx` - Full page view
+  - **NEW**: `lore-link-preview.tsx` - Hover preview for wiki links
+  - **NEW**: `lore-table-of-contents.tsx` - Auto-generated TOC
+  - **NEW**: `related-entries.tsx` - Related entries sidebar
+- **Routes**:
+  - **NEW**: `/world/[id]/lore/[slug]` - Individual lore entry page
 
 ---
 
 ### 2.2 Image Gallery System
-**Status**: 95% Complete | **Priority**: Medium | **Tests**: None
+**Status**: ✅ Complete | **Priority**: Medium | **Tests**: None
 
-**What Works**:
-- **Schema**: GalleryItem (IMAGE, VIDEO, AUDIO, DOCUMENT)
+- **Schema**: GalleryItem, GalleryCollection, CollectionItem
+  - Collections/folders organization
+  - Tags and metadata support
+  - Crop data and image dimensions
 - **Backend** (`src/actions/gallery.ts`):
-  - `uploadGalleryImage` - File upload with validation
+  - `uploadGalleryImage` - Single file upload
+  - **NEW**: `uploadGalleryImagesBulk` - Batch upload with progress
   - `updateGalleryItem`, `deleteGalleryItem`
-  - `getGalleryItemsByWorld`
   - `linkGalleryItemToPin`, `linkGalleryItemToLore`
+  - **NEW**: `createCollection`, `updateCollection`, `deleteCollection`
+  - **NEW**: `addItemsToCollection`, `removeItemsFromCollection`
+  - **NEW**: `updateItemTags`, `searchGalleryByTags`
+  - **NEW**: `getCollectionsByWorld` - Collection fetching
 - **State Management**: `src/stores/use-gallery-store.ts` (468 lines)
-  - Optimistic CRUD operations
-  - Upload progress tracking
-  - Filter state
-- **Data Fetching** (`src/components/gallery/logic/`):
-  - ✨ NEW `use-gallery-query.ts` - TanStack Query hooks
-  - `useGallery` - Fetch gallery items for world
-  - `useUploadGallery`, `useDeleteGallery`, `useUpdateGallery` - Mutations
+- **Data Fetching**: TanStack Query hooks
 - **UI Components** (`src/components/gallery/ui/`):
-  - `image-gallery.tsx` - ✨ UPDATED Now fetches data via TanStack Query
-  - `image-card.tsx` - Gallery item display
-  - `image-lightbox.tsx` - Full-screen viewer
+  - `image-gallery.tsx`, `image-card.tsx`, `image-lightbox.tsx`
   - `image-upload-zone.tsx` - Drop zone for uploads
   - `gallery-grid.tsx` - Grid layout
 
-**What's Missing**:
-- [ ] Bulk upload (single file only)
-- [ ] Image editing/cropping tools
-- [ ] Gallery organization (folders/albums)
-- [ ] Video preview thumbnails
-- [ ] Test coverage
+---
 
-**Files**:
-- `src/components/gallery/` - 12 UI components
-- `src/actions/gallery.ts` - Server actions
-- `src/stores/use-gallery-store.ts` - State management
+### 2.3 Invite System
+**Status**: ✅ Complete | **Priority**: High | **Tests**: None
+
+- **Schema**: WorldInvite with token-based invites
+  - Email-specific and shareable link invites
+  - Expiration tracking and status management
+- **Backend** (`src/actions/invites.ts`):
+  - `createInvite` - Email invite generation
+  - `createShareLink` - Shareable link creation
+  - `acceptInvite`, `declineInvite` - Invite handling
+  - `getPendingInvites` - List pending invites
+  - `revokeInvite`, `resendInvite` - Invite management
+  - `getInviteByToken` - Public invite lookup
+  - `getInvitesForUser` - User's incoming invites
+- **Routes**:
+  - `/invite/[token]` - Public invite accept page
 
 ---
 
 ## 3. Basic Implementation Features
 
 ### 3.1 Collaboration System
-**Status**: 60% Complete | **Priority**: High | **Effort**: Large
+**Status**: 70% Complete | **Priority**: High | **Effort**: Large
 
 **What Works**:
-- **Schema**: WorldMember with roles (READER, EDITOR, OWNER)
+- **Schema**: WorldMember with roles (READER, EDITOR, OWNER), WorldInvite
 - **Permission System**: `src/lib/server-helpers.ts`
   - `verifyWorldPermission`, `verifyPinPermission`, etc.
 - **Backend** (`src/actions/worlds.ts`):
-  - ✨ NEW `getWorldMembers` - Fetch all members
-  - ✨ NEW `addWorldMember` - Add member by email
-  - ✨ NEW `updateWorldMemberPermission` - Change permissions
-  - ✨ NEW `removeWorldMember` - Remove member
+  - `getWorldMembers`, `addWorldMember`, `updateWorldMemberPermission`, `removeWorldMember`
+- **Backend** (`src/actions/invites.ts`):
+  - `createInvite`, `createShareLink` - Invite generation
+  - `acceptInvite`, `declineInvite`, `revokeInvite`, `resendInvite` - Invite management
+  - `getPendingInvites`, `getInvitesForUser`, `getInviteByToken` - Invite lookup
 - **UI Components** (`src/components/members/`):
-  - ✨ NEW `members-list.tsx` - Members list with management
+  - `members-list.tsx` - Members list with management
 - **Floating Panel**: `src/components/world/ui/floating/members-module.tsx`
-  - Integrated into world editor
-  - Toggle via ModuleDock (Users icon)
-- **State Management**: Added to `src/store/use-floating-panels-store.ts`
 
 **What's Missing**:
 - [ ] Real-time presence indicators (who's viewing/editing)
 - [ ] Real-time editing synchronization (WebSocket/Socket.io)
 - [ ] Conflict resolution for concurrent edits
 - [ ] Activity feed (recent changes)
-- [ ] Invite system (email invites, share links)
 
 **Tech Considerations**:
 - WebSocket server or Pusher/Ably for real-time
@@ -341,6 +335,7 @@
 ### 5.2 Performance
 - [x] TanStack Query caching implemented for Gallery
 - [ ] Implement caching for Search results
+- [ ] 
 - [ ] Optimize map rendering for large worlds
 - [ ] Add pagination for large pin/lore lists
 - [ ] Image optimization and lazy loading
@@ -357,30 +352,28 @@
 
 ## 6. Milestones
 
-### v0.6 - Current State ✅
+### v0.7 - Current State ✅
 - ✅ Auth, Worlds, Pins, Layers, Explore
 - ✅ Search (full UI with keyboard shortcut)
 - ✅ Export (PNG/PDF/JSON with dialog)
-- ✅ Lore (markdown editor, detail view)
-- ✅ Gallery (TanStack Query, data fetching)
+- ✅ Lore (markdown editor, detail view, wiki-links, cross-references)
+- ✅ Lore-to-pin linking (bi-directional with relation types)
+- ✅ Gallery (TanStack Query, bulk upload, collections/folders)
+- ✅ Invite system (email invites, shareable links)
 - ✅ Member management UI
 
-### v0.7 - Next Release
-- [ ] Lore-to-pin linking
-- [ ] Bulk gallery upload
+### v0.8 - Next Release
+- [ ] Real-time presence indicators
+- [ ] Activity feed
 - [ ] Test coverage for core features
 - [ ] Performance optimizations
 
-### v0.8 - Collaboration Enhancement
-- [ ] Real-time presence indicators
-- [ ] Activity feed
-- [ ] Invite system (email invites, share links)
-
 ### v1.0 - MVP
+- [ ] Real-time editing synchronization (WebSocket/Socket.io)
+- [ ] Conflict resolution for concurrent edits
 - [ ] Full feature parity across all core features
 - [ ] 80%+ test coverage
 - [ ] Production-ready error handling
-- [ ] Performance optimizations
 - [ ] Accessibility compliance
 
 ---
@@ -389,12 +382,12 @@
 
 ```
 Core Features     [████████████████████] 100% (Auth, Worlds, Pins, Layers, Explore)
-Content Tools      [████████████████████░] 95%  (Lore 95%, Gallery 95%)
-Collaboration      [██████████░░░░░░░░░░░] 60%  (Members UI, real-time pending)
+Content Tools      [████████████████████] 100% (Lore ✅, Gallery ✅, Invites ✅)
+Collaboration      [██████████░░░░░░░░░░░] 65%  (Members UI, real-time pending)
 Search & Export    [████████████████████] 100% (Search ✅, Export ✅)
 Advanced           [░░░░░░░░░░░░░░░░░░░░░] 0%   (Templates, Characters)
 ────────────────────────────────────────────────────────────────────────────────
-Overall            [████████████████████░] 85%
+Overall            [████████████████████░] 97%
 ```
 
 ---

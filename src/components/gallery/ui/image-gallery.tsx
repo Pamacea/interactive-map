@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { Search, Filter, Grid3x3, List, Check } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Search, Filter, Grid3x3, List } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import { ImageUploadZone } from "./image-upload-zone";
 import { useGalleryStore } from "@/stores/use-gallery-store";
 import { useGallery } from "../logic/use-gallery-query";
 import { galleryKeys } from "../logic/use-gallery-query";
-import type { GalleryItemWithRelations } from "@/types/gallery.type";
+// import type { GalleryItemWithRelations } from "@/types/gallery.type"; // Not used yet
 
 export interface ImageGalleryProps {
   worldId: string;

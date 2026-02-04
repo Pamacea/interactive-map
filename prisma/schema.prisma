@@ -29,6 +29,8 @@ model User {
   worldMembers  WorldMember[]
   pins          Pin[]
   loreEntries   LoreEntry[]
+  invitesCreated WorldInvite[] @relation("InvitesCreated")
+  invitesAccepted WorldInvite[] @relation("InvitesAccepted")
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }
@@ -88,9 +90,11 @@ model GameWorld {
   userId      String
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   members     WorldMember[]
+  invites     WorldInvite[]
   pins        Pin[]
   layers      MapLayer[]
   loreEntries LoreEntry[]
+  collections GalleryCollection[]
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
@@ -112,6 +116,38 @@ model WorldMember {
   @@unique([userId, gameWorldId])
   @@index([gameWorldId])
   @@index([userId])
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  EXPIRED
+  REVOKED
+}
+
+model WorldInvite {
+  id              String       @id @default(cuid())
+  token           String       @unique
+  email           String?
+  worldId         String
+  world           GameWorld    @relation(fields: [worldId], references: [id], onDelete: Cascade)
+  invitedByUserId String
+  invitedBy       User         @relation("InvitesCreated", fields: [invitedByUserId], references: [id], onDelete: Cascade)
+  acceptedByUserId String?     // The user who accepted the invite
+  acceptedBy      User?        @relation("InvitesAccepted", fields: [acceptedByUserId], references: [id], onDelete: SetNull)
+  permission      Permission   @default(READER)
+  status          InviteStatus @default(PENDING)
+  expiresAt       DateTime
+  message         String?      @db.Text // Personal message from inviter
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([token])
+  @@index([worldId])
+  @@index([email])
+  @@index([status])
+  @@index([expiresAt])
 }
 
 // ============================================
@@ -156,29 +192,30 @@ enum PinType {
 }
 
 model Pin {
-  id          String    @id @default(cuid())
+  id          String              @id @default(cuid())
   title       String
-  description String?   @db.Text
-  pinType     PinType   @default(CUSTOM)
+  description String?             @db.Text
+  pinType     PinType             @default(CUSTOM)
   latitude    Float
   longitude   Float
   icon        String?
-  color       String    @default("#3b82f6")
-  size        Int       @default(32)
-  opacity     Float     @default(1.0)
-  isVisible   Boolean   @default(true)
-  minZoom     Int       @default(0)
-  maxZoom     Int       @default(200)
-  properties  Json?     // Custom properties for RPG data (level, faction, etc.)
+  color       String              @default("#3b82f6")
+  size        Int                 @default(32)
+  opacity     Float               @default(1.0)
+  isVisible   Boolean             @default(true)
+  minZoom     Int                 @default(0)
+  maxZoom     Int                 @default(200)
+  properties  Json?               // Custom properties for RPG data (level, faction, etc.)
   userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   gameWorldId String
-  gameWorld   GameWorld @relation(fields: [gameWorldId], references: [id], onDelete: Cascade)
+  gameWorld   GameWorld           @relation(fields: [gameWorldId], references: [id], onDelete: Cascade)
   layerId     String?
-  layer       MapLayer? @relation(fields: [layerId], references: [id], onDelete: SetNull)
+  layer       MapLayer?           @relation(fields: [layerId], references: [id], onDelete: SetNull)
   gallery     GalleryItem[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  loreLinks   LorePinRelation[]   @relation("PinsToLore")
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
 
   @@index([latitude, longitude])
   @@index([gameWorldId])
@@ -190,20 +227,23 @@ model Pin {
 // ============================================
 
 model LoreEntry {
-  id          String       @id @default(cuid())
+  id          String              @id @default(cuid())
   title       String
-  content     String       @db.Text
+  content     String              @db.Text
   slug        String
-  category    LoreCategory @default(GENERAL)
-  isVisible   Boolean      @default(false)
-  isPublic    Boolean      @default(true)
+  category    LoreCategory        @default(GENERAL)
+  isVisible   Boolean             @default(false)
+  isPublic    Boolean             @default(true)
   userId      String
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   gameWorldId String
-  gameWorld   GameWorld    @relation(fields: [gameWorldId], references: [id], onDelete: Cascade)
+  gameWorld   GameWorld           @relation(fields: [gameWorldId], references: [id], onDelete: Cascade)
   gallery     GalleryItem[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  pinLinks    LorePinRelation[]   @relation("LoreToPins")
+  references  LoreReference[]    @relation("LoreReferences")
+  referencedBy LoreReference[]   @relation("ReferencedByLore")
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
 
   @@unique([gameWorldId, slug])
   @@index([gameWorldId])
@@ -222,26 +262,110 @@ enum LoreCategory {
   CUSTOM
 }
 
+// Lore-Pin linking relation
+enum RelationType {
+  REFERENCES    // Lore references this pin location
+  DESCRIBES     // Lore describes this pin
+  CONTAINS      // Lore mentions what's at this pin
+  IS_LOCATED_AT // Lore event happened at this pin
+  CUSTOM        // Custom relationship
+}
+
+model LorePinRelation {
+  id           String       @id @default(cuid())
+  loreEntryId  String
+  loreEntry    LoreEntry    @relation("LoreToPins", fields: [loreEntryId], references: [id], onDelete: Cascade)
+  pinId        String
+  pin          Pin          @relation("PinsToLore", fields: [pinId], references: [id], onDelete: Cascade)
+  relationType RelationType @default(REFERENCES)
+  notes        String?      @db.Text // Optional notes about the relationship
+  order        Int          @default(0) // For ordering multiple links
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@unique([loreEntryId, pinId])
+  @@index([loreEntryId])
+  @@index([pinId])
+}
+
+// Lore-to-Lore cross-references
+model LoreReference {
+  id              String      @id @default(cuid())
+  sourceLoreId    String      // The lore entry that contains the link
+  sourceLoreEntry LoreEntry   @relation("LoreReferences", fields: [sourceLoreId], references: [id], onDelete: Cascade)
+  targetLoreId    String      // The lore entry being linked to
+  targetLoreEntry LoreEntry   @relation("ReferencedByLore", fields: [targetLoreId], references: [id], onDelete: Cascade)
+  linkText        String      // The text used for the link (e.g., "See Also: Kingdom of Eldoria")
+  linkType        String      @default("MENTION") // MENTION, SEE_ALSO, RELATED, CONTRADICTS
+  context         String?     @db.Text // Context around the reference
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@unique([sourceLoreId, targetLoreId])
+  @@index([sourceLoreId])
+  @@index([targetLoreId])
+}
+
 // ============================================
 // GALLERY & MEDIA
 // ============================================
 
 model GalleryItem {
-  id          String     @id @default(cuid())
-  title       String
-  description String?    @db.Text
-  imageUrl    String
-  type        MediaType @default(IMAGE)
-  order       Int        @default(0)
-  pinId       String?
-  pin         Pin?       @relation(fields: [pinId], references: [id], onDelete: Cascade)
-  loreEntryId String?
-  loreEntry   LoreEntry? @relation(fields: [loreEntryId], references: [id], onDelete: Cascade)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id            String              @id @default(cuid())
+  title         String
+  description   String?             @db.Text
+  imageUrl      String
+  thumbnailUrl  String?             // Generated thumbnail for videos/images
+  type          MediaType           @default(IMAGE)
+  order         Int                 @default(0)
+  width         Int?                // Image/video dimensions
+  height        Int?
+  size          Int?                // File size in bytes
+  format        String?             // File format (jpg, png, mp4, etc.)
+  tags          String[]            @default([]) // Searchable tags
+  cropData      Json?               // Crop coordinates {x, y, width, height}
+  pinId         String?
+  pin           Pin?                @relation(fields: [pinId], references: [id], onDelete: Cascade)
+  loreEntryId   String?
+  loreEntry     LoreEntry?          @relation(fields: [loreEntryId], references: [id], onDelete: Cascade)
+  worldId       String?             // Direct world link for unlinked items
+  collections   CollectionItem[]    @relation("GalleryItemCollections")
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
 
   @@index([pinId])
   @@index([loreEntryId])
+  @@index([worldId])
+  @@index([tags])
+}
+
+model GalleryCollection {
+  id          String              @id @default(cuid())
+  name        String
+  description String?             @db.Text
+  color       String?             @default("#3b82f6") // Accent color for UI
+  icon        String?             // Icon identifier
+  order       Int                 @default(0)
+  worldId     String
+  world       GameWorld           @relation(fields: [worldId], references: [id], onDelete: Cascade)
+  items       CollectionItem[]    @relation("CollectionItems")
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  @@index([worldId])
+}
+
+model CollectionItem {
+  id           String             @id @default(cuid())
+  galleryItemId String
+  galleryItem  GalleryItem        @relation("GalleryItemCollections", fields: [galleryItemId], references: [id], onDelete: Cascade)
+  collectionId String
+  collection   GalleryCollection  @relation("CollectionItems", fields: [collectionId], references: [id], onDelete: Cascade)
+  order        Int                @default(0)
+  addedAt      DateTime           @default(now())
+
+  @@unique([galleryItemId, collectionId])
+  @@index([collectionId])
 }
 
 enum MediaType {

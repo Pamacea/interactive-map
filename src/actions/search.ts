@@ -1,10 +1,8 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import type { PinType as PrismaPinType, LoreCategory as PrismaLoreCategory } from "@prisma/client";
 import {
   safeAsync,
-  ValidationError,
   type Result,
 } from "@/lib/errors";
 import {
@@ -19,6 +17,7 @@ import {
   type LoreSearchResult,
   type SearchResults,
 } from "@/lib/search-types";
+import type { Prisma } from "@prisma/client";
 
 // ============================================
 // SEARCH HELPERS
@@ -73,7 +72,7 @@ function calculateRelevance(
 /**
  * Highlight search terms in text
  */
-function highlightText(text: string, query: string): string {
+function _highlightText(text: string, query: string): string {
   if (!query) return text;
 
   const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi");
@@ -154,7 +153,7 @@ async function searchPinsInWorld(
   limit: number = 50
 ): Promise<PinSearchResult[]> {
   // Build Prisma query
-  const where: any = {
+  const where: Prisma.PinWhereInput = {
     gameWorldId: worldId,
     isVisible: true,
   };
@@ -226,7 +225,7 @@ async function searchLoreInWorld(
   limit: number = 50
 ): Promise<LoreSearchResult[]> {
   // Build Prisma query
-  const where: any = {
+  const where: Prisma.LoreEntryWhereInput = {
     gameWorldId: worldId,
     isVisible: true,
   };

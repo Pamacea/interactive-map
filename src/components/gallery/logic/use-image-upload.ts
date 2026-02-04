@@ -36,9 +36,9 @@ interface UseImageUploadReturn {
  * Manages file validation, preview generation, and upload state
  */
 export function useImageUpload({
-  maxSize,
-  accept,
-  multiple,
+  maxSize: _maxSize,
+  accept: _accept,
+  multiple: _multiple,
   onUpload,
 }: UseImageUploadOptions = {}): UseImageUploadReturn {
   const [pendingFiles, setPendingFiles] = useState<FileWithPreview[]>([]);

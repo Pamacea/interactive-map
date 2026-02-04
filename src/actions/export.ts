@@ -10,7 +10,7 @@ import {
   getAuthenticatedUser,
   verifyWorldPermission,
 } from "@/lib/server-helpers";
-import type { GameWorld, Pin, MapLayer, LoreEntry } from "@prisma/client";
+import type { Pin, MapLayer, LoreEntry } from "@prisma/client";
 
 /**
  * Export format types

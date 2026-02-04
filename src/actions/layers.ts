@@ -8,6 +8,7 @@ import {
   verifyWorldPermission,
   verifyLayerPermission,
 } from "@/lib/server-helpers";
+import type { MapLayer } from "@prisma/client";
 
 /**
  * Create a new layer for a world
@@ -29,7 +30,7 @@ export async function createLayer(
     minZoom?: number;
     maxZoom?: number;
   }
-): Promise<Result<any>> {
+): Promise<Result<MapLayer>> {
   return safeAsync(async () => {
     // Get authenticated user
     const user = await getAuthenticatedUser();
@@ -86,7 +87,7 @@ export async function updateLayer(
     minZoom?: number;
     maxZoom?: number;
   }
-): Promise<Result<any>> {
+): Promise<Result<MapLayer>> {
   return safeAsync(async () => {
     // Get authenticated user
     const user = await getAuthenticatedUser();
@@ -128,7 +129,7 @@ export async function updateLayerPosition(
   layerId: string,
   offsetX: number,
   offsetY: number
-): Promise<Result<any>> {
+): Promise<Result<MapLayer>> {
   return safeAsync(async () => {
     // Get authenticated user
     const user = await getAuthenticatedUser();
@@ -154,7 +155,7 @@ export async function updateLayerPosition(
  * @param scale - Scale factor (0.5 - 2.0)
  * @returns Result with updated layer or error
  */
-export async function updateLayerScale(layerId: string, scale: number): Promise<Result<any>> {
+export async function updateLayerScale(layerId: string, scale: number): Promise<Result<MapLayer>> {
   return safeAsync(async () => {
     // Get authenticated user
     const user = await getAuthenticatedUser();
@@ -179,7 +180,7 @@ export async function updateLayerScale(layerId: string, scale: number): Promise<
  * @param zIndex - New z-index value
  * @returns Result with updated layer or error
  */
-export async function updateLayerZIndex(layerId: string, zIndex: number): Promise<Result<any>> {
+export async function updateLayerZIndex(layerId: string, zIndex: number): Promise<Result<MapLayer>> {
   return safeAsync(async () => {
     // Get authenticated user
     const user = await getAuthenticatedUser();
@@ -203,7 +204,7 @@ export async function updateLayerZIndex(layerId: string, zIndex: number): Promis
  * @param layerId - Layer ID to delete
  * @returns Result with deleted layer or error
  */
-export async function deleteLayer(layerId: string): Promise<Result<any>> {
+export async function deleteLayer(layerId: string): Promise<Result<MapLayer>> {
   return safeAsync(async () => {
     // Get authenticated user
     const user = await getAuthenticatedUser();
@@ -234,7 +235,7 @@ export async function batchUpdateLayers(
     offsetY?: number;
     scale?: number;
   }>
-): Promise<Result<any[]>> {
+): Promise<Result<MapLayer[]>> {
   return safeAsync(async () => {
     // Get authenticated user
     const user = await getAuthenticatedUser();

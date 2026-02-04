@@ -11,7 +11,7 @@ interface ResultsHeaderProps {
   onViewModeChange: (mode: "grid" | "list") => void;
   onToggleFilters: () => void;
   onToggleFilter: (filter: string) => void;
-  onClearAllFilters: () => void;
+  onClearAllFilters?: () => void;
 }
 
 export const ResultsHeader = memo(function ResultsHeader({
@@ -22,7 +22,6 @@ export const ResultsHeader = memo(function ResultsHeader({
   onViewModeChange,
   onToggleFilters,
   onToggleFilter,
-  onClearAllFilters,
 }: ResultsHeaderProps) {
   return (
     <div className="flex items-center justify-between gap-4">

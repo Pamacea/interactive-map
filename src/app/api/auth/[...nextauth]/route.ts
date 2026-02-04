@@ -19,7 +19,7 @@ declare module "next-auth" {
 }
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma) as any,
+  adapter: PrismaAdapter(prisma) as NextAuthOptions["adapter"],
   providers: [
     GitHubProvider({
       clientId: process.env.GITHUB_CLIENT_ID!,

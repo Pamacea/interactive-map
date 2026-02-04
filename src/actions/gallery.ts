@@ -7,15 +7,14 @@ import {
   UpdateGalleryItemSchema,
   validateImageFile,
   generateSafeFilename,
-  IMAGE_MAX_SIZE,
 } from "@/components/gallery/logic/gallery-schemas";
 import type { GalleryItemCreateInput, GalleryItemUpdateInput } from "@/types/gallery.type";
 import {
   safeAsync,
   ValidationError,
-  FileUploadError,
   type Result,
 } from "@/lib/errors";
+import type { GalleryItem, GalleryCollection, CollectionItem } from "@prisma/client";
 import {
   getAuthenticatedUser,
   verifyWorldPermission,
@@ -29,7 +28,7 @@ import {
  * @param formData - FormData with file and metadata
  * @returns Result with created gallery item ID and data, or error
  */
-export async function uploadGalleryImage(formData: FormData): Promise<Result<{ itemId: string; galleryItem: any }>> {
+export async function uploadGalleryImage(formData: FormData): Promise<Result<{ itemId: string; galleryItem: GalleryItem }>> {
   return safeAsync(async () => {
     // Get authenticated user
     const user = await getAuthenticatedUser();
@@ -124,7 +123,7 @@ export async function uploadGalleryImage(formData: FormData): Promise<Result<{ i
  * @param data - Gallery item creation data
  * @returns Result with created gallery item ID and data, or error
  */
-export async function createGalleryItem(data: GalleryItemCreateInput): Promise<Result<{ itemId: string; galleryItem: any }>> {
+export async function createGalleryItem(data: GalleryItemCreateInput): Promise<Result<{ itemId: string; galleryItem: GalleryItem }>> {
   return safeAsync(async () => {
     // Validate input
     const validated = CreateGalleryItemSchema.parse(data);
@@ -271,7 +270,7 @@ export async function getGalleryItemsByLore(loreEntryId: string) {
  * @param data - Gallery item update data
  * @returns Result with updated gallery item or error
  */
-export async function updateGalleryItem(data: GalleryItemUpdateInput): Promise<Result<any>> {
+export async function updateGalleryItem(data: GalleryItemUpdateInput): Promise<Result<GalleryItem>> {
   return safeAsync(async () => {
     // Validate input
     const validated = UpdateGalleryItemSchema.parse(data);
@@ -286,7 +285,7 @@ export async function updateGalleryItem(data: GalleryItemUpdateInput): Promise<R
     const worldId = existingItem.pin?.gameWorldId || existingItem.loreEntry?.gameWorldId;
 
     // Build update data
-    const updateData: any = {};
+    const updateData: Partial<GalleryItem> = {};
     if (validated.title !== undefined) updateData.title = validated.title;
     if (validated.description !== undefined) updateData.description = validated.description;
     if (validated.imageUrl !== undefined) updateData.imageUrl = validated.imageUrl;
@@ -356,7 +355,7 @@ export async function deleteGalleryItem(id: string): Promise<Result<{ itemId: st
  * @param pinId - Pin ID
  * @returns Result with updated gallery item or error
  */
-export async function linkGalleryItemToPin(itemId: string, pinId: string): Promise<Result<any>> {
+export async function linkGalleryItemToPin(itemId: string, pinId: string): Promise<Result<GalleryItem>> {
   return safeAsync(async () => {
     // Get authenticated user
     const user = await getAuthenticatedUser();
@@ -401,7 +400,7 @@ export async function linkGalleryItemToPin(itemId: string, pinId: string): Promi
  * @param loreEntryId - Lore entry ID
  * @returns Result with updated gallery item or error
  */
-export async function linkGalleryItemToLore(itemId: string, loreEntryId: string): Promise<Result<any>> {
+export async function linkGalleryItemToLore(itemId: string, loreEntryId: string): Promise<Result<GalleryItem>> {
   return safeAsync(async () => {
     // Get authenticated user
     const user = await getAuthenticatedUser();
@@ -445,7 +444,7 @@ export async function linkGalleryItemToLore(itemId: string, loreEntryId: string)
  * @param updates - Array of { id, order } pairs
  * @returns Result with updated gallery items or error
  */
-export async function reorderGalleryItems(updates: Array<{ id: string; order: number }>): Promise<Result<any[]>> {
+export async function reorderGalleryItems(updates: Array<{ id: string; order: number }>): Promise<Result<GalleryItem[]>> {
   return safeAsync(async () => {
     // Get authenticated user
     const user = await getAuthenticatedUser();
@@ -467,4 +466,516 @@ export async function reorderGalleryItems(updates: Array<{ id: string; order: nu
 
     return updatedItems;
   }, "reorderGalleryItems");
+}
+
+// ============================================
+// BULK UPLOAD
+// ============================================
+
+export interface BulkUploadItem {
+  file: File;
+  title: string;
+  description?: string;
+  pinId?: string;
+  loreEntryId?: string;
+}
+
+export interface BulkUploadResult {
+  success: boolean;
+  itemId?: string;
+  error?: string;
+  fileName?: string;
+}
+
+/**
+ * Upload multiple gallery items at once
+ * @param gameWorldId - World ID
+ * @param items - Array of items to upload
+ * @returns Result with upload results or error
+ */
+export async function uploadGalleryImagesBulk(
+  gameWorldId: string,
+  items: BulkUploadItem[]
+): Promise<Result<{ results: BulkUploadResult[] }>> {
+  return safeAsync(async () => {
+    const user = await getAuthenticatedUser();
+
+    // Verify world access
+    await verifyWorldPermission(gameWorldId, user.id);
+
+    const { writeFile, mkdir } = await import("fs/promises");
+    const path = await import("path");
+    const uploadsDir = path.default.join(process.cwd(), "public", "uploads", "gallery");
+
+    try {
+      await mkdir(uploadsDir, { recursive: true });
+    } catch {
+      // Directory might already exist
+    }
+
+    const results: BulkUploadResult[] = [];
+    let currentOrder = 0;
+
+    // Get current max order
+    const maxOrderItem = await prisma.galleryItem.findFirst({
+      where: {
+        OR: [
+          { pin: { gameWorldId } },
+          { loreEntry: { gameWorldId } },
+          { worldId: gameWorldId },
+        ],
+      },
+      orderBy: { order: "desc" },
+    });
+
+    if (maxOrderItem) {
+      currentOrder = maxOrderItem.order + 1;
+    }
+
+    // Process each file
+    for (const item of items) {
+      try {
+        // Validate file
+        validateImageFile(item.file);
+
+        // Verify pinId belongs to this world (if provided)
+        if (item.pinId) {
+          const pin = await prisma.pin.findUnique({
+            where: { id: item.pinId },
+          });
+
+          if (!pin || pin.gameWorldId !== gameWorldId) {
+            results.push({
+              success: false,
+              error: "Invalid pin: Pin does not belong to this world",
+              fileName: item.file.name,
+            });
+            continue;
+          }
+        }
+
+        // Verify loreEntryId belongs to this world (if provided)
+        if (item.loreEntryId) {
+          const lore = await prisma.loreEntry.findUnique({
+            where: { id: item.loreEntryId },
+          });
+
+          if (!lore || lore.gameWorldId !== gameWorldId) {
+            results.push({
+              success: false,
+              error: "Invalid lore entry: Lore entry does not belong to this world",
+              fileName: item.file.name,
+            });
+            continue;
+          }
+        }
+
+        // Save file to disk
+        const fileName = generateSafeFilename(item.file.name);
+        const filePath = path.default.join(uploadsDir, fileName);
+        const imageUrl = `/uploads/gallery/${fileName}`;
+
+        const bytes = await item.file.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+        await writeFile(filePath, buffer);
+
+        // Create gallery item in database
+        const galleryItem = await prisma.galleryItem.create({
+          data: {
+            title: item.title,
+            description: item.description || null,
+            imageUrl,
+            type: "IMAGE",
+            order: currentOrder++,
+            pinId: item.pinId,
+            loreEntryId: item.loreEntryId,
+            worldId: gameWorldId,
+          },
+        });
+
+        results.push({
+          success: true,
+          itemId: galleryItem.id,
+          fileName: item.file.name,
+        });
+      } catch (error) {
+        results.push({
+          success: false,
+          error: error instanceof Error ? error.message : "Unknown error",
+          fileName: item.file.name,
+        });
+      }
+    }
+
+    revalidatePath(`/world/${gameWorldId}`);
+
+    return { results };
+  }, "uploadGalleryImagesBulk");
+}
+
+// ============================================
+// COLLECTIONS MANAGEMENT
+// ============================================
+
+/**
+ * Create a new gallery collection
+ * @param worldId - World ID
+ * @param name - Collection name
+ * @param description - Optional description
+ * @param color - Optional accent color
+ * @param icon - Optional icon identifier
+ * @returns Result with created collection or error
+ */
+export async function createCollection(
+  worldId: string,
+  name: string,
+  description?: string,
+  color?: string,
+  icon?: string
+): Promise<Result<GalleryCollection>> {
+  return safeAsync(async () => {
+    const user = await getAuthenticatedUser();
+
+    // Verify world access
+    await verifyWorldPermission(worldId, user.id);
+
+    // Get max order for collections in this world
+    const maxOrderCollection = await prisma.galleryCollection.findFirst({
+      where: { worldId },
+      orderBy: { order: "desc" },
+    });
+
+    const order = (maxOrderCollection?.order ?? -1) + 1;
+
+    const collection = await prisma.galleryCollection.create({
+      data: {
+        name,
+        description,
+        color: color || "#3b82f6",
+        icon,
+        order,
+        worldId,
+      },
+    });
+
+    revalidatePath(`/world/${worldId}`);
+
+    return collection;
+  }, "createCollection");
+}
+
+/**
+ * Update a collection
+ * @param collectionId - Collection ID
+ * @param data - Update data
+ * @returns Result with updated collection or error
+ */
+export async function updateCollection(
+  collectionId: string,
+  data: {
+    name?: string;
+    description?: string;
+    color?: string;
+    icon?: string;
+  }
+): Promise<Result<GalleryCollection>> {
+  return safeAsync(async () => {
+    const user = await getAuthenticatedUser();
+
+    const collection = await prisma.galleryCollection.findUnique({
+      where: { id: collectionId },
+    });
+
+    if (!collection) {
+      throw new ValidationError("Collection not found");
+    }
+
+    // Verify world access
+    await verifyWorldPermission(collection.worldId, user.id);
+
+    const updated = await prisma.galleryCollection.update({
+      where: { id: collectionId },
+      data,
+    });
+
+    revalidatePath(`/world/${collection.worldId}`);
+
+    return updated;
+  }, "updateCollection");
+}
+
+/**
+ * Delete a collection
+ * @param collectionId - Collection ID
+ * @returns Result with deleted collection ID or error
+ */
+export async function deleteCollection(collectionId: string): Promise<Result<{ collectionId: string }>> {
+  return safeAsync(async () => {
+    const user = await getAuthenticatedUser();
+
+    const collection = await prisma.galleryCollection.findUnique({
+      where: { id: collectionId },
+    });
+
+    if (!collection) {
+      throw new ValidationError("Collection not found");
+    }
+
+    // Verify world access
+    await verifyWorldPermission(collection.worldId, user.id);
+
+    await prisma.galleryCollection.delete({
+      where: { id: collectionId },
+    });
+
+    revalidatePath(`/world/${collection.worldId}`);
+
+    return { collectionId };
+  }, "deleteCollection");
+}
+
+/**
+ * Add items to a collection
+ * @param itemIds - Array of gallery item IDs
+ * @param collectionId - Collection ID
+ * @returns Result with added items or error
+ */
+export async function addItemsToCollection(
+  itemIds: string[],
+  collectionId: string
+): Promise<Result<CollectionItem[]>> {
+  return safeAsync(async () => {
+    const user = await getAuthenticatedUser();
+
+    const collection = await prisma.galleryCollection.findUnique({
+      where: { id: collectionId },
+    });
+
+    if (!collection) {
+      throw new ValidationError("Collection not found");
+    }
+
+    // Verify world access
+    await verifyWorldPermission(collection.worldId, user.id);
+
+    // Get current max order in collection
+    const maxOrderItem = await prisma.collectionItem.findFirst({
+      where: { collectionId },
+      orderBy: { order: "desc" },
+    });
+
+    let currentOrder = (maxOrderItem?.order ?? -1) + 1;
+
+    // Create collection items
+    const results = await Promise.all(
+      itemIds.map((itemId) =>
+        prisma.collectionItem.create({
+          data: {
+            galleryItemId: itemId,
+            collectionId,
+            order: currentOrder++,
+          },
+          include: {
+            galleryItem: true,
+          },
+        })
+      )
+    );
+
+    revalidatePath(`/world/${collection.worldId}`);
+
+    return results;
+  }, "addItemsToCollection");
+}
+
+/**
+ * Remove items from a collection
+ * @param itemIds - Array of gallery item IDs
+ * @param collectionId - Collection ID
+ * @returns Result with removed count or error
+ */
+export async function removeItemsFromCollection(
+  itemIds: string[],
+  collectionId: string
+): Promise<Result<{ count: number }>> {
+  return safeAsync(async () => {
+    const user = await getAuthenticatedUser();
+
+    const collection = await prisma.galleryCollection.findUnique({
+      where: { id: collectionId },
+    });
+
+    if (!collection) {
+      throw new ValidationError("Collection not found");
+    }
+
+    // Verify world access
+    await verifyWorldPermission(collection.worldId, user.id);
+
+    const result = await prisma.collectionItem.deleteMany({
+      where: {
+        collectionId,
+        galleryItemId: { in: itemIds },
+      },
+    });
+
+    revalidatePath(`/world/${collection.worldId}`);
+
+    return { count: result.count };
+  }, "removeItemsFromCollection");
+}
+
+/**
+ * Get all collections for a world
+ * @param worldId - World ID
+ * @returns Array of collections with item counts
+ */
+export async function getCollectionsByWorld(worldId: string) {
+  try {
+    const collections = await prisma.galleryCollection.findMany({
+      where: { worldId },
+      include: {
+        items: {
+          include: {
+            galleryItem: {
+              select: {
+                id: true,
+                title: true,
+                imageUrl: true,
+                type: true,
+              },
+            },
+          },
+          orderBy: { order: "asc" },
+        },
+      },
+      orderBy: { order: "asc" },
+    });
+
+    return collections.map((collection) => ({
+      ...collection,
+      itemCount: collection.items.length,
+    }));
+  } catch (error) {
+    console.error("[getCollectionsByWorld] Failed to fetch collections:", error);
+    return [];
+  }
+}
+
+/**
+ * Update tags on a gallery item
+ * @param itemId - Gallery item ID
+ * @param tags - Array of tags
+ * @returns Result with updated item or error
+ */
+export async function updateItemTags(
+  itemId: string,
+  tags: string[]
+): Promise<Result<GalleryItem>> {
+  return safeAsync(async () => {
+    const user = await getAuthenticatedUser();
+
+    const item = await verifyGalleryPermission(itemId, user.id);
+
+    const updated = await prisma.galleryItem.update({
+      where: { id: itemId },
+      data: { tags },
+    });
+
+    const worldId = item.pin?.gameWorldId || item.loreEntry?.gameWorldId || item.worldId;
+    if (worldId) {
+      revalidatePath(`/world/${worldId}`);
+    }
+
+    return updated;
+  }, "updateItemTags");
+}
+
+/**
+ * Search gallery items by tags
+ * @param worldId - World ID
+ * @param tags - Array of tags to search for
+ * @returns Array of matching gallery items
+ */
+export async function searchGalleryByTags(worldId: string, tags: string[]) {
+  try {
+    const items = await prisma.galleryItem.findMany({
+      where: {
+        worldId,
+        tags: { hasSome: tags },
+      },
+      include: {
+        pin: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+        loreEntry: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return items;
+  } catch (error) {
+    console.error("[searchGalleryByTags] Failed to search items:", error);
+    return [];
+  }
+}
+
+/**
+ * Get all gallery items for a world (with worldId support)
+ * @param gameWorldId - World ID
+ * @returns Array of gallery items
+ */
+export async function getGalleryItemsByWorldWithDirect(gameWorldId: string) {
+  try {
+    const galleryItems = await prisma.galleryItem.findMany({
+      where: {
+        OR: [
+          { pin: { gameWorldId } },
+          { loreEntry: { gameWorldId } },
+          { worldId: gameWorldId },
+        ],
+      },
+      orderBy: {
+        order: "asc",
+      },
+      include: {
+        pin: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+        loreEntry: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+        collections: {
+          include: {
+            collection: {
+              select: {
+                id: true,
+                name: true,
+                color: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return galleryItems;
+  } catch (error) {
+    console.error("[getGalleryItemsByWorldWithDirect] Failed to fetch gallery items:", error);
+    return [];
+  }
 }

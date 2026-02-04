@@ -72,7 +72,7 @@ export function validateImageFile(file: File): void {
   }
 
   // Check file type
-  if (!IMAGE_ALLOWED_TYPES.includes(file.type as any)) {
+  if (!IMAGE_ALLOWED_TYPES.includes(file.type as (typeof IMAGE_ALLOWED_TYPES)[number])) {
     throw new Error(
       `Invalid file type. Allowed: ${IMAGE_ALLOWED_TYPES.join(", ")}`
     );

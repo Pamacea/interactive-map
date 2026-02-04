@@ -16,6 +16,7 @@ import {
   getAuthenticatedUser,
   verifyWorldPermission,
 } from "@/lib/server-helpers";
+import type { GameWorld } from "@prisma/client";
 
 // Cache tags for revalidation
 const CACHE_TAGS = {
@@ -55,7 +56,7 @@ export async function createWorld(data: {
 
       // Generate unique filename with world ID prefix
       const timestamp = Date.now();
-      const fileExtension = data.map.name.split(".").pop();
+      const _fileExtension = data.map.name.split(".").pop();
       const fileName = `${timestamp}-${data.map.name}`;
       const uploadsDir = path.join(process.cwd(), "public", "uploads");
 
@@ -69,7 +70,7 @@ export async function createWorld(data: {
       try {
         await writeFile(filePath, buffer);
         mapPath = `/uploads/${fileName}`;
-      } catch (error) {
+      } catch {
         throw new FileUploadError("Failed to save map image");
       }
     }
@@ -335,7 +336,7 @@ export async function getMyWorlds() {
  * @param title - New title
  * @returns Result with updated world or error
  */
-export async function updateWorldTitle(id: string, title: string): Promise<Result<any>> {
+export async function updateWorldTitle(id: string, title: string): Promise<Result<GameWorld>> {
   return safeAsync(async () => {
     const world = await prisma.gameWorld.update({
       where: { id },
@@ -374,7 +375,7 @@ export async function updateWorldState(
     scale?: string;
     pinCount?: number;
   }
-): Promise<Result<any>> {
+): Promise<Result<GameWorld>> {
   return safeAsync(async () => {
     // Get authenticated user
     const user = await getAuthenticatedUser();
@@ -558,7 +559,7 @@ export async function addWorldMember(
   worldId: string,
   email: string,
   permission: "READER" | "EDITOR" | "OWNER"
-): Promise<Result<any>> {
+): Promise<Result<GameWorld>> {
   return safeAsync(async () => {
     const user = await getAuthenticatedUser();
 
@@ -638,7 +639,7 @@ export async function addWorldMember(
 export async function updateWorldMemberPermission(
   memberId: string,
   permission: "READER" | "EDITOR" | "OWNER"
-): Promise<Result<any>> {
+): Promise<Result<GameWorld>> {
   return safeAsync(async () => {
     const user = await getAuthenticatedUser();
 

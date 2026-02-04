@@ -11,7 +11,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Download, FileImage, FileText, Code, Loader2 } from "lucide-react";
 import { exportMap, estimateFileSize, formatFileSize } from "../utils/export-utils";

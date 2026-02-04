@@ -5,9 +5,8 @@ import { revalidatePath } from "next/cache";
 import {
   CreatePinSchema,
   UpdatePinSchema,
-  PinFiltersSchema,
 } from "@/components/pins/logic/pin-schemas";
-import type { Pin, PinCreateInput, PinUpdateInput } from "@/types/pin.type";
+import type { PinCreateInput, PinUpdateInput } from "@/types/pin.type";
 import {
   safeAsync,
   ValidationError,
@@ -19,6 +18,7 @@ import {
   verifyWorldPermission,
   verifyPinPermission,
 } from "@/lib/server-helpers";
+import type { Pin } from "@prisma/client";
 
 /**
  * Create a new pin in a world
@@ -146,7 +146,7 @@ export async function updatePin(data: PinUpdateInput): Promise<Result<Pin>> {
     }
 
     // Build update data (only include fields that are provided)
-    const updateData: any = {};
+    const updateData: Partial<Pin> = {};
     if (validated.title !== undefined) updateData.title = validated.title;
     if (validated.description !== undefined) updateData.description = validated.description;
     if (validated.pinType !== undefined) updateData.pinType = validated.pinType;
@@ -315,7 +315,7 @@ export async function uploadPinIcon(
     // Generate unique filename with UUID
     const timestamp = Date.now();
     const randomId = Math.random().toString(36).substring(2, 15);
-    const ext = path.default.extname(file.name);
+    const _ext = path.default.extname(file.name);
     const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
     const fileName = `${timestamp}-${randomId}-${sanitizedName}`;
     const filePath = path.default.join(uploadsDir, fileName);

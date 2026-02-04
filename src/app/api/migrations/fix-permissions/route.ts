@@ -28,11 +28,11 @@ export async function POST() {
       message: "World permissions fixed successfully",
       data: result.data,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
       {
         error: "Migration failed",
-        details: error?.message || "Unknown error",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
     );

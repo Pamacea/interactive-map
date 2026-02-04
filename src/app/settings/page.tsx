@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { Settings as SettingsIcon, Bell, Lock, Globe, Crown } from "lucide-react";
+import { Settings as SettingsIcon, Bell, Lock, Globe } from "lucide-react";
 import { AppHeader } from "@/components/ui/app-header";
 import { Footer } from "@/components/home/ui/footer";
 import { FloatingParticles } from "@/components/ui/particles";
