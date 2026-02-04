@@ -6,6 +6,7 @@ import { MapImage } from "../map-image";
 import { PinsRenderer } from "../pins-renderer";
 import { SelectedPinPopup } from "../selected-pin-popup";
 import { useMapStore } from "@/stores/map-store";
+import { useSelectedPinId } from "@/stores/use-pins-store";
 
 interface MapPinsWrapperProps {
   baseMapVisible: boolean;
@@ -44,6 +45,8 @@ export const MapPinsWrapper = memo(function MapPinsWrapper({
 }: MapPinsWrapperProps) {
   // Get layers for popup positioning
   const layers = useMapStore((state) => state.layers);
+  // Get selected pin ID from store (real-time updates)
+  const selectedPinId = useSelectedPinId();
 
   if (!imageDimensions) return null;
 
@@ -70,9 +73,9 @@ export const MapPinsWrapper = memo(function MapPinsWrapper({
         onContextMenu={onContextMenu}
       >
         {pinsRenderer}
-        {selectedPin && (
+        {selectedPinId && (
           <SelectedPinPopup
-            selectedPin={selectedPin}
+            selectedPinId={selectedPinId}
             onClose={onPopupClose}
             imageDimensions={imageDimensions}
             layers={layers}
@@ -92,9 +95,9 @@ export const MapPinsWrapper = memo(function MapPinsWrapper({
       }}
     >
       {pinsRenderer}
-      {selectedPin && (
+      {selectedPinId && (
         <SelectedPinPopup
-          selectedPin={selectedPin}
+          selectedPinId={selectedPinId}
           onClose={onPopupClose}
           imageDimensions={imageDimensions}
           layers={layers}

@@ -51,10 +51,9 @@ export function useContextMenuPosition({
 
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Ignore right-click (button 2) to allow context menu to open
-      if (event.button === 2) {
-        return;
-      }
+      // Close menu on any click outside (including right-click)
+      // Note: mousedown fires before contextmenu, so the menu will close
+      // and then the contextmenu event can trigger the map's context menu
       if (
         menuRef.current &&
         !menuRef.current.contains(event.target as Node)
@@ -85,19 +84,16 @@ export function useContextMenuPosition({
   React.useEffect(() => {
     const handleContextMenu = (event: MouseEvent) => {
       // Only prevent context menu inside the menu itself
-      // Let clicks outside pass through so the map can handle them
-      if (
-        menuRef.current &&
-        menuRef.current.contains(event.target as Node)
-      ) {
+      if (menuRef.current && menuRef.current.contains(event.target as Node)) {
         event.preventDefault();
+        event.stopPropagation();
       }
-      // Otherwise, let the event propagate to the map's context menu handler
+      // Let clicks outside pass through to the map's handler
     };
 
-    document.addEventListener("contextmenu", handleContextMenu);
+    document.addEventListener("contextmenu", handleContextMenu, { capture: true });
     return () => {
-      document.removeEventListener("contextmenu", handleContextMenu);
+      document.removeEventListener("contextmenu", handleContextMenu, { capture: true });
     };
   }, []);
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { memo } from "react";
-import { PinContextMenu } from "@/components/pins/ui/pin-context-menu";
+import { PinContextMenuPortal } from "@/components/pins/ui/pin-context-menu-portal";
 import { useMapInitialization } from "../logic/use-map-initialization";
 import { useMapEvents } from "../logic/use-map-events";
 import { PlacementIndicator } from "./placement-indicator";
@@ -105,16 +105,16 @@ export const MapCanvas = memo(function MapCanvas({ mapImage, worldId }: MapCanva
         </MapTransformLayer>
 
         <PlacementIndicator show={isCreatingPin && !contextMenu} />
-
-        {contextMenu && worldId && (
-          <PinContextMenu
-            position={contextMenu.position}
-            coordinates={contextMenu.coordinates}
-            onClose={closeContextMenu}
-            onSelectPinType={handleSelectPinType}
-          />
-        )}
       </MapContainer>
+
+      {contextMenu && worldId && (
+        <PinContextMenuPortal
+          position={contextMenu.position}
+          coordinates={contextMenu.coordinates}
+          onClose={closeContextMenu}
+          onSelectPinType={handleSelectPinType}
+        />
+      )}
     </MapCenterProvider>
   );
 });

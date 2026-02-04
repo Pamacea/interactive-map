@@ -20,8 +20,7 @@ export const PinsRenderer: FC<PinsRendererProps> = memo(
             <MemoizedPinMarker
               key={pin.id}
               pin={pin}
-              mapWidth={imageDimensions.width}
-              mapHeight={imageDimensions.height}
+              imageDimensions={imageDimensions}
               transform={transform}
               onPinClick={onPinClick}
             />

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { Pin } from "@prisma/client";
 import { PinType } from "@/types/pin.type";
 import { eventManager } from "@/lib/event-manager";
@@ -47,13 +47,6 @@ export function useMapInteractions(options: UseMapInteractionsOptions) {
   } = options;
 
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
-  const isMountedRef = useRef(true);
-
-  useEffect(() => {
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
 
   const handleClick = useCallback((e: React.MouseEvent) => {
     // Don't handle click if event was captured by another element
@@ -77,6 +70,12 @@ export function useMapInteractions(options: UseMapInteractionsOptions) {
   }, [contextMenu, selectedPin, onClearSelection, onCloseContextMenu]);
 
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
+    // Don't handle context menu if event was captured by another element
+    // (e.g., pin popup, sidebar, etc.)
+    if (eventManager.isCaptured()) {
+      return;
+    }
+
     // Prevent default browser context menu first
     e.preventDefault();
     e.stopPropagation();
@@ -105,10 +104,6 @@ export function useMapInteractions(options: UseMapInteractionsOptions) {
       transform,
       imageDimensions
     );
-
-    if (!isMountedRef.current) {
-      return;
-    }
 
     // Use calculated coordinates or fallback to center of map
     setContextMenu({
@@ -144,8 +139,6 @@ export function useMapInteractions(options: UseMapInteractionsOptions) {
   // Handle Escape key to cancel pin placement or close context menu
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isMountedRef.current) return;
-
       if (e.key === "Escape") {
         if (contextMenu) {
           setContextMenu(null);

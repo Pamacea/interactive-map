@@ -32,10 +32,8 @@ export function PinPopup({
     return () => release();
   }, []);
 
-  // Focus management - return focus when popup closes
+  // Focus management
   useFocusReturn(true);
-
-  // Focus trap - keep focus within popup
   useFocusTrap(true, popupRef as React.RefObject<HTMLElement>);
 
   // Announce to screen readers
@@ -85,10 +83,11 @@ export function PinPopup({
         "animate-in fade-in zoom-in-95 duration-200"
       )}
       onClick={stopPropagation}
-      onMouseDown={stopPropagation}
       onMouseUp={stopPropagation}
     >
+      {/* Header */}
       <PopupHeader pin={pin} onClose={onClose} onDelete={onDelete} onTitleChange={onTitleChange} />
+
       <PopupContentEnhanced pin={pin} worldId={worldId} />
       <PopupArrow />
     </div>
