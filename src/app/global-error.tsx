@@ -1,21 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
-// Icons rendered as unicode to avoid global-error.tsx module resolution issues
 
-/**
- * Global Error Boundary
- *
- * Catches errors at the root layout level and displays a fallback UI.
- * This is the last resort error handler for the entire application.
- *
- * IMPORTANT: global-error.tsx must define its own <html> and <body> tags
- * because it replaces the root layout when active.
- *
- * According to Next.js 16 error handling:
- * https://nextjs.org/docs/app/getting-started/error-handling
- */
 export default function GlobalError({
   error,
   reset,
@@ -23,9 +9,6 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  /**
-   * Log critical errors to external service
-   */
   const logCriticalError = (error: Error & { digest?: string }): void => {
     const errorPayload = {
       digest: error.digest,
@@ -35,16 +18,11 @@ export default function GlobalError({
       severity: "CRITICAL",
       route: "global",
     };
-
-    // TODO: Send to error reporting service with high priority
     console.error("[GlobalError] Critical error logged:", errorPayload);
   };
 
   useEffect(() => {
-    // Log error to console
     console.error("[GlobalError] Critical application error:", error);
-
-    // Log to error reporting service in production
     if (process.env.NODE_ENV === "production") {
       logCriticalError(error);
     }
@@ -52,51 +30,53 @@ export default function GlobalError({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="bg-background-base text-text-primary antialiased">
-        <div className="min-h-screen flex items-center justify-center px-4">
-          <div className=" w-full space-y-8">
-            {/* Critical Error Icon */}
+      <body className="bg-void text-bone antialiased font-fell">
+        <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
+          <div className="absolute inset-0 bg-grain opacity-[0.04] pointer-events-none" aria-hidden="true" />
+
+          <div className="relative z-10 w-full max-w-3/5 space-y-8">
+            <div className="absolute -top-20 -left-20 text-accent-gold-dark opacity-20 text-5xl animate-rune-glow">ᛟ</div>
+            <div className="absolute -top-20 -right-20 text-accent-gold-dark opacity-20 text-5xl animate-rune-glow" style={{ animationDelay: "1s" }}>ᛞ</div>
+            <div className="absolute -bottom-20 -left-20 text-accent-gold-dark opacity-20 text-5xl animate-rune-glow" style={{ animationDelay: "2s" }}>ᛃ</div>
+
             <div className="flex justify-center">
               <div className="relative">
-                <div className="absolute inset-0 bg-status-error/30 rounded-sm blur-2xl animate-pulse" />
-                <div className="relative w-24 h-24 text-6xl flex items-center justify-center text-status-error">
-                  ⚠️
+                <div className="absolute inset-0 bg-accent-gold/20 rounded-sm blur-2xl animate-pulse" />
+                <div className="relative w-24 h-24 flex items-center justify-center text-accent-gold">
+                  <span className="text-6xl">⚠</span>
                 </div>
               </div>
             </div>
 
-            {/* Error Message */}
             <div className="space-y-4 text-center">
-              <h1 className="text-4xl font-display font-bold text-text-primary">
-                Critical Application Error
+              <p className="font-display text-xs tracking-[0.4em] text-bone-dark">THE FABRIC TEARS</p>
+              <h1 className="font-display-ornate text-4xl sm:text-5xl text-accent-gold tracking-wider">
+                Critical Error
               </h1>
-              <p className="text-lg text-text-secondary">
-                The application encountered a critical error and cannot continue.
-                This is likely due to a system-wide issue that needs immediate attention.
+              <p className="text-bone-dark text-sm sm:text-base max-w-2/3 mx-auto">
+                The application has encountered a critical error and cannot continue.
+                This shadow requires immediate attention.
               </p>
             </div>
 
-            {/* Error Details (Development Only) */}
             {process.env.NODE_ENV === "development" && (
-              <details className="bg-background-card rounded-sm border border-border-subtle p-6">
-                <summary className="cursor-pointer text-sm text-text-secondary hover:text-accent-gold transition-colors font-medium">
-                  Technical Details (Development Only)
+              <details className="bg-obsidian/60 backdrop-blur-sm border border-iron rounded-sm p-6">
+                <summary className="cursor-pointer text-sm text-bone-dark hover:text-accent-gold transition-colors font-display tracking-wider">
+                  Technical Details
                 </summary>
-                <div className="mt-4 space-y-3">
+                <div className="mt-4 space-y-3 font-mono text-xs">
                   <div>
-                    <p className="text-xs font-medium text-text-primary">Digest:</p>
-                    <p className="text-sm text-text-muted font-mono">
-                      {error.digest || "N/A"}
-                    </p>
+                    <p className="font-medium text-accent-gold">Digest:</p>
+                    <p className="text-bone-dark mt-1">{error.digest || "N/A"}</p>
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-text-primary">Message:</p>
-                    <p className="text-sm text-text-muted">{error.message}</p>
+                    <p className="font-medium text-accent-gold">Message:</p>
+                    <p className="text-bone-dark mt-1">{error.message}</p>
                   </div>
                   {error.stack && (
                     <div>
-                      <p className="text-xs font-medium text-text-primary">Stack Trace:</p>
-                      <pre className="text-xs text-text-muted overflow-auto max-h-40 bg-background-base p-3 rounded mt-2 font-mono">
+                      <p className="font-medium text-accent-gold">Stack Trace:</p>
+                      <pre className="text-bone-dark mt-1 overflow-auto max-h-40 bg-void/50 p-3 rounded">
                         {error.stack}
                       </pre>
                     </div>
@@ -105,40 +85,28 @@ export default function GlobalError({
               </details>
             )}
 
-            {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
+              <button
                 onClick={reset}
-                variant="primary"
-                size="lg"
-                className="gap-2"
+                className="px-8 py-3 bg-accent-gold/10 border-2 border-accent-gold text-accent-gold font-display tracking-wider hover:bg-accent-gold/20 transition-all duration-300 rounded-sm"
               >
-                <span className="text-lg">🔄</span>
-                Reload Application
-              </Button>
-              <Button
+                <span className="mr-2">↻</span> RELOAD
+              </button>
+              <button
                 onClick={() => window.location.href = "/"}
-                variant="secondary"
-                size="lg"
-                className="gap-2"
+                className="px-8 py-3 bg-obsidian/60 border border-iron text-bone font-display tracking-wider hover:border-accent-gold hover:text-accent-gold transition-all duration-300 rounded-sm"
               >
-                <span className="text-lg">🏠</span>
-                Go to Home
-              </Button>
+                <span className="mr-2">⌂</span> HOME
+              </button>
             </div>
 
-            {/* Support Information */}
-            <div className="bg-background-card rounded-sm border border-border-subtle p-6 text-center space-y-3">
-              <p className="text-sm text-text-secondary">
-                This error has been logged and our team has been notified.
+            <div className="bg-obsidian/60 backdrop-blur-sm border border-iron rounded-sm p-6 text-center space-y-3">
+              <p className="text-sm text-bone-dark font-display">
+                This error has been logged. The guardians have been notified.
               </p>
-              <p className="text-sm text-text-muted">
-                If you continue to experience this issue, please contact our support team
-                with the following error reference:
+              <p className="text-xs text-bone-dark">
+                Error Reference: <code className="text-accent-gold">{error.digest || new Date().getTime().toString(36)}</code>
               </p>
-              <code className="block text-sm font-mono text-accent-gold bg-background-base px-3 py-2 rounded">
-                {error.digest || new Date().getTime().toString(36)}
-              </code>
             </div>
           </div>
         </div>

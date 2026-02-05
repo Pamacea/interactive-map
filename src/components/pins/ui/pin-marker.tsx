@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useCallback, useEffect, useRef } from "react";
+import { memo, useCallback } from "react";
 import { useMapStore } from "@/stores/map-store";
 import { useSelectPin, useSelectedPinId, useClearSelection, usePinById } from "@/stores/use-pins-store";
 import { getPinTypeConfig, type PinType } from "@/constants/pin-types";
@@ -59,7 +59,7 @@ export function PinMarker({
   const isLayerLocked = layer?.locked ?? false;
 
   // Unified drag handling using input manager
-  const { isDragging, dragPosition, handleMouseDown: handleDragMouseDown } = usePinDragInput({
+  const { isDragging, dragPosition, handleMouseDown: handleDragMouseDown, justFinishedDragRef } = usePinDragInput({
     pin,
     imageDimensions,
     transform,
@@ -108,20 +108,16 @@ export function PinMarker({
 
   const { finalZIndex, finalSize, iconSize, boxShadow, transformScale } = markerStyling;
 
-  // Track if we were dragging (for click handler)
-  const wasDraggingRef = useRef(false);
-
-  // Update wasDragging ref when drag state changes
-  useEffect(() => {
-    wasDraggingRef.current = isDragging;
-  }, [isDragging]);
-
   // Click handler - toggle selection (only if not dragging)
   const handleClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
 
-    // Don't handle click if we were dragging
-    if (wasDraggingRef.current) return;
+    // Don't handle click if we were just dragging
+    // Check and clear the flag in the same operation
+    if (justFinishedDragRef.current) {
+      justFinishedDragRef.current = false;
+      return;
+    }
 
     if (isPinSelected) {
       clearSelection();
@@ -129,7 +125,7 @@ export function PinMarker({
       selectPin(pin.id);
       onPinClick?.(pin);
     }
-  }, [isPinSelected, clearSelection, selectPin, pin, onPinClick]);
+  }, [isPinSelected, clearSelection, selectPin, pin, onPinClick, justFinishedDragRef]);
 
   // Combined mouse down handler
   const handleMouseDown = useCallback((e: React.MouseEvent) => {

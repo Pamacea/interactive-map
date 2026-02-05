@@ -24,6 +24,8 @@ import {
   CharactersModule,
   ActivityModule,
   CommentsModule,
+  VersionsModule,
+  ImportModule,
 } from "@/components/world/ui/floating";
 import type { OptimizedWorld } from "@/types/world.type";
 import type { Pin } from "@/types/pin.type";
@@ -105,6 +107,22 @@ function FloatingUI({ world, pins, currentUserId, worldOwnerId }: {
       {/* Comments module - only show if authenticated */}
       {currentUserId && (
         <CommentsModule worldId={world.id} />
+      )}
+
+      {/* Versions module - only show if authenticated */}
+      {currentUserId && (
+        <VersionsModule
+          worldId={world.id}
+          canModify={currentUserId === worldOwnerId}
+        />
+      )}
+
+      {/* Import module - only show if authenticated and can modify */}
+      {currentUserId && currentUserId === worldOwnerId && (
+        <ImportModule
+          worldId={world.id}
+          canModify={currentUserId === worldOwnerId}
+        />
       )}
     </>
   );

@@ -351,12 +351,12 @@
 ---
 
 ### 4.3 Advanced Features
-**Status**: In Progress | **Priority**: Varies | **Effort**: Varies
+**Status**: 90% Complete | **Priority**: Varies | **Effort**: Varies
 
 | Feature | Priority | Effort | Description |
 |---------|----------|--------|-------------|
 | Comments/Annotations | Low | Medium | Add notes to map locations |
-| Version History | Low | Large | Track and revert world changes |
+| Version History | Low | Medium | Track and revert world changes |
 | Map Providers | Low | Medium | Integrate third-party map tiles |
 | Mobile App | Low | Very Large | Native mobile experience |
 | Offline Mode | Low | Large | Service worker, local storage |
@@ -387,6 +387,61 @@
   - Edit own comments
   - Comment markers on map
   - Filter by resolved status
+  - Floating panel integration
+
+---
+
+## 8.2 Version History System
+**Status**: ✅ Complete | **Priority**: Low | **Effort**: Medium
+
+- **Schema**: MapVersion with snapshot, changelog, isAuto flag
+- **UI Components**: `src/components/versions/ui/`
+  - `version-list.tsx` - Version list with restore/delete actions
+  - `version-create-form.tsx` - Manual version creation
+  - `version-detail.tsx` - Version detail view
+- **Floating Module**: `src/components/world/ui/floating/versions-module.tsx`
+- **State Management**: `src/store/use-versions-store.ts` (Zustand)
+- **Backend** (`src/actions/versions.ts`):
+  - `createVersion` - Create manual version with snapshot
+  - `getWorldVersions` - Fetch version list
+  - `restoreVersion` - Restore world to previous version
+  - `deleteVersion` - Delete a version
+  - `updateVersion` - Update title/changelog
+- **TanStack Query Hooks**: `src/hooks/use-versions.ts`
+- **Features**:
+  - Manual version creation with title and changelog
+  - Complete world state snapshots (pins, layers, lore, characters)
+  - Version restoration with confirmation
+  - Version deletion by owner only
+  - Version list with timestamps
+  - Auto-save support (isAuto flag for future)
+  - Floating panel integration
+
+---
+
+## 8.3 Import from Tools System
+**Status**: ✅ Complete | **Priority**: Medium | **Effort**: Medium
+
+- **Schema**: ImportJob with status tracking, progress, error handling
+- **UI Components**: `src/components/import/ui/`
+  - `import-dialog.tsx` - Drag & drop file import dialog
+  - `import-status.tsx` - Import job status display
+- **Floating Module**: `src/components/world/ui/floating/import-module.tsx`
+- **Backend** (`src/actions/import.ts`):
+  - `createImportJob` - Create import job
+  - `processImportJob` - Process import (JSON, GeoJSON, Image)
+  - `getWorldImportJobs` - Fetch import history
+  - `cancelImportJob` - Cancel pending job
+- **TanStack Query Hooks**: `src/hooks/use-import.ts`
+- **Features**:
+  - JSON import (world export format)
+  - GeoJSON import (FeatureCollection with Points)
+  - Image import (as new map layer)
+  - Drag & drop file upload
+  - Job status tracking with progress
+  - Auto-processing after job creation
+  - Polling for active jobs
+  - Error handling and display
   - Floating panel integration
 
 ---
@@ -426,18 +481,12 @@
 
 ## 6. Milestones
 
-### v0.8 - Current State ✅
-- ✅ Auth, Worlds, Pins, Layers, Explore
-- ✅ Search (full UI with keyboard shortcut)
-- ✅ Export (PNG/PDF/JSON with dialog)
-- ✅ Lore (markdown editor, detail view, wiki-links, cross-references)
-- ✅ Lore-to-pin linking (bi-directional with relation types)
-- ✅ Gallery (TanStack Query, bulk upload, collections/folders)
-- ✅ Invite system (email invites, shareable links)
-- ✅ Member management UI
-- ✅ Character system (CRUD, stat blocks, portraits, relationships, pin linking)
-- ✅ Real-time presence indicators
-- ✅ Activity feed UI with event logging
+### v0.9 - Current State ✅
+- ✅ All v0.8 features
+- ✅ Version history system (create, restore, delete versions)
+- ✅ Import from tools (JSON, GeoJSON, Image)
+- ✅ Comments/Annotations system (threaded comments, markers, resolution)
+- ✅ Floating panel modules (Versions, Import, Comments)
 
 ### v1.0 - Future Enhancements
 - [ ] WebSocket/Socket.io for true real-time sync
@@ -458,7 +507,7 @@ Core Features     [████████████████████]
 Content Tools      [████████████████████] 100% (Lore ✅, Gallery ✅, Invites ✅, Characters ✅)
 Collaboration      [████████████████████] 100% (Members, Presence ✅, Activity Feed ✅)
 Search & Export    [████████████████████] 100% (Search ✅, Export ✅)
-Advanced           [░░░░░░░░░░░░░░░░░░░░░] 5%   (Templates)
+Advanced           [████████████████░░░░] 70%  (Versions ✅, Import ✅, Comments ✅)
 ────────────────────────────────────────────────────────────────────────────────
 Overall            [████████████████████] 100%
 ```

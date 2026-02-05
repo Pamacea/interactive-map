@@ -11,6 +11,8 @@ import {
   GripVertical,
   Clock,
   MessageSquare,
+  History,
+  Upload,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePanelState, useTogglePanel } from "@/store/use-floating-panels-store";
@@ -54,6 +56,8 @@ export const ModuleDock = memo(function ModuleDock() {
   const membersPanel = usePanelState("members");
   const activityPanel = usePanelState("activity");
   const commentsPanel = usePanelState("comments");
+  const versionsPanel = usePanelState("versions");
+  const importPanel = usePanelState("import");
 
 
   return (
@@ -123,6 +127,18 @@ export const ModuleDock = memo(function ModuleDock() {
             icon={<MessageSquare className="w-5 h-5" />}
             label="Comments"
             isActive={commentsPanel.isVisible}
+          />
+          <DockButton
+            id="versions"
+            icon={<History className="w-5 h-5" />}
+            label="Version History"
+            isActive={versionsPanel.isVisible}
+          />
+          <DockButton
+            id="import"
+            icon={<Upload className="w-5 h-5" />}
+            label="Import"
+            isActive={importPanel.isVisible}
           />
         </div>
       </div>

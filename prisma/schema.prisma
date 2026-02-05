@@ -35,6 +35,8 @@ model User {
   events        CollaborationEvent[] @relation("UserEvents")
   characters    Character[]    @relation("CharacterCreator")
   comments      MapComment[]   @relation("UserComments")
+  versions      MapVersion[]   @relation("UserVersions")
+  importJobs    ImportJob[]    @relation("UserImports")
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }
@@ -103,6 +105,8 @@ model GameWorld {
   events      CollaborationEvent[] @relation("WorldEvents")
   characters  Character[]    @relation("WorldCharacters")
   comments    MapComment[]   @relation("WorldComments")
+  versions    MapVersion[]   @relation("WorldVersions")
+  importJobs  ImportJob[]    @relation("WorldImports")
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
@@ -627,4 +631,63 @@ model MapComment {
   @@index([pinId])
   @@index([parentId])
   @@index([latitude, longitude])
+}
+
+// ============================================
+// VERSION HISTORY
+// ============================================
+
+model MapVersion {
+  id        String   @id @default(cuid())
+  worldId   String
+  world     GameWorld @relation("WorldVersions", fields: [worldId], references: [id], onDelete: Cascade)
+  version   Int      // Auto-incrementing version number
+  title     String   @default("")
+  snapshot  Json     // Complete world state snapshot
+  changelog String?  @db.Text // Description of changes
+  isAuto    Boolean  @default(false) // Auto-saved vs manual version
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String
+  user      User     @relation("UserVersions", fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@index([worldId])
+  @@index([createdAt])
+  @@index([worldId, version])
+}
+
+// ============================================
+// IMPORT FROM TOOLS
+// ============================================
+
+enum ImportStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+model ImportJob {
+  id         String       @id @default(cuid())
+  worldId    String
+  world      GameWorld    @relation("WorldImports", fields: [worldId], references: [id], onDelete: Cascade)
+  sourceType String       // "JSON", "GEOJSON", "IMAGE", "KML", "URL"
+  filename   String?      // Original filename
+  status     ImportStatus @default(PENDING)
+  rawData    Json         // Original imported data
+  processed  Json?        // Processed/mapped data
+  settings   Json?        // Import settings/options
+  error      String?      @db.Text // Error message if failed
+  progress   Int          @default(0) // 0-100
+  createdBy  String
+  user       User         @relation("UserImports", fields: [createdBy], references: [id])
+  startedAt  DateTime?
+  completedAt DateTime?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  @@index([worldId])
+  @@index([status])
+  @@index([createdAt])
 }

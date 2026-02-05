@@ -22,6 +22,7 @@ export interface UsePinDragInputReturn {
   isDragging: boolean;
   dragPosition: { x: number; y: number } | null;
   handleMouseDown: (e: React.MouseEvent) => void;
+  justFinishedDragRef: React.MutableRefObject<boolean>;
 }
 
 const DRAG_THRESHOLD = 5;
@@ -54,11 +55,13 @@ export function usePinDragInput({
   } | null>(null);
 
   const hasMovedRef = useRef(false);
+  // Ref that persists through the click cycle to prevent click-after-drag
+  const justFinishedDragRef = useRef(false);
 
   // Register with input manager
+  // Note: Always register to handle dynamic lock state changes properly.
+  // The enabled() callback handles whether handlers actually fire.
   useEffect(() => {
-    if (isLayerLocked) return;
-
     const cleanup = inputManager.register({
       element: "pin-marker",
       elementId: pin.id,
@@ -150,6 +153,12 @@ export function usePinDragInput({
             const wasDragging = hasMovedRef.current;
             dragStartRef.current = null;
             hasMovedRef.current = false;
+
+            // Set flag BEFORE clearing state (for click-after-drag prevention)
+            if (wasDragging) {
+              justFinishedDragRef.current = true;
+            }
+
             setIsDragging(false);
             setDragPosition(null);
 
@@ -182,5 +191,6 @@ export function usePinDragInput({
     isDragging,
     dragPosition,
     handleMouseDown,
+    justFinishedDragRef,
   };
 }
