@@ -6,8 +6,9 @@ import type { Pin } from "@prisma/client";
 import { PopupHeader } from "./popup-header";
 import { PopupContentEnhanced } from "./popup-content-enhanced";
 import { PopupArrow } from "./popup-arrow";
-import { eventManager, stopPropagation } from "@/lib/event-manager";
+import { stopPropagation } from "@/lib/event-manager";
 import { useFocusTrap, useFocusReturn } from "@/hooks/accessibility";
+import { useEventCapture } from "@/hooks/use-event-capture";
 
 interface PinPopupProps {
   pin: Pin;
@@ -27,10 +28,11 @@ export function PinPopup({
   const popupRef = React.useRef<HTMLDivElement>(null);
 
   // Capture events when popup is mounted to prevent map interactions
-  React.useEffect(() => {
-    const release = eventManager.capture("pin-popup");
-    return () => release();
-  }, []);
+  // Using the unified input manager
+  useEventCapture({
+    scope: "popup",
+    onEscape: onClose,
+  });
 
   // Focus management
   useFocusReturn(true);
@@ -55,20 +57,6 @@ export function PinPopup({
     };
   }, [pin.title]);
 
-  // Close popup on Escape key
-  React.useEffect(() => {
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose?.();
-      }
-    };
-
-    document.addEventListener("keydown", handleEscape);
-    return () => {
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, [onClose]);
-
   return (
     <div
       ref={popupRef}
@@ -77,9 +65,9 @@ export function PinPopup({
       aria-labelledby="pin-popup-title"
       aria-describedby="pin-popup-description"
       className={cn(
-        "relative z-50 min-w-80 max-w-96 rounded-sm border-2 border-[var(--color-accent-gold)]",
-        "bg-[var(--color-background-card)] shadow-2xl",
-        "font-display text-[var(--color-text-primary)]",
+        "relative z-50 min-w-80 max-w-96 rounded-sm border-2 border-accent-gold",
+        "bg-obsidian/95 backdrop-blur-md shadow-2xl",
+        "font-display text-text-primary",
         "animate-in fade-in zoom-in-95 duration-200"
       )}
       onClick={stopPropagation}

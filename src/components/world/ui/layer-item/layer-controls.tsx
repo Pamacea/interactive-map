@@ -72,6 +72,8 @@ export function LayerControls({
 
       {/* Opacity Slider */}
       <input
+        id={`layer-opacity-${layer.id}`}
+        name={`layerOpacity-${layer.id}`}
         type="range"
         min="0"
         max="100"

@@ -1,6 +1,7 @@
 "use client";
 
 import { X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface LayerDeleteConfirmationProps {
   onConfirm: () => void;
@@ -15,13 +16,21 @@ export function LayerDeleteConfirmation({
     <div className="flex items-center gap-1.5 animate-in fade-in slide-in-from-right-1 duration-200">
       <button
         onClick={onConfirm}
-        className="px-2 py-1 text-xs bg-rose-600 text-white rounded-sm hover:bg-rose-700 transition-colors font-medium"
+        className={cn(
+          "px-2 py-1 text-xs font-medium rounded-sm transition-all duration-200",
+          "bg-blood text-bone hover:bg-blood/90",
+          "border border-blood/70 shadow-sm"
+        )}
       >
         Delete
       </button>
       <button
         onClick={onCancel}
-        className="p-1 hover:bg-background-base rounded-sm transition-colors text-text-muted hover:text-text-secondary"
+        className={cn(
+          "p-1 rounded-sm transition-all duration-200",
+          "text-text-muted hover:text-text-secondary hover:bg-background-elevated/50",
+          "border border-transparent hover:border-border-subtle"
+        )}
         title="Cancel"
         aria-label="Cancel delete"
       >

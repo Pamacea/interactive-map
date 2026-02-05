@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSetHoverPin } from "@/stores/use-pins-store";
-import { eventManager } from "@/lib/event-manager";
+import { inputManager } from "@/lib/input-manager";
 
 interface UsePinEventsParams {
   pinId: string;
@@ -20,7 +20,7 @@ interface UsePinEventsReturn {
  *
  * This hook encapsulates all event-related logic for a pin marker:
  * - Hover state management
- * - Event capture via eventManager (prevents deselection bugs)
+ * - Event capture via inputManager (prevents deselection bugs)
  * - Integration with usePinsStore for hover/selection state
  *
  * @param params - Hook parameters
@@ -44,13 +44,19 @@ export function usePinEvents({
   /**
    * Capture events when pin is hovered or selected.
    * This prevents the deselection bug that occurs when clicking outside pins.
-   * The eventManager ensures that map clicks don't interfere with pin interactions.
+   * The inputManager ensures that map clicks don't interfere with pin interactions.
    */
   useEffect(() => {
     // Only capture events if not dragging (dragging has its own event handling)
     if (!isDragging && (isHovered || isPinSelected)) {
-      const release = eventManager.capture("pin-marker");
-      return () => release();
+      // Set focused element to prevent map interactions
+      inputManager.setFocusedElement("pin-marker");
+      return () => {
+        // Only reset if still focused on this pin
+        if (inputManager.getFocusedElement() === "pin-marker") {
+          inputManager.setFocusedElement("none");
+        }
+      };
     }
   }, [isHovered, isPinSelected, isDragging]);
 

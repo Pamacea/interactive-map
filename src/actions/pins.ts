@@ -19,6 +19,8 @@ import {
   verifyPinPermission,
 } from "@/lib/server-helpers";
 import type { Pin } from "@prisma/client";
+import { safeLogCollaborationEvent } from "@/actions/presence";
+import { CollaborationEventType } from "@/lib/presence";
 
 /**
  * Create a new pin in a world
@@ -70,6 +72,14 @@ export async function createPin(data: PinCreateInput): Promise<Result<{ pinId: s
     // CRITICAL: Revalidate the world page to refresh server component data
     // This ensures the new pin appears when the page reloads or data is refreshed
     revalidatePath(`/world/${pin.gameWorldId}`);
+
+    // Log collaboration event
+    await safeLogCollaborationEvent({
+      worldId: pin.gameWorldId,
+      eventType: CollaborationEventType.PIN_CREATED,
+      targetId: pin.id,
+      targetType: "pin",
+    });
 
     return { pinId: pin.id, pin };
   }, "createPin");
@@ -166,6 +176,22 @@ export async function updatePin(data: PinUpdateInput): Promise<Result<Pin>> {
       data: updateData,
     });
 
+    // Check if this is a position-only update (PIN_MOVED) or general update (PIN_UPDATED)
+    const isPositionOnly =
+      Object.keys(updateData).length === 2 &&
+      "latitude" in updateData &&
+      "longitude" in updateData;
+
+    // Log collaboration event
+    await safeLogCollaborationEvent({
+      worldId: pin.gameWorldId,
+      eventType: isPositionOnly
+        ? CollaborationEventType.PIN_MOVED
+        : CollaborationEventType.PIN_UPDATED,
+      targetId: pin.id,
+      targetType: "pin",
+    });
+
     // Note: No revalidatePath needed - TanStack Query manages client cache via optimistic updates
 
     return pin;
@@ -186,8 +212,16 @@ export async function deletePin(id: string): Promise<Result<{ pinId: string }>> 
     await verifyPinPermission(id, user.id);
 
     // Delete pin
-    await prisma.pin.delete({
+    const deletedPin = await prisma.pin.delete({
       where: { id },
+    });
+
+    // Log collaboration event
+    await safeLogCollaborationEvent({
+      worldId: deletedPin.gameWorldId,
+      eventType: CollaborationEventType.PIN_DELETED,
+      targetId: id,
+      targetType: "pin",
     });
 
     // Note: No revalidatePath needed - TanStack Query manages client cache via optimistic updates
@@ -214,6 +248,15 @@ export async function togglePinVisibility(id: string): Promise<Result<Pin>> {
     const updated = await prisma.pin.update({
       where: { id },
       data: { isVisible: !pin.isVisible },
+    });
+
+    // Log collaboration event
+    await safeLogCollaborationEvent({
+      worldId: pin.gameWorldId,
+      eventType: CollaborationEventType.PIN_UPDATED,
+      targetId: id,
+      targetType: "pin",
+      eventData: { field: "isVisible", value: !pin.isVisible },
     });
 
     // Note: If this action is used directly (not through updatePin), consider cache invalidation
@@ -260,6 +303,14 @@ export async function updatePinPosition(
     // CRITICAL FIX: No revalidatePath here!
     // The Zustand store is updated optimistically in pin-marker.tsx BEFORE this server call
     // Calling revalidatePath would cause TanStack Query to refetch, creating a race condition
+
+    // Log collaboration event (fire and forget)
+    await safeLogCollaborationEvent({
+      worldId: updated.gameWorldId,
+      eventType: CollaborationEventType.PIN_MOVED,
+      targetId: pinId,
+      targetType: "pin",
+    });
 
     return updated;
   }, "updatePinPosition");
@@ -332,6 +383,15 @@ export async function uploadPinIcon(
       data: { icon: iconPath },
     });
 
+    // Log collaboration event
+    await safeLogCollaborationEvent({
+      worldId: pin.gameWorldId,
+      eventType: CollaborationEventType.PIN_UPDATED,
+      targetId: pinId,
+      targetType: "pin",
+      eventData: { field: "icon" },
+    });
+
     // Revalidate the world page
     revalidatePath(`/world/${pin.gameWorldId}`);
 
@@ -389,6 +449,16 @@ export async function batchUpdatePinPositions(
         })
       )
     );
+
+    // Log collaboration event for batch move (fire and forget, one log per world)
+    for (const worldId of worldIds) {
+      await safeLogCollaborationEvent({
+        worldId,
+        eventType: CollaborationEventType.PIN_MOVED,
+        targetType: "pin",
+        eventData: { count: updates.length },
+      });
+    }
 
     // Revalidate only the affected world paths
     for (const worldId of worldIds) {

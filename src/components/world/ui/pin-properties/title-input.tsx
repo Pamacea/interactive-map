@@ -15,8 +15,10 @@ export function TitleInput({
 }: TitleInputProps) {
   return (
     <div className="px-3 py-2.5 bg-obsidian/60 border-x border-b border-iron/50">
-      <label className="block text-xs font-display text-bone-dark mb-2 uppercase tracking-wide">Title</label>
+      <label className="block text-xs font-display text-bone-dark mb-2 uppercase tracking-wide" htmlFor="pin-title">Title</label>
       <input
+        id="pin-title"
+        name="pinTitle"
         type="text"
         value={value}
         onChange={(e) => {

@@ -83,6 +83,8 @@ export function LayerPropertiesPanel({
           </span>
         </div>
         <input
+          id={`layer-opacity-${layer.id}`}
+          name={`layerOpacity-${layer.id}`}
           type="range"
           min="0"
           max="100"
@@ -103,6 +105,8 @@ export function LayerPropertiesPanel({
             </span>
           </div>
           <input
+            id={`layer-scale-${layer.id}`}
+            name={`layerScale-${layer.id}`}
             type="range"
             min="50"
             max="200"
@@ -136,6 +140,8 @@ export function LayerPropertiesPanel({
               <span className="text-xs font-display font-semibold text-accent-gold">{layer.minZoom}%</span>
             </div>
             <input
+              id={`layer-min-zoom-${layer.id}`}
+              name={`layerMinZoom-${layer.id}`}
               type="range"
               min="0"
               max="200"
@@ -155,6 +161,8 @@ export function LayerPropertiesPanel({
               <span className="text-xs font-display font-semibold text-accent-gold">{layer.maxZoom}%</span>
             </div>
             <input
+              id={`layer-max-zoom-${layer.id}`}
+              name={`layerMaxZoom-${layer.id}`}
               type="range"
               min="0"
               max="200"

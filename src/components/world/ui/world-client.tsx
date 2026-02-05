@@ -22,6 +22,8 @@ import {
   PropertiesModule,
   MembersModule,
   CharactersModule,
+  ActivityModule,
+  CommentsModule,
 } from "@/components/world/ui/floating";
 import type { OptimizedWorld } from "@/types/world.type";
 import type { Pin } from "@/types/pin.type";
@@ -93,6 +95,16 @@ function FloatingUI({ world, pins, currentUserId, worldOwnerId }: {
           worldOwnerId={worldOwnerId}
           currentUserId={currentUserId}
         />
+      )}
+
+      {/* Activity module - only show if authenticated */}
+      {currentUserId && (
+        <ActivityModule worldId={world.id} />
+      )}
+
+      {/* Comments module - only show if authenticated */}
+      {currentUserId && (
+        <CommentsModule worldId={world.id} />
       )}
     </>
   );
@@ -188,9 +200,24 @@ export const WorldClient = memo(function WorldClient({
 
           {/* Map canvas takes full screen */}
           <ErrorBoundary
+            onError={(error, errorInfo) => {
+              console.error("[MapCanvas ErrorBoundary] Error:", error);
+              console.error("[MapCanvas ErrorBoundary] Error message:", error.message);
+              console.error("[MapCanvas ErrorBoundary] Stack:", error.stack);
+              console.error("[MapCanvas ErrorBoundary] Component stack:", errorInfo.componentStack);
+              // Store error globally for debugging
+              (window as any).__lastError = {
+                message: error.message,
+                stack: error.stack,
+                componentStack: errorInfo.componentStack
+              };
+            }}
             fallback={
               <div className="h-full flex items-center justify-center bg-void">
-                <p className="text-bone-dark">Map canvas failed to load</p>
+                <div className="text-center">
+                  <p className="text-bone-dark mb-2">Map canvas failed to load</p>
+                  <p className="text-xs text-text-muted">Check console for details</p>
+                </div>
               </div>
             }
           >

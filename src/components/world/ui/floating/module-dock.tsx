@@ -9,6 +9,8 @@ import {
   Users,
   User,
   GripVertical,
+  Clock,
+  MessageSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePanelState, useTogglePanel } from "@/store/use-floating-panels-store";
@@ -50,6 +52,8 @@ export const ModuleDock = memo(function ModuleDock() {
   const filtersPanel = usePanelState("filters");
   const propertiesPanel = usePanelState("properties");
   const membersPanel = usePanelState("members");
+  const activityPanel = usePanelState("activity");
+  const commentsPanel = usePanelState("comments");
 
 
   return (
@@ -107,6 +111,18 @@ export const ModuleDock = memo(function ModuleDock() {
             icon={<Users className="w-5 h-5" />}
             label="Members"
             isActive={membersPanel.isVisible}
+          />
+          <DockButton
+            id="activity"
+            icon={<Clock className="w-5 h-5" />}
+            label="Activity"
+            isActive={activityPanel.isVisible}
+          />
+          <DockButton
+            id="comments"
+            icon={<MessageSquare className="w-5 h-5" />}
+            label="Comments"
+            isActive={commentsPanel.isVisible}
           />
         </div>
       </div>

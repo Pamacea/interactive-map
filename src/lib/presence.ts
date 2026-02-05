@@ -15,6 +15,19 @@ export enum CollaborationEventType {
   USER_JOINED = 'USER_JOINED',
   USER_LEFT = 'USER_LEFT',
   SELECTION_CHANGED = 'SELECTION_CHANGED',
+  COMMENT_CREATED = 'COMMENT_CREATED',
+  COMMENT_UPDATED = 'COMMENT_UPDATED',
+  COMMENT_DELETED = 'COMMENT_DELETED',
+  COMMENT_RESOLVED = 'COMMENT_RESOLVED',
+  COMMENT_REOPENED = 'COMMENT_REOPENED',
+}
+
+export interface Viewport {
+  x: number;
+  y: number;
+  zoom: number;
+  width?: number;
+  height?: number;
 }
 
 export interface PresenceData {
@@ -23,11 +36,7 @@ export interface PresenceData {
   userImage?: string | null;
   cursorX?: number;
   cursorY?: number;
-  viewport?: {
-    x: number;
-    y: number;
-    zoom: number;
-  };
+  viewport?: Viewport;
   selectedPinId?: string | null;
 }
 

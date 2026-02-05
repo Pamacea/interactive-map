@@ -29,25 +29,24 @@ export const SelectedPinPopup: FC<SelectedPinPopupProps> = ({
   const deletePinServer = useDeletePinServer();
   const { showToast } = useToast();
 
-  if (!pin) return null;
-
-  // Calculate popup position using the same logic as pins
+  // CRITICAL: Call ALL hooks before any early returns to avoid "Rendered more hooks than during the previous render" error
+  // If pin is null, we still need to call usePinScreenCoordinates with a dummy pin
   const coordinates = usePinScreenCoordinates({
-    pin,
+    pin: pin ?? { id: selectedPinId, latitude: 0, longitude: 0 },
     imageDimensions,
     layers,
   });
+
+  if (!pin) return null;
 
   const handleDelete = async () => {
     try {
       await deletePinServer(pin.id);
       onClose();
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to delete pin. Please try again.";
       console.error("Failed to delete pin:", error);
-      showToast(
-        "Failed to delete pin. Please try again.",
-        "error"
-      );
+      showToast(errorMessage, "error");
     }
   };
 

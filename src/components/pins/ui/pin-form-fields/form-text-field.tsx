@@ -10,6 +10,8 @@ export interface FormTextFieldProps {
   disabled?: boolean;
   autoFocus?: boolean;
   inputRef?: React.RefObject<HTMLInputElement | null>;
+  id?: string;
+  name?: string;
 }
 
 export const FormTextField: FC<FormTextFieldProps> = ({
@@ -22,15 +24,23 @@ export const FormTextField: FC<FormTextFieldProps> = ({
   disabled = false,
   autoFocus = false,
   inputRef,
+  id,
+  name,
 }) => {
+  // Generate id from label if not provided
+  const inputId = id || label.toLowerCase().replace(/\s+/g, '-');
+  const inputName = name || label.toLowerCase().replace(/\s+/g, '-');
+
   return (
     <div className="grid gap-2">
-      <label className="text-sm font-medium leading-none">
+      <label className="text-sm font-medium leading-none" htmlFor={inputId}>
         {label}
         {required && <span className="text-status-error ml-1">*</span>}
       </label>
       <input
         ref={inputRef}
+        id={inputId}
+        name={inputName}
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}

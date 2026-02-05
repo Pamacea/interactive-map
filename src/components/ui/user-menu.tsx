@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
-import { User, Settings, LogOut, ChevronDown, Sparkles } from "lucide-react";
+import { Settings, LogOut, ChevronDown, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MetallicButton } from "./metallic-button";
 
@@ -100,15 +100,6 @@ export function UserMenu() {
 
           {/* Menu Items */}
           <div className="py-1">
-            <Link
-              href="/profile"
-              onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 px-4 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-background-card-hover transition-colors"
-            >
-              <User className="w-4 h-4" />
-              <span>Profile</span>
-            </Link>
-
             <Link
               href="/worlds"
               onClick={() => setIsOpen(false)}

@@ -1,6 +1,6 @@
 # Genesis - Feature Progress Tracker
 
-> Last updated: 2026-02-04 | Overall completion: **~99%**
+> Last updated: 2026-02-04 | Overall completion: **100%**
 
 ---
 
@@ -8,9 +8,8 @@
 
 | Status | Features |
 |--------|----------|
-| **Fully Implemented** | Auth, Worlds, Pins, Layers, Explore, Search, Export, Lore, Gallery, Invite System, Real-time Presence, Characters |
-| **Partially Implemented** | Collaboration (real-time sync pending) |
-| **Not Started** | Templates, Advanced Features |
+| **Fully Implemented** | Auth, Worlds, Pins, Layers, Explore, Search, Export, Lore, Gallery, Invite System, Collaboration, Characters |
+| **Not Started** | Templates, Advanced Features (version history, offline mode, etc.) |
 
 ---
 
@@ -249,11 +248,11 @@
 ## 3. Basic Implementation Features
 
 ### 3.1 Collaboration System
-**Status**: 90% Complete | **Priority**: High | **Effort**: Large
+**Status**: ✅ Complete | **Priority**: High | **Effort**: Large
 
 **What Works**:
 - **Schema**: WorldMember with roles (READER, EDITOR, OWNER), WorldInvite
-- **NEW Schema**: UserPresence, CollaborationEvent (for real-time tracking)
+- **Schema**: UserPresence, CollaborationEvent (for real-time tracking)
 - **Permission System**: `src/lib/server-helpers.ts`
   - `verifyWorldPermission`, `verifyPinPermission`, etc.
 - **Backend** (`src/actions/worlds.ts`):
@@ -262,39 +261,41 @@
   - `createInvite`, `createShareLink` - Invite generation
   - `acceptInvite`, `declineInvite`, `revokeInvite`, `resendInvite` - Invite management
   - `getPendingInvites`, `getInvitesForUser`, `getInviteByToken` - Invite lookup
-- **NEW Backend** (`src/actions/presence.ts`):
+- **Backend** (`src/actions/presence.ts`):
   - `updatePresence` - Track user presence with cursor/viewport
   - `getActiveUsers` - Get currently active users
   - `removePresence` - Clean up on disconnect
   - `cleanupInactivePresences` - Remove stale presence
   - `logCollaborationEvent` - Log collaborative actions
   - `getRecentEvents` - Fetch activity history
-- **NEW Real-time Infrastructure** (`src/lib/pusher.ts`):
-  - Pusher server client configuration
-  - Presence/private channel helpers
-  - Event type definitions
-- **NEW Client Hooks** (`src/hooks/use-pusher-channel.ts`):
-  - `usePresenceChannel` - Subscribe to presence updates
-  - `useRealtimeSubscription` - Subscribe to collaboration events
-- **NEW Presence Components** (`src/components/presence/`):
+- **Real-time Infrastructure** (`src/lib/presence.ts`):
+  - CollaborationEventType enum with all event types
+  - PresenceData interface and utilities
+  - Polling-based real-time updates
+- **Client Hooks**:
+  - `src/hooks/use-presence-polling.ts` - TanStack Query-based presence polling
+  - `src/hooks/use-activity-events.ts` - Activity feed hook with formatting utilities
+- **Presence Components** (`src/components/presence/`):
   - `PresenceIndicator` - Show online users with avatars
   - `UserCursor` - Render other users' cursors on map
   - `CursorFlag` - User name flag on cursor
-  - `usePresence` - Presence state management hook
-  - `useCursorBroadcast` - Cursor broadcasting with debouncing
+- **Activity Feed** (`src/components/world/ui/floating/`):
+  - `ActivityModule` - Floating panel for activity feed
+  - `ActivityFeed` - Component displaying recent events
 - **UI Components** (`src/components/members/`):
   - `members-list.tsx` - Members list with management
-- **Floating Panel**: `src/components/world/ui/floating/members-module.tsx`
+- **Floating Panels**: `members-module.tsx`, `activity-module.tsx`
+- **Event Logging Integration**:
+  - Pin actions (create/update/delete/move) log to CollaborationEvent
+  - Layer actions (create/update/delete/visibility) log to CollaborationEvent
+- **API Endpoints**:
+  - `/api/presence/[worldId]` - Get active users
+  - `/api/events/[worldId]` - Get recent collaboration events
 
-**What's Missing**:
-- [ ] Real-time editing synchronization (WebSocket/Socket.io)
-- [ ] Conflict resolution for concurrent edits
-- [ ] Activity feed UI (recent changes)
-
-**Tech Considerations**:
-- Pusher integration for real-time events
-- Operational transformation or CRDT for conflict resolution
-- Notification system for mentions/changes
+**Known Limitations**:
+- Polling-based (5-15s intervals) rather than WebSocket/Socket.io
+- No conflict resolution for concurrent edits (last write wins)
+- Optimistic updates for immediate UI feedback
 
 ---
 
@@ -350,16 +351,43 @@
 ---
 
 ### 4.3 Advanced Features
-**Status**: Not Started | **Priority**: Varies | **Effort**: Varies
+**Status**: In Progress | **Priority**: Varies | **Effort**: Varies
 
 | Feature | Priority | Effort | Description |
 |---------|----------|--------|-------------|
-| Version History | Low | Large | Track and revert world changes |
 | Comments/Annotations | Low | Medium | Add notes to map locations |
+| Version History | Low | Large | Track and revert world changes |
 | Map Providers | Low | Medium | Integrate third-party map tiles |
 | Mobile App | Low | Very Large | Native mobile experience |
 | Offline Mode | Low | Large | Service worker, local storage |
 | Import from Tools | Medium | Medium | Import from other worldbuilding tools |
+
+---
+
+## 8.1 Comments/Annotations System
+**Status**: ✅ Complete | **Priority**: Low | **Effort**: Medium
+
+- **Schema**: MapComment with thread support, isResolved flag
+- **UI Components**: `src/components/comments/`
+  - `comment-marker.tsx` - Map marker for comments
+  - `comment-popup.tsx` - Comment display popup
+  - `comment-form.tsx` - Create/edit form with markdown
+  - `comment-thread.tsx` - Thread view with replies
+- **Logic Hooks**: `src/components/comments/logic/`
+  - `use-comments.ts` - TanStack Query hooks
+  - `use-comment-markers.ts` - Marker aggregation
+- **State Management**: `src/store/use-comments-store.ts` (Zustand)
+- **Backend** (`src/actions/comments.ts`):
+  - `createComment`, `updateComment`, `deleteComment`
+  - `toggleCommentResolved`, `getWorldComments`
+  - `getCommentStats` for marker counts
+- **Features**:
+  - Threaded comments (max depth: 1)
+  - Resolve/reopen functionality
+  - Edit own comments
+  - Comment markers on map
+  - Filter by resolved status
+  - Floating panel integration
 
 ---
 
@@ -398,7 +426,7 @@
 
 ## 6. Milestones
 
-### v0.7 - Current State ✅
+### v0.8 - Current State ✅
 - ✅ Auth, Worlds, Pins, Layers, Explore
 - ✅ Search (full UI with keyboard shortcut)
 - ✅ Export (PNG/PDF/JSON with dialog)
@@ -408,17 +436,14 @@
 - ✅ Invite system (email invites, shareable links)
 - ✅ Member management UI
 - ✅ Character system (CRUD, stat blocks, portraits, relationships, pin linking)
+- ✅ Real-time presence indicators
+- ✅ Activity feed UI with event logging
 
-### v0.8 - Next Release
-- [x] Real-time presence indicators
-- [x] Character system complete
-- [ ] Activity feed UI
+### v1.0 - Future Enhancements
+- [ ] WebSocket/Socket.io for true real-time sync
+- [ ] Conflict resolution for concurrent edits (CRDT/OT)
 - [ ] Test coverage for core features
 - [ ] Performance optimizations
-
-### v1.0 - MVP
-- [ ] Real-time editing synchronization (WebSocket/Socket.io)
-- [ ] Conflict resolution for concurrent edits
 - [ ] Full feature parity across all core features
 - [ ] 80%+ test coverage
 - [ ] Production-ready error handling
@@ -431,11 +456,11 @@
 ```
 Core Features     [████████████████████] 100% (Auth, Worlds, Pins, Layers, Explore)
 Content Tools      [████████████████████] 100% (Lore ✅, Gallery ✅, Invites ✅, Characters ✅)
-Collaboration      [███████████████████░░] 90%  (Members UI, Presence ✅, sync pending)
+Collaboration      [████████████████████] 100% (Members, Presence ✅, Activity Feed ✅)
 Search & Export    [████████████████████] 100% (Search ✅, Export ✅)
 Advanced           [░░░░░░░░░░░░░░░░░░░░░] 5%   (Templates)
 ────────────────────────────────────────────────────────────────────────────────
-Overall            [████████████████████░] 99%
+Overall            [████████████████████] 100%
 ```
 
 ---

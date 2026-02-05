@@ -10,6 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ImageCard } from "./image-card";
 import { ImageLightbox } from "./image-lightbox";
 import { ImageUploadZone } from "./image-upload-zone";
+import { DeleteConfirmDialog } from "@/components/pins/ui/delete-confirm-dialog";
 import { useGalleryStore } from "@/stores/use-gallery-store";
 import { useGallery } from "../logic/use-gallery-query";
 import { galleryKeys } from "../logic/use-gallery-query";
@@ -21,6 +22,10 @@ export interface ImageGalleryProps {
 }
 
 export function ImageGallery({ worldId, className }: ImageGalleryProps) {
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [imageToDelete, setImageToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   // TanStack Query for data fetching
   const { data: galleryItems = [], isLoading: isLoadingQuery, refetch } = useGallery(worldId);
   const queryClient = useQueryClient();
@@ -78,14 +83,23 @@ export function ImageGallery({ worldId, className }: ImageGalleryProps) {
   };
 
   const handleDelete = async (imageId: string) => {
-    if (confirm("Are you sure you want to delete this image?")) {
-      try {
-        await deleteGalleryItemServer(imageId);
-        // Invalidate queries to refresh data
-        queryClient.invalidateQueries({ queryKey: galleryKeys.world(worldId) });
-      } catch (error) {
-        console.error("Failed to delete image:", error);
-      }
+    setImageToDelete(imageId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!imageToDelete) return;
+    try {
+      setIsDeleting(true);
+      await deleteGalleryItemServer(imageToDelete);
+      setDeleteDialogOpen(false);
+      setImageToDelete(null);
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: galleryKeys.world(worldId) });
+    } catch (error) {
+      console.error("Failed to delete image:", error);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -215,6 +229,16 @@ export function ImageGallery({ worldId, className }: ImageGalleryProps) {
         onLinkToLore={(image) => {
           /* TODO: Implement link to lore dialog */
         }}
+      />
+
+      {/* Delete confirmation dialog */}
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDeleteConfirm}
+        isDeleting={isDeleting}
+        title="Delete Image?"
+        description="Are you sure you want to delete this image? This action cannot be undone."
       />
     </div>
   );

@@ -103,77 +103,82 @@ export const usePinsDataStore = create<PinDataStore>()(
 
       // Server sync methods with optimistic updates
       createPin: async (data) => {
-        try {
-          // Optimistic update - add pin with temporary ID
-          const tempId = `temp-${Date.now()}`;
-          const optimisticPin: Pin = {
-            ...data,
-            id: tempId,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            isVisible: data.isVisible ?? true,
-            opacity: data.opacity ?? 1,
-            size: data.size ?? 32,
-            minZoom: 0,
-            maxZoom: 200,
-          } as Pin;
+        // Optimistic update - add pin with temporary ID
+        const tempId = `temp-${Date.now()}`;
+        const optimisticPin: Pin = {
+          ...data,
+          id: tempId,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          isVisible: data.isVisible ?? true,
+          opacity: data.opacity ?? 1,
+          size: data.size ?? 32,
+          minZoom: 0,
+          maxZoom: 200,
+        } as Pin;
 
-          get().addPin(optimisticPin);
+        get().addPin(optimisticPin);
 
-          // Server call
-          const result = await createPinAction(data);
+        // Server call
+        const result = await createPinAction(data);
 
-          if (!result.success) {
-            throw new Error(result.error.message);
-          }
-
-          // Replace optimistic pin with real one
-          set((state) => {
-            const updatedPins = state.pins.map((p) =>
-              p.id === tempId ? { ...result.data.pin, gameWorldId: data.gameWorldId } as Pin : p
-            );
-            return { pins: updatedPins };
-          });
-
-          // Re-apply filters after replacement
-          const applyFilters = usePinsFilterStore.getState().applyFilters;
-          applyFilters(get().pins);
-        } catch (error) {
-          get().setError(error instanceof Error ? error.message : "Failed to create pin");
-          throw error;
+        // Roll back on failure
+        if (!result.success) {
+          get().deletePin(tempId);
+          get().setError(result.error.message);
+          throw new Error(result.error.message);
         }
+
+        // Replace optimistic pin with real one
+        set((state) => {
+          const updatedPins = state.pins.map((p) =>
+            p.id === tempId ? { ...result.data.pin, gameWorldId: data.gameWorldId } as Pin : p
+          );
+          return { pins: updatedPins };
+        });
+
+        // Re-apply filters after replacement
+        const applyFilters = usePinsFilterStore.getState().applyFilters;
+        applyFilters(get().pins);
       },
 
       deletePinServer: async (pinId) => {
-        try {
-          // Optimistic update - remove from store
-          const pinToDelete = get().pins.find((p) => p.id === pinId);
-          if (!pinToDelete) {
-            throw new Error("Pin not found");
-          }
+        // Optimistic update - remove from store
+        const pinToDelete = get().pins.find((p) => p.id === pinId);
+        if (!pinToDelete) {
+          throw new Error("Pin not found");
+        }
 
-          get().deletePin(pinId);
+        get().deletePin(pinId);
 
-          // Server call
-          await deletePinAction(pinId);
-        } catch (error) {
-          console.error("[PinsDataStore] Failed to delete pin:", error);
-          get().setError(error instanceof Error ? error.message : "Failed to delete pin");
-          throw error;
+        // Server call
+        const result = await deletePinAction(pinId);
+
+        // Roll back on failure
+        if (!result.success) {
+          get().addPin(pinToDelete);
+          get().setError(result.error.message);
+          throw new Error(result.error.message);
         }
       },
 
       updatePinServer: async (data) => {
-        try {
-          // Optimistic update - update in store
-          get().updatePin(data.id, data as Partial<Pin>);
+        // Optimistic update - update in store
+        const pinBeforeUpdate = get().pins.find((p) => p.id === data.id);
+        if (!pinBeforeUpdate) {
+          throw new Error("Pin not found");
+        }
 
-          // Server call
-          await updatePinAction(data);
-        } catch (error) {
-          console.error("[PinsDataStore] Failed to update pin:", error);
-          get().setError(error instanceof Error ? error.message : "Failed to update pin");
-          throw error;
+        get().updatePin(data.id, data as Partial<Pin>);
+
+        // Server call
+        const result = await updatePinAction(data);
+
+        // Roll back on failure
+        if (!result.success) {
+          get().updatePin(data.id, pinBeforeUpdate);
+          get().setError(result.error.message);
+          throw new Error(result.error.message);
         }
       },
     }),

@@ -9,6 +9,8 @@ import {
   verifyLayerPermission,
 } from "@/lib/server-helpers";
 import type { MapLayer } from "@prisma/client";
+import { safeLogCollaborationEvent } from "@/actions/presence";
+import { CollaborationEventType } from "@/lib/presence";
 
 /**
  * Create a new layer for a world
@@ -63,6 +65,14 @@ export async function createLayer(
 
     revalidatePath(`/world/${worldId}`);
 
+    // Log collaboration event
+    await safeLogCollaborationEvent({
+      worldId,
+      eventType: CollaborationEventType.LAYER_CREATED,
+      targetId: layer.id,
+      targetType: "layer",
+    });
+
     return layer;
   }, "createLayer");
 }
@@ -113,6 +123,18 @@ export async function updateLayer(
 
     revalidatePath(`/world/${layer.gameWorldId}`);
 
+    // Log collaboration event - use LAYER_VISIBILITY_CHANGED if only visibility changed
+    const eventType = data.isVisible !== undefined && Object.keys(data).length === 1
+      ? CollaborationEventType.LAYER_VISIBILITY_CHANGED
+      : CollaborationEventType.LAYER_UPDATED;
+
+    await safeLogCollaborationEvent({
+      worldId: layer.gameWorldId,
+      eventType,
+      targetId: layerId,
+      targetType: "layer",
+    });
+
     return updatedLayer;
   }, "updateLayer");
 }
@@ -142,6 +164,15 @@ export async function updateLayerPosition(
       data: { offsetX, offsetY },
     });
 
+    // Log collaboration event
+    await safeLogCollaborationEvent({
+      worldId: updatedLayer.gameWorldId,
+      eventType: CollaborationEventType.LAYER_UPDATED,
+      targetId: layerId,
+      targetType: "layer",
+      eventData: { field: "position" },
+    });
+
     // No revalidatePath needed - Zustand store manages client-side state
     // This optimization prevents unnecessary page refreshes during drag operations
 
@@ -166,6 +197,15 @@ export async function updateLayerScale(layerId: string, scale: number): Promise<
     const updatedLayer = await prisma.mapLayer.update({
       where: { id: layerId },
       data: { scale },
+    });
+
+    // Log collaboration event
+    await safeLogCollaborationEvent({
+      worldId: updatedLayer.gameWorldId,
+      eventType: CollaborationEventType.LAYER_UPDATED,
+      targetId: layerId,
+      targetType: "layer",
+      eventData: { field: "scale" },
     });
 
     // No revalidatePath needed - Zustand store manages client-side state
@@ -193,6 +233,15 @@ export async function updateLayerZIndex(layerId: string, zIndex: number): Promis
       data: { zIndex },
     });
 
+    // Log collaboration event
+    await safeLogCollaborationEvent({
+      worldId: updatedLayer.gameWorldId,
+      eventType: CollaborationEventType.LAYER_UPDATED,
+      targetId: layerId,
+      targetType: "layer",
+      eventData: { field: "zIndex" },
+    });
+
     // No revalidatePath needed - Zustand store manages client-side state
 
     return updatedLayer;
@@ -218,6 +267,14 @@ export async function deleteLayer(layerId: string): Promise<Result<MapLayer>> {
 
     revalidatePath(`/world/${layer.gameWorldId}`);
 
+    // Log collaboration event
+    await safeLogCollaborationEvent({
+      worldId: layer.gameWorldId,
+      eventType: CollaborationEventType.LAYER_DELETED,
+      targetId: layerId,
+      targetType: "layer",
+    });
+
     return deletedLayer;
   }, "deleteLayer");
 }
@@ -241,8 +298,10 @@ export async function batchUpdateLayers(
     const user = await getAuthenticatedUser();
 
     // Verify permission for first layer (assumes all layers belong to same world)
+    let worldId: string | null = null;
     if (updates.length > 0) {
-      await verifyLayerPermission(updates[0].id, user.id);
+      const firstLayer = await verifyLayerPermission(updates[0].id, user.id);
+      worldId = firstLayer.gameWorldId;
     }
 
     // Update all layers in a transaction
@@ -259,6 +318,16 @@ export async function batchUpdateLayers(
         })
       )
     );
+
+    // Log collaboration event for batch reorder
+    if (worldId) {
+      await safeLogCollaborationEvent({
+        worldId,
+        eventType: CollaborationEventType.LAYER_UPDATED,
+        targetType: "layer",
+        eventData: { count: updates.length, field: "reorder" },
+      });
+    }
 
     return updatedLayers;
   }, "batchUpdateLayers");

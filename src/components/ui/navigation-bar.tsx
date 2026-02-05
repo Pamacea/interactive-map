@@ -11,8 +11,6 @@ import { UserMenu } from "./user-menu";
 const navLinks = [
   { href: "/create", label: "Create World" },
   { href: "/explore", label: "Explore" },
-  { href: "/library", label: "Library" },
-  { href: "/tutorials", label: "Tutorials" },
 ];
 
 export function NavigationBar() {

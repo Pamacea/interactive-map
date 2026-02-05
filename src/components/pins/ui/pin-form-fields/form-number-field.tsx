@@ -9,6 +9,8 @@ export interface FormNumberFieldProps {
   max?: number;
   step?: number;
   disabled?: boolean;
+  id?: string;
+  name?: string;
 }
 
 export const FormNumberField: FC<FormNumberFieldProps> = ({
@@ -20,11 +22,19 @@ export const FormNumberField: FC<FormNumberFieldProps> = ({
   max,
   step = "any",
   disabled = false,
+  id,
+  name,
 }) => {
+  // Generate id from label if not provided
+  const inputId = id || label.toLowerCase().replace(/\s+/g, '-');
+  const inputName = name || label.toLowerCase().replace(/\s+/g, '-');
+
   return (
     <div className="grid gap-2">
-      <label className="text-sm font-medium leading-none">{label}</label>
+      <label className="text-sm font-medium leading-none" htmlFor={inputId}>{label}</label>
       <input
+        id={inputId}
+        name={inputName}
         type="number"
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value) || 0)}

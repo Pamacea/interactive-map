@@ -6,6 +6,8 @@ export interface FormColorPickerProps {
   onChange: (value: string) => void;
   error?: string;
   disabled?: boolean;
+  id?: string;
+  name?: string;
 }
 
 const PRESET_COLORS = [
@@ -26,12 +28,22 @@ export const FormColorPicker: FC<FormColorPickerProps> = ({
   onChange,
   error,
   disabled = false,
+  id,
+  name,
 }) => {
+  // Generate id from label if not provided
+  const inputId = id || label.toLowerCase().replace(/\s+/g, '-');
+  const colorInputId = `${inputId}-color`;
+  const textInputId = `${inputId}-text`;
+  const inputName = name || label.toLowerCase().replace(/\s+/g, '-');
+
   return (
     <div className="grid gap-2">
-      <label className="text-sm font-medium leading-none">{label}</label>
+      <label className="text-sm font-medium leading-none" htmlFor={textInputId}>{label}</label>
       <div className="flex items-center gap-3">
         <input
+          id={colorInputId}
+          name={inputName}
           type="color"
           value={value}
           onChange={(e) => onChange(e.target.value)}
@@ -39,6 +51,8 @@ export const FormColorPicker: FC<FormColorPickerProps> = ({
           className="w-16 h-10 rounded cursor-pointer disabled:opacity-50"
         />
         <input
+          id={textInputId}
+          name={inputName}
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Pin } from "@prisma/client";
 import { PinType } from "@/types/pin.type";
-import { eventManager } from "@/lib/event-manager";
+import { inputManager, INPUT_PRIORITY, useKeyboard } from "@/lib/input-manager";
 import { mouseToMapCoordinates } from "@/components/pins/logic/use-pin-screen-coordinates";
 
 export interface ContextMenuState {
@@ -27,7 +27,6 @@ export interface UseMapInteractionsOptions {
   }) => void;
   onCloseContextMenu?: () => void;
   onStopCreating?: () => void;
-  onSelectPin?: (pinId: string | null) => void;
   onClearSelection?: () => void;
 }
 
@@ -42,53 +41,104 @@ export function useMapInteractions(options: UseMapInteractionsOptions) {
     onCreatePin,
     onCloseContextMenu,
     onStopCreating,
-    onSelectPin,
     onClearSelection,
   } = options;
 
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
 
-  const handleClick = useCallback((e: React.MouseEvent) => {
-    // Don't handle click if event was captured by another element
-    if (eventManager.isCaptured()) {
-      return;
-    }
+  // Register click handler with input manager
+  useEffect(() => {
+    const cleanup = inputManager.register({
+      element: "map-canvas",
+      priority: INPUT_PRIORITY.MAP_CANVAS,
+      handlers: {
+        mouse: {
+          click: (e: MouseEvent) => {
+            // Don't handle click if event was captured by another element
+            if (inputManager.isCaptured()) return true;
 
-    // Close context menu on left click
+            // Close context menu on left click
+            if (contextMenu) {
+              setContextMenu(null);
+              onCloseContextMenu?.();
+              return false;
+            }
+
+            // Deselect pin when clicking on empty space (left button only)
+            if (e.button === 0 && selectedPin) {
+              onClearSelection?.();
+            }
+
+            return false;
+          },
+          contextMenu: (e: MouseEvent) => {
+            // Don't handle if captured by another element
+            if (inputManager.isCaptured()) return true;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            const rect = containerRef.current?.getBoundingClientRect();
+            if (!rect) return true;
+
+            // Check if we have valid image dimensions
+            if (!imageDimensions || imageDimensions.width <= 0 || imageDimensions.height <= 0) {
+              setContextMenu({
+                position: { x: e.clientX, y: e.clientY },
+                coordinates: { lat: 0.5, lng: 0.5 },
+              });
+              return false;
+            }
+
+            // Use shared coordinate calculation
+            const coords = mouseToMapCoordinates(
+              e.clientX,
+              e.clientY,
+              rect,
+              transform,
+              imageDimensions
+            );
+
+            setContextMenu({
+              position: { x: e.clientX, y: e.clientY },
+              coordinates: coords ? { lat: coords.lat, lng: coords.lng } : { lat: 0.5, lng: 0.5 },
+            });
+
+            return false;
+          },
+        },
+        keyboard: {}, // Empty keyboard handlers - keyboard handled by useKeyboard hook
+      },
+      enabled: () => true,
+    });
+
+    return cleanup;
+  }, [contextMenu, selectedPin, onClearSelection, onCloseContextMenu, containerRef, imageDimensions, transform]);
+
+  // Legacy handlers for backward compatibility
+  const handleClick = useCallback((e: React.MouseEvent) => {
+    // Handled by input manager
+    if (inputManager.isCaptured()) return;
     if (contextMenu) {
       setContextMenu(null);
       onCloseContextMenu?.();
       return;
     }
-
-    // Deselect pin when clicking on empty space (left button only)
     if (e.button === 0 && selectedPin) {
-      // Check if click is not on a pin marker
-      // (Pin markers have their own click handlers)
       onClearSelection?.();
     }
   }, [contextMenu, selectedPin, onClearSelection, onCloseContextMenu]);
 
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
-    // Don't handle context menu if event was captured by another element
-    // (e.g., pin popup, sidebar, etc.)
-    if (eventManager.isCaptured()) {
-      return;
-    }
-
-    // Prevent default browser context menu first
+    // Handled by input manager
+    if (inputManager.isCaptured()) return;
     e.preventDefault();
     e.stopPropagation();
 
     const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) {
-      return;
-    }
+    if (!rect) return;
 
-    // Check if we have valid image dimensions before calculating coordinates
     if (!imageDimensions || imageDimensions.width <= 0 || imageDimensions.height <= 0) {
-      // Still show context menu even if coordinates calculation fails
-      // The menu will use default coordinates and the pin will be created at (0,0)
       setContextMenu({
         position: { x: e.clientX, y: e.clientY },
         coordinates: { lat: 0.5, lng: 0.5 },
@@ -96,7 +146,6 @@ export function useMapInteractions(options: UseMapInteractionsOptions) {
       return;
     }
 
-    // Use shared coordinate calculation
     const coords = mouseToMapCoordinates(
       e.clientX,
       e.clientY,
@@ -105,12 +154,11 @@ export function useMapInteractions(options: UseMapInteractionsOptions) {
       imageDimensions
     );
 
-    // Use calculated coordinates or fallback to center of map
     setContextMenu({
       position: { x: e.clientX, y: e.clientY },
       coordinates: coords ? { lat: coords.lat, lng: coords.lng } : { lat: 0.5, lng: 0.5 },
     });
-  }, [containerRef, transform, imageDimensions]);
+  }, [containerRef, imageDimensions, transform]);
 
   const closeContextMenu = useCallback(() => {
     setContextMenu(null);
@@ -121,36 +169,34 @@ export function useMapInteractions(options: UseMapInteractionsOptions) {
       return;
     }
 
-    // Close context menu
     closeContextMenu();
 
-    // Create pin immediately with default values
     onCreatePin?.({
       gameWorldId: worldId,
       title: `New ${pinType}`,
       pinType: pinType as (typeof PinType)[keyof typeof PinType],
       latitude: lat,
       longitude: lng,
-      layerId: undefined, // Will be set by the selected layer from store
+      layerId: undefined,
       isVisible: true,
     });
   }, [worldId, closeContextMenu, onCreatePin]);
 
   // Handle Escape key to cancel pin placement or close context menu
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        if (contextMenu) {
-          setContextMenu(null);
-        } else if (isCreatingPin) {
-          onStopCreating?.();
-        }
+  useKeyboard({
+    onEscape: (_e) => {
+      if (contextMenu) {
+        setContextMenu(null);
+        return false;
       }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isCreatingPin, onStopCreating, contextMenu]);
+      if (isCreatingPin) {
+        onStopCreating?.();
+        return false;
+      }
+      return true;
+    },
+    scope: "map-canvas",
+  });
 
   return {
     contextMenu,

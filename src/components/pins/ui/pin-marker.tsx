@@ -1,11 +1,12 @@
 "use client";
 
-import { memo, useState, useRef, useCallback } from "react";
+import { memo, useCallback, useEffect, useRef } from "react";
 import { useMapStore } from "@/stores/map-store";
-import { useSelectPin, useSelectedPinId, useClearSelection, useUpdatePin, usePinById } from "@/stores/use-pins-store";
+import { useSelectPin, useSelectedPinId, useClearSelection, usePinById } from "@/stores/use-pins-store";
 import { getPinTypeConfig, type PinType } from "@/constants/pin-types";
 import { usePinEvents } from "@/components/pins/logic/use-pin-events";
 import { usePinScreenCoordinates } from "@/components/pins/logic/use-pin-screen-coordinates";
+import { usePinDragInput } from "@/components/pins/logic/use-pin-drag-input";
 import type { Pin } from "@prisma/client";
 import { MarkerContainer } from "./pin-marker/marker-container";
 import { useMarkerVisibility } from "./pin-marker/use-marker-visibility";
@@ -28,14 +29,13 @@ interface PinMarkerProps {
   onPinClick?: (pin: Pin) => void;
 }
 
-// Movement threshold to distinguish click from drag
-const DRAG_THRESHOLD = 5;
-
 /**
  * PinMarker - Interactive map pin
  *
  * Click: toggle selection
  * Drag: move pin (pin follows cursor exactly)
+ *
+ * Uses the unified input manager for consistent event handling.
  */
 export function PinMarker({
   pin,
@@ -48,16 +48,23 @@ export function PinMarker({
   const selectPin = useSelectPin();
   const clearSelection = useClearSelection();
   const selectedPinId = useSelectedPinId();
-  const updatePin = useUpdatePin();
 
   // Get real-time pin data from store (for position updates during drag)
   const latestPin = usePinById(pin.id);
 
   const isPinSelected = selectedPinId === pin.id;
 
-  // Local drag state for real-time position updates
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragPosition, setDragPosition] = useState<{ x: number; y: number } | null>(null);
+  // Get layer info for lock state
+  const layer = pin.layerId ? layers.find((layer) => layer.id === pin.layerId) : null;
+  const isLayerLocked = layer?.locked ?? false;
+
+  // Unified drag handling using input manager
+  const { isDragging, dragPosition, handleMouseDown: handleDragMouseDown } = usePinDragInput({
+    pin,
+    imageDimensions,
+    transform,
+    isLayerLocked,
+  });
 
   // Get initial position from store
   const basePosition = usePinScreenCoordinates({
@@ -68,10 +75,6 @@ export function PinMarker({
 
   // Use drag position if dragging, otherwise use base position
   const position = dragPosition || basePosition;
-
-  // Get layer info for lock state
-  const layer = pin.layerId ? layers.find((layer) => layer.id === pin.layerId) : null;
-  const isLayerLocked = layer?.locked ?? false;
 
   // Event handling (hover, event capture)
   const { isHovered, handleMouseEnter, handleMouseLeave } = usePinEvents({
@@ -98,10 +101,6 @@ export function PinMarker({
     isHovered,
   });
 
-  if (!shouldRender) {
-    return null;
-  }
-
   // Icon configuration
   const pinConfig = getPinTypeConfig(pin.pinType as PinType);
   const iconName = pin.icon || pinConfig.icon;
@@ -109,80 +108,20 @@ export function PinMarker({
 
   const { finalZIndex, finalSize, iconSize, boxShadow, transformScale } = markerStyling;
 
-  // Track drag state
-  const dragStartRef = useRef<{
-    clientX: number;
-    clientY: number;
-    startLat: number;
-    startLng: number;
-  } | null>(null);
-  const hasMovedRef = useRef(false);
+  // Track if we were dragging (for click handler)
+  const wasDraggingRef = useRef(false);
 
-  // Handle mouse move during drag
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!dragStartRef.current) return;
+  // Update wasDragging ref when drag state changes
+  useEffect(() => {
+    wasDraggingRef.current = isDragging;
+  }, [isDragging]);
 
-    const { clientX: startClientX, clientY: startClientY, startLat, startLng } = dragStartRef.current;
-
-    // Calculate screen delta
-    const screenDeltaX = e.clientX - startClientX;
-    const screenDeltaY = e.clientY - startClientY;
-
-    // Check threshold
-    const distance = Math.sqrt(screenDeltaX ** 2 + screenDeltaY ** 2);
-    if (!hasMovedRef.current && distance <= DRAG_THRESHOLD) {
-      return;
-    }
-
-    if (!hasMovedRef.current) {
-      hasMovedRef.current = true;
-      setIsDragging(true);
-    }
-
-    // Convert screen delta to map delta (accounting for scale)
-    const mapDeltaX = screenDeltaX / transform.scale;
-    const mapDeltaY = screenDeltaY / transform.scale;
-
-    // Calculate new position in pixels (from starting position)
-    const newX = startLng * imageDimensions.width + mapDeltaX;
-    const newY = startLat * imageDimensions.height + mapDeltaY;
-
-    // Clamp to map boundaries
-    const clampedX = Math.max(0, Math.min(imageDimensions.width, newX));
-    const clampedY = Math.max(0, Math.min(imageDimensions.height, newY));
-
-    // Update local state for instant visual feedback
-    setDragPosition({ x: clampedX, y: clampedY });
-
-    // Update store with normalized coordinates
-    const newLat = clampedY / imageDimensions.height;
-    const newLng = clampedX / imageDimensions.width;
-    updatePin(pin.id, { latitude: newLat, longitude: newLng });
-  }, [imageDimensions, transform.scale, pin.id, updatePin]);
-
-  // Handle mouse up
-  const handleMouseUp = useCallback(() => {
-    dragStartRef.current = null;
-    if (!hasMovedRef.current) {
-      setDragPosition(null);
-    } else {
-      hasMovedRef.current = false;
-    }
-    setIsDragging(false);
-    setDragPosition(null);
-
-    window.removeEventListener("mousemove", handleMouseMove);
-    window.removeEventListener("mouseup", handleMouseUp);
-  }, [handleMouseMove]);
-
-  // Click handler - toggle selection
-  const handleClick = (e: React.MouseEvent) => {
+  // Click handler - toggle selection (only if not dragging)
+  const handleClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
 
-    if (hasMovedRef.current) {
-      hasMovedRef.current = false;
-      return;
-    }
+    // Don't handle click if we were dragging
+    if (wasDraggingRef.current) return;
 
     if (isPinSelected) {
       clearSelection();
@@ -190,28 +129,23 @@ export function PinMarker({
       selectPin(pin.id);
       onPinClick?.(pin);
     }
-  };
+  }, [isPinSelected, clearSelection, selectPin, pin, onPinClick]);
 
-  // Mouse down handler - start drag tracking
-  const handleMouseDown = (e: React.MouseEvent) => {
+  // Combined mouse down handler
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (e.button !== 0) return;
     if (isLayerLocked) return;
 
+    // Stop propagation to prevent map pan
     e.stopPropagation();
-    e.preventDefault();
 
-    // Store initial state
-    dragStartRef.current = {
-      clientX: e.clientX,
-      clientY: e.clientY,
-      startLat: latestPin?.latitude ?? pin.latitude,
-      startLng: latestPin?.longitude ?? pin.longitude,
-    };
-    hasMovedRef.current = false;
+    // Delegate to drag handler
+    handleDragMouseDown(e);
+  }, [isLayerLocked, handleDragMouseDown]);
 
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
-  };
+  if (!shouldRender) {
+    return null;
+  }
 
   return (
     <MarkerContainer
@@ -230,6 +164,7 @@ export function PinMarker({
       isSelected={isPinSelected}
       isLayerLocked={isLayerLocked}
       isDragging={isDragging}
+      pinId={pin.id}
       onClick={handleClick}
       onMouseDown={handleMouseDown}
       onMouseEnter={handleMouseEnter}

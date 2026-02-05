@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import type { PresenceData } from '@/lib/pusher';
+import type { PresenceData } from '@/lib/presence';
 
 interface PresenceIndicatorProps {
   users: Record<string, PresenceData>;

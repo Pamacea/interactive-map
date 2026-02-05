@@ -16,6 +16,8 @@ export function AddLayerDialog({
   return (
     <div className="px-3 py-2 rounded-sm bg-obsidian/70 border border-iron/50 space-y-2">
       <input
+        id="new-layer-name"
+        name="newLayerName"
         type="text"
         value={newLayerName}
         onChange={(e) => onNameChange(e.target.value)}

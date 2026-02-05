@@ -8,6 +8,8 @@ export { CharactersModule } from "./characters-module";
 export { FiltersModule } from "./filters-module";
 export { PropertiesModule } from "./properties-module";
 export { MembersModule } from "./members-module";
+export { ActivityModule } from "./activity-module";
+export { CommentsModule } from "./comments-module";
 
 // Re-export types
 export type { FloatingPanelProps } from "./floating-panel";

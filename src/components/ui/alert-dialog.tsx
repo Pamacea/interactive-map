@@ -10,6 +10,11 @@ interface AlertDialogProps {
   children: React.ReactNode
 }
 
+const AlertDialogContext = React.createContext<{
+  open: boolean
+  onOpenChange: (open: boolean) => void
+} | null>(null)
+
 const AlertDialog = ({ open, onOpenChange, children }: AlertDialogProps) => {
   const [internalOpen, setInternalOpen] = React.useState(open || false)
 
@@ -24,49 +29,38 @@ const AlertDialog = ({ open, onOpenChange, children }: AlertDialogProps) => {
   }
 
   return (
-    <>
-      {React.Children.map(children, (child) => {
-        if (React.isValidElement(child)) {
-          return React.cloneElement(child as React.ReactElement<any>, {
-            open: isOpen,
-            onOpenChange: handleOpenChange,
-          })
-        }
-        return child
-      })}
-    </>
+    <AlertDialogContext.Provider value={{ open: isOpen, onOpenChange: handleOpenChange }}>
+      {children}
+    </AlertDialogContext.Provider>
   )
 }
 
 const AlertDialogContent = ({
   className,
-  open,
-  onOpenChange,
   children,
   ...props
-}: React.HTMLAttributes<HTMLDivElement> & {
-  open?: boolean
-  onOpenChange?: (open: boolean) => void
-}) => {
+}: React.HTMLAttributes<HTMLDivElement>) => {
+  const context = React.useContext(AlertDialogContext)
+
   React.useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && open) {
-        onOpenChange?.(false)
+      if (e.key === "Escape" && context?.open) {
+        context.onOpenChange(false)
       }
     }
 
     document.addEventListener("keydown", handleEscape)
     return () => document.removeEventListener("keydown", handleEscape)
-  }, [open, onOpenChange])
+  }, [context])
 
-  if (!open) return null
+  if (!context?.open) return null
 
   const content = (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50"
-        onClick={() => onOpenChange?.(false)}
+        onClick={() => context.onOpenChange(false)}
       />
 
       {/* Content */}
@@ -82,8 +76,8 @@ const AlertDialogContent = ({
           }
         }}
         className={cn(
-          "relative rounded-sm shadow-2xl p-6 w-full max-w-3/5 sm: z-[100] animate-in fade-in zoom-in-95",
-          "bg-[var(--color-background-card)] border-2 border-[var(--color-accent-gold)]",
+          "relative rounded-sm shadow-2xl p-5 max-w-[32vw] z-[100] animate-in fade-in zoom-in-95",
+          "bg-obsidian/95 backdrop-blur-md border border-iron",
           className
         )}
         onClick={(e) => e.stopPropagation()}
@@ -95,7 +89,7 @@ const AlertDialogContent = ({
   )
 
   // Use portal to render dialog outside of parent containers (e.g., pin popup)
-  // This prevents width constraints from parent components affecting the dialog
+  // This prevents width constraints from parent containers affecting the dialog
   return typeof document !== 'undefined' ? createPortal(content, document.body) : content
 }
 
@@ -141,33 +135,43 @@ const AlertDialogDescription = ({
 
 const AlertDialogAction = ({
   className,
+  onClick,
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
   <button
     className={cn(
-      "inline-flex items-center justify-center rounded-sm px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-gold)]/50",
-      "bg-[var(--color-accent-gold)] text-[var(--color-background-base)] hover:bg-[var(--color-accent-gold)]/90",
+      "inline-flex items-center justify-center rounded-sm px-4 py-1.5 text-sm font-medium transition-colors focus:outline-none focus:ring-1 focus:ring-accent-gold/50",
       "disabled:opacity-50 disabled:cursor-not-allowed",
       className
     )}
+    onClick={onClick}
     {...props}
   />
 )
 
 const AlertDialogCancel = ({
   className,
+  onClick,
   ...props
-}: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
-  <button
-    className={cn(
-      "inline-flex items-center justify-center rounded-sm px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-accent-gold)]/50",
-      "bg-[var(--color-background-elevated)] text-[var(--color-text-primary)] hover:bg-[var(--color-background-elevated)]/80",
-      "disabled:opacity-50 disabled:cursor-not-allowed",
-      className
-    )}
-    {...props}
-  />
-)
+}: React.ButtonHTMLAttributes<HTMLButtonElement>) => {
+  const context = React.useContext(AlertDialogContext)
+
+  return (
+    <button
+      type="button"
+      className={cn(
+        "inline-flex items-center justify-center rounded-sm px-4 py-1.5 text-sm font-medium transition-colors focus:outline-none focus:ring-1 focus:ring-accent-gold/50",
+        "disabled:opacity-50 disabled:cursor-not-allowed",
+        className
+      )}
+      onClick={(e) => {
+        onClick?.(e)
+        context?.onOpenChange(false)
+      }}
+      {...props}
+    />
+  )
+}
 
 export {
   AlertDialog,

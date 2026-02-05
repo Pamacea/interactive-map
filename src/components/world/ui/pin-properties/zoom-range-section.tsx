@@ -34,12 +34,14 @@ export function ZoomRangeSection({
 
       <div className="px-3 py-2.5 bg-obsidian/60 border-x border-iron/50">
         <div className="flex items-center justify-between mb-2">
-          <label className="text-xs font-display text-bone-dark uppercase tracking-wide">Min Zoom</label>
+          <label className="text-xs font-display text-bone-dark uppercase tracking-wide" htmlFor="pin-min-zoom">Min Zoom</label>
           <span className="text-xs font-display font-semibold text-accent-gold px-2 py-0.5 bg-accent-gold/10 rounded">
             {minZoom}%
           </span>
         </div>
         <input
+          id="pin-min-zoom"
+          name="pinMinZoom"
           type="range"
           min="0"
           max="200"
@@ -57,12 +59,14 @@ export function ZoomRangeSection({
 
       <div className="px-3 py-2.5 bg-obsidian/60 border-x border-iron/50">
         <div className="flex items-center justify-between mb-2">
-          <label className="text-xs font-display text-bone-dark uppercase tracking-wide">Max Zoom</label>
+          <label className="text-xs font-display text-bone-dark uppercase tracking-wide" htmlFor="pin-max-zoom">Max Zoom</label>
           <span className="text-xs font-display font-semibold text-accent-gold px-2 py-0.5 bg-accent-gold/10 rounded">
             {maxZoom}%
           </span>
         </div>
         <input
+          id="pin-max-zoom"
+          name="pinMaxZoom"
           type="range"
           min="0"
           max="200"

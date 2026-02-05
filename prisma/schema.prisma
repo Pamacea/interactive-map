@@ -34,6 +34,7 @@ model User {
   presences     UserPresence[] @relation("UserPresences")
   events        CollaborationEvent[] @relation("UserEvents")
   characters    Character[]    @relation("CharacterCreator")
+  comments      MapComment[]   @relation("UserComments")
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }
@@ -101,6 +102,7 @@ model GameWorld {
   presences   UserPresence[] @relation("WorldPresences")
   events      CollaborationEvent[] @relation("WorldEvents")
   characters  Character[]    @relation("WorldCharacters")
+  comments    MapComment[]   @relation("WorldComments")
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
@@ -194,6 +196,11 @@ enum CollaborationEventType {
   USER_JOINED
   USER_LEFT
   SELECTION_CHANGED
+  COMMENT_CREATED
+  COMMENT_UPDATED
+  COMMENT_DELETED
+  COMMENT_RESOLVED
+  COMMENT_REOPENED
 }
 
 model CollaborationEvent {
@@ -278,6 +285,7 @@ model Pin {
   gallery     GalleryItem[]
   loreLinks   LorePinRelation[]   @relation("PinsToLore")
   characterLinks CharacterPinRelation[] @relation("CharacterPins")
+  comments    MapComment[]        @relation("PinComments")
   createdAt   DateTime            @default(now())
   updatedAt   DateTime            @updatedAt
 
@@ -581,4 +589,42 @@ model CharacterRelationship {
   @@index([sourceId])
   @@index([targetId])
   @@index([relationshipType])
+}
+
+// ============================================
+// COMMENTS & ANNOTATIONS
+// ============================================
+
+model MapComment {
+  id          String   @id @default(cuid())
+  worldId     String
+  world       GameWorld @relation("WorldComments", fields: [worldId], references: [id], onDelete: Cascade)
+
+  // Optional: Attach to pin
+  pinId       String?
+  pin         Pin?     @relation("PinComments", fields: [pinId], references: [id], onDelete: Cascade)
+
+  // Location for free-standing annotations
+  latitude    Float?
+  longitude   Float?
+
+  // Comment content
+  content     String   @db.Text
+  isResolved  Boolean  @default(false)
+
+  // Thread support
+  parentId    String?
+  parent      MapComment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies     MapComment[] @relation("CommentReplies")
+
+  // Metadata
+  userId      String
+  user        User     @relation("UserComments", fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([worldId, isResolved])
+  @@index([pinId])
+  @@index([parentId])
+  @@index([latitude, longitude])
 }

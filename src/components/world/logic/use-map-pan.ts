@@ -1,5 +1,11 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useMapStore } from "@/stores/map-store";
+import { inputManager, INPUT_PRIORITY } from "@/lib/input-manager";
+
+// Validation helper
+function isHTMLElement(target: EventTarget | null): target is HTMLElement {
+  return target !== null && "tagName" in target;
+}
 
 export interface Transform {
   scale: number;
@@ -26,14 +32,9 @@ export function useMapPan(options: UseMapPanOptions = {}) {
     translateY: 0,
   });
   const [isDragging, setIsDragging] = useState(false);
-  const isDraggingRef = useRef(false);
-  const dragStart = useRef({ x: 0, y: 0 });
-  // Ref to track pending scale update to avoid calling setState during render
-  const pendingScaleRef = useRef<number | null>(null);
 
   // Sync store zoom changes to transform.scale
   useEffect(() => {
-    // Defer setState to avoid calling setState synchronously within effect
     const syncTimer = setTimeout(() => {
       setTransform((prev) => ({
         ...prev,
@@ -48,63 +49,122 @@ export function useMapPan(options: UseMapPanOptions = {}) {
       const newTransform = updater(prev);
       // Schedule store update if scale changed (defer to avoid setState during render)
       if (newTransform.scale !== prev.scale) {
-        pendingScaleRef.current = newTransform.scale;
         // Defer the Zustand store update to avoid updating during render
         Promise.resolve().then(() => {
-          if (pendingScaleRef.current === newTransform.scale) {
-            setStoreZoom(newTransform.scale);
-            pendingScaleRef.current = null;
-          }
+          setStoreZoom(newTransform.scale);
         });
       }
       return newTransform;
     });
   }, [setStoreZoom]);
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    // Only allow dragging with left mouse button, not when creating a pin
-    if (e.button === 0 && !isCreatingPin && !isDraggingRef.current) {
-      isDraggingRef.current = true;
-      setIsDragging(true);
-      dragStart.current = {
-        x: e.clientX - transform.translateX,
-        y: e.clientY - transform.translateY,
-      };
-      onDragStart?.();
-    }
-  }, [transform.translateX, transform.translateY, isCreatingPin, onDragStart]);
+  // Track drag start position
+  const dragStartRef = useRef<{ x: number; y: number } | null>(null);
 
-  // Attach window listeners once, check ref for drag state
+  // Track animation frame for cancellation
+  const animationFrameRef = useRef<number | null>(null);
+
+  // Register with input manager for unified drag handling
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (isDraggingRef.current) {
-        e.preventDefault();
-        setTransform((prev) => ({
-          ...prev,
-          translateX: e.clientX - dragStart.current.x,
-          translateY: e.clientY - dragStart.current.y,
-        }));
-      }
-    };
+    if (isCreatingPin) return;
 
-    const handleMouseUp = (e: MouseEvent) => {
-      if (isDraggingRef.current) {
-        e.preventDefault();
-        isDraggingRef.current = false;
-        setIsDragging(false);
-        onDragEnd?.();
-      }
-    };
+    const cleanup = inputManager.register({
+      element: "map-canvas",
+      priority: INPUT_PRIORITY.MAP_CANVAS,
+      handlers: {
+        mouse: {
+          down: (e: MouseEvent) => {
+            // Only left click
+            if (e.button !== 0) return false;
 
-    // Attach listeners to window for drag continuity
-    window.addEventListener('mousemove', handleMouseMove, { passive: false });
-    window.addEventListener('mouseup', handleMouseUp, { passive: false });
+            // Check if input is captured by higher priority element
+            if (inputManager.isCaptured()) return false;
+
+            // Don't start drag if clicking on interactive elements
+            if (!isHTMLElement(e.target)) return false;
+
+            const target = e.target;
+            if (
+              target.closest("button") ||
+              target.closest("a") ||
+              target.closest('[role="button"]') ||
+              target.closest("input") ||
+              target.closest("textarea")
+            ) {
+              return false;
+            }
+
+            dragStartRef.current = {
+              x: e.clientX - transform.translateX,
+              y: e.clientY - transform.translateY,
+            };
+
+            return true; // Capture event
+          },
+          move: (e: MouseEvent) => {
+            // Only handle move if we captured the down event
+            if (!dragStartRef.current) return false;
+
+            // Check if we're actually dragging (past threshold)
+            if (!inputManager.isDraggingElement("map-canvas")) return false;
+
+            e.preventDefault();
+            // Capture the ref value locally to avoid null reference race condition
+            const dragStart = dragStartRef.current;
+            if (!dragStart) return false;
+
+            setTransform((prev) => ({
+              ...prev,
+              translateX: e.clientX - dragStart.x,
+              translateY: e.clientY - dragStart.y,
+            }));
+
+            return true; // Capture event
+          },
+          up: (_e: MouseEvent) => {
+            if (dragStartRef.current) {
+              dragStartRef.current = null;
+              setIsDragging(false);
+              onDragEnd?.();
+            }
+            return false; // Let event continue
+          },
+        },
+        keyboard: {}, // Empty keyboard handlers - this hook only handles mouse
+      },
+      enabled: () => !isCreatingPin,
+    });
+
+    // Listen to drag start/end events from input manager
+    const unsubscribeDragStart = inputManager.on("drag-start", () => {
+      if (inputManager.isDraggingElement("map-canvas")) {
+        setIsDragging(true);
+        onDragStart?.();
+      }
+    });
+
+    const unsubscribeDragEnd = inputManager.on("drag-end", () => {
+      setIsDragging(false);
+      onDragEnd?.();
+    });
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      cleanup();
+      unsubscribeDragStart();
+      unsubscribeDragEnd();
+      // Cancel any pending animation frame
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
     };
-  }, [onDragEnd]);
+  }, [transform.translateX, transform.translateY, isCreatingPin, onDragStart, onDragEnd]);
+
+  // Legacy handler for backward compatibility (now delegates to input manager)
+  const handleMouseDown = useCallback((_e: React.MouseEvent) => {
+    // The actual handling is done by input manager
+    // This is kept for backward compatibility with existing code
+  }, []);
 
   const reset = useCallback(() => {
     const newTransform = { scale: 1, translateX: 0, translateY: 0 };
@@ -168,11 +228,18 @@ export function useMapPan(options: UseMapPanOptions = {}) {
       });
 
       if (progress < 1) {
-        requestAnimationFrame(animate);
+        animationFrameRef.current = requestAnimationFrame(animate);
+      } else {
+        animationFrameRef.current = null;
       }
     };
 
-    requestAnimationFrame(animate);
+    // Cancel any existing animation
+    if (animationFrameRef.current !== null) {
+      cancelAnimationFrame(animationFrameRef.current);
+    }
+
+    animationFrameRef.current = requestAnimationFrame(animate);
   }, [transform.scale, transform.translateX, transform.translateY]);
 
   return {

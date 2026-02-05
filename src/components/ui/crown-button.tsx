@@ -1,19 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { forwardRef } from "react";
-import { useRouter } from "next/navigation";
+import { forwardRef, AnchorHTMLAttributes } from "react";
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps {
   variant?: "gold" | "iron" | "blood";
   size?: "sm" | "md" | "lg";
   href?: string;
+  children: React.ReactNode;
+  className?: string;
+  onClick?: (e: React.MouseEvent) => void;
 }
 
-export const CrownButton = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = "gold", size = "md", href, children, className = "", onClick, ...props }, ref) => {
-    const router = useRouter();
-
+export const CrownButton = forwardRef<HTMLAnchorElement, ButtonProps>(
+  ({ variant = "gold", size = "md", href, children, className = "", onClick }, ref) => {
     const baseStyles = "relative inline-flex items-center justify-center gap-2 font-display tracking-wider transition-all duration-300 border cursor-pointer";
 
     const variantStyles = {
@@ -28,26 +28,29 @@ export const CrownButton = forwardRef<HTMLButtonElement, ButtonProps>(
       lg: "px-8 py-3 text-base",
     };
 
-    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-      if (href) {
-        e.preventDefault();
-        router.push(href);
-      }
-      onClick?.(e);
-    };
+    const combinedClassName = `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`;
 
-    const buttonElement = (
+    if (href) {
+      return (
+        <Link
+          ref={ref}
+          href={href}
+          className={combinedClassName}
+          onClick={onClick}
+        >
+          <span className="relative z-10">{children}</span>
+        </Link>
+      );
+    }
+
+    return (
       <button
-        ref={ref}
-        className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
-        onClick={handleClick}
-        {...props}
+        className={combinedClassName}
+        onClick={onClick}
       >
         <span className="relative z-10">{children}</span>
       </button>
     );
-
-    return buttonElement;
   }
 );
 

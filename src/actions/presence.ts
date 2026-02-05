@@ -1,6 +1,7 @@
 'use server';
 
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import {
   safeAsync,
   type Result,
@@ -15,6 +16,35 @@ const PRESENCE_TIMEOUT_MS = 30_000;
 const MAX_EVENTS_LIMIT = 500;
 const CURSOR_MIN = 0;
 const CURSOR_MAX = 1;
+
+/**
+ * Safely log a collaboration event with error handling
+ * Uses fire-and-forget pattern but logs errors for monitoring
+ */
+export async function safeLogCollaborationEvent(input: {
+  worldId: string;
+  eventType: CollaborationEventType;
+  targetId?: string;
+  targetType?: string;
+  eventData?: unknown;
+}): Promise<void> {
+  try {
+    const result = await logCollaborationEvent(input);
+    if (!result.success) {
+      console.error('[Collaboration] Failed to log event:', {
+        worldId: input.worldId,
+        eventType: input.eventType,
+        error: result.error?.message,
+      });
+    }
+  } catch (error) {
+    console.error('[Collaboration] Error logging event:', {
+      worldId: input.worldId,
+      eventType: input.eventType,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+}
 
 function validateCursor(value?: number): number | undefined {
   if (value === undefined || value === null) return undefined;
@@ -66,7 +96,7 @@ export async function updatePresence(
         lastSeen: now,
         cursorX,
         cursorY,
-        viewport: input.viewport as any,
+        viewport: input.viewport as Prisma.InputJsonValue,
         selectedPinId: input.selectedPinId,
       },
       update: {
@@ -74,7 +104,7 @@ export async function updatePresence(
         lastSeen: now,
         cursorX,
         cursorY,
-        viewport: input.viewport as any,
+        viewport: input.viewport as Prisma.InputJsonValue,
         selectedPinId: input.selectedPinId,
       },
     });
@@ -204,7 +234,7 @@ export async function logCollaborationEvent(input: {
         eventType: input.eventType,
         targetId: input.targetId,
         targetType: input.targetType,
-        eventData: input.eventData as any,
+        eventData: input.eventData as Prisma.InputJsonValue,
       },
     });
 

@@ -34,10 +34,15 @@ export async function getAuthenticatedUser() {
  * Verify user has permission to access a world
  * @param worldId - World ID to check
  * @param userId - User ID to verify
+ * @param requiredPermission - Minimum permission level required (default: EDITOR)
  * @throws NotFoundError if world not found
  * @throws AuthorizationError if user lacks permission
  */
-export async function verifyWorldPermission(worldId: string, userId: string) {
+export async function verifyWorldPermission(
+  worldId: string,
+  userId: string,
+  requiredPermission: "READER" | "EDITOR" | "OWNER" = "EDITOR"
+) {
   const world = await prisma.gameWorld.findUnique({
     where: { id: worldId },
   });
@@ -51,12 +56,25 @@ export async function verifyWorldPermission(worldId: string, userId: string) {
     return world;
   }
 
-  // Check if user is a member with EDITOR or OWNER permissions
+  // For public worlds, allow READ access without membership
+  if (world.isPublic && requiredPermission === "READER") {
+    return world;
+  }
+
+  // Build permission check array based on required level
+  const allowedPermissions: Array<"READER" | "EDITOR" | "OWNER"> =
+    requiredPermission === "OWNER"
+      ? ["OWNER"]
+      : requiredPermission === "EDITOR"
+      ? ["EDITOR", "OWNER"]
+      : ["READER", "EDITOR", "OWNER"];
+
+  // Check if user is a member with sufficient permissions
   const member = await prisma.worldMember.findFirst({
     where: {
       gameWorldId: worldId,
       userId: userId,
-      permission: { in: ["EDITOR", "OWNER"] },
+      permission: { in: allowedPermissions },
     },
   });
 

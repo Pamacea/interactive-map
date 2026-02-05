@@ -12,12 +12,14 @@ export function OpacitySlider({
   return (
     <div className="px-3 py-2.5 bg-obsidian/60 border-x border-b border-iron/50">
       <div className="flex items-center justify-between mb-2">
-        <label className="text-xs font-display text-bone-dark uppercase tracking-wide">Opacity</label>
+        <label className="text-xs font-display text-bone-dark uppercase tracking-wide" htmlFor="pin-opacity">Opacity</label>
         <span className="text-xs font-display font-semibold text-accent-gold px-2 py-0.5 bg-accent-gold/10 rounded">
           {Math.round(value * 100)}%
         </span>
       </div>
       <input
+        id="pin-opacity"
+        name="pinOpacity"
         type="range"
         min="0"
         max="1"

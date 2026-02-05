@@ -62,6 +62,8 @@ interface SliderControlProps {
   displayValue: string;
   showReset?: boolean;
   onReset?: () => void;
+  id?: string;
+  name?: string;
 }
 
 function SliderControl({
@@ -74,7 +76,13 @@ function SliderControl({
   displayValue,
   showReset,
   onReset,
+  id,
+  name,
 }: SliderControlProps) {
+  // Generate id from label if not provided
+  const inputId = id || label.toLowerCase().replace(/\s+/g, '-');
+  const inputName = name || label.toLowerCase().replace(/\s+/g, '-');
+
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between text-xs">
@@ -92,6 +100,8 @@ function SliderControl({
         </div>
       </div>
       <input
+        id={inputId}
+        name={inputName}
         type="range"
         min={min}
         max={max}

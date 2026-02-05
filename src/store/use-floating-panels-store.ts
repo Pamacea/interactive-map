@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { Z_INDEX } from "@/constants/z-index";
 
-export type FloatingPanelId = "layers" | "lore" | "characters" | "filters" | "properties" | "members";
+export type FloatingPanelId = "layers" | "lore" | "characters" | "filters" | "properties" | "members" | "activity" | "comments";
 
 export interface FloatingPanelState {
   id: FloatingPanelId;
@@ -73,6 +73,20 @@ const DEFAULT_PANELS: Record<FloatingPanelId, Omit<FloatingPanelState, "zIndex">
     size: { width: 280, height: 350 },
     isCollapsed: false,
   },
+  activity: {
+    id: "activity",
+    isVisible: false,
+    position: { x: 992, y: 16 },
+    size: { width: 280, height: 350 },
+    isCollapsed: false,
+  },
+  comments: {
+    id: "comments",
+    isVisible: false,
+    position: { x: 1276, y: 16 },
+    size: { width: 320, height: 450 },
+    isCollapsed: false,
+  },
 };
 
 // Helper function to safely get or initialize a panel
@@ -98,6 +112,8 @@ const createInitialPanels = (): Record<FloatingPanelId, FloatingPanelState> => (
   filters: { ...DEFAULT_PANELS.filters, zIndex: Z_INDEX.activeFloatingPanel },
   properties: { ...DEFAULT_PANELS.properties, zIndex: Z_INDEX.activeFloatingPanel },
   members: { ...DEFAULT_PANELS.members, zIndex: Z_INDEX.activeFloatingPanel },
+  activity: { ...DEFAULT_PANELS.activity, zIndex: Z_INDEX.activeFloatingPanel },
+  comments: { ...DEFAULT_PANELS.comments, zIndex: Z_INDEX.activeFloatingPanel },
 });
 
 export const useFloatingPanelsStore = create<FloatingPanelsStore>()(
@@ -229,6 +245,8 @@ const DEFAULT_PANELS_WITH_ZINDEX: Record<FloatingPanelId, FloatingPanelState> = 
   filters: { ...DEFAULT_PANELS.filters, zIndex: Z_INDEX.activeFloatingPanel },
   properties: { ...DEFAULT_PANELS.properties, zIndex: Z_INDEX.activeFloatingPanel },
   members: { ...DEFAULT_PANELS.members, zIndex: Z_INDEX.activeFloatingPanel },
+  activity: { ...DEFAULT_PANELS.activity, zIndex: Z_INDEX.activeFloatingPanel },
+  comments: { ...DEFAULT_PANELS.comments, zIndex: Z_INDEX.activeFloatingPanel },
 };
 
 // Selector hooks for specific panels

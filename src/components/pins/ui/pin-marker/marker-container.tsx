@@ -33,6 +33,8 @@ interface MarkerContainerProps {
   isLayerLocked: boolean;
   /** Whether the pin is being dragged */
   isDragging: boolean;
+  /** Pin ID for drag detection */
+  pinId?: string;
   /** Click handler */
   onClick: (e: React.MouseEvent) => void;
   /** Mouse down handler */
@@ -95,6 +97,7 @@ export const MarkerContainer = memo(function MarkerContainer({
   isSelected,
   isLayerLocked,
   isDragging,
+  pinId,
   onClick,
   onMouseDown,
   onMouseEnter,
@@ -124,6 +127,7 @@ export const MarkerContainer = memo(function MarkerContainer({
       aria-label={`Pin: ${title || 'Untitled'}`}
       aria-describedby={isSelected ? 'pin-selected' : undefined}
       aria-pressed={isSelected}
+      data-pin-id={pinId}
       onClick={onClick}
       onMouseDown={onMouseDown}
       onMouseEnter={onMouseEnter}

@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { BookOpen, Clock, Eye, EyeOff, Edit, Trash2 } from "lucide-react";
 import { LoreEntry } from "@/types/lore.type";
 import { useLoreStore } from "@/stores/use-lore-store";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { DeleteConfirmDialog } from "@/components/pins/ui/delete-confirm-dialog";
 
 // Simple utility to format time ago
 function formatTimeAgo(date: Date): string {
@@ -55,6 +57,8 @@ interface LoreCardProps {
 }
 
 export function LoreCard({ lore, isSelected, onSelect, categoryLabel }: LoreCardProps) {
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const toggleExpanded = useLoreStore((state) => state.toggleExpanded);
   const startEditing = useLoreStore((state) => state.startEditing);
   const deleteLoreEntryServer = useLoreStore((state) => state.deleteLoreEntryServer);
@@ -66,15 +70,19 @@ export function LoreCard({ lore, isSelected, onSelect, categoryLabel }: LoreCard
     startEditing();
   };
 
-  const handleDelete = async (e: React.MouseEvent) => {
+  const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (confirm(`Are you sure you want to delete "${lore.title}"?`)) {
-      try {
-        await deleteLoreEntryServer(lore.id);
-      } catch (error) {
-        console.error("Failed to delete lore entry:", error);
-        alert(error instanceof Error ? error.message : "Failed to delete lore entry");
-      }
+    setDeleteOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      setIsDeleting(true);
+      await deleteLoreEntryServer(lore.id);
+      setDeleteOpen(false);
+    } catch (error) {
+      console.error("Failed to delete lore entry:", error);
+      setIsDeleting(false);
     }
   };
 
@@ -174,12 +182,21 @@ export function LoreCard({ lore, isSelected, onSelect, categoryLabel }: LoreCard
         <Button
           size="sm"
           variant="ghost"
-          onClick={handleDelete}
-          className="h-7 px-2 text-xs text-text-muted hover:text-red-500"
+          onClick={handleDeleteClick}
+          className="h-7 px-2 text-xs text-text-muted hover:text-blood"
         >
           <Trash2 className="w-3 h-3" />
         </Button>
       </div>
+
+      <DeleteConfirmDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        onConfirm={handleDeleteConfirm}
+        isDeleting={isDeleting}
+        title="Delete Lore Entry?"
+        description={`Are you sure you want to delete "${lore.title}"? This action cannot be undone.`}
+      />
     </Card>
   );
 }
