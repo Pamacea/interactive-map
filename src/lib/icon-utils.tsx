@@ -79,3 +79,42 @@ export function DynamicIcon({ iconName, ...props }: DynamicIconProps) {
   // Render using createElement to satisfy static component requirement
   return React.createElement(IconComponent, props);
 }
+
+/**
+ * Wrapper component for Lucide icons that suppresses hydration warnings.
+ *
+ * This prevents React hydration warnings caused by browser extensions (like Dark Reader)
+ * that modify SVG attributes before React hydrates the page.
+ *
+ * Usage:
+ *   <Icon icon={<ArrowLeft />} className="w-4 h-4" />
+ *
+ * Or use the icon component directly with the wrapper:
+ *   <Icon icon={ArrowLeft} className="w-4 h-4" />
+ */
+export interface IconWrapperProps {
+  icon: React.ReactNode | React.ComponentType<LucideProps>;
+  className?: string;
+  [key: string]: unknown;
+}
+
+export function Icon({ icon, className, ...props }: IconWrapperProps) {
+  // If icon is a component (function), render it with props
+  // If icon is already a ReactNode, render it directly
+  const isComponent = typeof icon === "function";
+
+  if (isComponent) {
+    const IconComponent = icon as React.ComponentType<LucideProps>;
+    return (
+      <span suppressHydrationWarning className={className}>
+        <IconComponent {...(props as LucideProps)} />
+      </span>
+    );
+  }
+
+  return (
+    <span suppressHydrationWarning className={className}>
+      {icon as React.ReactNode}
+    </span>
+  );
+}

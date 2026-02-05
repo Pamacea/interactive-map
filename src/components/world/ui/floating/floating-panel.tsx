@@ -135,7 +135,9 @@ export const FloatingPanel = forwardRef<HTMLDivElement, FloatingPanelProps>(
             className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize flex items-center justify-center text-bone-dark/40 hover:text-accent-gold transition-colors"
             aria-label="Resize panel"
           >
-            <GripHorizontal className="w-3 h-3" />
+            <span suppressHydrationWarning>
+              <GripHorizontal className="w-3 h-3" />
+            </span>
           </button>
         )}
 

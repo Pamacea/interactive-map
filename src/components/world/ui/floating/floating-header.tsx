@@ -3,12 +3,33 @@
 import Link from "next/link";
 import { memo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ArrowLeft, Home, Crown, Download, Minus, Plus, RotateCcw } from "lucide-react";
+import {
+  ArrowLeft,
+  Home,
+  Crown,
+  Download,
+  Minus,
+  Plus,
+  RotateCcw,
+  Layers,
+  BookOpen,
+  Filter,
+  Settings2,
+  Users,
+  User,
+  GripVertical,
+  Clock,
+  MessageSquare,
+  History,
+  Upload,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useScale, useZoom, useMapStore } from "@/stores/map-store";
 import { ExportDialog } from "@/components/export/ui/export-dialog";
 import { getWorldExportData } from "@/actions/export";
 import type { WorldExportData } from "@/actions/export";
+import { usePanelState, useTogglePanel } from "@/store/use-floating-panels-store";
+import type { FloatingPanelId } from "@/store/use-floating-panels-store";
 
 const SCALE_OPTIONS = ["1:1000", "1:500", "1:100"] as const;
 
@@ -24,7 +45,7 @@ function ToolButton({
   onClick,
   disabled,
   title,
-  "aria-label": ariaLabel
+  "aria-label": ariaLabel,
 }: {
   children: React.ReactNode;
   isActive?: boolean;
@@ -48,7 +69,36 @@ function ToolButton({
       title={title}
       aria-label={ariaLabel}
     >
-      {children}
+      <span suppressHydrationWarning>{children}</span>
+    </button>
+  );
+}
+
+interface DockButtonProps {
+  id: FloatingPanelId;
+  icon: React.ReactNode;
+  label: string;
+  isActive: boolean;
+}
+
+function DockButton({ id, icon, label, isActive }: DockButtonProps) {
+  const togglePanel = useTogglePanel();
+
+  return (
+    <button
+      onClick={() => togglePanel(id)}
+      type="button"
+      className={cn(
+        "w-8 h-8 bg-obsidian/80 backdrop-blur-sm rounded-sm border border-iron shadow-lg flex items-center justify-center transition-all",
+        "text-bone-dark hover:text-accent-gold hover:border-accent-gold/50 hover:bg-accent-gold/10",
+        "focus:outline-none focus:ring-2 focus:ring-accent-gold/50",
+        isActive && "border-accent-gold text-accent-gold bg-accent-gold/10"
+      )}
+      title={isActive ? `Hide ${label}` : `Show ${label}`}
+      aria-label={isActive ? `Hide ${label}` : `Show ${label}`}
+      aria-pressed={isActive}
+    >
+      <span suppressHydrationWarning>{icon}</span>
     </button>
   );
 }
@@ -158,6 +208,18 @@ export const FloatingHeader = memo(function FloatingHeader({
   const [loading, setLoading] = useState(false);
   const [worldData, setWorldData] = useState<WorldExportData | null>(null);
 
+  // Panel states
+  const layersPanel = usePanelState("layers");
+  const lorePanel = usePanelState("lore");
+  const charactersPanel = usePanelState("characters");
+  const filtersPanel = usePanelState("filters");
+  const propertiesPanel = usePanelState("properties");
+  const membersPanel = usePanelState("members");
+  const activityPanel = usePanelState("activity");
+  const commentsPanel = usePanelState("comments");
+  const versionsPanel = usePanelState("versions");
+  const importPanel = usePanelState("import");
+
   const handleExportClick = async () => {
     if (!worldData) {
       setLoading(true);
@@ -175,7 +237,7 @@ export const FloatingHeader = memo(function FloatingHeader({
   };
 
   return (
-    <div className="fixed top-4 left-4 z-30">
+    <div className="fixed bottom-4 left-4 right-4 z-30 w-1/2">
       <div className="relative bg-obsidian/80 backdrop-blur-md rounded-sm border border-iron shadow-xl overflow-hidden group hover:border-accent-gold/50 transition-all duration-300">
         {/* Ornate gold corners */}
         <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-accent-gold/40 group-hover:border-accent-gold transition-colors pointer-events-none" />
@@ -186,10 +248,11 @@ export const FloatingHeader = memo(function FloatingHeader({
         {/* Cracked pattern overlay */}
         <div className="absolute inset-0 bg-crack-pattern opacity-[0.03] pointer-events-none" />
 
-        <div className="relative p-2 flex items-center gap-2 py-3 px-4">
+        <div className="relative p-2 flex items-center gap-2 py-3 px-4 flex-wrap" suppressHydrationWarning>
           {/* Grip handle */}
           <div className="flex items-center gap-1 pr-3 border-r border-iron/50">
             <span className="text-accent-gold/30 text-xs">ᛟ</span>
+            <GripVertical className="w-4 h-4 text-bone-dark/60" />
           </div>
 
           {/* Back | Home */}
@@ -197,7 +260,7 @@ export const FloatingHeader = memo(function FloatingHeader({
             <Link
               href="/worlds"
               className="w-8 h-8 bg-obsidian/80 backdrop-blur-sm rounded-sm border border-iron shadow-lg flex items-center justify-center transition-all text-bone-dark hover:text-accent-gold hover:border-accent-gold/50 hover:bg-accent-gold/10 focus:outline-none focus:ring-2 focus:ring-accent-gold/50"
-              title="My Worlds"
+              title="Back to worlds"
             >
               <ArrowLeft className="w-4 h-4" strokeWidth={2} />
             </Link>
@@ -214,7 +277,7 @@ export const FloatingHeader = memo(function FloatingHeader({
           {/* World Title Badge */}
           <div className="flex items-center gap-2 px-3 py-1.5 bg-obsidian/60 rounded-sm border border-iron/50">
             <Crown className="w-3.5 h-3.5 text-accent-gold/60 flex-shrink-0" strokeWidth={1.5} />
-            <span className="text-xs font-display font-medium text-bone max-w-[80px] truncate" title={worldTitle}>
+            <span className="text-xs font-display font-medium text-bone max-w-[120px] truncate" title={worldTitle}>
               {worldTitle}
             </span>
           </div>
@@ -222,10 +285,72 @@ export const FloatingHeader = memo(function FloatingHeader({
           {/* Separator */}
           <div className="w-px h-6 bg-iron/50" />
 
-          {/* Scale & Zoom controls */}
+          {/* Panel buttons */}
           <div className="flex items-center gap-1 border-r border-iron/50 pr-3">
-            <ScaleAndZoom />
+            <DockButton
+              id="layers"
+              icon={<Layers className="w-4 h-4" />}
+              label="Layers"
+              isActive={layersPanel.isVisible}
+            />
+            <DockButton
+              id="lore"
+              icon={<BookOpen className="w-4 h-4" />}
+              label="Lore"
+              isActive={lorePanel.isVisible}
+            />
+            <DockButton
+              id="characters"
+              icon={<User className="w-4 h-4" />}
+              label="Characters"
+              isActive={charactersPanel.isVisible}
+            />
+            <DockButton
+              id="filters"
+              icon={<Filter className="w-4 h-4" />}
+              label="Filters"
+              isActive={filtersPanel.isVisible}
+            />
+            <DockButton
+              id="properties"
+              icon={<Settings2 className="w-4 h-4" />}
+              label="Properties"
+              isActive={propertiesPanel.isVisible}
+            />
+            <DockButton
+              id="members"
+              icon={<Users className="w-4 h-4" />}
+              label="Members"
+              isActive={membersPanel.isVisible}
+            />
+            <DockButton
+              id="activity"
+              icon={<Clock className="w-4 h-4" />}
+              label="Activity"
+              isActive={activityPanel.isVisible}
+            />
+            <DockButton
+              id="comments"
+              icon={<MessageSquare className="w-4 h-4" />}
+              label="Comments"
+              isActive={commentsPanel.isVisible}
+            />
+            <DockButton
+              id="versions"
+              icon={<History className="w-4 h-4" />}
+              label="Version History"
+              isActive={versionsPanel.isVisible}
+            />
+            <DockButton
+              id="import"
+              icon={<Upload className="w-4 h-4" />}
+              label="Import"
+              isActive={importPanel.isVisible}
+            />
           </div>
+
+          {/* Separator */}
+          <div className="w-px h-6 bg-iron/50" />
 
           {/* Export */}
           <ToolButton
@@ -237,14 +362,11 @@ export const FloatingHeader = memo(function FloatingHeader({
             <Download className="w-4 h-4" strokeWidth={2} />
           </ToolButton>
 
-          {/* My Worlds button */}
-          <Link
-            href="/worlds"
-            className="px-3 py-1.5 bg-obsidian/60 rounded-sm border border-iron/50 text-bone-dark hover:text-accent-gold hover:border-accent-gold/50 hover:bg-accent-gold/10 transition-all text-xs font-display whitespace-nowrap"
-            title="My Worlds"
-          >
-            My Worlds
-          </Link>
+          {/* Separator */}
+          <div className="w-px h-6 bg-iron/50" />
+
+          {/* Scale & Zoom controls */}
+          <ScaleAndZoom />
         </div>
       </div>
 

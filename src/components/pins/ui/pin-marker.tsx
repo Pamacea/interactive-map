@@ -58,6 +58,15 @@ export function PinMarker({
   const layer = pin.layerId ? layers.find((layer) => layer.id === pin.layerId) : null;
   const isLayerLocked = layer?.locked ?? false;
 
+  // Debug logging
+  console.log('[PinMarker] Rendering', {
+    pinId: pin.id,
+    pinLayerId: pin.layerId,
+    layer: layer ? { id: layer.id, locked: layer.locked } : null,
+    isLayerLocked,
+    allLayers: layers.map(l => ({ id: l.id, locked: l.locked })),
+  });
+
   // Unified drag handling using input manager
   const { isDragging, dragPosition, handleMouseDown: handleDragMouseDown, justFinishedDragRef } = usePinDragInput({
     pin,
@@ -129,19 +138,34 @@ export function PinMarker({
 
   // Combined mouse down handler
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    console.log('[PinMarker] handleMouseDown called', {
+      pinId: pin.id,
+      button: e.button,
+      isLayerLocked,
+    });
     if (e.button !== 0) return;
-    if (isLayerLocked) return;
+    if (isLayerLocked) {
+      console.log('[PinMarker] Layer locked, ignoring mousedown');
+      return;
+    }
 
     // Stop propagation to prevent map pan
     e.stopPropagation();
 
     // Delegate to drag handler
     handleDragMouseDown(e);
-  }, [isLayerLocked, handleDragMouseDown]);
+  }, [isLayerLocked, handleDragMouseDown, pin.id]);
 
   if (!shouldRender) {
     return null;
   }
+
+  console.log('[PinMarker] Rendering MarkerContainer', {
+    pinId: pin.id,
+    pinIdProp: pin.id,
+    position,
+    isDragging,
+  });
 
   return (
     <MarkerContainer

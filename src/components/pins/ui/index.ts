@@ -1,5 +1,6 @@
 export { PinList } from './pin-list';
 export { PinPopup } from './pin-popup';
+export type { PinPopupProps } from './pin-popup';
 // Pin marker and its atomic sub-components
 export {
   PinMarker,

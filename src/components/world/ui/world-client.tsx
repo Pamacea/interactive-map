@@ -15,7 +15,6 @@ import { useSelectPin, useSetPins } from "@/stores/use-pins-store";
 import { useSearchStore } from "@/store/use-search-store";
 import {
   FloatingHeader,
-  ModuleDock,
   LayersModule,
   LoreModule,
   FiltersModule,
@@ -65,15 +64,12 @@ function FloatingUI({ world, pins, currentUserId, worldOwnerId }: {
 
   return (
     <>
-      {/* Floating header (bottom-right) */}
+      {/* Floating header (merged top bar) */}
       <FloatingHeader
         worldTitle={world.title}
         worldId={world.id}
         mapElement={mapElement}
       />
-
-      {/* Module dock (bottom-left) */}
-      <ModuleDock />
 
       {/* Floating modules */}
       <LayersModule
@@ -215,6 +211,21 @@ export const WorldClient = memo(function WorldClient({
 
           {/* Ambient glow effect */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-accent-gold/5 rounded-sm blur-[150px] pointer-events-none" />
+
+          {/* DEBUG: Global click listener */}
+          <div
+            className="fixed inset-0 z-[99999] pointer-events-none"
+            onClick={(e) => {
+              const target = e.target as HTMLElement;
+              const pinElement = target.closest('[data-pin-id]');
+              console.log('[DEBUG] Global click', {
+                target: target.tagName,
+                className: target.className,
+                pinId: pinElement?.getAttribute('data-pin-id'),
+                pointerEvents: getComputedStyle(target).pointerEvents,
+              });
+            }}
+          />
 
           {/* Map canvas takes full screen */}
           <ErrorBoundary

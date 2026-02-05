@@ -54,6 +54,10 @@ export const SelectedPinPopup: FC<SelectedPinPopupProps> = ({
     // Title is already updated via optimistic update in PopupHeader
   };
 
+  const handleDescriptionChange = (_newDescription: string) => {
+    // Description is already updated via optimistic update
+  };
+
   return (
     <div
       className="absolute z-50 pointer-events-none"
@@ -69,6 +73,7 @@ export const SelectedPinPopup: FC<SelectedPinPopupProps> = ({
           onClose={onClose}
           onDelete={handleDelete}
           onTitleChange={handleTitleChange}
+          onDescriptionChange={handleDescriptionChange}
         />
       </div>
     </div>

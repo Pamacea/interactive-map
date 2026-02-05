@@ -240,6 +240,16 @@ class InputManager {
   }): () => void {
     const id = `${config.element}-${config.elementId || "global"}-${this.nextId++}`;
 
+    console.log('[InputManager] Registering', {
+      id,
+      element: config.element,
+      elementId: config.elementId,
+      priority: config.priority,
+      hasMouseDown: !!config.handlers.mouse?.down,
+      hasMouseMove: !!config.handlers.mouse?.move,
+      hasMouseUp: !!config.handlers.mouse?.up,
+    });
+
     // Create mounted ref to track if component is still mounted
     const mountedRef = { current: true };
 
@@ -269,7 +279,10 @@ class InputManager {
 
     this.registrations.set(id, registration);
 
+    console.log('[InputManager] Total registrations after add:', this.registrations.size);
+
     return () => {
+      console.log('[InputManager] Cleanup called for', id);
       // Mark as unmounted first (prevents calling handlers during cleanup)
       mountedRef.current = false;
 
@@ -288,9 +301,22 @@ class InputManager {
   // ============== Event Dispatch ==============
 
   private getSortedRegistrations(): HandlerRegistration[] {
-    return Array.from(this.registrations.values())
-      .filter((reg) => reg.enabled() && reg.mountedRef.current)
-      .sort((a, b) => b.priority - a.priority);
+    const allRegs = Array.from(this.registrations.values());
+    const filtered = allRegs.filter((reg) => {
+      const enabled = reg.enabled();
+      const mounted = reg.mountedRef.current;
+      console.log('[InputManager] getSortedRegistrations filtering', {
+        element: reg.element,
+        elementId: reg.elementId,
+        enabled,
+        mounted,
+        willInclude: enabled && mounted,
+      });
+      return enabled && mounted;
+    });
+    const sorted = filtered.sort((a, b) => b.priority - a.priority);
+    console.log('[InputManager] Sorted registrations:', sorted.map(r => ({ element: r.element, elementId: r.elementId, priority: r.priority })));
+    return sorted;
   }
 
   private createDispatchSnapshot(): void {
@@ -371,6 +397,15 @@ class InputManager {
   // ============== Mouse Event Handlers ==============
 
   private onMouseDown(e: MouseEvent): void {
+    // DEBUG: Log all mouse down events
+    console.log('[InputManager] onMouseDown', {
+      target: (e.target as HTMLElement)?.tagName,
+      className: (e.target as HTMLElement)?.className,
+      button: e.button,
+      registrationsCount: this.dispatchSnapshot.length,
+      registrations: this.dispatchSnapshot.map(r => ({ element: r.element, elementId: r.elementId, enabled: r.enabled() })),
+    });
+
     // Increment click sequence ID - this ties click events to their mousedown
     this.currentClickSequenceId++;
 
@@ -395,11 +430,15 @@ class InputManager {
     for (const reg of this.dispatchSnapshot) {
       if (!reg.mountedRef.current) continue;
 
+      console.log('[InputManager] Checking registration', reg.element, reg.elementId, 'enabled:', reg.enabled());
+
       if (reg.handlers.mouse.down) {
         try {
           const result = reg.handlers.mouse.down(e);
+          console.log('[InputManager] Handler result for', reg.element, ':', result);
           if (result === true) {
             // Handler captured the event (true = handled)
+            console.log('[InputManager] Event captured by', reg.element);
             this.state.capturedBy = reg.element;
             this.state.drag.element = reg.element;
             this.state.drag.elementId = reg.elementId ?? null;
@@ -413,6 +452,7 @@ class InputManager {
       }
     }
 
+    console.log('[InputManager] No handler captured the event');
     // Set mode based on button and target
     if (e.button === 0) {
       this.state.mode = "idle";

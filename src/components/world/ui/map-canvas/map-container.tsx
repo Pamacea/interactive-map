@@ -39,7 +39,7 @@ export const MapContainer = memo(
       return (
         <div
           ref={ref}
-          className={`relative w-full h-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden ${
+          className={`relative w-full h-full bg-gradient-to-br from-obsidian via-obsidian to-obsidian overflow-hidden ${
             isCreatingPin && !showContextMenu
               ? "cursor-crosshair ring-2 ring-accent-gold/50 ring-inset"
               : isDragging

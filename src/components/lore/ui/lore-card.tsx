@@ -7,7 +7,7 @@ import { useLoreStore } from "@/stores/use-lore-store";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { DeleteConfirmDialog } from "@/components/pins/ui/delete-confirm-dialog";
+import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
 
 // Simple utility to format time ago
 function formatTimeAgo(date: Date): string {

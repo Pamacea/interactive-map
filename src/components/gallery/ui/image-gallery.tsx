@@ -10,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ImageCard } from "./image-card";
 import { ImageLightbox } from "./image-lightbox";
 import { ImageUploadZone } from "./image-upload-zone";
-import { DeleteConfirmDialog } from "@/components/pins/ui/delete-confirm-dialog";
+import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
 import { useGalleryStore } from "@/stores/use-gallery-store";
 import { useGallery } from "../logic/use-gallery-query";
 import { galleryKeys } from "../logic/use-gallery-query";
