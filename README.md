@@ -1,5 +1,11 @@
 # Interactive Map
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub release](https://img.shields.io/github/v/release/Pamacea/interactive-map)](https://github.com/Pamacea/interactive-map/releases/latest)
+[![CI](https://github.com/Pamacea/interactive-map/actions/workflows/ci.yml/badge.svg)](https://github.com/Pamacea/interactive-map/actions)
+
+
+
 A creative tool for building interactive maps for games, roleplay (RPG) worlds, and fantasy narratives. Inspired by League of Legends interactive maps.
 
 ## Features
