@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useMemo } from "react";
+import { memo } from "react";
 import MDEditor from "@uiw/react-md-editor";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
@@ -34,31 +34,6 @@ export const MarkdownEditor = memo(function MarkdownEditor({
   showPreview = true,
   className,
 }: MarkdownEditorProps) {
-  // Custom preview component with project styling
-  const Preview = useMemo(() => {
-    return function CustomPreview({ source }: { source: string }) {
-      if (!source) return <div className="p-4 text-text-muted">Preview will appear here...</div>;
-
-      return (
-        <div className="prose prose-invert prose-sm max-w-none p-4">
-          <div
-            dangerouslySetInnerHTML={{
-              __html: source
-                .replace(/^### (.*$)/gim, "<h3>$1</h3>")
-                .replace(/^## (.*$)/gim, "<h2>$1</h2>")
-                .replace(/^# (.*$)/gim, "<h1>$1</h1>")
-                .replace(/\*\*(.*)\*\*/gim, "<strong>$1</strong>")
-                .replace(/\*(.*)\*/gim, "<em>$1</em>")
-                .replace(/!\[(.*?)\]\((.*?)\)/gim, "<img alt='$1' src='$2' />")
-                .replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2' target='_blank' rel='noopener'>$1</a>")
-                .replace(/\n/gim, "<br />"),
-            }}
-          />
-        </div>
-      );
-    };
-  }, []);
-
   return (
     <div className={cn("flex flex-col gap-2", className)}>
       {label && (
@@ -90,11 +65,8 @@ export const MarkdownEditor = memo(function MarkdownEditor({
             placeholder,
             disabled,
           }}
-          previewOptions={{
-            components: {
-              preview: Preview as any,
-            },
-          }}
+          // Use the built-in secure preview from @uiw/react-md-editor
+          // which properly sanitizes markdown to prevent XSS attacks
           className="!bg-obsidian/60 !text-text-primary"
           data-color-mode="dark"
         />

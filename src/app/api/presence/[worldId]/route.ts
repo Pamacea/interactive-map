@@ -1,20 +1,62 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getActiveUsers } from '@/actions/presence';
+import { getAuthenticatedUser } from '@/lib/server-helpers';
+import { verifyWorldPermission } from '@/lib/server-helpers';
 
+/**
+ * GET /api/presence/[worldId]
+ *
+ * Returns active users for a world.
+ * Requires authentication and world access permission.
+ */
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ worldId: string }> },
 ) {
-  const { worldId } = await params;
+  try {
+    // SECURITY: Verify user is authenticated
+    const user = await getAuthenticatedUser();
 
-  const result = await getActiveUsers({ worldId });
+    const { worldId } = await params;
 
-  if (!result.success) {
+    // SECURITY: Verify user has access to this world
+    await verifyWorldPermission(worldId, user.id);
+
+    const result = await getActiveUsers({ worldId });
+
+    if (!result.success) {
+      return NextResponse.json(
+        { error: 'Failed to fetch presence' },
+        { status: 500 },
+      );
+    }
+
+    return NextResponse.json(result.data);
+  } catch (error) {
+    // Check for authentication error
+    if (
+      error &&
+      typeof error === 'object' &&
+      'message' in error &&
+      error.message === 'Unauthorized'
+    ) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Check for permission error
+    if (
+      error &&
+      typeof error === 'object' &&
+      'message' in error &&
+      typeof error.message === 'string' &&
+      error.message.includes('do not have permission')
+    ) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     return NextResponse.json(
-      { error: result.error?.message || 'Failed to fetch presence' },
+      { error: 'Internal server error' },
       { status: 500 },
     );
   }
-
-  return NextResponse.json(result.data);
 }
