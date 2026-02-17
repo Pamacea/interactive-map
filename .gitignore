@@ -5,6 +5,11 @@
 
 # Testing
 /coverage
+/playwright-report
+/test-results
+/test-results-e2e
+.guardian/
+.daemon/
 
 # Next.js
 /.next/

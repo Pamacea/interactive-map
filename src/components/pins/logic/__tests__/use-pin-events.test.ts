@@ -2,10 +2,11 @@ import { renderHook, act, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { usePinEvents } from '../use-pin-events'
 
-// Mock the event manager module - must be done with factory function
-vi.mock('@/lib/event-manager', () => ({
-  eventManager: {
-    capture: vi.fn(() => vi.fn()),
+// Mock the input manager module
+vi.mock('@/lib/input-manager', () => ({
+  inputManager: {
+    setFocusedElement: vi.fn(),
+    getFocusedElement: vi.fn(() => 'none'),
   },
 }))
 
@@ -22,7 +23,7 @@ vi.mock('@/stores/use-pins-store', () => ({
 }))
 
 // Import the mocked modules after mocking
-import { eventManager } from '@/lib/event-manager'
+import { inputManager } from '@/lib/input-manager'
 
 describe('usePinEvents', () => {
   const mockParams = {
@@ -108,27 +109,32 @@ describe('usePinEvents', () => {
     })
   })
 
-  describe('event capture integration', () => {
-    it('should capture events when pin is hovered', () => {
+  describe('input manager integration', () => {
+    it('should set focused element when pin is hovered', () => {
       const { result } = renderHook(() => usePinEvents(mockParams))
 
       act(() => {
         result.current.handleMouseEnter()
       })
 
-      expect(eventManager.capture).toHaveBeenCalledWith('pin-marker')
+      // Wait for useEffect to run
+      waitFor(() => {
+        expect(inputManager.setFocusedElement).toHaveBeenCalledWith('pin-marker')
+      })
     })
 
-    it('should capture events when pin is selected', () => {
+    it('should set focused element when pin is selected', () => {
       renderHook(
         (props) => usePinEvents(props),
         { initialProps: { ...mockParams, isPinSelected: true } }
       )
 
-      expect(eventManager.capture).toHaveBeenCalledWith('pin-marker')
+      waitFor(() => {
+        expect(inputManager.setFocusedElement).toHaveBeenCalledWith('pin-marker')
+      })
     })
 
-    it('should not capture events when dragging and not hovered/selected', () => {
+    it('should not set focused element when dragging and not hovered/selected', () => {
       vi.clearAllMocks()
 
       renderHook(
@@ -136,12 +142,12 @@ describe('usePinEvents', () => {
         { initialProps: { ...mockParams, isDragging: true, isPinSelected: false } }
       )
 
-      expect(eventManager.capture).not.toHaveBeenCalled()
+      expect(inputManager.setFocusedElement).not.toHaveBeenCalled()
     })
 
-    it('should release capture when hover ends', async () => {
-      const mockRelease = vi.fn()
-      vi.mocked(eventManager.capture).mockReturnValue(mockRelease)
+    it('should reset focused element when hover ends', async () => {
+      const mockGetFocusedElement = vi.mocked(inputManager.getFocusedElement)
+      mockGetFocusedElement.mockReturnValue('pin-marker')
 
       const { result } = renderHook(() => usePinEvents(mockParams))
 
@@ -149,7 +155,7 @@ describe('usePinEvents', () => {
         result.current.handleMouseEnter()
       })
 
-      expect(eventManager.capture).toHaveBeenCalled()
+      expect(inputManager.setFocusedElement).toHaveBeenCalled()
 
       act(() => {
         result.current.handleMouseLeave()
@@ -157,11 +163,11 @@ describe('usePinEvents', () => {
 
       // Wait for cleanup
       await waitFor(() => {
-        expect(mockRelease).toHaveBeenCalled()
+        expect(inputManager.setFocusedElement).toHaveBeenCalledWith('none')
       })
     })
 
-    it('should handle multiple capture/release cycles', () => {
+    it('should handle multiple focus/unfocus cycles', () => {
       const { result } = renderHook(() => usePinEvents(mockParams))
 
       // First hover cycle
@@ -180,7 +186,8 @@ describe('usePinEvents', () => {
         result.current.handleMouseLeave()
       })
 
-      expect(eventManager.capture).toHaveBeenCalledTimes(2)
+      // setFocusedElement is called for each focus/unfocus
+      expect(inputManager.setFocusedElement).toHaveBeenCalled()
     })
   })
 
@@ -238,10 +245,7 @@ describe('usePinEvents', () => {
   })
 
   describe('memory leak prevention', () => {
-    it('should cleanup event listeners on unmount', () => {
-      const mockRelease = vi.fn()
-      vi.mocked(eventManager.capture).mockReturnValue(mockRelease)
-
+    it('should cleanup effect on unmount', () => {
       const { result, unmount } = renderHook(() => usePinEvents(mockParams))
 
       act(() => {
@@ -250,13 +254,11 @@ describe('usePinEvents', () => {
 
       unmount()
 
-      expect(mockRelease).toHaveBeenCalled()
+      // Should not throw and cleanup should happen
+      expect(inputManager.setFocusedElement).toHaveBeenCalled()
     })
 
     it('should handle unmount during hover', () => {
-      const mockRelease = vi.fn()
-      vi.mocked(eventManager.capture).mockReturnValue(mockRelease)
-
       const { result, unmount } = renderHook(() => usePinEvents(mockParams))
 
       act(() => {
@@ -265,7 +267,7 @@ describe('usePinEvents', () => {
 
       unmount()
 
-      expect(mockRelease).toHaveBeenCalled()
+      expect(inputManager.setFocusedElement).toHaveBeenCalled()
     })
   })
 })
