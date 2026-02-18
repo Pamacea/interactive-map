@@ -16,6 +16,7 @@ export interface FloatingPanelProps extends UseFloatingPanelOptions {
   showCollapse?: boolean;
   showResize?: boolean;
   onAdd?: () => void;
+  actions?: React.ReactNode;
 }
 
 export const FloatingPanel = forwardRef<HTMLDivElement, FloatingPanelProps>(
@@ -29,6 +30,7 @@ export const FloatingPanel = forwardRef<HTMLDivElement, FloatingPanelProps>(
       showCollapse = true,
       showResize = true,
       onAdd,
+      actions,
       panelId,
       minWidth = 200,
       maxWidth = 800,
@@ -111,6 +113,7 @@ export const FloatingPanel = forwardRef<HTMLDivElement, FloatingPanelProps>(
           onToggle={showCollapse ? () => collapseProps.onClick() : undefined}
           onClose={showClose ? () => closeProps.onClick() : undefined}
           onAdd={onAdd}
+          actions={actions}
           dragHandleProps={dragHandleProps}
         />
 
@@ -122,6 +125,8 @@ export const FloatingPanel = forwardRef<HTMLDivElement, FloatingPanelProps>(
               maxHeight: `calc(${size.height}px - 40px)`,
               minHeight: `${minHeight - 40}px`,
             }}
+            onClick={(e) => e.stopPropagation()}
+            onPointerDownCapture={(e) => e.stopPropagation()}
           >
             {children}
           </div>

@@ -107,6 +107,7 @@ export async function uploadGalleryImage(formData: FormData): Promise<Result<{ i
         imageUrl,
         type: "IMAGE",
         order: 0,
+        worldId: gameWorldId,  // IMPORTANT: Link to world so items appear in gallery
         pinId,
         loreEntryId,
       },
@@ -142,6 +143,7 @@ export async function createGalleryItem(data: GalleryItemCreateInput): Promise<R
         imageUrl: validated.imageUrl,
         type: validated.type,
         order: validated.order,
+        worldId: validated.gameWorldId,  // IMPORTANT: Link to world
         pinId: validated.pinId,
         loreEntryId: validated.loreEntryId,
       },

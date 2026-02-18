@@ -73,14 +73,15 @@ export const MapPinsWrapper = memo(function MapPinsWrapper({
         onContextMenu={onContextMenu}
       >
         {pinsRenderer}
-        {selectedPinId && (
+        {/* SelectedPinPopup temporarily disabled - replaced by PinDetailsModule sidebar */}
+        {/* {selectedPinId && (
           <SelectedPinPopup
             selectedPinId={selectedPinId}
             onClose={onPopupClose}
             imageDimensions={imageDimensions}
             layers={layers}
           />
-        )}
+        )} */}
       </MapImage>
     );
   }
@@ -95,14 +96,15 @@ export const MapPinsWrapper = memo(function MapPinsWrapper({
       }}
     >
       {pinsRenderer}
-      {selectedPinId && (
+      {/* SelectedPinPopup temporarily disabled - replaced by PinDetailsModule sidebar */}
+      {/* {selectedPinId && (
         <SelectedPinPopup
           selectedPinId={selectedPinId}
           onClose={onPopupClose}
           imageDimensions={imageDimensions}
           layers={layers}
         />
-      )}
+      )} */}
     </div>
   );
 });

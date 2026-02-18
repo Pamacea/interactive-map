@@ -13,6 +13,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Test coverage for core features
 - Performance optimizations
 
+## [1.1.3] - 2026-02-18
+
+### Added
+- **Gallery Module**: New floating panel module for image gallery accessible from dock
+- **Pin Details Sidebar**: Replaced popup with floating sidebar panel for pin details
+  - Edit title, description, icon, color, layer
+  - GPS coordinates display
+  - Visibility toggle
+  - Delete functionality
+- **Pin Gallery Integration**: Link/unlink images to pins with two-tab dialog
+  - Gallery tab: Select from all world images
+  - Upload New tab: Direct image upload from pin dialog
+  - Search functionality for finding images
+  - Images can be shared across multiple pins
+
+### Changed
+- Simplified pin drag handler by removing complex inputManager dependency
+- Each pin now handles its own drag events directly with window listeners
+- Improved FloatingPanel content click isolation to prevent unwanted map interactions
+
+### Fixed
+- **Pin Drag & Drop**: Fixed critical issue where pins couldn't be dragged on the map
+- **Pin Position Persistence**: Fixed issue where dragged pins would revert to original position after page reload
+  - Now correctly saves final position to database via server action
+- **Event Listener Closure Issues**: Fixed stale closure problems in drag handler using refs for dynamic values
+- **Gallery Upload**: Fixed missing `worldId` causing uploaded images to not appear in gallery
+- **Button Click Propagation**: Fixed Edit/Add Image buttons deselecting pins due to event bubbling
+
 ## [1.1.2] - 2026-02-18
 
 ### Changed
@@ -66,8 +94,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Authentication system for secure world management
 - Authorization controls for public/private worlds
 
-[Unreleased]: https://github.com/Pamacea/interactive-map/compare/v1.1.2...HEAD
-[1.1.2]: https://github.com/Pamacea/interactive-map/releases/tag/v1.1.2
+[Unreleased]: https://github.com/Pamacea/interactive-map/compare/v1.1.3...HEAD
+[1.1.3]: https://github.com/Pamacea/interactive-map/releases/tag/v1.1.3
+[1.1.2]: https://github.com/Pamacea/interactive-map/compare/v1.1.2...v1.1.3
 [1.1.1]: https://github.com/Pamacea/interactive-map/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/Pamacea/interactive-map/releases/tag/v1.1.0
 [1.0.0]: https://github.com/Pamacea/interactive-map/releases/tag/v1.0.0

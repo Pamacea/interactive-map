@@ -228,7 +228,18 @@ async function processImageImport(
   worldId: string,
   rawData: unknown
 ): Promise<ProcessResult> {
+  // Validate rawData structure
+  if (!rawData || typeof rawData !== 'object') {
+    throw new Error('Invalid image data: rawData is undefined or not an object');
+  }
+
   const data = rawData as { filename?: string; url?: string };
+
+  if (!data.url) {
+    throw new Error('Invalid image data: missing URL');
+  }
+
+  console.log('[processImageImport] Importing image:', { filename: data.filename, hasUrl: !!data.url });
 
   // Get current max zIndex
   const maxLayer = await prisma.mapLayer.findFirst({
@@ -237,6 +248,7 @@ async function processImageImport(
   });
   const nextZIndex = (maxLayer?.zIndex ?? -1) + 1;
 
+  // Create the image layer
   await prisma.mapLayer.create({
     data: {
       worldId,

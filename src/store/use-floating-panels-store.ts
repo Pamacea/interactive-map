@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { Z_INDEX } from "@/constants/z-index";
 
-export type FloatingPanelId = "layers" | "lore" | "characters" | "filters" | "properties" | "members" | "activity" | "comments" | "versions" | "import";
+export type FloatingPanelId = "layers" | "lore" | "gallery" | "characters" | "filters" | "properties" | "members" | "activity" | "comments" | "versions" | "import" | "pin-details";
 
 export interface FloatingPanelState {
   id: FloatingPanelId;
@@ -42,6 +42,13 @@ const DEFAULT_PANELS: Record<FloatingPanelId, Omit<FloatingPanelState, "zIndex">
     id: "lore",
     isVisible: false,
     position: { x: 352, y: 16 },
+    size: { width: 400, height: 550 },
+    isCollapsed: false,
+  },
+  gallery: {
+    id: "gallery",
+    isVisible: false,
+    position: { x: 688, y: 16 },
     size: { width: 400, height: 550 },
     isCollapsed: false,
   },
@@ -101,6 +108,13 @@ const DEFAULT_PANELS: Record<FloatingPanelId, Omit<FloatingPanelState, "zIndex">
     size: { width: 320, height: 400 },
     isCollapsed: false,
   },
+  "pin-details": {
+    id: "pin-details",
+    isVisible: false,
+    position: { x: 1100, y: 16 },
+    size: { width: 380, height: 500 },
+    isCollapsed: false,
+  },
 };
 
 // Helper function to safely get or initialize a panel
@@ -122,6 +136,7 @@ const getOrInitPanel = (
 const createInitialPanels = (): Record<FloatingPanelId, FloatingPanelState> => ({
   layers: { ...DEFAULT_PANELS.layers, zIndex: Z_INDEX.activeFloatingPanel },
   lore: { ...DEFAULT_PANELS.lore, zIndex: Z_INDEX.activeFloatingPanel },
+  gallery: { ...DEFAULT_PANELS.gallery, zIndex: Z_INDEX.activeFloatingPanel },
   characters: { ...DEFAULT_PANELS.characters, zIndex: Z_INDEX.activeFloatingPanel },
   filters: { ...DEFAULT_PANELS.filters, zIndex: Z_INDEX.activeFloatingPanel },
   properties: { ...DEFAULT_PANELS.properties, zIndex: Z_INDEX.activeFloatingPanel },
@@ -130,6 +145,7 @@ const createInitialPanels = (): Record<FloatingPanelId, FloatingPanelState> => (
   comments: { ...DEFAULT_PANELS.comments, zIndex: Z_INDEX.activeFloatingPanel },
   versions: { ...DEFAULT_PANELS.versions, zIndex: Z_INDEX.activeFloatingPanel },
   import: { ...DEFAULT_PANELS.import, zIndex: Z_INDEX.activeFloatingPanel },
+  "pin-details": { ...DEFAULT_PANELS["pin-details"], zIndex: Z_INDEX.activeFloatingPanel },
 });
 
 export const useFloatingPanelsStore = create<FloatingPanelsStore>()(
@@ -257,6 +273,7 @@ export const useFloatingPanelsStore = create<FloatingPanelsStore>()(
 const DEFAULT_PANELS_WITH_ZINDEX: Record<FloatingPanelId, FloatingPanelState> = {
   layers: { ...DEFAULT_PANELS.layers, zIndex: Z_INDEX.activeFloatingPanel },
   lore: { ...DEFAULT_PANELS.lore, zIndex: Z_INDEX.activeFloatingPanel },
+  gallery: { ...DEFAULT_PANELS.gallery, zIndex: Z_INDEX.activeFloatingPanel },
   characters: { ...DEFAULT_PANELS.characters, zIndex: Z_INDEX.activeFloatingPanel },
   filters: { ...DEFAULT_PANELS.filters, zIndex: Z_INDEX.activeFloatingPanel },
   properties: { ...DEFAULT_PANELS.properties, zIndex: Z_INDEX.activeFloatingPanel },
@@ -265,6 +282,7 @@ const DEFAULT_PANELS_WITH_ZINDEX: Record<FloatingPanelId, FloatingPanelState> = 
   comments: { ...DEFAULT_PANELS.comments, zIndex: Z_INDEX.activeFloatingPanel },
   versions: { ...DEFAULT_PANELS.versions, zIndex: Z_INDEX.activeFloatingPanel },
   import: { ...DEFAULT_PANELS.import, zIndex: Z_INDEX.activeFloatingPanel },
+  "pin-details": { ...DEFAULT_PANELS["pin-details"], zIndex: Z_INDEX.activeFloatingPanel },
 };
 
 // Selector hooks for specific panels

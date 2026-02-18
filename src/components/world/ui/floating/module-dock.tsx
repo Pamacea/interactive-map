@@ -13,6 +13,7 @@ import {
   MessageSquare,
   History,
   Upload,
+  Image,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePanelState, useTogglePanel } from "@/store/use-floating-panels-store";
@@ -50,6 +51,7 @@ function DockButton({ id, icon, label, isActive }: DockButtonProps) {
 export const ModuleDock = memo(function ModuleDock() {
   const layersPanel = usePanelState("layers");
   const lorePanel = usePanelState("lore");
+  const galleryPanel = usePanelState("gallery");
   const charactersPanel = usePanelState("characters");
   const filtersPanel = usePanelState("filters");
   const propertiesPanel = usePanelState("properties");
@@ -91,6 +93,12 @@ export const ModuleDock = memo(function ModuleDock() {
             icon={<BookOpen className="w-5 h-5" />}
             label="Lore"
             isActive={lorePanel.isVisible}
+          />
+          <DockButton
+            id="gallery"
+            icon={<Image className="w-5 h-5" />}
+            label="Gallery"
+            isActive={galleryPanel.isVisible}
           />
           <DockButton
             id="characters"
