@@ -18,7 +18,6 @@ import {
   LayersModule,
   LoreModule,
   GalleryModule,
-  PinDetailsModule,
   FiltersModule,
   PropertiesModule,
   MembersModule,
@@ -28,6 +27,7 @@ import {
   VersionsModule,
   ImportModule,
 } from "@/components/world/ui/floating";
+import { PinDetailsSidebar } from "@/components/world/ui/sidebar/pin-details-sidebar";
 import type { OptimizedWorld } from "@/types/world.type";
 import type { Pin } from "@/types/pin.type";
 import type { LoreEntry } from "@/types/lore.type";
@@ -84,7 +84,7 @@ function FloatingUI({ world, pins, currentUserId, worldOwnerId }: {
 
       <GalleryModule worldId={world.id} />
 
-      <PinDetailsModule
+      <PinDetailsSidebar
         worldId={world.id}
         worldLayers={world.layers ?? undefined}
       />

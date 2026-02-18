@@ -101,6 +101,7 @@ model GameWorld {
   layers      MapLayer[]
   loreEntries LoreEntry[]
   collections GalleryCollection[]
+  tags        Tag[]         @relation("WorldTags")
   presences   UserPresence[] @relation("WorldPresences")
   events      CollaborationEvent[] @relation("WorldEvents")
   characters  Character[]    @relation("WorldCharacters")
@@ -265,6 +266,16 @@ enum PinType {
   CUSTOM
 }
 
+enum IconShape {
+  CIRCLE
+  SQUARE
+  TRIANGLE
+  STAR
+  HEXAGON
+  DIAMOND
+  CUSTOM
+}
+
 model Pin {
   id          String              @id @default(cuid())
   title       String
@@ -280,6 +291,11 @@ model Pin {
   minZoom     Int                 @default(0)
   maxZoom     Int                 @default(200)
   properties  Json?               // Custom properties for RPG data (level, faction, etc.)
+  // Enhanced icon customization
+  customIcon  String?             // URL to custom uploaded icon (PNG, WebP, SVG)
+  iconShape   IconShape           @default(CIRCLE) // Shape of the pin marker
+  iconSize    Int                 @default(32) // Custom icon size override (12-64px)
+  iconBackground String?         // URL to custom background image for icon
   userId      String
   user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   gameWorldId String
@@ -290,6 +306,7 @@ model Pin {
   loreLinks   LorePinRelation[]   @relation("PinsToLore")
   characterLinks CharacterPinRelation[] @relation("CharacterPins")
   comments    MapComment[]        @relation("PinComments")
+  tagRelations PinTagRelation[]   @relation("PinTags")
   createdAt   DateTime            @default(now())
   updatedAt   DateTime            @updatedAt
 
@@ -390,6 +407,7 @@ model GalleryItem {
   id            String              @id @default(cuid())
   title         String
   description   String?             @db.Text
+  caption       String?             @db.Text // Display caption/legend for the image
   imageUrl      String
   thumbnailUrl  String?             // Generated thumbnail for videos/images
   type          MediaType           @default(IMAGE)
@@ -593,6 +611,55 @@ model CharacterRelationship {
   @@index([sourceId])
   @@index([targetId])
   @@index([relationshipType])
+}
+
+// ============================================
+// TAGS & REFERENCES (Obsidian-style bi-directional linking)
+// ============================================
+
+model Tag {
+  id          String   @id @default(cuid())
+  name        String   // Tag name (e.g., "#capital", "#forest", "#dangerous")
+  color       String?  @default("#3b82f6") // Tag color for UI
+  icon        String?  // Optional icon identifier
+  description String?  @db.Text // Optional tag description
+  gameWorldId String
+  gameWorld   GameWorld @relation("WorldTags", fields: [gameWorldId], references: [id], onDelete: Cascade)
+  pinRelations PinTagRelation[] @relation("TagPinRelations")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([gameWorldId, name])
+  @@index([gameWorldId])
+}
+
+enum ReferenceType {
+  PIN_TO_PIN       // Related pin (nearby, connected, etc.)
+  PIN_TO_IMAGE     // Associated image/gallery
+  PIN_TO_CHARACTER // NPC/character at this location
+  PIN_TO_REGION    // Map region/area
+  PIN_TO_LORE      // Related lore entry
+  CUSTOM           // Custom reference type
+}
+
+model PinTagRelation {
+  id          String         @id @default(cuid())
+  pinId       String
+  pin         Pin            @relation("PinTags", fields: [pinId], references: [id], onDelete: Cascade)
+  tagId       String?
+  tag         Tag?           @relation("TagPinRelations", fields: [tagId], references: [id], onDelete: SetNull)
+  referenceType ReferenceType @default(CUSTOM) // Type of reference
+  targetId    String?        // ID of the referenced entity (pin, character, image, etc.)
+  targetTitle String?        // Cached title of target for display
+  notes       String?        @db.Text // Optional notes about this reference
+  order       Int            @default(0) // For ordering references
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([pinId])
+  @@index([tagId])
+  @@index([referenceType])
+  @@index([targetId])
 }
 
 // ============================================

@@ -468,3 +468,154 @@ export async function batchUpdatePinPositions(
     return updatedPins;
   }, "batchUpdatePinPositions");
 }
+
+/**
+ * Update pin icon customization (shape, color, custom icon URL, size)
+ * @param pinId - Pin ID to update
+ * @param data - Icon customization data
+ * @returns Result with updated pin or error
+ */
+export async function updatePinIconCustomization(
+  pinId: string,
+  data: {
+    iconShape?: "CIRCLE" | "SQUARE" | "TRIANGLE" | "STAR" | "HEXAGON" | "DIAMOND" | "CUSTOM";
+    color?: string;
+    iconSize?: number;
+    customIcon?: string | null; // URL to custom icon or null to clear
+    iconBackground?: string | null; // URL to custom background or null to clear
+  }
+): Promise<Result<Pin>> {
+  return safeAsync(async () => {
+    // Get authenticated user
+    const user = await getAuthenticatedUser();
+
+    // Verify pin exists and user has permission
+    await verifyPinPermission(pinId, user.id);
+
+    // Validate icon size if provided
+    if (data.iconSize !== undefined) {
+      if (data.iconSize < 12 || data.iconSize > 64) {
+        throw new ValidationError("Icon size must be between 12 and 64 pixels");
+      }
+    }
+
+    // Validate color if provided (hex format)
+    if (data.color !== undefined) {
+      const hexColorRegex = /^#[0-9A-F]{6}$/i;
+      if (!hexColorRegex.test(data.color)) {
+        throw new ValidationError("Color must be a valid hex color (e.g., #3b82f6)");
+      }
+    }
+
+    // Build update data
+    const updateData: Partial<Pin> = {};
+    if (data.iconShape !== undefined) updateData.iconShape = data.iconShape;
+    if (data.color !== undefined) updateData.color = data.color;
+    if (data.iconSize !== undefined) updateData.iconSize = data.iconSize;
+    if (data.customIcon !== undefined) updateData.customIcon = data.customIcon;
+    if (data.iconBackground !== undefined) updateData.iconBackground = data.iconBackground;
+
+    // Update pin
+    const pin = await prisma.pin.update({
+      where: { id: pinId },
+      data: updateData,
+    });
+
+    // Log collaboration event
+    await safeLogCollaborationEvent({
+      worldId: pin.gameWorldId,
+      eventType: CollaborationEventType.PIN_UPDATED,
+      targetId: pinId,
+      targetType: "pin",
+      eventData: { field: "iconCustomization" },
+    });
+
+    return pin;
+  }, "updatePinIconCustomization");
+}
+
+/**
+ * Upload a custom pin icon with optimized size
+ * @param pinId - Pin ID to update
+ * @param formData - FormData containing the icon file
+ * @returns Result with icon URL and updated pin or error
+ */
+export async function uploadCustomPinIcon(
+  pinId: string,
+  formData: FormData
+): Promise<Result<{ iconUrl: string; pin: Pin }>> {
+  return safeAsync(async () => {
+    // Get authenticated user
+    const user = await getAuthenticatedUser();
+
+    // Verify pin exists and user has permission
+    const pin = await verifyPinPermission(pinId, user.id);
+
+    // Get file from formData
+    const file = formData.get("file") as File;
+
+    if (!file) {
+      throw new FileUploadError("No file provided");
+    }
+
+    // Validate file type
+    const validTypes = ["image/svg+xml", "image/png", "image/webp", "image/jpeg"];
+    if (!validTypes.includes(file.type)) {
+      throw new FileUploadError("Invalid file type. Please upload SVG, PNG, WEBP, or JPEG.");
+    }
+
+    // Validate file size (max 2MB for custom icons)
+    const maxSize = 2 * 1024 * 1024; // 2MB
+    if (file.size > maxSize) {
+      throw new FileUploadError("File size must be less than 2MB");
+    }
+
+    // Create pins/custom-icons directory
+    const { writeFile, mkdir } = await import("fs/promises");
+    const path = await import("path");
+    const uploadsDir = path.default.join(process.cwd(), "public", "uploads", "pins", "custom-icons");
+
+    try {
+      await mkdir(uploadsDir, { recursive: true });
+    } catch {
+      // Directory might already exist
+    }
+
+    // Generate unique filename
+    const timestamp = Date.now();
+    const randomId = Math.random().toString(36).substring(2, 15);
+    const ext = path.default.extname(file.name);
+    const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+    const fileName = `${timestamp}-${randomId}${ext}`;
+    const filePath = path.default.join(uploadsDir, fileName);
+
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    await writeFile(filePath, buffer);
+
+    const iconPath = `/uploads/pins/custom-icons/${fileName}`;
+
+    // Update pin with custom icon
+    const updatedPin = await prisma.pin.update({
+      where: { id: pinId },
+      data: {
+        customIcon: iconPath,
+        iconShape: "CUSTOM",
+      },
+    });
+
+    // Log collaboration event
+    await safeLogCollaborationEvent({
+      worldId: pin.gameWorldId,
+      eventType: CollaborationEventType.PIN_UPDATED,
+      targetId: pinId,
+      targetType: "pin",
+      eventData: { field: "customIcon" },
+    });
+
+    return {
+      iconUrl: iconPath,
+      pin: updatedPin,
+    };
+  }, "uploadCustomPinIcon");
+}

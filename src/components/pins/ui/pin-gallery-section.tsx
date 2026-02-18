@@ -131,6 +131,17 @@ export function PinGallerySection({
     }
   };
 
+  const handleCaptionUpdate = async (imageId: string, caption: string) => {
+    try {
+      const { updateGalleryItemCaption } = await import("@/actions/gallery");
+      await updateGalleryItemCaption(imageId, caption);
+      // Refetch images to show updated caption
+      onImageLinked?.(linkedImages.find(img => img.id === imageId)!);
+    } catch (error) {
+      console.error("Failed to update caption:", error);
+    }
+  };
+
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
@@ -279,7 +290,7 @@ export function PinGallerySection({
         </Dialog>
       </div>
 
-      {/* Linked images grid */}
+      {/* Linked images grid with captions */}
       {linkedImages.length === 0 ? (
         <div
           className="rounded-sm p-4 -mx-4 text-center border border-dashed border-border-subtle hover:border-accent-gold/50 transition-colors cursor-pointer"
@@ -294,39 +305,13 @@ export function PinGallerySection({
       ) : (
         <div className="grid grid-cols-3 gap-2">
           {linkedImages.map((image) => (
-            <div
+            <GalleryImageCard
               key={image.id}
-              className="relative aspect-square rounded-sm overflow-hidden border border-border-subtle group"
-            >
-              <Image
-                src={image.imageUrl}
-                alt={image.title}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 33vw"
-              />
-              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-8 w-8 text-white hover:text-red-500"
-                  onClick={() => handleUnlinkImage(image.id)}
-                  disabled={unlinkingImageId === image.id}
-                  title="Unlink image"
-                >
-                  {unlinkingImageId === image.id ? (
-                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-sm animate-spin" />
-                  ) : (
-                    <X className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-              <div className="absolute bottom-0 left-0 right-0 p-1.5 bg-gradient-to-t from-black/80 to-transparent">
-                <p className="text-white text-xs font-medium truncate">
-                  {image.title}
-                </p>
-              </div>
-            </div>
+              image={image}
+              onUnlink={() => handleUnlinkImage(image.id)}
+              isUnlinking={unlinkingImageId === image.id}
+              onCaptionUpdate={(caption) => handleCaptionUpdate(image.id, caption)}
+            />
           ))}
         </div>
       )}
@@ -336,6 +321,136 @@ export function PinGallerySection({
         <div className="flex items-center justify-between text-xs text-text-muted pt-1">
           <span>{linkedImages.length} image{linkedImages.length > 1 ? "s" : ""} linked</span>
         </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Gallery Image Card with Caption Support
+ * Shows image with editable caption overlay
+ */
+interface GalleryImageCardProps {
+  image: GalleryItemWithRelations & { caption?: string | null };
+  onUnlink: () => void;
+  isUnlinking: boolean;
+  onCaptionUpdate: (caption: string) => void;
+}
+
+function GalleryImageCard({ image, onUnlink, isUnlinking, onCaptionUpdate }: GalleryImageCardProps) {
+  const [isEditingCaption, setIsEditingCaption] = React.useState(false);
+  const [editedCaption, setEditedCaption] = React.useState(image.caption || "");
+  const [showFullCaption, setShowFullCaption] = React.useState(false);
+  const captionInputRef = React.useRef<HTMLInputElement>(null);
+
+  // Caption text to display
+  const displayCaption = image.caption || image.title;
+
+  // Check if caption is long (more than 2 lines approximately)
+  const isLongCaption = displayCaption.length > 30;
+
+  React.useEffect(() => {
+    if (isEditingCaption) {
+      captionInputRef.current?.focus();
+      captionInputRef.current?.select();
+    }
+  }, [isEditingCaption]);
+
+  const handleSaveCaption = () => {
+    onCaptionUpdate(editedCaption);
+    setIsEditingCaption(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSaveCaption();
+    } else if (e.key === "Escape") {
+      setEditedCaption(image.caption || "");
+      setIsEditingCaption(false);
+    }
+  };
+
+  return (
+    <div
+      className="relative aspect-square rounded-sm overflow-hidden border border-border-subtle group"
+      onMouseEnter={() => isLongCaption && setShowFullCaption(true)}
+      onMouseLeave={() => setShowFullCaption(false)}
+    >
+      {/* Image */}
+      <Image
+        src={image.imageUrl}
+        alt={image.title}
+        fill
+        className="object-cover"
+        sizes="(max-width: 768px) 100vw, 33vw"
+      />
+
+      {/* Hover overlay with actions */}
+      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+        <Button
+          size="icon"
+          variant="ghost"
+          className="h-8 w-8 text-white hover:text-accent-gold"
+          onClick={() => setIsEditingCaption(true)}
+          title="Edit caption"
+        >
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+        </Button>
+        <Button
+          size="icon"
+          variant="ghost"
+          className="h-8 w-8 text-white hover:text-red-500"
+          onClick={onUnlink}
+          disabled={isUnlinking}
+          title="Unlink image"
+        >
+          {isUnlinking ? (
+            <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-sm animate-spin" />
+          ) : (
+            <X className="h-4 w-4" />
+          )}
+        </Button>
+      </div>
+
+      {/* Caption bar */}
+      {isEditingCaption ? (
+        <div className="absolute bottom-0 left-0 right-0 p-2 bg-obsidian/95 backdrop-blur-sm">
+          <input
+            ref={captionInputRef}
+            type="text"
+            value={editedCaption}
+            onChange={(e) => setEditedCaption(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={handleSaveCaption}
+            className="w-full bg-background-input border border-accent-gold rounded px-2 py-1 text-xs text-text-primary placeholder:text-text-muted"
+            placeholder="Add a caption..."
+            maxLength={100}
+          />
+        </div>
+      ) : (
+        <div
+          className={cn(
+            "absolute bottom-0 left-0 right-0 p-1.5 bg-gradient-to-t from-black/90 via-black/60 to-transparent transition-all",
+            showFullCaption && "group-hover:from-black/95"
+          )}
+        >
+          <p
+            className={cn(
+              "text-white text-xs font-medium",
+              !showFullCaption && isLongCaption && "truncate"
+            )}
+          >
+            {displayCaption}
+          </p>
+        </div>
+      )}
+
+      {/* Caption indicator dot */}
+      {image.caption && (
+        <div className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-accent-gold" />
       )}
     </div>
   );

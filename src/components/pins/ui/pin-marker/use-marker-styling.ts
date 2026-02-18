@@ -57,7 +57,7 @@ export function useMarkerStyling({
       return "0 8px 20px rgba(0, 0, 0, 0.6)";
     }
     if (isPinSelected) {
-      return "0 0 0 4px rgba(59, 130, 246, 0.3), 0 4px 12px rgba(0, 0, 0, 0.5)";
+      return "0 4px 12px rgba(0, 0, 0, 0.5)";
     }
     if (isHovered) {
       return "0 4px 12px rgba(0, 0, 0, 0.5)";

@@ -80,6 +80,11 @@ export interface Pin {
   userId: string;
   gameWorldId: string;
   layerId: string | null;
+  // Enhanced icon customization
+  customIcon: string | null; // URL to custom uploaded icon (PNG, WebP, SVG)
+  iconShape: import("@prisma/client").IconShape | null; // Shape of the pin marker
+  iconSize: number | null; // Custom icon size override (12-64px)
+  iconBackground: string | null; // URL to custom background image for icon
   createdAt: Date;
   updatedAt: Date;
 }

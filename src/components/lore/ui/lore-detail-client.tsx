@@ -118,7 +118,7 @@ export function LoreDetailClient({
   if (showPrintView) {
     return (
       <div className="print:max-w-none print:p-8 print:text-black">
-        <div className="max-w-4xl mx-auto p-6 bg-white text-black">
+        <div className="max-w-2/3 mx-auto p-6 bg-white text-black">
           <div className="flex justify-between items-center mb-6 print:hidden">
             <button
               onClick={() => setShowPrintView(false)}
@@ -154,7 +154,7 @@ export function LoreDetailClient({
     <div className="min-h-screen bg-[var(--color-background-base)]">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-obsidian/80 border-b border-[var(--color-border-subtle)]">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="max-w-2/3 mx-auto px-4 py-4 flex items-center justify-between">
           <Link
             href={`/world/${world.id}`}
             className="flex items-center gap-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
@@ -198,7 +198,7 @@ export function LoreDetailClient({
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-4 py-8 flex gap-8">
+      <div className="max-w-2/3 mx-auto px-4 py-8 flex gap-8">
         {/* Main Content */}
         <main className="flex-1 min-w-0">
           {/* Title */}

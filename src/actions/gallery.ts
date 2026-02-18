@@ -981,3 +981,35 @@ export async function getGalleryItemsByWorldWithDirect(gameWorldId: string) {
     return [];
   }
 }
+
+/**
+ * Update gallery item caption/legend
+ * @param itemId - Gallery item ID
+ * @param caption - New caption text
+ * @returns Result with updated item or error
+ */
+export async function updateGalleryItemCaption(
+  itemId: string,
+  caption: string | null
+): Promise<Result<GalleryItem>> {
+  return safeAsync(async () => {
+    const user = await getAuthenticatedUser();
+
+    // Verify permission
+    const item = await verifyGalleryPermission(itemId, user.id);
+
+    // Update caption
+    const updated = await prisma.galleryItem.update({
+      where: { id: itemId },
+      data: { caption },
+    });
+
+    // Revalidate if needed
+    const worldId = item.pin?.gameWorldId || item.loreEntry?.gameWorldId || item.worldId;
+    if (worldId) {
+      revalidatePath(`/world/${worldId}`);
+    }
+
+    return updated;
+  }, "updateGalleryItemCaption");
+}

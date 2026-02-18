@@ -4,7 +4,6 @@ export { FloatingHeader } from "./floating-header";
 export { LayersModule } from "./layers-module";
 export { LoreModule } from "./lore-module";
 export { GalleryModule } from "./gallery-module";
-export { PinDetailsModule } from "./pin-details-module";
 export { CharactersModule } from "./characters-module";
 export { FiltersModule } from "./filters-module";
 export { PropertiesModule } from "./properties-module";

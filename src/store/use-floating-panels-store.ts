@@ -307,3 +307,6 @@ export const useHidePanel = () =>
 
 export const useBringToFront = () =>
   useFloatingPanelsStore((state) => state.bringToFront);
+
+export const useToggleCollapse = () =>
+  useFloatingPanelsStore((state) => state.toggleCollapse);

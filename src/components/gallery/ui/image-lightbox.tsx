@@ -101,7 +101,7 @@ export function ImageLightbox({
 
           {/* Info panel */}
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-6">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-2/3 mx-auto">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <h2 className="text-2xl font-display font-bold text-white mb-2">

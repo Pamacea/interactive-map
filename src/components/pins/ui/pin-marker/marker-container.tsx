@@ -1,6 +1,17 @@
 import { memo } from "react";
 import { MarkerIcon } from "./marker-icon";
-import { MarkerSelectionRing } from "./marker-selection-ring";
+import type { IconShape } from "@prisma/client";
+
+// Shape definitions with CSS clip-path
+const ICON_SHAPES: Record<IconShape, string> = {
+  CIRCLE: "circle(50%)",
+  SQUARE: "inset(0%)",
+  TRIANGLE: "polygon(50% 0%, 0% 100%, 100% 100%)",
+  STAR: "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)",
+  HEXAGON: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
+  DIAMOND: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
+  CUSTOM: "none",
+};
 
 interface MarkerContainerProps {
   /** Position X in pixels */
@@ -35,6 +46,12 @@ interface MarkerContainerProps {
   isDragging: boolean;
   /** Pin ID for drag detection */
   pinId?: string;
+  /** Icon shape (circle, square, triangle, star, hexagon, diamond, custom) */
+  iconShape?: IconShape | null;
+  /** Custom icon URL (uploaded image) */
+  customIcon?: string | null;
+  /** Custom icon background URL (uploaded image) */
+  iconBackground?: string | null;
   /** Click handler */
   onClick: (e: React.MouseEvent) => void;
   /** Mouse down handler */
@@ -98,6 +115,9 @@ export const MarkerContainer = memo(function MarkerContainer({
   isLayerLocked,
   isDragging,
   pinId,
+  iconShape,
+  customIcon,
+  iconBackground,
   onClick,
   onMouseDown,
   onMouseEnter,
@@ -112,6 +132,13 @@ export const MarkerContainer = memo(function MarkerContainer({
   // Visual feedback for locked state
   const lockedOpacity = isLayerLocked ? 0.5 : opacity;
   const lockedFilter = isLayerLocked ? "grayscale(100%)" : "none";
+
+  // Get clip path for shape
+  const shape = iconShape ?? "CIRCLE";
+  const clipPath = ICON_SHAPES[shape] ?? ICON_SHAPES.CIRCLE;
+
+  // Determine if we should use custom uploaded icon
+  const hasCustomIcon = customIcon && customIcon.trim() !== "";
 
   return (
     <div
@@ -140,31 +167,63 @@ export const MarkerContainer = memo(function MarkerContainer({
         }
       }}
     >
-      {/* Selection ring indicator */}
-      <MarkerSelectionRing isSelected={isSelected} pinSize={size} />
-
       {/* Main marker */}
-      <div
-        className="flex items-center justify-center transition-all duration-150 overflow-hidden"
-        style={{
-          width: `${size}px`,
-          height: `${size}px`,
-          backgroundColor: isCustomImage ? "transparent" : color,
-          borderRadius: "var(--radius-sm)",
-          opacity: lockedOpacity,
-          boxShadow,
-          transform: transformScale,
-          filter: lockedFilter,
-        }}
-        aria-hidden="true"
-      >
-        <MarkerIcon
-          iconName={iconName}
-          title={title}
-          iconSize={iconSize}
-          isCustomImage={isCustomImage}
+      {hasCustomIcon ? (
+        // Custom uploaded icon
+        /* eslint-disable-next-line @next/next/no-img-element */
+        <img
+          src={customIcon}
+          alt={title || 'Pin'}
+          className="transition-all duration-150"
+          style={{
+            width: `${size}px`,
+            height: `${size}px`,
+            objectFit: "contain",
+            opacity: lockedOpacity,
+            boxShadow,
+            transform: transformScale,
+            filter: lockedFilter,
+          }}
+          aria-hidden="true"
         />
-      </div>
+      ) : (
+        // Standard marker with shape and icon
+        <div
+          className="flex items-center justify-center transition-all duration-150 overflow-hidden relative"
+          style={{
+            width: `${size}px`,
+            height: `${size}px`,
+            backgroundColor: iconBackground ? "transparent" : color,
+            clipPath: clipPath === "none" ? undefined : clipPath,
+            opacity: lockedOpacity,
+            boxShadow,
+            transform: transformScale,
+            filter: lockedFilter,
+          }}
+          aria-hidden="true"
+        >
+          {/* Custom background image if provided - fully covers the color background */}
+          {iconBackground && (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={iconBackground}
+              alt="Background"
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{
+                clipPath: clipPath === "none" ? undefined : clipPath,
+                zIndex: 0,
+              }}
+            />
+          )}
+          <MarkerIcon
+            iconName={iconName}
+            title={title}
+            iconSize={iconSize}
+            isCustomImage={isCustomImage}
+            color="white"
+          />
+        </div>
+      )}
     </div>
   );
 });

@@ -163,6 +163,9 @@ export function PinMarker({
       isLayerLocked={isLayerLocked}
       isDragging={isDragging}
       pinId={pin.id}
+      iconShape={(latestPin || pin).iconShape}
+      customIcon={(latestPin || pin).customIcon}
+      iconBackground={(latestPin || pin).iconBackground}
       onClick={handleClick}
       onMouseDown={handleMouseDown}
       onMouseEnter={handleMouseEnter}

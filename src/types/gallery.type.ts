@@ -17,6 +17,7 @@ export type GalleryItemWithRelations = GalleryItem & {
     id: string;
     title: string;
   } | null;
+  caption?: string | null; // Display caption/legend
 };
 
 // Create input

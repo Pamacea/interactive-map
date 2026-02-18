@@ -3,7 +3,7 @@ import Link from "next/link";
 export function Footer() {
   return (
     <footer className="py-12 sm:py-16 px-6 bg-obsidian border-t border-iron">
-      <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+      <div className="max-w-2/3 mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
         <div className="flex flex-col gap-2 text-center md:text-left">
           <span className="text-xl font-display-ornate font-bold text-gradient tracking-wider">
             GENESIS
