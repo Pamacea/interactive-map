@@ -1,0 +1,384 @@
+/**
+ * Layer Selectors - Optimized selectors for layer data
+ *
+ * Provides memoized selectors for common layer queries.
+ * Use these to avoid unnecessary re-renders when accessing layer data.
+ */
+
+import type { MapLayer, OptimizedWorldLayer } from "@/types/world.type";
+
+// ============================================================================
+// Types
+// ============================================================================
+
+export interface UILayer {
+  id: string;
+  name: string;
+  visible: boolean;
+  locked: boolean;
+  opacity: number;
+  zIndex: number;
+  scale: number;
+  offsetX: number;
+  offsetY: number;
+  minZoom?: number;
+  maxZoom?: number;
+  imageUrl?: string | null;
+}
+
+// ============================================================================
+// Basic Selectors
+// ============================================================================
+
+/**
+ * Get all layers (identity selector)
+ */
+export const selectAllLayers = <T extends UILayer | MapLayer | OptimizedWorldLayer>(
+  layers: T[]
+): T[] => layers;
+
+/**
+ * Get layer by ID
+ */
+export const selectLayerById = <T extends UILayer | MapLayer | OptimizedWorldLayer>(
+  layers: T[],
+  layerId: string
+): T | undefined =>
+  layers.find((layer) => layer.id === layerId);
+
+/**
+ * Get visible layers
+ */
+export const selectVisibleLayers = <T extends UILayer | MapLayer | OptimizedWorldLayer>(
+  layers: T[]
+): T[] =>
+  layers.filter((layer) => ("isVisible" in layer ? layer.isVisible : layer.visible));
+
+/**
+ * Get hidden layers
+ */
+export const selectHiddenLayers = <T extends UILayer | MapLayer | OptimizedWorldLayer>(
+  layers: T[]
+): T[] =>
+  layers.filter((layer) => !("isVisible" in layer ? layer.isVisible : layer.visible));
+
+/**
+ * Get locked layers
+ */
+export const selectLockedLayers = <T extends UILayer | MapLayer>(
+  layers: T[]
+): T[] =>
+  layers.filter((layer) => layer.locked);
+
+/**
+ * Get unlocked layers
+ */
+export const selectUnlockedLayers = <T extends UILayer | MapLayer>(
+  layers: T[]
+): T[] =>
+  layers.filter((layer) => !layer.locked);
+
+/**
+ * Get base map layer (if exists)
+ */
+export const selectBaseMapLayer = <T extends UILayer | MapLayer | OptimizedWorldLayer>(
+  layers: T[]
+): T | undefined =>
+  layers.find((layer) => "isBaseMap" in layer && layer.isBaseMap);
+
+// ============================================================================
+// Ordering Selectors
+// ============================================================================
+
+/**
+ * Get layers sorted by z-index (ascending - bottom to top)
+ */
+export const selectLayersSortedByZIndex = <T extends UILayer | MapLayer | OptimizedWorldLayer>(
+  layers: T[]
+): T[] =>
+  [...layers].sort((a, b) => {
+    const aZ = a.zIndex ?? 0;
+    const bZ = b.zIndex ?? 0;
+    return aZ - bZ;
+  });
+
+/**
+ * Get layers sorted by z-index (descending - top to bottom)
+ */
+export const selectLayersSortedByZIndexDesc = <T extends UILayer | MapLayer | OptimizedWorldLayer>(
+  layers: T[]
+): T[] =>
+  [...layers].sort((a, b) => {
+    const aZ = a.zIndex ?? 0;
+    const bZ = b.zIndex ?? 0;
+    return bZ - aZ;
+  });
+
+/**
+ * Get layers sorted by name alphabetically
+ */
+export const selectLayersSortedByName = <T extends UILayer | MapLayer | OptimizedWorldLayer>(
+  layers: T[]
+): T[] =>
+  [...layers].sort((a, b) => a.name.localeCompare(b.name));
+
+// ============================================================================
+// Layer IDs Selectors
+// ============================================================================
+
+/**
+ * Get all layer IDs
+ */
+export const selectLayerIds = (layers: UILayer[] | MapLayer[] | OptimizedWorldLayer[]): string[] =>
+  layers.map((layer) => layer.id);
+
+/**
+ * Get visible layer IDs
+ */
+export const selectVisibleLayerIds = (layers: UILayer[] | MapLayer[]): string[] =>
+  layers
+    .filter((layer) => ("isVisible" in layer ? layer.isVisible : layer.visible))
+    .map((layer) => layer.id);
+
+/**
+ * Get unlocked/active layer IDs (for editing)
+ */
+export const selectActiveLayerIds = (layers: UILayer[] | MapLayer[]): string[] =>
+  layers.filter((layer) => !layer.locked).map((layer) => layer.id);
+
+// ============================================================================
+// State Selectors
+// ============================================================================
+
+/**
+ * Check if base map is visible
+ */
+export const selectIsBaseMapVisible = (
+  layers: UILayer[] | MapLayer[]
+): boolean => {
+  const baseMap = selectBaseMapLayer(layers);
+  if (!baseMap) return true; // Default to visible if no base map
+  return "isVisible" in baseMap ? baseMap.isVisible : baseMap.visible;
+};
+
+/**
+ * Get layer opacity (normalized 0-1)
+ */
+export const selectLayerOpacity = (
+  layers: UILayer[] | MapLayer[],
+  layerId: string
+): number => {
+  const layer = selectLayerById(layers, layerId);
+  return layer?.opacity ?? 1;
+};
+
+/**
+ * Get layer scale
+ */
+export const selectLayerScale = (
+  layers: UILayer[] | MapLayer[],
+  layerId: string
+): number => {
+  const layer = selectLayerById(layers, layerId);
+  return "scale" in layer ? layer.scale ?? 1 : 1;
+};
+
+/**
+ * Get layer position offset
+ */
+export const selectLayerOffset = (
+  layers: UILayer[] | MapLayer[],
+  layerId: string
+): { offsetX: number; offsetY: number } => {
+  const layer = selectLayerById(layers, layerId);
+  return {
+    offsetX: "offsetX" in layer ? layer.offsetX ?? 0 : 0,
+    offsetY: "offsetY" in layer ? layer.offsetY ?? 0 : 0,
+  };
+};
+
+// ============================================================================
+// Zoom-based Selectors
+// ============================================================================
+
+/**
+ * Get layers visible at current zoom level
+ */
+export const selectLayersAtZoom = <T extends UILayer | MapLayer>(
+  layers: T[],
+  currentZoom: number
+): T[] =>
+  layers.filter((layer) => {
+    const minZoom = ("minZoom" in layer ? layer.minZoom : undefined) ?? 0;
+    const maxZoom = ("maxZoom" in layer ? layer.maxZoom : undefined) ?? 200;
+    return currentZoom >= minZoom && currentZoom <= maxZoom;
+  });
+
+/**
+ * Get layer visibility at zoom level
+ */
+export const selectIsLayerVisibleAtZoom = <T extends UILayer | MapLayer>(
+  layers: T[],
+  layerId: string,
+  currentZoom: number
+): boolean => {
+  const layer = selectLayerById(layers, layerId);
+  if (!layer) return false;
+
+  // Check visible flag
+  if (!("isVisible" in layer ? layer.isVisible : layer.visible)) return false;
+
+  // Check zoom range
+  const minZoom = ("minZoom" in layer ? layer.minZoom : undefined) ?? 0;
+  const maxZoom = ("maxZoom" in layer ? layer.maxZoom : undefined) ?? 200;
+  return currentZoom >= minZoom && currentZoom <= maxZoom;
+};
+
+// ============================================================================
+// Transform Selectors
+// ============================================================================
+
+/**
+ * Get layer transform CSS string
+ */
+export const selectLayerTransform = (
+  layers: UILayer[] | MapLayer[],
+  layerId: string
+): string => {
+  const layer = selectLayerById(layers, layerId);
+  if (!layer || !("scale" in layer)) return "";
+
+  const { scale = 1, offsetX = 0, offsetY = 0 } = layer;
+  return `scale(${scale}) translate(${offsetX}px, ${offsetY}px)`;
+};
+
+/**
+ * Get layer style object (for React style prop)
+ */
+export const selectLayerStyle = (
+  layers: UILayer[] | MapLayer[],
+  layerId: string
+): React.CSSProperties => {
+  const layer = selectLayerById(layers, layerId);
+  if (!layer) return {};
+
+  const opacity = layer.opacity ?? 1;
+  const zIndex = layer.zIndex ?? 0;
+  const style: React.CSSProperties = {
+    opacity,
+    zIndex,
+  };
+
+  if ("scale" in layer) {
+    style.transform = `scale(${layer.scale ?? 1}) translate(${layer.offsetX ?? 0}px, ${layer.offsetY ?? 0}px)`;
+  }
+
+  return style;
+};
+
+// ============================================================================
+// Data Transformation Selectors
+// ============================================================================
+
+/**
+ * Transform OptimizedWorldLayer to UILayer
+ */
+export const selectUILayersFromWorldLayers = (
+  worldLayers: OptimizedWorldLayer[]
+): UILayer[] => {
+  return worldLayers.map((layer) => ({
+    id: layer.id,
+    name: layer.name,
+    visible: layer.isVisible,
+    locked: false,
+    opacity: layer.opacity,
+    zIndex: layer.zIndex,
+    scale: layer.scale ?? 1.0,
+    offsetX: layer.offsetX ?? 0,
+    offsetY: layer.offsetY ?? 0,
+    minZoom: layer.minZoom,
+    maxZoom: layer.maxZoom,
+    imageUrl: layer.imageUrl,
+  }));
+};
+
+/**
+ * Get layers with computed properties
+ */
+export const selectLayersWithComputedProps = <T extends UILayer | MapLayer>(
+  layers: T[]
+): Array<T & {
+  isBaseMap: boolean;
+  isVisible: boolean;
+  canEdit: boolean;
+}> => {
+  return layers.map((layer) => ({
+    ...layer,
+    isBaseMap: "isBaseMap" in layer && layer.isBaseMap,
+    isVisible: "isVisible" in layer ? layer.isVisible : layer.visible,
+    canEdit: !layer.locked,
+  }));
+};
+
+// ============================================================================
+// Utility Selectors
+// ============================================================================
+
+/**
+ * Count visible layers
+ */
+export const selectVisibleLayerCount = (layers: UILayer[] | MapLayer[]): number =>
+  layers.filter((layer) => ("isVisible" in layer ? layer.isVisible : layer.visible)).length;
+
+/**
+ * Count locked layers
+ */
+export const selectLockedLayerCount = (layers: UILayer[] | MapLayer[]): number =>
+  layers.filter((layer) => layer.locked).length;
+
+/**
+ * Get max z-index value
+ */
+export const selectMaxZIndex = (layers: UILayer[] | MapLayer[] | OptimizedWorldLayer[]): number =>
+  Math.max(...layers.map((layer) => layer.zIndex ?? 0), 0);
+
+/**
+ * Get next available z-index
+ */
+export const selectNextZIndex = (layers: UILayer[] | MapLayer[] | OptimizedWorldLayer[]): number =>
+  selectMaxZIndex(layers) + 1;
+
+/**
+ * Check if any layer has an image URL
+ */
+export const selectHasLayerImages = (layers: Array<UILayer | MapLayer | OptimizedWorldLayer>): boolean =>
+  layers.some((layer) => "imageUrl" in layer && !!layer.imageUrl);
+
+// ============================================================================
+// Batch Selectors (for multiple properties)
+// ============================================================================
+
+/**
+ * Get layer state summary
+ */
+export const selectLayerStateSummary = (layers: UILayer[] | MapLayer[]) => {
+  return {
+    total: layers.length,
+    visible: selectVisibleLayerCount(layers),
+    locked: selectLockedLayerCount(layers),
+    hasBaseMap: !!selectBaseMapLayer(layers),
+    baseMapVisible: selectIsBaseMapVisible(layers),
+    maxZIndex: selectMaxZIndex(layers),
+  };
+};
+
+/**
+ * Get layers filtered for UI display (exclude base map, sort by z-index)
+ */
+export const selectDisplayLayers = <T extends UILayer | MapLayer | OptimizedWorldLayer>(
+  layers: T[]
+): T[] => {
+  return selectLayersSortedByZIndex(
+    layers.filter((layer) => !("isBaseMap" in layer && layer.isBaseMap))
+  );
+};

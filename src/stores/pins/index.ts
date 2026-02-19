@@ -15,10 +15,13 @@
 export {
   usePinsUIStore,
   useSelectedPinId,
+  useSelectedPinIds,
   useIsCreatingPin,
   useIsEditingPin,
   useHoverPinId,
   useSelectPin,
+  useTogglePinSelection,
+  useSetMultiplePinSelection,
   useClearSelection,
   useStartCreating,
   useStopCreating,

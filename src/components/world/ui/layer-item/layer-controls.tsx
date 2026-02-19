@@ -82,6 +82,7 @@ export function LayerControls({
         className="w-16 h-1 bg-background-base rounded-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent-gold/50 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:rounded-sm [&::-webkit-slider-thumb]:bg-accent-gold"
         title={`Opacity: ${Math.round(layer.opacity * 100)}%`}
         aria-label={`Layer ${layer.name} opacity: ${Math.round(layer.opacity * 100)}%`}
+        data-no-shortcut="true"
       />
 
       {/* Visibility Toggle */}

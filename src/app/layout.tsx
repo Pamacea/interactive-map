@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Layout } from "@/components/@config/Layout";
+import { GlobalErrorHandler } from "@/components/@config/error-handler";
 import { siteConfig } from "@/config/site";
 import { WebSiteSchema, OrganizationSchema } from "@/shared/components/seo";
 
@@ -65,6 +66,7 @@ export default function RootLayout({
         <OrganizationSchema />
       </head>
       <body className={inter.className} suppressHydrationWarning>
+        <GlobalErrorHandler />
         {/* Skip Link for Keyboard Navigation */}
         <a
           href="#main-content"

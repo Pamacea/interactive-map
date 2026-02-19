@@ -10,6 +10,7 @@ import { useSelectedPinId } from "@/stores/use-pins-store";
 
 interface MapPinsWrapperProps {
   baseMapVisible: boolean;
+  baseMapOpacity?: number;
   visiblePins: PinWithLayer[];
   selectedPin: PinWithLayer | null;
   imageDimensions: { width: number; height: number } | null;
@@ -28,6 +29,7 @@ interface MapPinsWrapperProps {
 
 export const MapPinsWrapper = memo(function MapPinsWrapper({
   baseMapVisible,
+  baseMapOpacity = 1,
   visiblePins,
   selectedPin,
   imageDimensions,
@@ -68,6 +70,7 @@ export const MapPinsWrapper = memo(function MapPinsWrapper({
         showGrid={showGrid}
         gridSize={gridSize}
         layerScale={layerScale}
+        opacity={baseMapOpacity}
         onLoad={onImageLoad}
         onError={onImageError}
         onContextMenu={onContextMenu}

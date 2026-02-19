@@ -1,5 +1,4 @@
-import { useMemo } from "react";
-import { useMapStore } from "@/stores/map-store";
+import { useMemo, useEffect } from "react";
 import { usePins } from "@/stores/pins/use-pins-data-store";
 import { useCreatePin } from "@/stores/pins/use-pins-data-store";
 import { useSelectedPin } from "@/stores/use-pins-store";
@@ -8,6 +7,7 @@ import { useClearSelection } from "@/stores/pins/use-pins-ui-store";
 import { useStopCreating } from "@/stores/pins/use-pins-ui-store";
 import { useStartCreating } from "@/stores/pins/use-pins-ui-store";
 import { useSelectPin } from "@/stores/use-pins-store";
+import { useMapStore } from "@/stores/map-store";
 import { useMapPan } from "./use-map-pan";
 import { useMapZoom } from "./use-map-zoom";
 import { useMapImage } from "./use-map-image";
@@ -15,6 +15,8 @@ import { useMapInteractions } from "./use-map-interactions";
 import { useMapHandlers } from "./use-map-handlers";
 import { useMapWheel } from "./use-map-wheel";
 import { usePinsFiltering } from "./use-pins-filtering";
+import { useToolsManager } from "./tools/use-tools-manager";
+import { useRegionsInMap } from "./use-regions-in-map";
 import type { Transform } from "./use-map-pan";
 
 const GRID_SIZE = 40;
@@ -54,6 +56,8 @@ export interface MapEventsResult {
   isCreatingPin: boolean;
   // Event handlers
   handleMouseDown: (e: React.MouseEvent) => void;
+  handleMouseMove: (e: React.MouseEvent) => void;
+  handleMouseUp: (e: React.MouseEvent) => void;
   handleZoomIn: () => void;
   handleZoomOut: () => void;
   resetTransform: () => void;
@@ -70,6 +74,8 @@ export interface MapEventsResult {
   handlePopupClose: () => void;
   handleImageLoad: () => void;
   handleImageError: () => void;
+  handleKeyDown: (e: KeyboardEvent) => void;
+  handleKeyUp: (e: KeyboardEvent) => void;
   // Context menu
   contextMenu: { position: { x: number; y: number }; coordinates: { lat: number; lng: number } } | null;
   closeContextMenu: () => void;
@@ -78,6 +84,8 @@ export interface MapEventsResult {
   getGridSize: () => number;
   layerScale: number;
   centerOnPin: (pinId: string) => void;
+  // Tool cursor
+  toolCursor: string;
 }
 
 /**
@@ -91,8 +99,8 @@ export function useMapEvents(options: UseMapEventsOptions): MapEventsResult {
     containerRef,
     layers,
     selectedLayerId,
-    baseMapVisible,
-    grid,
+    baseMapVisible: _baseMapVisible,
+    grid: _grid,
     scale,
   } = options;
 
@@ -107,12 +115,12 @@ export function useMapEvents(options: UseMapEventsOptions): MapEventsResult {
   const clearSelection = useClearSelection();
   const stopCreating = useStopCreating();
   const startCreating = useStartCreating();
+  const activeLayerId = useMapStore((state) => state.activeLayerId);
 
   // Pan and zoom
   const {
     transform,
     isDragging,
-    handleMouseDown,
     reset: resetTransform,
     setTransform,
     centerToPin,
@@ -136,12 +144,10 @@ export function useMapEvents(options: UseMapEventsOptions): MapEventsResult {
   // Pin filtering
   const { visiblePins } = usePinsFiltering({ pins, layers, transform });
 
-  // Map interactions
+  // Map interactions (for context menu)
   const {
     contextMenu,
     closeContextMenu,
-    handleClick,
-    handleContextMenu,
     handleSelectPinType,
   } = useMapInteractions({
     worldId,
@@ -153,7 +159,7 @@ export function useMapEvents(options: UseMapEventsOptions): MapEventsResult {
     onCreatePin: (data) => {
       createPin({
         ...data,
-        layerId: selectedLayerId || undefined,
+        layerId: activeLayerId || undefined,
       });
     },
     onCloseContextMenu: () => {},
@@ -170,6 +176,46 @@ export function useMapEvents(options: UseMapEventsOptions): MapEventsResult {
     stopCreating,
     startCreating,
   });
+
+  // Regions management for region creation via Area tool
+  const regionsManager = useRegionsInMap({
+    worldId,
+    layers,
+  });
+
+  // Tools manager - handles all tool interactions
+  const toolsManager = useToolsManager({
+    worldId,
+    containerRef,
+    imageDimensions,
+    transform,
+    visiblePins,
+    visibleRegions: regionsManager.regions,
+    selectedLayerId,
+    onCreatePin: (data) => {
+      createPin({
+        ...data,
+        layerId: activeLayerId || undefined,
+      });
+    },
+    onCreateRegion: (coords) => {
+      // Pass the active layer ID to createRegionFromArea
+      regionsManager.createRegionFromArea(activeLayerId || "", coords);
+    },
+    onPinClick: selectPin,
+    onRegionClick: regionsManager.selectRegion,
+    onClearSelection: clearSelection,
+  });
+
+  // Register keyboard handlers from tools manager
+  useEffect(() => {
+    window.addEventListener("keydown", toolsManager.handleKeyDown);
+    window.addEventListener("keyup", toolsManager.handleKeyUp);
+    return () => {
+      window.removeEventListener("keydown", toolsManager.handleKeyDown);
+      window.removeEventListener("keyup", toolsManager.handleKeyUp);
+    };
+  }, [toolsManager.handleKeyDown, toolsManager.handleKeyUp]);
 
   // Grid size calculation
   const getGridSize = (): number => {
@@ -217,22 +263,27 @@ export function useMapEvents(options: UseMapEventsOptions): MapEventsResult {
     visiblePins,
     selectedPin,
     isCreatingPin,
-    handleMouseDown,
+    handleMouseDown: toolsManager.handleMapMouseDown,
+    handleMouseMove: toolsManager.handleMapMouseMove,
+    handleMouseUp: toolsManager.handleMapMouseUp,
     handleZoomIn,
     handleZoomOut,
     resetTransform,
     centerToPin,
-    handleClick,
-    handleContextMenu,
+    handleClick: toolsManager.handleMapClick,
+    handleContextMenu: toolsManager.handleMapContextMenu,
     handlePinClick,
     handlePopupClose,
     handleImageLoad,
     handleImageError,
+    handleKeyDown: toolsManager.handleKeyDown,
+    handleKeyUp: toolsManager.handleKeyUp,
     contextMenu,
     closeContextMenu,
     handleSelectPinType,
     getGridSize,
     layerScale,
     centerOnPin,
+    toolCursor: toolsManager.cursor,
   };
 }

@@ -198,7 +198,7 @@ test.describe('World Creation Flow', () => {
 
     // Tab through form fields
     await page.keyboard.press('Tab');
-    let focused = await page.evaluate(() => (document.activeElement as HTMLInputElement)?.name);
+    const focused = await page.evaluate(() => (document.activeElement as HTMLInputElement)?.name);
     expect(focused || '').toBeTruthy();
 
     // Tab to submit button

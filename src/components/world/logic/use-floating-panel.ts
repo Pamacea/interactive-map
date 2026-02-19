@@ -242,6 +242,7 @@ export function useFloatingPanel({
     isDragging: dragState.isDragging,
     isResizing: dragState.isResizing,
     handlePanelClick,
+    updatePosition,
     dragHandleProps: {
       onPointerDown: handleDragStart,
       style: { cursor: dragState.isDragging ? "grabbing" : "grab" },

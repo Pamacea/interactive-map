@@ -54,13 +54,14 @@ export function useMarkerStyling({
   // Shadow calculation based on interaction state
   const getBoxShadow = () => {
     if (isDragging) {
-      return "0 8px 20px rgba(0, 0, 0, 0.6)";
+      return "0 8px 20px rgba(0, 0, 0, 0.6), 0 0 20px rgba(212, 175, 55, 0.4)";
     }
     if (isPinSelected) {
-      return "0 4px 12px rgba(0, 0, 0, 0.5)";
+      // Enhanced gold glow for selected pins
+      return "0 4px 12px rgba(0, 0, 0, 0.5), 0 0 16px rgba(212, 175, 55, 0.5), 0 0 0 2px rgba(212, 175, 55, 0.3)";
     }
     if (isHovered) {
-      return "0 4px 12px rgba(0, 0, 0, 0.5)";
+      return "0 4px 12px rgba(0, 0, 0, 0.5), 0 0 12px rgba(212, 175, 55, 0.2)";
     }
     return "0 2px 8px rgba(0, 0, 0, 0.3)";
   };

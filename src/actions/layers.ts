@@ -23,7 +23,9 @@ export async function createLayer(
   data: {
     name: string;
     description?: string;
+    type?: "BASE_MAP" | "MARKERS" | "IMAGES" | "REGIONS" | "GROUP" | "CUSTOM";
     isVisible?: boolean;
+    locked?: boolean;
     opacity?: number;
     zIndex?: number;
     offsetX?: number;
@@ -51,7 +53,9 @@ export async function createLayer(
       data: {
         name: data.name,
         description: data.description,
+        type: data.type ?? "CUSTOM",
         isVisible: data.isVisible ?? true,
+        locked: data.locked ?? false,
         opacity: data.opacity ?? 1.0,
         zIndex: data.zIndex ?? (highestZIndex?.zIndex ?? -1) + 1,
         offsetX: data.offsetX ?? 0,
@@ -88,7 +92,9 @@ export async function updateLayer(
   data: {
     name?: string;
     description?: string;
+    type?: "BASE_MAP" | "MARKERS" | "IMAGES" | "REGIONS" | "GROUP" | "CUSTOM";
     isVisible?: boolean;
+    locked?: boolean;
     opacity?: number;
     zIndex?: number;
     offsetX?: number;
@@ -110,7 +116,9 @@ export async function updateLayer(
       data: {
         ...(data.name !== undefined && { name: data.name }),
         ...(data.description !== undefined && { description: data.description }),
+        ...(data.type !== undefined && { type: data.type }),
         ...(data.isVisible !== undefined && { isVisible: data.isVisible }),
+        ...(data.locked !== undefined && { locked: data.locked }),
         ...(data.opacity !== undefined && { opacity: data.opacity }),
         ...(data.zIndex !== undefined && { zIndex: data.zIndex }),
         ...(data.offsetX !== undefined && { offsetX: data.offsetX }),

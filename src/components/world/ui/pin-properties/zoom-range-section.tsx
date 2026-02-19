@@ -54,6 +54,7 @@ export function ZoomRangeSection({
           }}
           disabled={disabled}
           className="w-full h-1.5 bg-void rounded-sm appearance-none cursor-pointer accent-accent-gold disabled:opacity-50"
+          data-no-shortcut="true"
         />
       </div>
 
@@ -79,6 +80,7 @@ export function ZoomRangeSection({
           }}
           disabled={disabled}
           className="w-full h-1.5 bg-void rounded-sm appearance-none cursor-pointer accent-accent-gold disabled:opacity-50"
+          data-no-shortcut="true"
         />
       </div>
 

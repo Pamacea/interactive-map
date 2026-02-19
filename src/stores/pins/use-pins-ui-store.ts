@@ -15,6 +15,7 @@ import { devtools, persist } from "zustand/middleware";
 
 export interface PinUIState {
   selectedPinId: string | null;
+  selectedPinIds: string[];
   isCreating: boolean;
   isEditing: boolean;
   hoverPinId: string | null;
@@ -22,6 +23,8 @@ export interface PinUIState {
 
 interface PinUIActions {
   selectPin: (pinId: string | null) => void;
+  togglePinSelection: (pinId: string) => void;
+  setMultiplePinSelection: (pinIds: string[]) => void;
   clearSelection: () => void;
   startCreating: () => void;
   stopCreating: () => void;
@@ -35,6 +38,7 @@ type PinUIStore = PinUIState & PinUIActions;
 
 const initialState: PinUIState = {
   selectedPinId: null,
+  selectedPinIds: [],
   isCreating: false,
   isEditing: false,
   hoverPinId: null,
@@ -46,11 +50,27 @@ export const usePinsUIStore = create<PinUIStore>()(
       (set) => ({
         ...initialState,
 
-        selectPin: (pinId) => set({ selectedPinId: pinId }),
+        selectPin: (pinId) => set({ selectedPinId: pinId, selectedPinIds: pinId ? [pinId] : [] }),
 
-        clearSelection: () => set({ selectedPinId: null }),
+        togglePinSelection: (pinId) => set((state) => {
+          const isSelected = state.selectedPinIds.includes(pinId);
+          const newSelectedPinIds = isSelected
+            ? state.selectedPinIds.filter((id) => id !== pinId)
+            : [...state.selectedPinIds, pinId];
+          return {
+            selectedPinIds: newSelectedPinIds,
+            selectedPinId: newSelectedPinIds.length > 0 ? newSelectedPinIds[0] : null,
+          };
+        }),
 
-        startCreating: () => set({ isCreating: true, selectedPinId: null }),
+        setMultiplePinSelection: (pinIds) => set({
+          selectedPinIds: pinIds,
+          selectedPinId: pinIds.length > 0 ? pinIds[0] : null,
+        }),
+
+        clearSelection: () => set({ selectedPinId: null, selectedPinIds: [] }),
+
+        startCreating: () => set({ isCreating: true, selectedPinId: null, selectedPinIds: [] }),
 
         stopCreating: () => set({ isCreating: false }),
 
@@ -74,12 +94,15 @@ export const usePinsUIStore = create<PinUIStore>()(
 
 // Selector hooks for optimized re-renders
 export const useSelectedPinId = () => usePinsUIStore((state) => state.selectedPinId);
+export const useSelectedPinIds = () => usePinsUIStore((state) => state.selectedPinIds);
 export const useIsCreatingPin = () => usePinsUIStore((state) => state.isCreating);
 export const useIsEditingPin = () => usePinsUIStore((state) => state.isEditing);
 export const useHoverPinId = () => usePinsUIStore((state) => state.hoverPinId);
 
 // Action hooks
 export const useSelectPin = () => usePinsUIStore((state) => state.selectPin);
+export const useTogglePinSelection = () => usePinsUIStore((state) => state.togglePinSelection);
+export const useSetMultiplePinSelection = () => usePinsUIStore((state) => state.setMultiplePinSelection);
 export const useClearSelection = () => usePinsUIStore((state) => state.clearSelection);
 export const useStartCreating = () => usePinsUIStore((state) => state.startCreating);
 export const useStopCreating = () => usePinsUIStore((state) => state.stopCreating);

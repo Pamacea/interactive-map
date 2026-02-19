@@ -3,7 +3,7 @@
 import { memo, useCallback } from "react";
 import { useMapStore } from "@/stores/map-store";
 import { useSelectPin, useSelectedPinId, useClearSelection, usePinById } from "@/stores/use-pins-store";
-import { getPinTypeConfig, type PinType } from "@/constants/pin-types";
+import { getPinTypeConfig } from "@/constants/pin-types";
 import { usePinEvents } from "@/components/pins/logic/use-pin-events";
 import { usePinScreenCoordinates } from "@/components/pins/logic/use-pin-screen-coordinates";
 import { usePinDragInput } from "@/components/pins/logic/use-pin-drag-input";
@@ -54,9 +54,10 @@ export function PinMarker({
 
   const isPinSelected = selectedPinId === pin.id;
 
-  // Get layer info for lock state
+  // Get layer info for lock state and opacity
   const layer = pin.layerId ? layers.find((layer) => layer.id === pin.layerId) : null;
   const isLayerLocked = layer?.locked ?? false;
+  const layerOpacity = layer?.opacity ?? 1;
 
   // Unified drag handling using input manager
   const { isDragging, dragPosition, handleMouseDown: handleDragMouseDown, justFinishedDragRef } = usePinDragInput({
@@ -102,7 +103,7 @@ export function PinMarker({
   });
 
   // Icon configuration
-  const pinConfig = getPinTypeConfig(pin.pinType as PinType);
+  const pinConfig = getPinTypeConfig(pin.pinType as any) || { icon: "MapPin", color: "#3b82f6", label: "Pin" };
   const iconName = pin.icon || pinConfig.icon;
   const isCustomImage = iconName?.startsWith("/");
 
@@ -156,7 +157,7 @@ export function PinMarker({
       iconName={iconName}
       title={pin.title}
       color={pin.color}
-      opacity={pin.opacity}
+      opacity={pin.opacity * layerOpacity}
       boxShadow={boxShadow}
       transformScale={transformScale}
       isSelected={isPinSelected}

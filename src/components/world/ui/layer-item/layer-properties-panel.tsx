@@ -50,6 +50,7 @@ export function LayerPropertiesPanel({
                 min="-5000"
                 max="5000"
                 aria-label="X offset"
+                data-no-shortcut="true"
               />
             </div>
             <div className="flex-1 grid gap-1">
@@ -68,6 +69,7 @@ export function LayerPropertiesPanel({
                 min="-5000"
                 max="5000"
                 aria-label="Y offset"
+                data-no-shortcut="true"
               />
             </div>
           </div>
@@ -92,6 +94,7 @@ export function LayerPropertiesPanel({
           onChange={(e) => onOpacityChange(layer.id, parseInt(e.target.value) / 100)}
           className="w-full h-1.5 bg-void rounded-sm appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-sm [&::-webkit-slider-thumb]:bg-accent-gold [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-125"
           aria-label={`Layer opacity: ${Math.round(layer.opacity * 100)}%`}
+          data-no-shortcut="true"
         />
       </div>
 
@@ -114,6 +117,7 @@ export function LayerPropertiesPanel({
             onChange={(e) => onScaleChange(layer.id, parseInt(e.target.value) / 100)}
             className="w-full h-1.5 bg-void rounded-sm appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-sm [&::-webkit-slider-thumb]:bg-accent-gold [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-125"
             aria-label={`Layer scale: ${Math.round(layer.scale * 100)}%`}
+            data-no-shortcut="true"
           />
         </div>
       )}
@@ -153,6 +157,7 @@ export function LayerPropertiesPanel({
                 }
               }}
               className="w-full h-1.5 bg-void rounded-sm appearance-none cursor-pointer accent-accent-gold"
+              data-no-shortcut="true"
             />
           </div>
           <div className="space-y-1.5">
@@ -174,6 +179,7 @@ export function LayerPropertiesPanel({
                 }
               }}
               className="w-full h-1.5 bg-void rounded-sm appearance-none cursor-pointer accent-accent-gold"
+              data-no-shortcut="true"
             />
           </div>
           <div className="text-xs text-bone-dark/70">

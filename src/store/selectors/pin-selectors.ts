@@ -1,0 +1,298 @@
+/**
+ * Pin Selectors - Optimized selectors for pin data
+ *
+ * Provides memoized selectors for common pin queries.
+ * Use these to avoid unnecessary re-renders when accessing pin data.
+ */
+
+import type { Pin } from "@prisma/client";
+import { PinType } from "@/types/pin.type";
+import { shallow } from "zustand/shallow";
+
+// ============================================================================
+// Types
+// ============================================================================
+
+export interface PinFilters {
+  searchTerm: string;
+  pinTypeFilters: Partial<Record<PinType, boolean>>;
+  layerIds: string[];
+  showVisibleOnly: boolean;
+}
+
+// ============================================================================
+// Basic Selectors
+// ============================================================================
+
+/**
+ * Get all pins (identity selector)
+ */
+export const selectAllPins = (pins: Pin[]): Pin[] => pins;
+
+/**
+ * Get pin by ID
+ */
+export const selectPinById = (pins: Pin[], pinId: string): Pin | undefined =>
+  pins.find((pin) => pin.id === pinId);
+
+/**
+ * Get pins by layer ID
+ */
+export const selectPinsByLayer = (pins: Pin[], layerId: string): Pin[] =>
+  pins.filter((pin) => pin.layerId === layerId);
+
+/**
+ * Get pins by type
+ */
+export const selectPinsByType = (pins: Pin[], pinType: PinType): Pin[] =>
+  pins.filter((pin) => pin.pinType === pinType);
+
+/**
+ * Get only visible pins
+ */
+export const selectVisiblePins = (pins: Pin[]): Pin[] =>
+  pins.filter((pin) => pin.isVisible);
+
+/**
+ * Get hidden pins
+ */
+export const selectHiddenPins = (pins: Pin[]): Pin[] =>
+  pins.filter((pin) => !pin.isVisible);
+
+// ============================================================================
+// Filter Selectors
+// ============================================================================
+
+/**
+ * Filter pins by search term and filters
+ * This is the main filtering logic used across the app
+ */
+export const selectFilteredPins = (
+  pins: Pin[],
+  filters: PinFilters
+): Pin[] => {
+  const { searchTerm, pinTypeFilters, layerIds, showVisibleOnly } = filters;
+
+  return pins.filter((pin) => {
+    // Search term filter
+    if (searchTerm && !pin.title.toLowerCase().includes(searchTerm.toLowerCase())) {
+      return false;
+    }
+
+    // Pin type filter - check if type is explicitly set to false
+    if (pinTypeFilters[pin.pinType] === false) {
+      return false;
+    }
+
+    // Layer filter
+    if (layerIds.length > 0 && pin.layerId && !layerIds.includes(pin.layerId)) {
+      return false;
+    }
+
+    // Visibility filter
+    if (showVisibleOnly && !pin.isVisible) {
+      return false;
+    }
+
+    return true;
+  });
+};
+
+/**
+ * Get count of pins by type
+ */
+export const selectPinCountByType = (pins: Pin[]): Record<PinType, number> => {
+  const counts = {} as Record<PinType, number>;
+
+  for (const pin of pins) {
+    counts[pin.pinType] = (counts[pin.pinType] || 0) + 1;
+  }
+
+  return counts;
+};
+
+/**
+ * Get count of visible pins by type
+ */
+export const selectVisiblePinCountByType = (pins: Pin[]): Record<PinType, number> => {
+  const visiblePins = pins.filter((pin) => pin.isVisible);
+  return selectPinCountByType(visiblePins);
+};
+
+// ============================================================================
+// Zoom-based Selectors
+// ============================================================================
+
+/**
+ * Get pins visible at current zoom level
+ */
+export const selectPinsAtZoom = (pins: Pin[], currentZoom: number): Pin[] =>
+  pins.filter((pin) => {
+    const minZoom = pin.minZoom ?? 0;
+    const maxZoom = pin.maxZoom ?? 200;
+    return currentZoom >= minZoom && currentZoom <= maxZoom;
+  });
+
+// ============================================================================
+// Position-based Selectors
+// ============================================================================
+
+/**
+ * Get pins within a bounding box
+ */
+export const selectPinsInBounds = (
+  pins: Pin[],
+  bounds: { minX: number; minY: number; maxX: number; maxY: number }
+): Pin[] =>
+  pins.filter((pin) => {
+    const x = pin.latitude ?? 0;
+    const y = pin.longitude ?? 0;
+    return (
+      x >= bounds.minX &&
+      x <= bounds.maxX &&
+      y >= bounds.minY &&
+      y <= bounds.maxY
+    );
+  });
+
+/**
+ * Get pins near a position (within radius)
+ */
+export const selectPinsNearPosition = (
+  pins: Pin[],
+  position: { x: number; y: number },
+  radius: number
+): Pin[] =>
+  pins.filter((pin) => {
+    const x = pin.latitude ?? 0;
+    const y = pin.longitude ?? 0;
+    const distance = Math.sqrt(
+      Math.pow(x - position.x, 2) + Math.pow(y - position.y, 2)
+    );
+    return distance <= radius;
+  });
+
+// ============================================================================
+// Utility Selectors
+// ============================================================================
+
+/**
+ * Get unique layer IDs from pins
+ */
+export const selectPinLayerIds = (pins: Pin[]): string[] => {
+  const layerIds = new Set<string>();
+  for (const pin of pins) {
+    if (pin.layerId) {
+      layerIds.add(pin.layerId);
+    }
+  }
+  return Array.from(layerIds);
+};
+
+/**
+ * Get pins sorted by order
+ */
+export const selectPinsSortedByOrder = (pins: Pin[]): Pin[] =>
+  [...pins].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+/**
+ * Get pins sorted by title
+ */
+export const selectPinsSortedByTitle = (pins: Pin[]): Pin[] =>
+  [...pins].sort((a, b) => a.title.localeCompare(b.title));
+
+/**
+ * Get recently updated pins (within last N minutes)
+ */
+export const selectRecentlyUpdatedPins = (
+  pins: Pin[],
+  minutesAgo: number = 30
+): Pin[] => {
+  const cutoff = new Date(Date.now() - minutesAgo * 60 * 1000);
+  return pins.filter((pin) => pin.updatedAt > cutoff);
+};
+
+// ============================================================================
+// Zustand Store Integration Helpers
+// ============================================================================
+
+/**
+ * Create a memoized selector hook for filtered pins
+ * Usage: const filteredPins = useFilteredPinsSelector(filters);
+ */
+export const createFilteredPinsSelector = (filters: PinFilters) => {
+  return (pins: Pin[]) => selectFilteredPins(pins, filters);
+};
+
+/**
+ * Shallow comparison for array updates
+ * Use this to prevent unnecessary re-renders when arrays are updated
+ */
+export const shallowArrays = <T>(a: T[], b: T[]): boolean => {
+  if (a === b) return true;
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+};
+
+// ============================================================================
+// Composed Selectors (for complex queries)
+// ============================================================================
+
+/**
+ * Get pins grouped by layer
+ */
+export const selectPinsGroupedByLayer = (
+  pins: Pin[]
+): Map<string, Pin[]> => {
+  const grouped = new Map<string, Pin[]>();
+
+  for (const pin of pins) {
+    const layerId = pin.layerId ?? "unassigned";
+    if (!grouped.has(layerId)) {
+      grouped.set(layerId, []);
+    }
+    grouped.get(layerId)!.push(pin);
+  }
+
+  return grouped;
+};
+
+/**
+ * Get pins grouped by type
+ */
+export const selectPinsGroupedByType = (
+  pins: Pin[]
+): Map<PinType, Pin[]> => {
+  const grouped = new Map<PinType, Pin[]>();
+
+  for (const pin of pins) {
+    if (!grouped.has(pin.pinType)) {
+      grouped.set(pin.pinType, []);
+    }
+    grouped.get(pin.pinType)!.push(pin);
+  }
+
+  return grouped;
+};
+
+/**
+ * Get search result highlight positions
+ * Returns the start/end indices of the search term in the pin title
+ */
+export const selectSearchHighlightPositions = (
+  pin: Pin,
+  searchTerm: string
+): { start: number; end: number } | null => {
+  if (!searchTerm) return null;
+
+  const title = pin.title.toLowerCase();
+  const term = searchTerm.toLowerCase();
+  const index = title.indexOf(term);
+
+  if (index === -1) return null;
+
+  return { start: index, end: index + term.length };
+};

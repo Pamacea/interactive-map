@@ -109,6 +109,7 @@ function SliderControl({
         value={value}
         onChange={onChange}
         className="w-full h-1.5 bg-background-base rounded-sm appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-sm [&::-webkit-slider-thumb]:bg-accent-gold [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-125"
+        data-no-shortcut="true"
       />
     </div>
   );

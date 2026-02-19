@@ -229,11 +229,22 @@ model CollaborationEvent {
 // MAP LAYERS
 // ============================================
 
+enum LayerType {
+  BASE_MAP    // Carte de fond - contains the main map image
+  MARKERS     // Contains pins/markers
+  IMAGES      // Contains overlay images
+  REGIONS     // Contains regions/zones
+  GROUP       // Sub-group layer (can contain other layers in future)
+  CUSTOM      // Mixte - can contain any content type
+}
+
 model MapLayer {
   id          String    @id @default(cuid())
   name        String
   description String?   @db.Text
+  type        LayerType @default(CUSTOM)
   isVisible   Boolean   @default(true)
+  locked      Boolean   @default(false)
   opacity     Float     @default(1.0)
   zIndex      Int       @default(0)
   offsetX     Float     @default(0) // Pixel offset from top-left (X axis)
@@ -244,9 +255,43 @@ model MapLayer {
   gameWorldId String
   gameWorld   GameWorld @relation(fields: [gameWorldId], references: [id], onDelete: Cascade)
   pins        Pin[]
+  images      GalleryItem[]
+  regions     Region[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
+  @@index([gameWorldId])
+  @@index([gameWorldId, type])
+}
+
+// ============================================
+// REGIONS (Areas on the map)
+// ============================================
+
+enum RegionType {
+  RECTANGLE
+  CIRCLE
+  POLYGON
+}
+
+model Region {
+  id          String     @id @default(cuid())
+  name        String
+  type        RegionType @default(RECTANGLE)
+  coordinates Json       // Coordonnées de la forme: {x, y, width, height} ou {points: [{x, y}, ...]}
+  description String?    @db.Text
+  visible     Boolean    @default(true)
+  locked      Boolean    @default(false)
+  color       String     @default("#3b82f6")
+  opacity     Float      @default(0.3)
+  borderWidth Int        @default(2)
+  layerId     String
+  layer       MapLayer   @relation(fields: [layerId], references: [id], onDelete: Cascade)
+  gameWorldId String     // Denormalized for easier queries
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([layerId])
   @@index([gameWorldId])
 }
 
@@ -279,6 +324,7 @@ enum IconShape {
 model Pin {
   id          String              @id @default(cuid())
   title       String
+  slug        String?             // Unique tag identifier for linking (e.g., "castle-black", "dragon-keep")
   description String?             @db.Text
   pinType     PinType             @default(CUSTOM)
   latitude    Float
@@ -313,6 +359,7 @@ model Pin {
   @@index([latitude, longitude])
   @@index([gameWorldId])
   @@index([userId])
+  @@unique([gameWorldId, slug])  // Unique slug within a world
 }
 
 // ============================================
@@ -406,6 +453,7 @@ model LoreReference {
 model GalleryItem {
   id            String              @id @default(cuid())
   title         String
+  slug          String?             // Unique tag identifier for linking (e.g., "castle-view", "character-portrait")
   description   String?             @db.Text
   caption       String?             @db.Text // Display caption/legend for the image
   imageUrl      String
@@ -425,6 +473,8 @@ model GalleryItem {
   characterId   String?
   character     Character?          @relation(fields: [characterId], references: [id], onDelete: Cascade)
   worldId       String?             // Direct world link for unlinked items
+  layerId       String?             // Layer assignment for overlay images
+  layer         MapLayer?           @relation(fields: [layerId], references: [id], onDelete: SetNull)
   collections   CollectionItem[]    @relation("GalleryItemCollections")
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
@@ -432,7 +482,9 @@ model GalleryItem {
   @@index([pinId])
   @@index([loreEntryId])
   @@index([worldId])
+  @@index([layerId])
   @@index([tags])
+  @@unique([worldId, slug])  // Unique slug within a world
 }
 
 model GalleryCollection {
@@ -512,6 +564,7 @@ enum RelationshipType {
 
 model Character {
   id              String         @id @default(cuid())
+  slug            String?        @unique // Unique tag identifier for linking (#character-name)
   name            String
   shortName       String?        // Nickname or short name for UI
   characterType   CharacterType  @default(NPC)
@@ -568,6 +621,7 @@ model Character {
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
 
+  @@unique([gameWorldId, slug])
   @@index([gameWorldId])
   @@index([userId])
   @@index([characterType])

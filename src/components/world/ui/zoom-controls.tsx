@@ -92,10 +92,10 @@ export function ZoomControls({ scale, onZoomIn, onZoomOut, onReset }: ZoomContro
 
   return (
     <div className="absolute bottom-6 right-6 flex flex-row items-center gap-2" role="group" aria-label="Map zoom controls">
-      <div className="bg-obsidian/90 backdrop-blur-md rounded-sm border border-iron shadow-xl px-2 py-1.5 flex items-center gap-1.5">
+      <div className="bg-obsidian/90 backdrop-blur-md rounded-sm border border-iron shadow-xl px-2 py-1.5 flex items-center gap-1.5 hover:border-accent-gold/50 transition-all duration-300">
         <button
           onClick={onZoomOut}
-          className="h-5 w-5 flex items-center justify-center text-bone-dark hover:text-accent-gold hover:bg-accent-gold/10 rounded-sm transition-all focus:outline-none focus:ring-2 focus:ring-accent-gold/50"
+          className="h-5 w-5 flex items-center justify-center text-bone-dark hover:text-accent-gold hover:bg-accent-gold/20 rounded-sm transition-all duration-150 hover:scale-110 active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent-gold/50"
           title="Zoom out"
           aria-label="Zoom out"
           type="button"
@@ -117,7 +117,7 @@ export function ZoomControls({ scale, onZoomIn, onZoomOut, onReset }: ZoomContro
 
         <button
           onClick={onZoomIn}
-          className="h-5 w-5 flex items-center justify-center text-bone-dark hover:text-accent-gold hover:bg-accent-gold/10 rounded-sm transition-all focus:outline-none focus:ring-2 focus:ring-accent-gold/50"
+          className="h-5 w-5 flex items-center justify-center text-bone-dark hover:text-accent-gold hover:bg-accent-gold/20 rounded-sm transition-all duration-150 hover:scale-110 active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent-gold/50"
           title="Zoom in"
           aria-label="Zoom in"
           type="button"
@@ -129,7 +129,7 @@ export function ZoomControls({ scale, onZoomIn, onZoomOut, onReset }: ZoomContro
 
         <button
           onClick={onReset}
-          className="h-5 w-5 flex items-center justify-center text-bone-dark hover:text-accent-gold hover:bg-accent-gold/10 rounded-sm transition-all focus:outline-none focus:ring-2 focus:ring-accent-gold/50"
+          className="h-5 w-5 flex items-center justify-center text-bone-dark hover:text-accent-gold hover:bg-accent-gold/20 rounded-sm transition-all duration-150 hover:scale-110 active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent-gold/50"
           title="Reset view"
           aria-label="Reset zoom to default"
           type="button"
@@ -143,7 +143,7 @@ export function ZoomControls({ scale, onZoomIn, onZoomOut, onReset }: ZoomContro
       <div className="relative" ref={triggerRef}>
         <button
           onClick={handleToggleDropdown}
-          className="bg-obsidian/90 backdrop-blur-md rounded-sm border border-iron shadow-lg px-2 py-1 flex items-center gap-1.5 hover:border-accent-gold/50 transition-all focus:outline-none focus:ring-2 focus:ring-accent-gold/50"
+          className="bg-obsidian/90 backdrop-blur-md rounded-sm border border-iron shadow-lg px-2 py-1 flex items-center gap-1.5 hover:border-accent-gold/70 hover:bg-accent-gold/10 transition-all duration-150 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent-gold/50"
           title="Change map scale"
           aria-label="Change map scale. Current scale: {mapScale}"
           aria-expanded={scaleDropdownOpen}

@@ -47,9 +47,18 @@ export function calculatePinVisibility(
     if (!pin.layer.isVisible) {
       return false;
     }
+
+    // Also check layer zoom range
+    const zoomPercentage = transform.scale * 100;
+    const layerMinZoom = pin.layer.minZoom ?? 0;
+    const layerMaxZoom = pin.layer.maxZoom ?? 200;
+
+    if (zoomPercentage < layerMinZoom || zoomPercentage > layerMaxZoom) {
+      return false;
+    }
   }
 
-  // 3. Check zoom range
+  // 3. Check zoom range (individual pin zoom range, if different from layer)
   // Convert scale to percentage (1.0 = 100%)
   const zoomPercentage = transform.scale * 100;
 

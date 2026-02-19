@@ -45,6 +45,7 @@ export function DescriptionTextarea({
         className="w-full bg-void/50 border border-iron/30 rounded px-3 py-2 text-sm text-bone placeholder:text-bone-dark/40 focus:outline-none focus:border-accent-gold/50 focus:ring-1 focus:ring-accent-gold/30 transition-all resize-none disabled:opacity-50 font-fell"
         placeholder="Enter pin description..."
         maxLength={5000}
+        data-no-shortcut="true"
       />
     </div>
   );

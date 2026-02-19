@@ -54,6 +54,18 @@ export function ImageLightbox({
   const hasPrevious = currentIndex > 0;
   const hasNext = currentIndex < images.length - 1;
 
+  // Null safety checks for current image
+  if (!currentImage) return null;
+
+  const imageUrl = currentImage?.imageUrl ?? "";
+  const title = currentImage?.title ?? "Untitled";
+  const description = currentImage?.description;
+  const pinId = currentImage?.pinId ?? currentImage?.pin?.id ?? null;
+  const loreEntryId = currentImage?.loreEntryId ?? currentImage?.loreEntry?.id ?? null;
+
+  // Skip rendering if image URL is invalid
+  if (!imageUrl) return null;
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-black/95 border-none overflow-hidden">
@@ -89,8 +101,8 @@ export function ImageLightbox({
           <div className="relative w-full h-full max-w-7xl max-h-[90vh] px-16 flex items-center justify-center">
             <div className="relative w-full h-full">
               <Image
-                src={currentImage.imageUrl}
-                alt={currentImage.title}
+                src={imageUrl}
+                alt={title}
                 fill
                 className="object-contain"
                 priority
@@ -105,23 +117,23 @@ export function ImageLightbox({
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <h2 className="text-2xl font-display font-bold text-white mb-2">
-                    {currentImage.title}
+                    {title}
                   </h2>
-                  {currentImage.description && (
+                  {description && (
                     <p className="text-white/80 text-sm">
-                      {currentImage.description}
+                      {description}
                     </p>
                   )}
 
                   {/* Linked items */}
                   <div className="flex gap-2">
-                    {currentImage.pinId && (
+                    {pinId && (
                       <Badge className="bg-accent-gold text-background-base hover:bg-accent-gold/80 flex items-center gap-1">
                         <Link2 className="w-3 h-3" />
                         Linked to Pin
                       </Badge>
                     )}
-                    {currentImage.loreEntryId && (
+                    {loreEntryId && (
                       <Badge className="bg-purple-600 text-white hover:bg-purple-600/80 flex items-center gap-1">
                         <Link2 className="w-3 h-3" />
                         Linked to Lore
@@ -136,12 +148,12 @@ export function ImageLightbox({
                     variant="outline"
                     size="sm"
                     className="text-white border-white hover:bg-white/10"
-                    onClick={() => downloadImage(currentImage.imageUrl, currentImage.title)}
+                    onClick={() => downloadImage(imageUrl, title)}
                   >
                     <Download className="w-4 h-4" />
                   </Button>
 
-                  {onLinkToPin && !currentImage.pinId && (
+                  {onLinkToPin && !pinId && (
                     <Button
                       variant="outline"
                       size="sm"
@@ -155,7 +167,7 @@ export function ImageLightbox({
                     </Button>
                   )}
 
-                  {onLinkToLore && !currentImage.loreEntryId && (
+                  {onLinkToLore && !loreEntryId && (
                     <Button
                       variant="outline"
                       size="sm"

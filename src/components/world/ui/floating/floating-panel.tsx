@@ -1,11 +1,55 @@
 "use client";
 
-import { forwardRef, useMemo } from "react";
+import { forwardRef, useMemo, useState, useCallback } from "react";
 import { GripHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useFloatingPanel, type UseFloatingPanelOptions } from "@/components/world/logic/use-floating-panel";
 import { Z_INDEX_CLASSES } from "@/constants/z-index";
 import { PanelHeader } from "../panel";
+
+// Snap configuration
+const SNAP_THRESHOLD = 20;
+const SNAP_MARGIN = 0;
+
+/**
+ * Calculate snapped position to screen edges
+ */
+function getSnappedPosition(
+  x: number,
+  y: number,
+  width: number,
+  height: number
+): { x: number; y: number; snapped: boolean } {
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+
+  let newX = x;
+  let newY = y;
+  let snapped = false;
+
+  // Left edge
+  if (x < SNAP_THRESHOLD + SNAP_MARGIN) {
+    newX = SNAP_MARGIN;
+    snapped = true;
+  }
+  // Right edge
+  if (x + width > viewportWidth - SNAP_THRESHOLD - SNAP_MARGIN) {
+    newX = viewportWidth - width - SNAP_MARGIN;
+    snapped = true;
+  }
+  // Top edge
+  if (y < SNAP_THRESHOLD + SNAP_MARGIN) {
+    newY = SNAP_MARGIN;
+    snapped = true;
+  }
+  // Bottom edge
+  if (y + height > viewportHeight - SNAP_THRESHOLD - SNAP_MARGIN) {
+    newY = viewportHeight - height - SNAP_MARGIN;
+    snapped = true;
+  }
+
+  return { x: newX, y: newY, snapped };
+}
 
 export interface FloatingPanelProps extends UseFloatingPanelOptions {
   title: string;
@@ -44,11 +88,11 @@ export const FloatingPanel = forwardRef<HTMLDivElement, FloatingPanelProps>(
       panelState,
       isDragging,
       isResizing,
-      handlePanelClick,
       dragHandleProps,
       resizeHandleProps,
       collapseProps,
       closeProps,
+      updatePosition,
     } = useFloatingPanel({
       panelId,
       minWidth,
@@ -58,6 +102,33 @@ export const FloatingPanel = forwardRef<HTMLDivElement, FloatingPanelProps>(
     });
 
     const { isVisible, position, size, isCollapsed, zIndex } = panelState;
+    const [isSnapped, setIsSnapped] = useState(false);
+
+    // Prevent map interactions when interacting with floating panels
+    const handleInteraction = useCallback((e: React.MouseEvent | React.TouchEvent | React.PointerEvent) => {
+      if (e.type === 'pointerup') {
+        // Let handleDragEnd handle pointerup
+        return;
+      }
+      e.stopPropagation();
+    }, []);
+
+    // Apply snap-to-edges on drag end
+    const handleDragEnd = useCallback(() => {
+      const snapped = getSnappedPosition(
+        position.x,
+        position.y,
+        size.width,
+        size.height
+      );
+
+      if (snapped.snapped) {
+        updatePosition(panelId, { x: snapped.x, y: snapped.y });
+        setIsSnapped(true);
+        // Clear snapped state after animation
+        setTimeout(() => setIsSnapped(false), 300);
+      }
+    }, [panelId, position, size, updatePosition]);
 
     const panelStyle = useMemo(
       () => ({
@@ -66,8 +137,9 @@ export const FloatingPanel = forwardRef<HTMLDivElement, FloatingPanelProps>(
         width: `${size.width}px`,
         height: isCollapsed ? "auto" : `${size.height}px`,
         zIndex,
+        transition: isDragging ? "none" : isSnapped ? "left 0.2s ease-out, top 0.2s ease-out" : undefined,
       }),
-      [position, size, isCollapsed, zIndex]
+      [position, size, isCollapsed, zIndex, isDragging, isSnapped]
     );
 
     // Don't render if not visible
@@ -81,15 +153,22 @@ export const FloatingPanel = forwardRef<HTMLDivElement, FloatingPanelProps>(
           else if (ref) ref.current = node;
         }}
         className={cn(
-          "absolute bg-obsidian/80 backdrop-blur-md rounded-sm border border-iron shadow-xl overflow-hidden transition-all duration-300",
+          "absolute bg-obsidian/80 backdrop-blur-md rounded-sm border border-iron shadow-xl overflow-hidden",
           "hover:border-accent-gold/50",
           isDragging && "shadow-2xl border-accent-gold/30",
           isResizing && "cursor-se-resize",
           zIndex >= 25 && Z_INDEX_CLASSES.activeFloatingPanel,
+          isSnapped && "ring-2 ring-accent-gold/30",
           className
         )}
         style={panelStyle}
-        onClick={handlePanelClick}
+        onMouseDown={handleInteraction}
+        onMouseUp={handleInteraction}
+        onClick={handleInteraction}
+        onTouchStart={handleInteraction}
+        onTouchEnd={handleInteraction}
+        onTouchMove={handleInteraction}
+        onPointerUp={handleDragEnd}
         role="dialog"
         aria-labelledby={`${panelId}-title`}
         aria-modal="false"
@@ -125,8 +204,12 @@ export const FloatingPanel = forwardRef<HTMLDivElement, FloatingPanelProps>(
               maxHeight: `calc(${size.height}px - 40px)`,
               minHeight: `${minHeight - 40}px`,
             }}
+            onMouseDown={(e) => e.stopPropagation()}
+            onMouseUp={(e) => e.stopPropagation()}
             onClick={(e) => e.stopPropagation()}
-            onPointerDownCapture={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchEnd={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
           >
             {children}
           </div>

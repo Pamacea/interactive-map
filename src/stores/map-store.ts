@@ -1,23 +1,35 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { devtools, persist } from "zustand/middleware";
 import type { MapLayer } from "@/types/world.type";
 
 const SCALE_OPTIONS = ["1:1000", "1:500", "1:100"] as const;
 type ScaleOption = (typeof SCALE_OPTIONS)[number];
 
-interface Layer {
+export type LayerType = "BASE_MAP" | "MARKERS" | "IMAGES" | "REGIONS" | "GROUP" | "CUSTOM";
+
+export interface LayerContentCounts {
+  pins: number;
+  images: number;
+  regions: number;
+  total: number;
+}
+
+export interface Layer {
   id: string;
   name: string;
+  type: LayerType;
   visible: boolean;
   opacity: number;
   zIndex: number;
   locked: boolean;
-  isBaseMap?: boolean; // Special flag for base map layer
+  isBaseMap?: boolean; // Special flag for base map layer (derived from type === BASE_MAP)
   scale: number; // Visual scale of layer content (0.5 - 2.0)
   offsetX: number; // Pixel offset from top-left (X axis)
   offsetY: number; // Pixel offset from top-left (Y axis)
   minZoom: number; // Minimum zoom % for layer visibility (0-200)
   maxZoom: number; // Maximum zoom % for layer visibility (0-200)
+  // Content counts (cached from server)
+  contentCounts?: LayerContentCounts;
 }
 
 interface MapState {
@@ -27,22 +39,29 @@ interface MapState {
   zoom: number;
   layers: Layer[];
   selectedLayerId: string | null;
+  activeLayerId: string | null; // Currently active layer for adding new items
+  backgroundColor: string;
 
   // Computed values (memoized to prevent infinite loops)
   visibleLayerIds: string[];
   activeLayerIds: string[];
   baseMapVisible: boolean;
 
+  // Server sync state
+  worldId: string | null;
+
   // Layer actions
   setGrid: (value: boolean) => void;
   setSnap: (value: boolean) => void;
   setScale: (value: ScaleOption) => void;
   setZoom: (value: number) => void;
+  setBackgroundColor: (color: string) => void;
   zoomIn: () => void;
   zoomOut: () => void;
   resetZoom: () => void;
   setLayers: (layers: Layer[]) => void;
   setSelectedLayerId: (layerId: string | null) => void;
+  setActiveLayerId: (layerId: string | null) => void;
 
   // Layer CRUD
   toggleLayerVisibility: (layerId: string) => void;
@@ -54,13 +73,20 @@ interface MapState {
   updateLayerMinZoom: (layerId: string, minZoom: number) => void;
   updateLayerMaxZoom: (layerId: string, maxZoom: number) => void;
   resetLayerZoom: (layerId: string) => void;
-  addLayer: (layer: Omit<Layer, "id">) => void;
+  updateLayerType: (layerId: string, type: LayerType) => void;
+  updateLayerContentCounts: (layerId: string, counts: LayerContentCounts) => void;
+  addLayer: (layer: Omit<Layer, "id">) => Layer | null;
+  addLayerFromServer: (layer: Layer) => void;
   removeLayer: (layerId: string) => void;
   moveLayerUp: (layerId: string) => void;
   moveLayerDown: (layerId: string) => void;
 
   // Base map layer actions
   toggleBaseMapVisibility: () => void;
+
+  // World management
+  setWorldId: (worldId: string | null) => void;
+  initializeLayers: (layers: Layer[]) => void;
 
   reset: () => void;
 }
@@ -70,30 +96,18 @@ const initialState = {
   snap: false,
   scale: "1:1000" as ScaleOption,
   zoom: 1.0,
-  layers: [
-    {
-      id: "base-map",
-      name: "Base Map",
-      visible: true,
-      opacity: 1,
-      zIndex: 0,
-      locked: true,
-      isBaseMap: true,
-      scale: 1.0,
-      offsetX: 0,
-      offsetY: 0,
-      minZoom: 0,
-      maxZoom: 200,
-    },
-  ] as Layer[],
+  backgroundColor: "#1a1a1a",
+  layers: [] as Layer[], // Start empty - layers will be loaded from server
   selectedLayerId: null as string | null,
-  visibleLayerIds: ["base-map"],
+  activeLayerId: null as string | null,
+  visibleLayerIds: [] as string[],
   activeLayerIds: [] as string[],
   baseMapVisible: true,
+  worldId: null as string | null,
 };
 
 export const useMapStore = create<MapState>()(
-  persist(
+  devtools(
     (set, get) => ({
       ...initialState,
 
@@ -103,26 +117,66 @@ export const useMapStore = create<MapState>()(
 
       setScale: (value) => set({ scale: value }),
 
+      setBackgroundColor: (color) => set({ backgroundColor: color }),
+
       setLayers: (layers) =>
-        set(() => {
-          const newVisibleLayerIds = layers
+        set((state) => {
+          // Always ensure there's a base map layer at the bottom
+          const hasBaseMap = layers.some((l) => l.isBaseMap || l.type === "BASE_MAP");
+          let finalLayers = [...layers];
+          if (!hasBaseMap && state.worldId) {
+            // Add base map layer if it doesn't exist
+            finalLayers = [{
+              id: "base-map",
+              name: "Base Map",
+              type: "BASE_MAP" as LayerType,
+              visible: true,
+              opacity: 1,
+              zIndex: 0,
+              locked: true,
+              isBaseMap: true,
+              scale: 1.0,
+              offsetX: 0,
+              offsetY: 0,
+              minZoom: 0,
+              maxZoom: 200,
+              contentCounts: { pins: 0, images: 0, regions: 0, total: 0 },
+            }, ...layers];
+          }
+
+          // Remove any duplicate layer entries by keeping unique IDs
+          const uniqueLayers = finalLayers.filter((layer, index, self) =>
+            index === self.findIndex((l) => l.id === layer.id)
+          );
+
+          // Sort by zIndex
+          uniqueLayers.sort((a, b) => a.zIndex - b.zIndex);
+
+          const newVisibleLayerIds = uniqueLayers
             .filter((l) => l.visible)
             .map((l) => l.id);
-          const newActiveLayerIds = layers
+          const newActiveLayerIds = uniqueLayers
             .filter((l) => !l.locked)
             .map((l) => l.id);
-          const baseMapLayer = layers.find((l) => l.isBaseMap);
+          const baseMapLayer = uniqueLayers.find((l) => l.isBaseMap || l.type === "BASE_MAP");
           const newBaseMapVisible = baseMapLayer?.visible ?? true;
 
+          // Auto-select first non-base layer as active if none selected
+          const firstActiveLayer = uniqueLayers.find((l) => !l.locked && !l.isBaseMap);
+          const newActiveLayerId = state.activeLayerId ?? firstActiveLayer?.id ?? null;
+
           return {
-            layers,
+            layers: uniqueLayers,
             visibleLayerIds: newVisibleLayerIds,
             activeLayerIds: newActiveLayerIds,
             baseMapVisible: newBaseMapVisible,
+            activeLayerId: newActiveLayerId,
           };
         }),
 
       setSelectedLayerId: (layerId) => set({ selectedLayerId: layerId }),
+
+      setActiveLayerId: (layerId) => set({ activeLayerId: layerId }),
 
       toggleLayerVisibility: (layerId) =>
         set((state) => {
@@ -180,7 +234,7 @@ export const useMapStore = create<MapState>()(
         set((state) => {
           // Prevent moving base map layer
           const layer = state.layers.find((l) => l.id === layerId);
-          if (layer?.isBaseMap) {
+          if (layer?.isBaseMap || layer?.type === "BASE_MAP") {
             console.warn("Cannot move base map layer");
             return state;
           }
@@ -213,13 +267,29 @@ export const useMapStore = create<MapState>()(
           ),
         })),
 
+      updateLayerType: (layerId, type) =>
+        set((state) => ({
+          layers: state.layers.map((layer) =>
+            layer.id === layerId
+              ? { ...layer, type, isBaseMap: type === "BASE_MAP" }
+              : layer
+          ),
+        })),
+
+      updateLayerContentCounts: (layerId, contentCounts) =>
+        set((state) => ({
+          layers: state.layers.map((layer) =>
+            layer.id === layerId ? { ...layer, contentCounts } : layer
+          ),
+        })),
+
       addLayer: (layer) =>
         set((state) => {
           const newLayer = {
             ...layer,
             id: crypto.randomUUID(),
-            offsetX: 0,
-            offsetY: 0,
+            offsetX: layer.offsetX ?? 0,
+            offsetY: layer.offsetY ?? 0,
             minZoom: layer.minZoom ?? 0,
             maxZoom: layer.maxZoom ?? 200,
           };
@@ -234,11 +304,46 @@ export const useMapStore = create<MapState>()(
             layers: newLayers,
             visibleLayerIds: newVisibleLayerIds,
             activeLayerIds: newActiveLayerIds,
+            // Auto-select the new layer as active
+            activeLayerId: newLayer.id,
+          };
+        }),
+
+      addLayerFromServer: (layer) =>
+        set((state) => {
+          // Only add if not already present
+          if (state.layers.find((l) => l.id === layer.id)) {
+            // Update existing layer
+            return {
+              layers: state.layers.map((l) =>
+                l.id === layer.id ? { ...l, ...layer } : l
+              ),
+            };
+          }
+          const newLayers = [...state.layers, layer].sort((a, b) => a.zIndex - b.zIndex);
+          const newVisibleLayerIds = newLayers
+            .filter((l) => l.visible)
+            .map((l) => l.id);
+          const newActiveLayerIds = newLayers
+            .filter((l) => !l.locked)
+            .map((l) => l.id);
+          // Auto-select first active layer if none selected
+          const firstActiveLayer = newLayers.find((l) => !l.locked && !l.isBaseMap);
+          return {
+            layers: newLayers,
+            visibleLayerIds: newVisibleLayerIds,
+            activeLayerIds: newActiveLayerIds,
+            activeLayerId: state.activeLayerId ?? firstActiveLayer?.id ?? null,
           };
         }),
 
       removeLayer: (layerId) =>
         set((state) => {
+          const layerToRemove = state.layers.find((l) => l.id === layerId);
+          // Don't allow removing base map layer
+          if (layerToRemove?.isBaseMap || layerToRemove?.type === "BASE_MAP") {
+            return state;
+          }
           const newLayers = state.layers.filter((layer) => layer.id !== layerId);
           const newVisibleLayerIds = newLayers
             .filter((l) => l.visible)
@@ -253,6 +358,9 @@ export const useMapStore = create<MapState>()(
             // Clear selection if removed layer was selected
             selectedLayerId:
               state.selectedLayerId === layerId ? null : state.selectedLayerId,
+            // Clear active layer if it was the removed one
+            activeLayerId:
+              state.activeLayerId === layerId ? null : state.activeLayerId,
           };
         }),
 
@@ -325,6 +433,75 @@ export const useMapStore = create<MapState>()(
       zoomOut: () => set((state) => ({ zoom: Math.max(state.zoom / 1.2, 0.1) })),
       resetZoom: () => set((state) => ({ zoom: 1.0 })),
 
+      setWorldId: (worldId) => set({ worldId }),
+
+      initializeLayers: (layers) =>
+        set((state) => {
+          // Idempotency check: if layers are already initialized with same data, skip
+          if (state.layers.length === layers.length &&
+              state.layers.every((l, i) => l.id === layers[i]?.id)) {
+            return state;
+          }
+
+          // Ensure there's always a base map layer
+          const hasBaseMap = layers.some((l) => l.isBaseMap || l.type === "BASE_MAP");
+          let finalLayers = [...layers];
+          if (!hasBaseMap) {
+            finalLayers = [{
+              id: "base-map",
+              name: "Base Map",
+              type: "BASE_MAP" as LayerType,
+              visible: true,
+              opacity: 1,
+              zIndex: 0,
+              locked: true,
+              isBaseMap: true,
+              scale: 1.0,
+              offsetX: 0,
+              offsetY: 0,
+              minZoom: 0,
+              maxZoom: 200,
+              contentCounts: { pins: 0, images: 0, regions: 0, total: 0 },
+            }, ...layers];
+          }
+
+          // Remove any duplicate base-map entries by keeping unique IDs
+          // Additionally, prevent multiple base-map layers with different IDs
+          const baseMapLayers = finalLayers.filter((l) => l.isBaseMap || l.type === "BASE_MAP");
+          const uniqueLayers = finalLayers.filter((layer, index, self) => {
+            // For base-map layers, only keep the first one (prefer "base-map" id)
+            if ((layer.isBaseMap || layer.type === "BASE_MAP") && layer.id !== "base-map") {
+              return baseMapLayers.findIndex((l) => l.id === "base-map") >= 0 ? false :
+                     index === self.findIndex((l) => l.id === layer.id);
+            }
+            return index === self.findIndex((l) => l.id === layer.id);
+          });
+
+          // Sort by zIndex
+          uniqueLayers.sort((a, b) => a.zIndex - b.zIndex);
+
+          const newVisibleLayerIds = uniqueLayers
+            .filter((l) => l.visible)
+            .map((l) => l.id);
+          const newActiveLayerIds = uniqueLayers
+            .filter((l) => !l.locked)
+            .map((l) => l.id);
+          const baseMapLayer = uniqueLayers.find((l) => l.isBaseMap || l.type === "BASE_MAP");
+          const newBaseMapVisible = baseMapLayer?.visible ?? true;
+
+          // Auto-select first non-base layer as active if none selected
+          const firstActiveLayer = uniqueLayers.find((l) => !l.locked && !l.isBaseMap);
+          const newActiveLayerId = state.activeLayerId ?? firstActiveLayer?.id ?? null;
+
+          return {
+            layers: uniqueLayers,
+            visibleLayerIds: newVisibleLayerIds,
+            activeLayerIds: newActiveLayerIds,
+            baseMapVisible: newBaseMapVisible,
+            activeLayerId: newActiveLayerId,
+          };
+        }),
+
       reset: () => set(initialState),
     }),
     {
@@ -338,9 +515,12 @@ export const useGrid = () => useMapStore((state) => state.grid);
 export const useSnap = () => useMapStore((state) => state.snap);
 export const useScale = () => useMapStore((state) => state.scale);
 export const useZoom = () => useMapStore((state) => state.zoom);
+export const useBackgroundColor = () => useMapStore((state) => state.backgroundColor);
 export const useLayers = () => useMapStore((state) => state.layers);
 export const useSelectedLayerId = () =>
   useMapStore((state) => state.selectedLayerId);
+export const useActiveLayerId = () =>
+  useMapStore((state) => state.activeLayerId);
 export const useVisibleLayerIds = () =>
   useMapStore((state) => state.visibleLayerIds);
 export const useActiveLayerIds = () =>
@@ -352,3 +532,12 @@ export const useLayerPosition = (layerId: string) =>
     const layer = state.layers.find((l) => l.id === layerId);
     return { offsetX: layer?.offsetX ?? 0, offsetY: layer?.offsetY ?? 0 };
   });
+
+// Layer-specific hooks
+export const useLayerById = (layerId: string) =>
+  useMapStore((state) => state.layers.find((l) => l.id === layerId));
+
+export const useBaseMapLayer = () =>
+  useMapStore((state) =>
+    state.layers.find((l) => l.isBaseMap || l.type === "BASE_MAP")
+  );

@@ -47,6 +47,24 @@ export function ImageCard({
     setImageError(true);
   };
 
+  // Null safety checks for gallery item properties
+  const imageUrl = image?.imageUrl ?? "";
+  const title = image?.title ?? "Untitled";
+  const description = image?.description;
+  const pinId = image?.pinId ?? image?.pin?.id ?? null;
+  const loreEntryId = image?.loreEntryId ?? image?.loreEntry?.id ?? null;
+
+  // Skip rendering if image data is invalid
+  if (!image || !imageUrl) {
+    return (
+      <Card className={cn("aspect-square bg-background-card rounded-sm overflow-hidden", className)}>
+        <CardContent className="p-0 h-full relative flex items-center justify-center bg-background-elevated">
+          <FileImage className="w-12 h-12 text-text-muted" />
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card
       className={cn(
@@ -60,8 +78,8 @@ export function ImageCard({
         {/* Image */}
         {!imageError ? (
           <Image
-            src={image.imageUrl}
-            alt={image.title}
+            src={imageUrl}
+            alt={title}
             fill
             className="object-cover"
             onError={handleImageError}
@@ -78,22 +96,22 @@ export function ImageCard({
 
         {/* Title */}
         <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
-          <p className="text-white text-xs font-medium truncate">{image.title}</p>
-          {image.description && (
+          <p className="text-white text-xs font-medium truncate">{title}</p>
+          {description && (
             <p className="text-white/70 text-xs truncate">
-              {image.description}
+              {description}
             </p>
           )}
         </div>
 
         {/* Linked indicators */}
         <div className="absolute top-2 left-2 flex gap-1">
-          {image.pinId && (
+          {pinId && (
             <Badge className="bg-accent-gold text-background-base hover:bg-accent-gold/80">
               Pin
             </Badge>
           )}
-          {image.loreEntryId && (
+          {loreEntryId && (
             <Badge className="bg-purple-600 text-white hover:bg-purple-600/80">
               Lore
             </Badge>

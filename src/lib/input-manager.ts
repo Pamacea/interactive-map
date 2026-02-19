@@ -128,7 +128,7 @@ function isValidButton(button: number): button is MouseButton {
   return button === 0 || button === 1 || button === 2;
 }
 
-function isHTMLElement(target: EventTarget | null): target is HTMLElement {
+export function isHTMLElement(target: EventTarget | null): target is HTMLElement {
   return target !== null && "tagName" in target;
 }
 

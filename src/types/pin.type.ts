@@ -65,6 +65,7 @@ export const PIN_TYPE_ICONS: Record<keyof typeof PrismaPinType, string[]> = {
 export interface Pin {
   id: string;
   title: string;
+  slug: string | null; // Unique tag identifier for linking
   description: string | null;
   pinType: (typeof PrismaPinType)[keyof typeof PrismaPinType];
   latitude: number;
@@ -116,6 +117,7 @@ export interface PinCreateInput {
 export interface PinUpdateInput {
   id: string;
   title?: string;
+  slug?: string | null;
   description?: string;
   pinType?: (typeof PrismaPinType)[keyof typeof PrismaPinType];
   latitude?: number;

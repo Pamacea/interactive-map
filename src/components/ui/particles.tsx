@@ -27,6 +27,12 @@ export function FloatingParticles() {
   const [isVisible, setIsVisible] = useState(false);
   const [isInView, setIsInView] = useState(true);
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const isInViewRef = useRef(isInView);
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    isInViewRef.current = isInView;
+  }, [isInView]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -76,7 +82,7 @@ export function FloatingParticles() {
       setIsVisible(true);
       const animate = () => {
         // Skip animation when not in view (performance optimization)
-        if (!isInView) {
+        if (!isInViewRef.current) {
           animationRef.current = requestAnimationFrame(animate);
           return;
         }
@@ -120,7 +126,7 @@ export function FloatingParticles() {
         observerRef.current.disconnect();
       }
     };
-  }, [isInView]);
+  }, []);
 
   return (
     <canvas

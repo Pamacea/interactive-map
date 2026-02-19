@@ -1,8 +1,10 @@
-import { memo, type ReactNode } from "react";
+import { memo, type ReactNode, useCallback } from "react";
 import type { PinWithLayer } from "../../logic/use-pins-filtering";
 import { MapPinsWrapper } from "./map-canvas/map-pins-wrapper";
 import { MapLayersIndicator } from "./map-layers-indicator";
+import { RegionsRenderer } from "./regions-renderer";
 import type { Transform } from "../../logic/use-map-pan";
+import type { RegionWithLayer, Region } from "@/stores/regions";
 
 interface MapLayersProps {
   baseMapVisible: boolean;
@@ -28,7 +30,18 @@ interface MapLayersProps {
     scale?: number;
     offsetX?: number;
     offsetY?: number;
+    opacity?: number;
+    minZoom?: number;
+    maxZoom?: number;
   }>;
+  // Regions props
+  regions?: RegionWithLayer[];
+  selectedRegionId?: string | null;
+  hoverRegionId?: string | null;
+  isDraggingRegion?: boolean;
+  onRegionClick?: (region: Region) => void;
+  onRegionMouseDown?: (region: Region, e: React.MouseEvent) => void;
+  onRegionHover?: (region: Region | null) => void;
   children?: ReactNode;
 }
 
@@ -53,12 +66,50 @@ export const MapLayers = memo(function MapLayers({
   showGrid,
   gridSize,
   visibleLayers,
+  regions,
+  selectedRegionId,
+  hoverRegionId,
+  isDraggingRegion,
+  onRegionClick,
+  onRegionMouseDown,
+  onRegionHover,
   children,
 }: MapLayersProps) {
+  // Convert RegionWithLayer to Region for callbacks
+  const handleRegionClick = useCallback((regionWithLayer: RegionWithLayer) => {
+    if (onRegionClick) {
+      const { layerVisible, layerOpacity, layerScale, layerOffsetX, layerOffsetY, ...region } = regionWithLayer;
+      onRegionClick(region);
+    }
+  }, [onRegionClick]);
+
+  const handleRegionMouseDown = useCallback((regionWithLayer: RegionWithLayer, e: React.MouseEvent) => {
+    if (onRegionMouseDown) {
+      const { layerVisible, layerOpacity, layerScale, layerOffsetX, layerOffsetY, ...region } = regionWithLayer;
+      onRegionMouseDown(region, e);
+    }
+  }, [onRegionMouseDown]);
+
+  const handleRegionHover = useCallback((regionWithLayer: RegionWithLayer | null) => {
+    if (onRegionHover) {
+      if (!regionWithLayer) {
+        onRegionHover(null);
+        return;
+      }
+      const { layerVisible, layerOpacity, layerScale, layerOffsetX, layerOffsetY, ...region } = regionWithLayer;
+      onRegionHover(region);
+    }
+  }, [onRegionHover]);
+
+  // Find base map layer opacity
+  const baseMapLayer = visibleLayers.find(l => l.isBaseMap);
+  const baseMapOpacity = baseMapLayer?.opacity ?? 1;
+
   return (
     <>
       <MapPinsWrapper
         baseMapVisible={baseMapVisible}
+        baseMapOpacity={baseMapOpacity}
         visiblePins={visiblePins}
         selectedPin={selectedPin}
         imageDimensions={imageDimensions}
@@ -74,6 +125,18 @@ export const MapLayers = memo(function MapLayers({
         showGrid={showGrid}
         gridSize={gridSize}
       />
+      {regions && regions.length > 0 && (
+        <RegionsRenderer
+          regions={regions}
+          transform={transform}
+          selectedRegionId={selectedRegionId ?? null}
+          hoverRegionId={hoverRegionId ?? null}
+          isDraggingRegion={isDraggingRegion ?? false}
+          onRegionClick={handleRegionClick}
+          onRegionMouseDown={handleRegionMouseDown}
+          onRegionHover={handleRegionHover}
+        />
+      )}
       <MapLayersIndicator layers={visibleLayers} />
       {children}
     </>

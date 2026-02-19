@@ -1,16 +1,40 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Clock } from 'lucide-react';
 import { FloatingPanel } from './floating-panel';
 import { ActivityFeed } from './activity-feed';
 import { useActivityEvents } from '@/hooks/use-activity-events';
+import { usePanelState } from '@/store/use-floating-panels-store';
 
 interface ActivityModuleProps {
   worldId: string;
 }
 
+/**
+ * ActivityModule - Floating panel for activity feed
+ *
+ * Features:
+ * - Lazy loading (only fetches when visible)
+ * - Polling for real-time updates
+ * - Suspense boundary
+ */
 export function ActivityModule({ worldId }: ActivityModuleProps) {
+  const { isVisible } = usePanelState("activity");
+
+  // Only render content when visible to save resources
+  if (!isVisible) {
+    return (
+      <FloatingPanel
+        panelId="activity"
+        title="Activity"
+        icon={<Clock className="w-4 h-4" />}
+      >
+        {/* Content will load when panel opens */}
+      </FloatingPanel>
+    );
+  }
+
   return (
     <FloatingPanel
       panelId="activity"
@@ -25,7 +49,11 @@ export function ActivityModule({ worldId }: ActivityModuleProps) {
 }
 
 function ActivityFeedContent({ worldId }: { worldId: string }) {
-  const { data: events, isLoading } = useActivityEvents(worldId);
+  // Enable polling only when panel is visible
+  const { data: events, isLoading } = useActivityEvents(worldId, {
+    pollingInterval: 30000, // 30 seconds
+    enabled: true,
+  });
 
   return <ActivityFeed events={events || []} isLoading={isLoading} />;
 }

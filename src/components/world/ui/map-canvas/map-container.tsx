@@ -8,8 +8,12 @@ interface MapContainerProps {
   isDragging: boolean;
   showContextMenu: boolean;
   onMouseDown: (e: React.MouseEvent<HTMLDivElement>) => void;
+  onMouseMove?: (e: React.MouseEvent<HTMLDivElement>) => void;
+  onMouseUp?: (e: React.MouseEvent<HTMLDivElement>) => void;
   onClick: (e: React.MouseEvent<HTMLDivElement>) => void;
   onContextMenu: (e: React.MouseEvent<HTMLDivElement>) => void;
+  cursor?: string; // Dynamic cursor based on active tool
+  backgroundColor?: string; // Background color for the map
   children: ReactNode;
 }
 
@@ -21,8 +25,12 @@ export const MapContainer = memo(
         isDragging,
         showContextMenu,
         onMouseDown,
+        onMouseMove,
+        onMouseUp,
         onClick,
         onContextMenu,
+        cursor,
+        backgroundColor = "#1a1a1a",
         children,
       },
       ref
@@ -36,17 +44,39 @@ export const MapContainer = memo(
         }
       }, [setMapElement, ref]);
 
+      // Build cursor style
+      const getCursorStyle = (): React.CSSProperties => {
+        // If we have a custom cursor from tools manager, use it as style
+        if (cursor) {
+          return { cursor };
+        }
+        // Default cursors
+        if (isCreatingPin && !showContextMenu) {
+          return { cursor: "crosshair" };
+        }
+        if (isDragging) {
+          return { cursor: "grabbing" };
+        }
+        return { cursor: "grab" };
+      };
+
+      const getCursorClass = () => {
+        // Additional classes for ring effect when creating pin
+        if (isCreatingPin && !showContextMenu && !cursor) {
+          return "ring-2 ring-accent-gold/50 ring-inset";
+        }
+        return "";
+      };
+
       return (
         <div
           ref={ref}
-          className={`relative w-full h-full bg-gradient-to-br from-obsidian via-obsidian to-obsidian overflow-hidden ${
-            isCreatingPin && !showContextMenu
-              ? "cursor-crosshair ring-2 ring-accent-gold/50 ring-inset"
-              : isDragging
-                ? "cursor-grabbing"
-                : "cursor-grab"
-          }`}
+          data-map-container="true"
+          className={`relative w-full h-full overflow-hidden ${getCursorClass()}`}
+          style={{ backgroundColor, ...getCursorStyle() }}
           onMouseDown={onMouseDown}
+          onMouseMove={onMouseMove}
+          onMouseUp={onMouseUp}
           onClick={onClick}
           onContextMenu={onContextMenu}
         >

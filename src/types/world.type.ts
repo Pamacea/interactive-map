@@ -24,11 +24,23 @@ export const LoreCategoryEnum = z.enum([
   "CUSTOM",
 ]);
 
+// Layer type enum
+export const LayerTypeEnum = z.enum([
+  "BASE_MAP",
+  "MARKERS",
+  "IMAGES",
+  "REGIONS",
+  "GROUP",
+  "CUSTOM",
+]);
+
 export const MapLayerSchema = z.object({
   id: z.string().cuid(),
   name: z.string(),
   description: z.string().nullable(),
+  type: LayerTypeEnum,
   isVisible: z.boolean().default(true),
+  locked: z.boolean().default(false),
   opacity: z.number().default(1.0),
   zIndex: z.number().default(0),
   offsetX: z.number().default(0),
@@ -113,12 +125,16 @@ export const OptimizedWorldLayerSchema = z.object({
   id: z.string().cuid(),
   name: z.string(),
   description: z.string().nullable(),
+  type: LayerTypeEnum,
   isVisible: z.boolean(),
+  locked: z.boolean(),
   opacity: z.number(),
   zIndex: z.number(),
   offsetX: z.number(),
   offsetY: z.number(),
   scale: z.number(),
+  minZoom: z.number(),
+  maxZoom: z.number(),
 });
 
 export const OptimizedWorldSchema = z.object({
@@ -153,5 +169,14 @@ export type WorldMember = z.infer<typeof WorldMemberSchema>;
 export type Permission = z.infer<typeof PermissionEnum>;
 export type PinType = z.infer<typeof PinTypeEnum>;
 export type LoreCategory = z.infer<typeof LoreCategoryEnum>;
+export type LayerType = z.infer<typeof LayerTypeEnum>;
 export type OptimizedWorld = z.infer<typeof OptimizedWorldSchema>;
 export type OptimizedWorldLayer = z.infer<typeof OptimizedWorldLayerSchema>;
+
+// Layer content counts type
+export interface LayerContentCounts {
+  pins: number;
+  images: number;
+  regions: number;
+  total: number;
+}

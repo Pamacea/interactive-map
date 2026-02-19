@@ -20,26 +20,23 @@ import {
   Church,
   Landmark,
   Flame,
-  Drop,
+  Droplets, // Drop doesn't exist, using Droplets instead
   Zap,
   Skull,
   Shield,
   Trophy,
   Key,
-  Chest,
-  Campfire,
+  Package, // Chest doesn't exist, using Package instead
+  Flame as Campfire, // Campfire doesn't exist, using Flame with alias
   Tent,
   Anchor,
   Binoculars,
   Compass,
   Flag,
   Ghost,
-  Dragon,
-  Witch,
   Sparkles,
-  Coins,
-  PotionIcon as Potion,
-  SkullIcon as SkullIcon,
+  CircleDollarSign, // Coins doesn't exist, using CircleDollarSign instead
+  FlaskConical, // Potion doesn't exist, using FlaskConical instead
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -131,9 +128,9 @@ const EMOJI_ICONS = {
     "🚢",
     "✈️",
   ],
-  combat: ["⚔️", "🛡️", "🏹", "🪓", "🗡️", "⚔️", "🔱", "🔥", "💣", "🎯"],
+  combat: ["⚔️", "🛡️", "🏹", "🪓", "🗡️", "🔱", "🔥", "💣", "🎯", "⚔️"],
   items: ["💎", "📜", "🛒", "👤", "👑", "💍", "🗝️", "📦", "🎁", "💰", "💀", "🧪"],
-  nature: ["🌊", "🔥", "💧", "⚡", "❄️", "🌈", "☀️", "🌙", "⭐", "🌙"],
+  nature: ["🌊", "🔥", "💧", "⚡", "❄️", "🌈", "☀️", "🌙", "⭐", "🌍"],
   creatures: [
     "🐉",
     "🦅",
@@ -180,26 +177,23 @@ const LUCIDE_ICONS = {
   Church,
   Landmark,
   Flame,
-  Drop,
+  Droplets,
   Zap,
   Skull,
   Shield,
   Trophy,
   Key,
-  Chest,
-  Campfire,
+  Package,
+  Campfire: Flame, // Use Flame as Campfire alternative
   Tent,
   Anchor,
   Binoculars,
   Compass,
   Flag,
   Ghost,
-  Dragon,
-  Witch,
   Sparkles,
-  Coins,
-  Potion,
-  SkullIcon,
+  CircleDollarSign,
+  FlaskConical,
 };
 
 type IconCategory = "emoji" | "lucide";

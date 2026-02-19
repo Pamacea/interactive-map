@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 import path from "path";
 
 const nextConfig: NextConfig = {
+  // Add metadataBase for social open graph images
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
+
   experimental: {
     serverActions: {
       bodySizeLimit: '10mb', // Allow file uploads up to 10MB
@@ -50,10 +53,10 @@ const nextConfig: NextConfig = {
             value: [
               "default-src 'self'",
               "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net",
-              "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
+              "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com",
               "img-src 'self' data: https: blob:",
-              "font-src 'self' data:",
-              "connect-src 'self' https://*.github.com https://*.discord.com",
+              "font-src 'self' data: https://fonts.gstatic.com",
+              "connect-src 'self' https://*.github.com https://*.discord.com https://fonts.googleapis.com https://fonts.gstatic.com",
               "frame-src 'self'",
               "base-uri 'self'",
               "form-action 'self'",

@@ -2,7 +2,21 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { Z_INDEX } from "@/constants/z-index";
 
-export type FloatingPanelId = "layers" | "lore" | "gallery" | "characters" | "filters" | "properties" | "members" | "activity" | "comments" | "versions" | "import" | "pin-details";
+/**
+ * Floating panel identifiers
+ *
+ * These panels provide spatial context and global tools:
+ * - lore: Wiki/lore entries for the world
+ * - gallery: World-level images
+ * - characters: World characters
+ * - filters: Global map filters
+ * - members: Collaboration/presence
+ * - activity: Activity feed
+ * - import: Data import
+ *
+ * Note: layers, properties, comments, versions are now in docks/sidebars
+ */
+export type FloatingPanelId = "lore" | "gallery" | "characters" | "filters" | "members" | "activity" | "import";
 
 export interface FloatingPanelState {
   id: FloatingPanelId;
@@ -29,90 +43,55 @@ interface FloatingPanelsStore {
   resetAll: () => void;
 }
 
-// Default panel configurations
+// Default panel configurations for floating modules
 const DEFAULT_PANELS: Record<FloatingPanelId, Omit<FloatingPanelState, "zIndex">> = {
-  layers: {
-    id: "layers",
-    isVisible: false,
-    position: { x: 16, y: 16 },
-    size: { width: 320, height: 450 },
-    isCollapsed: false,
-  },
   lore: {
     id: "lore",
     isVisible: false,
-    position: { x: 352, y: 16 },
+    position: { x: 16, y: 16 },
     size: { width: 400, height: 550 },
     isCollapsed: false,
   },
   gallery: {
     id: "gallery",
     isVisible: false,
-    position: { x: 688, y: 16 },
+    position: { x: 432, y: 16 },
     size: { width: 400, height: 550 },
     isCollapsed: false,
   },
   characters: {
     id: "characters",
     isVisible: false,
-    position: { x: 16, y: 482 },
+    position: { x: 16, y: 582 },
     size: { width: 350, height: 500 },
     isCollapsed: false,
   },
   filters: {
     id: "filters",
     isVisible: false,
-    position: { x: 376, y: 482 },
+    position: { x: 382, y: 582 },
     size: { width: 280, height: 300 },
-    isCollapsed: false,
-  },
-  properties: {
-    id: "properties",
-    isVisible: false,
-    position: { x: 680, y: 482 },
-    size: { width: 320, height: 400 },
     isCollapsed: false,
   },
   members: {
     id: "members",
     isVisible: false,
-    position: { x: 680, y: 16 },
+    position: { x: 848, y: 16 },
     size: { width: 280, height: 350 },
     isCollapsed: false,
   },
   activity: {
     id: "activity",
     isVisible: false,
-    position: { x: 992, y: 16 },
+    position: { x: 848, y: 382 },
     size: { width: 280, height: 350 },
-    isCollapsed: false,
-  },
-  comments: {
-    id: "comments",
-    isVisible: false,
-    position: { x: 1276, y: 16 },
-    size: { width: 320, height: 450 },
-    isCollapsed: false,
-  },
-  versions: {
-    id: "versions",
-    isVisible: false,
-    position: { x: 16, y: 100 },
-    size: { width: 350, height: 500 },
     isCollapsed: false,
   },
   import: {
     id: "import",
     isVisible: false,
-    position: { x: 380, y: 100 },
+    position: { x: 1144, y: 16 },
     size: { width: 320, height: 400 },
-    isCollapsed: false,
-  },
-  "pin-details": {
-    id: "pin-details",
-    isVisible: false,
-    position: { x: 1100, y: 16 },
-    size: { width: 380, height: 500 },
     isCollapsed: false,
   },
 };
@@ -134,18 +113,13 @@ const getOrInitPanel = (
 
 // Create initial panels with z-index (above header)
 const createInitialPanels = (): Record<FloatingPanelId, FloatingPanelState> => ({
-  layers: { ...DEFAULT_PANELS.layers, zIndex: Z_INDEX.activeFloatingPanel },
   lore: { ...DEFAULT_PANELS.lore, zIndex: Z_INDEX.activeFloatingPanel },
   gallery: { ...DEFAULT_PANELS.gallery, zIndex: Z_INDEX.activeFloatingPanel },
   characters: { ...DEFAULT_PANELS.characters, zIndex: Z_INDEX.activeFloatingPanel },
   filters: { ...DEFAULT_PANELS.filters, zIndex: Z_INDEX.activeFloatingPanel },
-  properties: { ...DEFAULT_PANELS.properties, zIndex: Z_INDEX.activeFloatingPanel },
   members: { ...DEFAULT_PANELS.members, zIndex: Z_INDEX.activeFloatingPanel },
   activity: { ...DEFAULT_PANELS.activity, zIndex: Z_INDEX.activeFloatingPanel },
-  comments: { ...DEFAULT_PANELS.comments, zIndex: Z_INDEX.activeFloatingPanel },
-  versions: { ...DEFAULT_PANELS.versions, zIndex: Z_INDEX.activeFloatingPanel },
   import: { ...DEFAULT_PANELS.import, zIndex: Z_INDEX.activeFloatingPanel },
-  "pin-details": { ...DEFAULT_PANELS["pin-details"], zIndex: Z_INDEX.activeFloatingPanel },
 });
 
 export const useFloatingPanelsStore = create<FloatingPanelsStore>()(
@@ -271,18 +245,13 @@ export const useFloatingPanelsStore = create<FloatingPanelsStore>()(
 
 // Create memoized default panel states to avoid infinite loop warnings
 const DEFAULT_PANELS_WITH_ZINDEX: Record<FloatingPanelId, FloatingPanelState> = {
-  layers: { ...DEFAULT_PANELS.layers, zIndex: Z_INDEX.activeFloatingPanel },
   lore: { ...DEFAULT_PANELS.lore, zIndex: Z_INDEX.activeFloatingPanel },
   gallery: { ...DEFAULT_PANELS.gallery, zIndex: Z_INDEX.activeFloatingPanel },
   characters: { ...DEFAULT_PANELS.characters, zIndex: Z_INDEX.activeFloatingPanel },
   filters: { ...DEFAULT_PANELS.filters, zIndex: Z_INDEX.activeFloatingPanel },
-  properties: { ...DEFAULT_PANELS.properties, zIndex: Z_INDEX.activeFloatingPanel },
   members: { ...DEFAULT_PANELS.members, zIndex: Z_INDEX.activeFloatingPanel },
   activity: { ...DEFAULT_PANELS.activity, zIndex: Z_INDEX.activeFloatingPanel },
-  comments: { ...DEFAULT_PANELS.comments, zIndex: Z_INDEX.activeFloatingPanel },
-  versions: { ...DEFAULT_PANELS.versions, zIndex: Z_INDEX.activeFloatingPanel },
   import: { ...DEFAULT_PANELS.import, zIndex: Z_INDEX.activeFloatingPanel },
-  "pin-details": { ...DEFAULT_PANELS["pin-details"], zIndex: Z_INDEX.activeFloatingPanel },
 };
 
 // Selector hooks for specific panels

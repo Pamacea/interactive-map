@@ -22,6 +22,7 @@ import {
   verifyLorePermission,
   verifyGalleryPermission,
 } from "@/lib/server-helpers";
+import { generateSlug, generateUniqueSlug } from "@/lib/slug";
 
 /**
  * Upload an image and create a gallery item
@@ -99,10 +100,23 @@ export async function uploadGalleryImage(formData: FormData): Promise<Result<{ i
     const buffer = Buffer.from(bytes);
     await writeFile(filePath, buffer);
 
+    // Generate unique slug from title (without file extension)
+    const baseSlug = generateSlug(title);
+    const uniqueSlug = await generateUniqueSlug(
+      baseSlug,
+      async (slug) => {
+        const existing = await prisma.galleryItem.findFirst({
+          where: { worldId: gameWorldId, slug },
+        });
+        return !!existing;
+      }
+    );
+
     // Create gallery item in database
     const galleryItem = await prisma.galleryItem.create({
       data: {
         title,
+        slug: uniqueSlug,
         description: description || null,
         imageUrl,
         type: "IMAGE",
@@ -188,9 +202,9 @@ export async function getGalleryItemById(id: string) {
 }
 
 /**
- * Get all gallery items for a world
+ * Get all gallery items for a world (for tag autosuggest)
  * @param gameWorldId - World ID
- * @returns Array of gallery items
+ * @returns Array of gallery items with id, title, and slug
  */
 export async function getGalleryItemsByWorld(gameWorldId: string) {
   try {
@@ -199,26 +213,16 @@ export async function getGalleryItemsByWorld(gameWorldId: string) {
         OR: [
           { pin: { gameWorldId } },
           { loreEntry: { gameWorldId } },
-          // Also get items not linked to anything but should be in world
-          // This requires a worldId field, which we'll need to add to schema
+          { worldId: gameWorldId },
         ],
       },
-      orderBy: {
-        order: "asc",
+      select: {
+        id: true,
+        title: true,
+        slug: true,
       },
-      include: {
-        pin: {
-          select: {
-            id: true,
-            title: true,
-          },
-        },
-        loreEntry: {
-          select: {
-            id: true,
-            title: true,
-          },
-        },
+      orderBy: {
+        title: "asc",
       },
     });
 

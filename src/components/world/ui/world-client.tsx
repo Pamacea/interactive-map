@@ -1,33 +1,34 @@
 "use client";
 
-import { Suspense, useCallback, lazy, memo, useEffect } from "react";
+import { Suspense, useCallback, lazy, memo, useEffect, useState } from "react";
 import { MapSkeleton } from "@/components/world/ui/map-skeleton";
 import { FloatingParticles } from "@/components/ui/particles";
-import { useWorldInitialization } from "@/components/world/logic/use-world-initialization";
+import { useWorldInitializationWithWorldId } from "@/components/world/logic/use-world-initialization";
 import { useAutosavePreparation } from "@/components/world/logic/use-autosave-preparation";
 import { useAutosave } from "@/hooks/use-autosave";
 import { useKeyboardShortcut, SHORTCUTS } from "@/hooks/use-keyboard-shortcut";
 import { updateWorldState } from "@/actions/worlds";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
-import { MapExportProvider, useMapExport } from "@/components/export/utils/use-map-export-context";
+import { MapExportProvider } from "@/components/export/utils/use-map-export-context";
 import { useLoreStore } from "@/stores/use-lore-store";
 import { useSelectPin, useSetPins } from "@/stores/use-pins-store";
 import { useSearchStore } from "@/store/use-search-store";
+// New layout components
+import { TopBar } from "@/components/world/ui/bars";
+import { LeftDock, RightDock } from "@/components/world/ui/docks";
+// Floating modules - spatial context and global tools
 import {
-  FloatingHeader,
-  LayersModule,
   LoreModule,
   GalleryModule,
   FiltersModule,
-  PropertiesModule,
   MembersModule,
   CharactersModule,
   ActivityModule,
-  CommentsModule,
-  VersionsModule,
   ImportModule,
 } from "@/components/world/ui/floating";
-import { PinDetailsSidebar } from "@/components/world/ui/sidebar/pin-details-sidebar";
+// Tool controls
+import { MeasureControls } from "@/components/world/ui/measure-controls";
+import { BarsContainer, ShortcutsDialog } from "@/components/world/ui/bars";
 import type { OptimizedWorld } from "@/types/world.type";
 import type { Pin } from "@/types/pin.type";
 import type { LoreEntry } from "@/types/lore.type";
@@ -59,41 +60,35 @@ function FloatingUI({ world, pins, currentUserId, worldOwnerId }: {
   currentUserId?: string;
   worldOwnerId: string;
 }) {
-  const { getMapElement } = useMapExport();
-  const mapElement = getMapElement();
-
   const hasLayers = !!world.layers && world.layers.length > 0;
 
   return (
     <>
-      {/* Floating header (merged top bar) */}
-      <FloatingHeader
+      {/* Top Bar - Navigation, world title, user menu */}
+      <TopBar
         worldTitle={world.title}
         worldId={world.id}
-        mapElement={mapElement}
+        isOwner={currentUserId === worldOwnerId}
+        canEdit={currentUserId === worldOwnerId}
       />
 
-      {/* Floating modules */}
-      <LayersModule
+      {/* Left Dock - Tools and Layers */}
+      <LeftDock worldId={world.id} />
+
+      {/* Right Dock - Pin details and Map properties */}
+      <RightDock
         worldId={world.id}
-        worldLayers={world.layers ?? undefined}
-        mapImage={world.map}
+        world={world}
       />
 
+      {/* Floating modules - spatial context and global tools */}
       <LoreModule worldId={world.id} />
 
       <GalleryModule worldId={world.id} />
 
-      <PinDetailsSidebar
-        worldId={world.id}
-        worldLayers={world.layers ?? undefined}
-      />
-
       <CharactersModule worldId={world.id} />
 
       <FiltersModule />
-
-      <PropertiesModule />
 
       {/* Members module - only show if authenticated */}
       {currentUserId && (
@@ -109,19 +104,6 @@ function FloatingUI({ world, pins, currentUserId, worldOwnerId }: {
         <ActivityModule worldId={world.id} />
       )}
 
-      {/* Comments module - only show if authenticated */}
-      {currentUserId && (
-        <CommentsModule worldId={world.id} />
-      )}
-
-      {/* Versions module - only show if authenticated */}
-      {currentUserId && (
-        <VersionsModule
-          worldId={world.id}
-          canModify={currentUserId === worldOwnerId}
-        />
-      )}
-
       {/* Import module - only show if authenticated and can modify */}
       {currentUserId && currentUserId === worldOwnerId && (
         <ImportModule
@@ -129,6 +111,9 @@ function FloatingUI({ world, pins, currentUserId, worldOwnerId }: {
           canModify={currentUserId === worldOwnerId}
         />
       )}
+
+      {/* Measure tool controls - only shown when measuring */}
+      <MeasureControls />
     </>
   );
 }
@@ -142,8 +127,11 @@ export const WorldClient = memo(function WorldClient({
   currentUserId,
   worldOwnerId,
 }: WorldClientProps) {
+  // Shortcuts dialog state
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
+
   // Initialize layers from world data (handle undefined from Prisma)
-  useWorldInitialization(world.layers ?? null);
+  useWorldInitializationWithWorldId(world.id, world.layers ?? null);
 
   // Initialize lore store with server data
   const setLoreEntries = useLoreStore((state) => state.setLoreEntries);
@@ -184,6 +172,13 @@ export const WorldClient = memo(function WorldClient({
       ...SHORTCUTS.SEARCH,
       handler: toggleSearch,
     },
+    {
+      key: "?",
+      handler: () => {
+        setShortcutsOpen((prev) => !prev);
+        return true;
+      },
+    },
   ]);
 
   // Prepare world state for autosave
@@ -211,7 +206,7 @@ export const WorldClient = memo(function WorldClient({
   return (
     <ErrorBoundary>
       <MapExportProvider>
-        <div className="h-screen bg-void relative overflow-hidden">
+        <div className="h-screen w-screen bg-void relative overflow-hidden">
           {/* Fantasy background effects */}
           <div className="fixed inset-0 z-0 pointer-events-none">
             <div className="absolute inset-0 bg-grain opacity-[0.04]" aria-hidden="true" />
@@ -281,6 +276,16 @@ export const WorldClient = memo(function WorldClient({
           <Suspense fallback={null}>
             {/* We'll need to adapt AutosaveIndicator to floating */}
           </Suspense>
+
+          {/* Bottom bar and mini-map */}
+          <BarsContainer
+            mapImage={world.map}
+            worldId={world.id}
+            onHelpToggle={() => setShortcutsOpen(true)}
+          />
+
+          {/* Shortcuts dialog */}
+          <ShortcutsDialog isOpen={shortcutsOpen} onClose={() => setShortcutsOpen(false)} />
         </div>
       </MapExportProvider>
     </ErrorBoundary>

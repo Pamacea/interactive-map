@@ -1,6 +1,6 @@
 # Genesis - Feature Progress Tracker
 
-> Last updated: 2026-02-04 | Overall completion: **100%**
+> Last updated: 2026-02-19 | Overall completion: **100%**
 
 ---
 
@@ -8,8 +8,8 @@
 
 | Status | Features |
 |--------|----------|
-| **Fully Implemented** | Auth, Worlds, Pins, Layers, Explore, Search, Export, Lore, Gallery, Invite System, Collaboration, Characters |
-| **Not Started** | Templates, Advanced Features (version history, offline mode, etc.) |
+| **Fully Implemented** | Auth, Worlds, Pins, Layers, Tools, Regions, Explore, Search, Export, Lore, Gallery, Invite System, Collaboration, Characters |
+| **Not Started** | Templates, Advanced Features (WebSocket, offline mode, etc.) |
 
 ---
 
@@ -93,20 +93,76 @@
 ### 1.4 Map Layers System
 **Status**: ✅ Complete | **Priority**: Core | **Tests**: Manual
 
-- **Schema**: MapLayer (visibility, opacity, offsetX, offsetY, zIndex)
-- **UI Components** (`src/components/layers/`):
-  - Layer panel with toggle controls
-  - Layer properties editor
-  - Add/remove layer buttons
-  - Layer reorder UI
+- **Schema**: MapLayer, LayerType enum (BASE_MAP, MARKERS, IMAGES, REGIONS, GROUP, CUSTOM)
+- **UI Components** (`src/components/world/ui/docks/`):
+  - `layers-panel.tsx` - Collapsible layers panel with drag-and-drop
+  - Layer cards with visibility/lock controls
+  - Layer properties editor (opacity, offset, z-index)
 - **Backend** (`src/actions/layers.ts`):
   - `createLayer`, `updateLayer`, `deleteLayer`
-  - `reorderLayers`
+  - `reorderLayers`, `toggleLayerVisibility`, `toggleLayerLock`
 - **Features**:
   - Multiple map layers per world
-  - Independent visibility/opacity per layer
+  - Layer types: Base Map, Markers, Images, Regions, Groups
+  - Independent visibility/opacity/lock per layer
   - Layer offset for parallax effects
-  - Layer lock for editing
+  - Drag-and-drop reordering
+  - Layer-as-group support
+
+---
+
+### 1.5 Tools System ✨ NEW v1.2.0
+**Status**: ✅ Complete | **Priority**: Core | **Tests**: Manual
+
+- **State Management**: `src/stores/tools/use-tools-store.ts` (180+ lines)
+  - Tool modes: Select, Create Pin, Pan, Measure, Area
+  - Measure state (points, segments, distances)
+  - Selection state (rectangle, multi-select)
+- **UI Components** (`src/components/world/ui/docks/`):
+  - `tools-panel.tsx` - Tool buttons with shortcuts
+  - `measure-overlay.tsx` - Visual measurement display
+  - `selection-rectangle.tsx` - Area selection overlay
+- **Keyboard Shortcuts**: V (Select), P (Pin), H (Pan), M (Measure), A (Area), Space (Temp Pan)
+- **Features**: Distinct cursors, multi-point measurement, area selection, optimistic UI
+
+---
+
+### 1.6 Regions System ✨ NEW v1.2.0
+**Status**: ✅ Complete | **Priority**: Core | **Tests**: Manual
+
+- **Schema**: Region, RegionType (RECTANGLE, CIRCLE, POLYGON)
+  - Coordinates (JSON), color, opacity, border customization
+  - Visible/locked states, layer association
+- **Backend** (`src/actions/regions.ts`): Full CRUD operations
+- **UI Components**: `regions-renderer.tsx` - Render regions on map
+- **Features**: Rectangle/circle/polygon shapes, visual customization, layer organization
+
+---
+
+### 1.7 Dock UI System ✨ NEW v1.2.0
+**Status**: ✅ Complete | **Priority**: Core | **Tests**: Manual
+
+- **UI Components** (`src/components/world/ui/docks/`):
+  - `left-dock.tsx` - Left collapsible dock (Tools, Layers)
+  - `right-dock.tsx` - Right collapsible dock (Pin Details, Permissions, Properties)
+- **Logic Hooks**: `use-left-dock.ts`, `use-right-dock.ts`, `use-resizable-dock.ts`
+- **Features**: Collapsible panels, keyboard shortcuts, persistent state, responsive
+
+---
+
+### 1.8 Top & Bottom Bars ✨ NEW v1.2.0
+**Status**: ✅ Complete | **Priority**: Core | **Tests**: Manual
+
+- **UI Components** (`src/components/world/ui/bars/`):
+  - `top-bar.tsx`, `bottom-bar.tsx` - Main navigation bars
+  - `undo-redo-control.tsx`, `zoom-control.tsx`
+  - `mini-map.tsx`, `scale-selector.tsx`
+  - `shortcuts-dialog.tsx` - Keyboard shortcuts reference
+- **Features**: Undo/redo, mini-map with viewport, scale selector, help dialog
+
+---
+
+### 1.9 Explore / Public Worlds
 
 ---
 
@@ -126,7 +182,7 @@
 
 ---
 
-### 1.6 Search System ✨ NEW
+### 1.10 Search System
 **Status**: ✅ Complete | **Priority**: Medium | **Tests**: Manual
 
 - **Backend** (`src/actions/search.ts`):
@@ -150,7 +206,7 @@
 
 ---
 
-### 1.7 Export Functionality ✨ NEW
+### 1.11 Export Functionality
 **Status**: ✅ Complete | **Priority**: Medium | **Tests**: Manual
 
 - **Backend** (`src/actions/export.ts`):

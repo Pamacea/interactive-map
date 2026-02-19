@@ -80,6 +80,7 @@ export const UpdatePinSchema = z
   .object({
     id: z.string().cuid(),
     title: z.string().min(1).max(200).optional(),
+    slug: z.string().max(100).regex(/^[a-z0-9-]*$/, "Slug must contain only lowercase letters, numbers, and hyphens").optional().nullable(),
     description: z.string().max(5000).optional(),
     pinType: PinTypeSchema.optional(),
     latitude: z.number().min(-90).max(90).optional(),

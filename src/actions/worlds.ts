@@ -130,12 +130,16 @@ export async function getWorldById(id: string): Promise<OptimizedWorld | null> {
             id: true,
             name: true,
             description: true,
+            type: true,
             isVisible: true,
+            locked: true,
             opacity: true,
             zIndex: true,
             offsetX: true,
             offsetY: true,
             scale: true,
+            minZoom: true,
+            maxZoom: true,
           },
           orderBy: { zIndex: "asc" },
         },
@@ -184,12 +188,16 @@ export async function getWorldWithData(id: string) {
             id: true,
             name: true,
             description: true,
+            type: true,
             isVisible: true,
+            locked: true,
             opacity: true,
             zIndex: true,
             offsetX: true,
             offsetY: true,
             scale: true,
+            minZoom: true,
+            maxZoom: true,
           },
           orderBy: { zIndex: "asc" },
         },
@@ -749,4 +757,182 @@ export async function removeWorldMember(
 
     return { memberId };
   }, "removeWorldMember");
+}
+
+/**
+ * Create an invite for a world
+ * @param worldId - World ID
+ * @param email - Email to invite (optional)
+ * @param permission - Permission level for invitee
+ * @param expiresInDays - Days until invite expires (default 7)
+ * @returns Result with invite token or error
+ */
+export async function createInvite(
+  worldId: string,
+  email: string | null,
+  permission: "READER" | "EDITOR" | "OWNER",
+  expiresInDays: number = 7
+): Promise<Result<{ inviteToken: string; inviteLink: string }>> {
+  return safeAsync(async () => {
+    const user = await getAuthenticatedUser();
+
+    // Verify user is an owner of this world
+    await verifyWorldPermission(worldId, user.id, "OWNER");
+
+    // Check if world exists
+    const world = await prisma.gameWorld.findUnique({
+      where: { id: worldId },
+    });
+
+    if (!world) {
+      throw new ValidationError("World not found");
+    }
+
+    // Generate invite token
+    const inviteToken = Math.random().toString(36).substring(2, 10).toUpperCase();
+
+    // Calculate expiration date
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + expiresInDays);
+
+    // Create invite record
+    await prisma.worldInvite.create({
+      data: {
+        worldId: worldId,
+        email,
+        permission,
+        token: inviteToken,
+        expiresAt,
+        invitedByUserId: user.id,
+      },
+    });
+
+    const inviteLink = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/world/${worldId}/invite/${inviteToken}`;
+
+    revalidatePath(`/world/${worldId}`);
+
+    return { inviteToken, inviteLink };
+  }, "createInvite");
+}
+
+/**
+ * Create a shareable link for a world
+ * @param worldId - World ID
+ * @param permission - Permission level for the link
+ * @param expiresInDays - Days until link expires (default 30)
+ * @returns Result with share link or error
+ */
+export async function createShareLink(
+  worldId: string,
+  permission: "READER" | "EDITOR" | "OWNER" = "READER",
+  expiresInDays: number = 30
+): Promise<Result<{ shareLink: string; token: string }>> {
+  return safeAsync(async () => {
+    const user = await getAuthenticatedUser();
+
+    // Verify user is an owner of this world
+    await verifyWorldPermission(worldId, user.id, "OWNER");
+
+    // Check if world exists
+    const world = await prisma.gameWorld.findUnique({
+      where: { id: worldId },
+    });
+
+    if (!world) {
+      throw new ValidationError("World not found");
+    }
+
+    // Generate share token
+    const shareToken = Math.random().toString(36).substring(2, 12);
+
+    // Calculate expiration date
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + expiresInDays);
+
+    // Create share link record (using WorldInvite with null email)
+    await prisma.worldInvite.create({
+      data: {
+        worldId: worldId,
+        email: null,
+        permission,
+        token: shareToken,
+        expiresAt,
+        invitedByUserId: user.id,
+      },
+    });
+
+    const shareLink = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/world/${worldId}/invite/${shareToken}`;
+
+    revalidatePath(`/world/${worldId}`);
+
+    return { shareLink, token: shareToken };
+  }, "createShareLink");
+}
+
+/**
+ * Get pending invites for a world
+ * @param worldId - World ID
+ * @returns Result with list of pending invites or error
+ */
+export async function getPendingInvites(
+  worldId: string
+): Promise<Result<Array<{ id: string; email: string | null; permission: string; token: string; expiresAt: Date }>>> {
+  return safeAsync(async () => {
+    const user = await getAuthenticatedUser();
+
+    // Verify user is an owner of this world
+    await verifyWorldPermission(worldId, user.id, "OWNER");
+
+    const invites = await prisma.worldInvite.findMany({
+      where: {
+        worldId: worldId,
+        status: "PENDING",
+        expiresAt: { gte: new Date() },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return invites.map((invite) => ({
+      id: invite.id,
+      email: invite.email,
+      permission: invite.permission,
+      token: invite.token,
+      expiresAt: invite.expiresAt,
+    }));
+  }, "getPendingInvites");
+}
+
+/**
+ * Revoke a pending invite
+ * @param inviteId - Invite ID to revoke
+ * @returns Result with success status or error
+ */
+export async function revokeInvite(
+  inviteId: string
+): Promise<Result<{ inviteId: string }>> {
+  return safeAsync(async () => {
+    const user = await getAuthenticatedUser();
+
+    // Get the invite
+    const invite = await prisma.worldInvite.findUnique({
+      where: { id: inviteId },
+      include: { world: true },
+    });
+
+    if (!invite) {
+      throw new ValidationError("Invite not found");
+    }
+
+    // Verify user is an owner of this world
+    await verifyWorldPermission(invite.worldId, user.id, "OWNER");
+
+    // Delete the invite
+    await prisma.worldInvite.delete({
+      where: { id: inviteId },
+    });
+
+    revalidatePath(`/world/${invite.worldId}`);
+
+    return { inviteId };
+  }, "revokeInvite");
 }

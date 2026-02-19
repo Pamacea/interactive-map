@@ -1,10 +1,13 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useMapStore } from "@/stores/map-store";
+import { useFloatingPanelsStore } from "@/store/use-floating-panels-store";
+import { useLeftDock } from "../logic/use-left-dock";
 import { useQuery } from "@tanstack/react-query";
 import { getWorldById, getWorldWithData } from "@/actions/worlds";
 import { CACHE_TIMES } from "@/components/providers/query-provider";
 import type { OptimizedWorldLayer } from "@/types/world.type";
 import type { OptimizedWorld } from "@/types/world.type";
+import type { Layer } from "@/stores/map-store";
 
 /**
  * Initializes map layers from world data into Zustand store
@@ -12,7 +15,25 @@ import type { OptimizedWorld } from "@/types/world.type";
  * Memoized to prevent unnecessary recalculations
  */
 export function useWorldInitialization(worldLayers: OptimizedWorldLayer[] | null) {
-  const setLayers = useMapStore((state) => state.setLayers);
+  const initializeLayers = useMapStore((state) => state.initializeLayers);
+  const setWorldId = useMapStore((state) => state.setWorldId);
+
+  // Track previous world ID to detect world changes
+  const prevWorldIdRef = useRef<string | null>(null);
+  const currentWorldId = useMapStore((state) => state.worldId);
+
+  // Reset panel positions when world changes
+  const resetFloatingPanels = useFloatingPanelsStore((state) => state.resetAll);
+  const resetLeftDock = useLeftDock((state) => state.reset);
+
+  useEffect(() => {
+    // When world ID changes, reset panels and docks
+    if (currentWorldId && currentWorldId !== prevWorldIdRef.current) {
+      resetFloatingPanels();
+      resetLeftDock();
+      prevWorldIdRef.current = currentWorldId;
+    }
+  }, [currentWorldId, resetFloatingPanels, resetLeftDock]);
 
   // Memoize layer transformation to prevent recalculation on every render
   const uiLayers = useMemo(() => {
@@ -20,24 +41,44 @@ export function useWorldInitialization(worldLayers: OptimizedWorldLayer[] | null
       return [];
     }
 
-    return worldLayers.map((layer) => ({
+    return worldLayers.map((layer): Layer => ({
       id: layer.id,
       name: layer.name,
+      type: layer.type as any,
       visible: layer.isVisible,
-      locked: false,
+      locked: layer.locked,
       opacity: layer.opacity,
       zIndex: layer.zIndex,
       scale: layer.scale ?? 1.0,
       offsetX: layer.offsetX ?? 0,
       offsetY: layer.offsetY ?? 0,
+      minZoom: layer.minZoom,
+      maxZoom: layer.maxZoom,
+      isBaseMap: layer.type === "BASE_MAP",
+      contentCounts: { pins: 0, images: 0, regions: 0, total: 0 }, // Will be fetched separately
     }));
   }, [worldLayers]);
 
   useEffect(() => {
-    if (uiLayers.length > 0) {
-      setLayers(uiLayers);
-    }
-  }, [uiLayers, setLayers]);
+    // Initialize layers from server data
+    initializeLayers(uiLayers);
+  }, [uiLayers, initializeLayers]);
+}
+
+/**
+ * Extended initialization that also sets worldId
+ */
+export function useWorldInitializationWithWorldId(worldId: string, worldLayers: OptimizedWorldLayer[] | null) {
+  const initializeLayers = useMapStore((state) => state.initializeLayers);
+  const setWorldId = useMapStore((state) => state.setWorldId);
+
+  // Set world ID first
+  useEffect(() => {
+    setWorldId(worldId);
+  }, [worldId, setWorldId]);
+
+  // Then initialize layers
+  useWorldInitialization(worldLayers);
 }
 
 /**

@@ -21,10 +21,13 @@ export {
   // UI Store
   usePinsUIStore,
   useSelectedPinId,
+  useSelectedPinIds,
   useIsCreatingPin,
   useIsEditingPin,
   useHoverPinId,
   useSelectPin,
+  useTogglePinSelection,
+  useSetMultiplePinSelection,
   useClearSelection,
   useStartCreating,
   useStopCreating,
@@ -93,6 +96,7 @@ type PinTypeEnum = (typeof PinType)[keyof typeof PinType];
 export interface LegacyPinsStore {
   // UI State
   selectedPinId: string | null;
+  selectedPinIds: string[];
   isCreating: boolean;
   isEditing: boolean;
   hoverPinId: string | null;
@@ -111,6 +115,8 @@ export interface LegacyPinsStore {
 
   // Actions
   selectPin: (pinId: string | null) => void;
+  togglePinSelection: (pinId: string) => void;
+  setMultiplePinSelection: (pinIds: string[]) => void;
   clearSelection: () => void;
   startCreating: () => void;
   stopCreating: () => void;
@@ -163,6 +169,7 @@ export const usePinsStore = (): LegacyPinsStore => {
   return {
     // UI State
     selectedPinId: uiState.selectedPinId,
+    selectedPinIds: uiState.selectedPinIds,
     isCreating: uiState.isCreating,
     isEditing: uiState.isEditing,
     hoverPinId: uiState.hoverPinId,
@@ -181,6 +188,8 @@ export const usePinsStore = (): LegacyPinsStore => {
 
     // UI Actions
     selectPin: uiActions().selectPin,
+    togglePinSelection: uiActions().togglePinSelection,
+    setMultiplePinSelection: uiActions().setMultiplePinSelection,
     clearSelection: uiActions().clearSelection,
     startCreating: uiActions().startCreating,
     stopCreating: uiActions().stopCreating,

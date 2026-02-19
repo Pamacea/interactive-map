@@ -8,6 +8,7 @@ export interface MapImageProps {
   showGrid: boolean;
   gridSize: number;
   layerScale?: number; // Scale factor for layer content (0.5 - 2.0)
+  opacity?: number; // Opacity for the map image (0-1)
   onLoad: () => void;
   onError: () => void;
   onContextMenu?: (e: React.MouseEvent) => void;
@@ -21,6 +22,7 @@ export const MapImage: FC<MapImageProps> = ({
   showGrid,
   gridSize,
   layerScale = 1,
+  opacity = 1,
   onLoad,
   onError,
   onContextMenu,
@@ -38,6 +40,7 @@ export const MapImage: FC<MapImageProps> = ({
       style={{
         width: scaledWidth > 0 ? scaledWidth : "100%",
         height: scaledHeight > 0 ? scaledHeight : "100%",
+        opacity,
       }}
     >
       <img

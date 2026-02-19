@@ -21,6 +21,7 @@ import {
 import type { Pin } from "@prisma/client";
 import { safeLogCollaborationEvent } from "@/actions/presence";
 import { CollaborationEventType } from "@/lib/presence";
+import { generateSlug, generateUniqueSlug } from "@/lib/slug";
 
 /**
  * Create a new pin in a world
@@ -49,10 +50,23 @@ export async function createPin(data: PinCreateInput): Promise<Result<{ pinId: s
       }
     }
 
+    // Generate unique slug from title
+    const baseSlug = generateSlug(validated.title);
+    const uniqueSlug = await generateUniqueSlug(
+      baseSlug,
+      async (slug) => {
+        const existing = await prisma.pin.findFirst({
+          where: { gameWorldId: validated.gameWorldId, slug },
+        });
+        return !!existing;
+      }
+    );
+
     // Create pin
     const pin = await prisma.pin.create({
       data: {
         title: validated.title,
+        slug: uniqueSlug,
         description: validated.description,
         pinType: validated.pinType,
         latitude: validated.latitude,
@@ -129,6 +143,30 @@ export async function getPinById(id: string) {
 }
 
 /**
+ * Get all pins for a world (for tag autosuggest)
+ * @param gameWorldId - World ID
+ * @returns Array of pins with id, title, and slug
+ */
+export async function getPinsByWorld(gameWorldId: string) {
+  try {
+    const pins = await prisma.pin.findMany({
+      where: { gameWorldId },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+      },
+      orderBy: { title: "asc" },
+    });
+
+    return pins;
+  } catch (error) {
+    console.error("[getPinsByWorld] Failed to fetch pins:", error);
+    return [];
+  }
+}
+
+/**
  * Update an existing pin
  * @param data - Pin update data (validated with Zod)
  * @returns Result with updated pin or error
@@ -158,6 +196,7 @@ export async function updatePin(data: PinUpdateInput): Promise<Result<Pin>> {
     // Build update data (only include fields that are provided)
     const updateData: Partial<Pin> = {};
     if (validated.title !== undefined) updateData.title = validated.title;
+    if (validated.slug !== undefined) updateData.slug = validated.slug;
     if (validated.description !== undefined) updateData.description = validated.description;
     if (validated.pinType !== undefined) updateData.pinType = validated.pinType;
     if (validated.latitude !== undefined) updateData.latitude = validated.latitude;

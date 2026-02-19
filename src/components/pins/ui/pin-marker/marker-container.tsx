@@ -167,6 +167,23 @@ export const MarkerContainer = memo(function MarkerContainer({
         }
       }}
     >
+      {/* Selection ring - visible when pin is selected */}
+      {isSelected && (
+        <div
+          className="absolute rounded-sm pointer-events-none transition-all duration-200 animate-pulse"
+          style={{
+            width: `${size + 12}px`,
+            height: `${size + 12}px`,
+            left: "50%",
+            top: "50%",
+            transform: "translate(-50%, -50%)",
+            border: "2px solid rgba(212, 175, 55, 0.6)",
+            boxShadow: "0 0 16px rgba(212, 175, 55, 0.4), inset 0 0 8px rgba(212, 175, 55, 0.2)",
+            zIndex: -1,
+          }}
+        />
+      )}
+
       {/* Main marker */}
       {hasCustomIcon ? (
         // Custom uploaded icon
