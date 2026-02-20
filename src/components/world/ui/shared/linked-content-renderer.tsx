@@ -4,7 +4,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { useSelectedPinId, useSelectPin } from "@/stores/use-pins-store";
+import { useSelectPin } from "@/stores/use-pins-store";
 
 interface LinkedContentRendererProps {
   content: string;
@@ -18,7 +18,7 @@ interface LinkedContentRendererProps {
  * Falls back to search if entity not found
  */
 export function LinkedContentRenderer({ content, className, worldId }: LinkedContentRendererProps) {
-  const router = useRouter();
+  const _router = useRouter();
   const selectPin = useSelectPin();
 
   // Fetch all entities to resolve tags
@@ -53,15 +53,15 @@ export function LinkedContentRenderer({ content, className, worldId }: LinkedCon
   const entityMap = React.useMemo(() => {
     const map = new Map<string, { type: string; id: string; name: string }>();
 
-    pins.forEach((pin: any) => {
+    pins.forEach((pin: { id: string; slug?: string; title: string }) => {
       if (pin.slug) map.set(pin.slug, { type: "pin", id: pin.id, name: pin.title });
     });
 
-    characters.forEach((char: any) => {
+    characters.forEach((char: { id: string; slug?: string; name: string }) => {
       if (char.slug) map.set(char.slug, { type: "character", id: char.id, name: char.name });
     });
 
-    loreEntries.forEach((entry: any) => {
+    loreEntries.forEach((entry: { id: string; slug?: string; title: string }) => {
       if (entry.slug) map.set(entry.slug, { type: "lore", id: entry.id, name: entry.title });
     });
 

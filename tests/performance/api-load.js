@@ -65,7 +65,7 @@ export function setup() {
 }
 
 // Main test function
-export default function(data) {
+export default function apiLoadTest(data) {
   const headers = {
     'Content-Type': 'application/json',
   };
@@ -75,10 +75,11 @@ export default function(data) {
 
   // Test 1: GET /api/worlds - List worlds
   const getWorldsRes = http.get(`${BASE_URL}/api/worlds`, Object.assign(params, { headers }));
-  check(getWorldsRes, {
+  const worldsCheck = check(getWorldsRes, {
     'GET /api/worlds status 200': (r) => r.status === 200,
     'GET /api/worlds has data': (r) => r.json('length') >= 0,
-  }) || errorRate.add(1);
+  });
+  if (!worldsCheck) errorRate.add(1);
   apiLatency.add(getWorldsRes.timings.duration);
 
   sleep(1);
@@ -92,10 +93,11 @@ export default function(data) {
     });
 
     const createWorldRes = http.post(`${BASE_URL}/api/worlds`, createPayload, Object.assign(params, { headers }));
-    check(createWorldRes, {
+    const createCheck = check(createWorldRes, {
       'POST /api/worlds status 200': (r) => r.status === 200,
       'POST /api/worlds returns world': (r) => r.json('id') !== undefined,
-    }) || errorRate.add(1);
+    });
+    if (!createCheck) errorRate.add(1);
     apiLatency.add(createWorldRes.timings.duration);
 
     // Store created world ID for subsequent tests
@@ -107,9 +109,10 @@ export default function(data) {
   // Test 3: GET /api/presence/[worldId] - Presence endpoint
   if (__ENV.WORLD_ID) {
     const presenceRes = http.get(`${BASE_URL}/api/presence/${__ENV.WORLD_ID}`, params);
-    check(presenceRes, {
+    const presenceCheck = check(presenceRes, {
       'GET /api/presence status 200': (r) => r.status === 200 || r.status === 404, // 404 is acceptable
-    }) || errorRate.add(1);
+    });
+    if (!presenceCheck) errorRate.add(1);
     apiLatency.add(presenceRes.timings.duration);
   }
 
@@ -117,15 +120,16 @@ export default function(data) {
 
   // Test 4: GET /worlds - Page load
   const worldsPageRes = http.get(`${BASE_URL}/worlds`, params);
-  check(worldsPageRes, {
+  const pageCheck = check(worldsPageRes, {
     'GET /worlds status 200': (r) => r.status === 200,
-  }) || errorRate.add(1);
+  });
+  if (!pageCheck) errorRate.add(1);
 
   sleep(2);
 }
 
 // Teardown - cleanup test data
-export function teardown(data) {
+export function teardown(_data) {
   // Optionally delete test worlds created during load test
   // This would require authentication and proper cleanup API calls
 }

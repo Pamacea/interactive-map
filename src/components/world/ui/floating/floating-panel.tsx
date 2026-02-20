@@ -20,8 +20,8 @@ function getSnappedPosition(
   width: number,
   height: number
 ): { x: number; y: number; snapped: boolean } {
-  const viewportWidth = window.innerWidth;
-  const viewportHeight = window.innerHeight;
+  const _viewportWidth = window.innerWidth;
+  const _viewportHeight = window.innerHeight;
 
   let newX = x;
   let newY = y;

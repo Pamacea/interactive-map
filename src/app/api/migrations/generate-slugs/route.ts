@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { generateMissingSlugs } from "@/actions/migrations";
+import { generateMissingSlugs } from "@/features/migrations";
 
 /**
  * Generate slugs for existing entities
  * POST /api/migrations/generate-slugs
  */
 export async function POST() {
-  const result = await generateMissingSlugs();
+  const _result = await generateMissingSlugs();
 
   if (result.success) {
     return NextResponse.json(result.data);

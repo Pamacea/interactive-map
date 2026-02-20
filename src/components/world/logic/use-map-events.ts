@@ -51,8 +51,8 @@ export interface MapEventsResult {
   imageDimensions: { width: number; height: number } | null;
   shouldShowGrid: boolean;
   // Pin state
-  visiblePins: Array<any>;
-  selectedPin: any;
+  visiblePins: Array<{ id: string; title: string; latitude: number; longitude: number; pinType: string }>;
+  selectedPin: { id: string; title: string; latitude: number; longitude: number } | null;
   isCreatingPin: boolean;
   // Event handlers
   handleMouseDown: (e: React.MouseEvent) => void;
@@ -70,7 +70,7 @@ export interface MapEventsResult {
   ) => void;
   handleClick: (e: React.MouseEvent) => void;
   handleContextMenu: (e: React.MouseEvent) => void;
-  handlePinClick: (pin: any) => void;
+  handlePinClick: (pin: { id: string; title: string }) => void;
   handlePopupClose: () => void;
   handleImageLoad: () => void;
   handleImageError: () => void;
@@ -107,10 +107,10 @@ export function useMapEvents(options: UseMapEventsOptions): MapEventsResult {
   const baseMapLayer = layers.find((l) => l.isBaseMap);
 
   // Pin state
-  const pins = usePins();
+  const _pins = usePins();
   const createPin = useCreatePin();
-  const selectedPin = useSelectedPin();
-  const isCreatingPin = useIsCreatingPin();
+  const _selectedPin = useSelectedPin();
+  const _isCreatingPin = useIsCreatingPin();
   const selectPin = useSelectPin();
   const clearSelection = useClearSelection();
   const stopCreating = useStopCreating();
@@ -224,7 +224,7 @@ export function useMapEvents(options: UseMapEventsOptions): MapEventsResult {
   };
 
   // Layer scale
-  const layerScale = baseMapLayer?.scale ?? 1;
+  const _layerScale = baseMapLayer?.scale ?? 1;
 
   // Center on pin function (exposed via context)
   const centerOnPin = useMemo(() => {
@@ -234,8 +234,8 @@ export function useMapEvents(options: UseMapEventsOptions): MapEventsResult {
 
       // Calculate pin position using the same logic as the marker
       const layer = layers.find((l) => l.id === pin.layerId);
-      const layerOffsetX = layer?.offsetX ?? 0;
-      const layerOffsetY = layer?.offsetY ?? 0;
+      const _layerOffsetX = layer?.offsetX ?? 0;
+      const _layerOffsetY = layer?.offsetY ?? 0;
 
       // Convert lat/lng to pixel coordinates
       const pinX = pin.longitude * imageDimensions.width + layerOffsetX;
@@ -250,6 +250,7 @@ export function useMapEvents(options: UseMapEventsOptions): MapEventsResult {
         containerRef
       );
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Zustand store values are stable
   }, [pins, imageDimensions, layers, centerToPin, containerRef]);
 
   return {

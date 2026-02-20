@@ -24,7 +24,7 @@ export function GalleryModule({ worldId }: GalleryModuleProps) {
     <FloatingPanel
       panelId="gallery"
       title="Gallery"
-      icon={<Image className="w-4 h-4" />}
+      icon={<Image className="w-4 h-4" aria-hidden="true" alt="" />}
     >
       {isVisible && (
         <Suspense fallback={<GallerySkeleton />}>

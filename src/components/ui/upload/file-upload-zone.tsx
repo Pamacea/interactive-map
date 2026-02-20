@@ -24,7 +24,7 @@ export function FileUploadZone({
   onDragOver,
   onDrop,
   disabled = false,
-  previewClassName = "aspect-video w-full",
+  previewClassName: _previewClassName = "aspect-video w-full",
   children,
 }: FileUploadZoneProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);

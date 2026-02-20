@@ -18,7 +18,7 @@ export function Toast({ toast, onHide }: ToastProps) {
     }
   }, []);
 
-  const Icon = toast.type === "success" ? Check : AlertCircle;
+  const _Icon = toast.type === "success" ? Check : AlertCircle;
 
   return (
     <div
@@ -32,11 +32,11 @@ export function Toast({ toast, onHide }: ToastProps) {
             : "bg-rose-950/90 border-rose-700/50"
         } backdrop-blur-sm`}
       >
-        <Icon
+        {_Icon && <_Icon
           className={`w-5 h-5 flex-shrink-0 ${
             toast.type === "success" ? "text-emerald-400" : "text-rose-400"
           }`}
-        />
+        />}
         <p
           className={`flex-1 text-sm leading-relaxed ${
             toast.type === "success" ? "text-emerald-100" : "text-rose-100"

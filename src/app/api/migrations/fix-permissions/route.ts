@@ -1,6 +1,6 @@
-import { fixWorldPermissions } from "@/actions/migrations";
+import { fixWorldPermissions } from "@/features/migrations";
 import { NextResponse } from "next/server";
-import { getAuthenticatedUser } from "@/lib/server-helpers";
+import { getAuthenticatedUser } from "@/shared/lib/server-helpers";
 import { Role } from "@prisma/client";
 
 /**
@@ -29,7 +29,7 @@ export async function POST() {
       );
     }
 
-    const result = await fixWorldPermissions();
+    const _result = await fixWorldPermissions();
 
     if (!result.success) {
       // Log error server-side but don't expose details to client

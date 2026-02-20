@@ -1,0 +1,454 @@
+/**
+ * Layers Panel (Dock) - Dock panel in left sidebar using unified layers components
+ * @module docks/layers-panel
+ *
+ * UX Improvements:
+ * - Better spacing and visual hierarchy
+ * - Cleaner add layer button
+ * - Improved loading states
+ */
+
+"use client";
+
+import { useState, useMemo, useCallback, useEffect } from "react";
+import { Plus, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useMapStore, type LayerType } from "@/stores/map-store";
+import { useLeftDock } from "@/components/world/logic/use-left-dock";
+import {
+  LayersList,
+  LayersEmptyState,
+  createLayerActions,
+  type UILayer,
+  type LayerContentCounts,
+} from "@/components/world/ui/layers";
+import { AddLayerDialog } from "@/components/world/ui/add-layer-dialog";
+import { UploadMapDialog } from "@/components/world/ui/upload-map-dialog";
+import { moveItemToLayer } from "@/actions/regions";
+import { createLayer, deleteLayer as deleteLayerAction } from "@/actions/layers";
+import { getLayerContentCounts } from "@/actions/regions";
+import type { OptimizedWorldLayer } from "@/types/world.type";
+
+interface LayersDockPanelProps {
+  className?: string;
+  worldId?: string;
+  worldLayers?: OptimizedWorldLayer[];
+  mapImage?: string | null;
+  // Content counts for each layer (from server)
+  layerContentCounts?: Record<string, LayerContentCounts>;
+}
+
+export function LayersDockPanel({
+  className,
+  worldId,
+  worldLayers = [],
+  mapImage,
+  layerContentCounts = {},
+}: LayersDockPanelProps) {
+  const { isExpanded } = useLeftDock();
+
+  // Store selectors
+  const layers = useMapStore((state) => state.layers);
+  const selectedLayerId = useMapStore((state) => state.selectedLayerId);
+  const activeLayerId = useMapStore((state) => state.activeLayerId);
+  const toggleLayerVisibility = useMapStore((state) => state.toggleLayerVisibility);
+  const toggleLayerLock = useMapStore((state) => state.toggleLayerLock);
+  const updateLayerOpacity = useMapStore((state) => state.updateLayerOpacity);
+  const moveLayerUp = useMapStore((state) => state.moveLayerUp);
+  const moveLayerDown = useMapStore((state) => state.moveLayerDown);
+  const setSelectedLayerId = useMapStore((state) => state.setSelectedLayerId);
+  const setActiveLayerId = useMapStore((state) => state.setActiveLayerId);
+  const addLayerFromServer = useMapStore((state) => state.addLayerFromServer);
+  const removeLayer = useMapStore((state) => state.removeLayer);
+
+  // Local state for dialogs
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [newLayerName, setNewLayerName] = useState("");
+  const [selectedLayerType, setSelectedLayerType] = useState<LayerType>("CUSTOM");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
+  const [showUploadDialog, setShowUploadDialog] = useState(false);
+  const [expandedLayers, setExpandedLayers] = useState<Set<string>>(new Set());
+  const [isCreatingLayer, setIsCreatingLayer] = useState(false);
+  const [isDeletingLayer, setIsDeletingLayer] = useState<string | null>(null);
+  const [contentCountsCache, setContentCountsCache] = useState<Record<string, LayerContentCounts>>({});
+
+  // Fetch content counts for all layers
+  useEffect(() => {
+    if (!worldId || layers.length === 0) return;
+
+    const fetchCounts = async () => {
+      const counts: Record<string, LayerContentCounts> = {};
+      await Promise.all(
+        layers.map(async (layer) => {
+          if (layer.isBaseMap || layer.type === "BASE_MAP") return;
+          try {
+            const layerCounts = await getLayerContentCounts(layer.id);
+            counts[layer.id] = layerCounts;
+          } catch (error) {
+            console.error(`Failed to fetch counts for layer ${layer.id}:`, error);
+          }
+        })
+      );
+      setContentCountsCache(counts);
+    };
+
+    fetchCounts();
+  }, [worldId, layers]);
+
+  // Convert store layers to UILayer format with content counts
+  const uiLayers: UILayer[] = useMemo(() => {
+    return layers.map((layer) => ({
+      ...layer,
+      type: layer.type || "CUSTOM",
+      isSelected: selectedLayerId === layer.id,
+      contentCounts: layer.contentCounts || contentCountsCache[layer.id] || layerContentCounts[layer.id] || {
+        pins: 0,
+        images: 0,
+        regions: 0,
+        total: 0,
+      },
+    }));
+  }, [layers, selectedLayerId, layerContentCounts, contentCountsCache]);
+
+  // Toggle layer expansion
+  const toggleLayerExpansion = useCallback((layerId: string) => {
+    setExpandedLayers((prev) => {
+      const next = new Set(prev);
+      if (next.has(layerId)) {
+        next.delete(layerId);
+      } else {
+        next.add(layerId);
+      }
+      return next;
+    });
+  }, []);
+
+  // Handle zoom range changes
+  const handleMinZoomChange = useCallback(async (layerId: string, minZoom: number) => {
+    const layer = layers.find(l => l.id === layerId);
+    if (!layer) return;
+
+    // Ensure minZoom doesn't exceed maxZoom
+    const validatedMinZoom = Math.min(minZoom, layer.maxZoom ?? 200);
+
+    // Update local store
+    useMapStore.getState().updateLayerMinZoom(layerId, validatedMinZoom);
+
+    // Update server
+    try {
+      const { updateLayer } = await import("@/actions/layers");
+      await updateLayer(layerId, { minZoom: validatedMinZoom });
+    } catch (error) {
+      console.error("Failed to update layer min zoom:", error);
+    }
+  }, [layers]);
+
+  const handleMaxZoomChange = useCallback(async (layerId: string, maxZoom: number) => {
+    const layer = layers.find(l => l.id === layerId);
+    if (!layer) return;
+
+    // Ensure maxZoom doesn't go below minZoom
+    const validatedMaxZoom = Math.max(maxZoom, layer.minZoom ?? 0);
+
+    // Update local store
+    useMapStore.getState().updateLayerMaxZoom(layerId, validatedMaxZoom);
+
+    // Update server
+    try {
+      const { updateLayer } = await import("@/actions/layers");
+      await updateLayer(layerId, { maxZoom: validatedMaxZoom });
+    } catch (error) {
+      console.error("Failed to update layer max zoom:", error);
+    }
+  }, [layers]);
+
+  const handleResetZoom = useCallback(async (layerId: string) => {
+    // Reset to default range (0-200%)
+    useMapStore.getState().updateLayerMinZoom(layerId, 0);
+    useMapStore.getState().updateLayerMaxZoom(layerId, 200);
+
+    try {
+      const { updateLayer } = await import("@/actions/layers");
+      await updateLayer(layerId, { minZoom: 0, maxZoom: 200 });
+    } catch (error) {
+      console.error("Failed to reset layer zoom:", error);
+    }
+  }, []);
+
+  // Create layer actions
+  const layerActions = useMemo(() =>
+    createLayerActions({
+      onToggleVisibility: toggleLayerVisibility,
+      onToggleLock: toggleLayerLock,
+      onOpacityChange: updateLayerOpacity,
+      onMinZoomChange: handleMinZoomChange,
+      onMaxZoomChange: handleMaxZoomChange,
+      onResetZoom: handleResetZoom,
+      onMoveUp: moveLayerUp,
+      onMoveDown: moveLayerDown,
+      onDelete: (layerId) => {
+        if (showDeleteConfirm === layerId) {
+          handleDeleteLayer(layerId);
+        } else {
+          setShowDeleteConfirm(layerId);
+        }
+      },
+      onSelect: (layerId) => {
+        const newSelectedId = selectedLayerId === layerId ? null : layerId;
+        setSelectedLayerId(newSelectedId);
+        // Also set as active layer for new items
+        setActiveLayerId(newSelectedId);
+      },
+      onDrop: async (draggedLayerId, targetLayerId) => {
+        // Reorder layers via zIndex update
+        const draggedLayer = layers.find(l => l.id === draggedLayerId);
+        const targetLayer = layers.find(l => l.id === targetLayerId);
+
+        if (draggedLayer && targetLayer && draggedLayer.id !== targetLayer.id) {
+          // Swap zIndex values
+          const draggedZIndex = draggedLayer.zIndex;
+          const targetZIndex = targetLayer.zIndex;
+
+          // Update local store immediately for responsive UI
+          useMapStore.getState().updateLayerZIndex(draggedLayer.id, targetZIndex);
+          useMapStore.getState().updateLayerZIndex(targetLayer.id, draggedZIndex);
+
+          // Update server
+          try {
+            const { updateLayerZIndex: updateServerZIndex } = await import("@/actions/layers");
+            await Promise.all([
+              updateServerZIndex(draggedLayer.id, targetZIndex),
+              updateServerZIndex(targetLayer.id, draggedZIndex),
+            ]);
+          } catch (error) {
+            console.error("Failed to reorder layers:", error);
+            // Revert on error
+            useMapStore.getState().updateLayerZIndex(draggedLayer.id, draggedZIndex);
+            useMapStore.getState().updateLayerZIndex(targetLayer.id, targetZIndex);
+          }
+        }
+      },
+    }),
+    [
+      toggleLayerVisibility,
+      toggleLayerLock,
+      updateLayerOpacity,
+      handleMinZoomChange,
+      handleMaxZoomChange,
+      handleResetZoom,
+      moveLayerUp,
+      moveLayerDown,
+      showDeleteConfirm,
+      handleDeleteLayer,
+      selectedLayerId,
+      setSelectedLayerId,
+      setActiveLayerId,
+      layers,
+    ]
+  );
+
+  // Handlers
+  const handleAddLayer = useCallback(async () => {
+    if (!worldId || !newLayerName.trim()) return;
+
+    setIsCreatingLayer(true);
+    try {
+      const result = await createLayer(worldId, {
+        name: newLayerName.trim(),
+        type: selectedLayerType,
+        isVisible: true,
+        locked: false,
+        opacity: 1,
+      });
+
+      if (result.success && result.data) {
+        // Add layer to store from server response
+        addLayerFromServer({
+          id: result.data.id,
+          name: result.data.name,
+          type: result.data.type as LayerType,
+          visible: result.data.isVisible,
+          locked: result.data.locked,
+          opacity: result.data.opacity,
+          zIndex: result.data.zIndex,
+          scale: result.data.scale,
+          offsetX: result.data.offsetX,
+          offsetY: result.data.offsetY,
+          minZoom: result.data.minZoom,
+          maxZoom: result.data.maxZoom,
+          isBaseMap: result.data.type === "BASE_MAP",
+          contentCounts: { pins: 0, images: 0, regions: 0, total: 0 },
+        });
+
+        // Clear form
+        setNewLayerName("");
+        setSelectedLayerType("CUSTOM");
+        setShowAddDialog(false);
+      } else {
+        console.error("Failed to create layer:", result.error);
+      }
+    } catch (error) {
+      console.error("Failed to create layer:", error);
+    } finally {
+      setIsCreatingLayer(false);
+    }
+  }, [worldId, newLayerName, selectedLayerType, addLayerFromServer]);
+
+  const handleDeleteLayer = useCallback(async (layerId: string) => {
+    const layer = layers.find((l) => l.id === layerId);
+    if (layer?.isBaseMap || layer?.type === "BASE_MAP") return;
+
+    setIsDeletingLayer(layerId);
+    try {
+      const result = await deleteLayerAction(layerId);
+      if (result.success) {
+        removeLayer(layerId);
+      } else {
+        console.error("Failed to delete layer:", result.error);
+      }
+    } catch (error) {
+      console.error("Failed to delete layer:", error);
+    } finally {
+      setIsDeletingLayer(null);
+      setShowDeleteConfirm(null);
+    }
+  }, [layers, removeLayer]);
+
+  const handleCancelDelete = useCallback(() => {
+    setShowDeleteConfirm(null);
+  }, []);
+
+  const handleOpenUploadDialog = useCallback(() => {
+    setShowUploadDialog(true);
+  }, []);
+
+  const handleCloseUploadDialog = useCallback(() => {
+    setShowUploadDialog(false);
+  }, []);
+
+  const handleMapUploadSuccess = useCallback(() => {
+    setShowUploadDialog(false);
+    // Refresh would be handled by parent
+  }, []);
+
+  // Handle moving items between layers
+  const handleMoveItemToLayer = useCallback(async (
+    itemId: string,
+    itemType: "pin" | "image" | "region",
+    targetLayerId: string
+  ) => {
+    if (!worldId) return;
+
+    try {
+      await moveItemToLayer(itemId, itemType, targetLayerId);
+      // Refresh content counts
+      const counts: Record<string, LayerContentCounts> = { ...contentCountsCache };
+      // Invalidate cache for affected layers
+      delete counts[targetLayerId];
+      setContentCountsCache(counts);
+    } catch (error) {
+      console.error("Failed to move item to layer:", error);
+    }
+  }, [worldId, contentCountsCache]);
+
+  // Determine variant based on dock state
+  // Use "expanded" for full-featured view, "compact" for collapsed
+  const variant = isExpanded ? "expanded" : "compact";
+
+  // Prevent map interactions when interacting with the panel
+  const handleInteraction = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    e.stopPropagation();
+  }, []);
+
+  return (
+    <div
+      className={cn("space-y-2", className)}
+      onMouseDown={handleInteraction}
+      onMouseUp={handleInteraction}
+      onClick={handleInteraction}
+      onTouchStart={handleInteraction}
+      onTouchEnd={handleInteraction}
+      onTouchMove={handleInteraction}
+    >
+      {/* Add button - only when expanded */}
+      {isExpanded && (
+        <div className="flex items-center justify-end px-3 pb-1">
+          <button
+            onClick={() => setShowAddDialog(true)}
+            disabled={!worldId}
+            className={cn(
+              "flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-sm transition-all",
+              "text-accent-gold border border-accent-gold/30 hover:border-accent-gold/60 hover:bg-accent-gold/10",
+              "font-display tracking-wide disabled:opacity-40 disabled:cursor-not-allowed"
+            )}
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Add Layer
+          </button>
+        </div>
+      )}
+
+      {/* Add Layer Dialog */}
+      {showAddDialog && (
+        <div className="px-3 pb-2">
+          <AddLayerDialog
+            newLayerName={newLayerName}
+            onNameChange={setNewLayerName}
+            onAdd={handleAddLayer}
+            onCancel={() => {
+              setShowAddDialog(false);
+              setNewLayerName("");
+              setSelectedLayerType("CUSTOM");
+            }}
+          />
+          {isCreatingLayer && (
+            <div className="flex items-center justify-center py-2">
+              <Loader2 className="w-4 h-4 animate-spin text-accent-gold" />
+              <span className="ml-2 text-xs text-bone-dark">Creating layer...</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Upload Map Dialog */}
+      {showUploadDialog && worldId && (
+        <UploadMapDialog
+          worldId={worldId}
+          isOpen={showUploadDialog}
+          onClose={handleCloseUploadDialog}
+          onSuccess={handleMapUploadSuccess}
+        />
+      )}
+
+      {/* Layers List */}
+      <LayersList
+        layers={uiLayers}
+        selectedLayerId={selectedLayerId}
+        activeLayerId={activeLayerId}
+        variant={variant}
+        isCollapsed={!isExpanded}
+        mapImage={mapImage}
+        actions={layerActions}
+        expandedLayers={expandedLayers}
+        onToggleExpansion={toggleLayerExpansion}
+        onMoveItemToLayer={handleMoveItemToLayer}
+        showProperties={true}
+        renderEmptyState={() => (
+          <LayersEmptyState
+            onAddLayer={isExpanded && worldId ? () => setShowAddDialog(true) : undefined}
+          />
+        )}
+      />
+
+      {/* Deleting indicator */}
+      {isDeletingLayer && (
+        <div className="px-3 py-2 bg-obsidian/50 border border-iron/30 rounded-sm">
+          <div className="flex items-center justify-center">
+            <Loader2 className="w-4 h-4 animate-spin text-accent-gold" />
+            <span className="ml-2 text-xs text-bone-dark">Deleting layer...</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

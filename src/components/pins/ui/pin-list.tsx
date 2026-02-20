@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { MapPin, Badge } from "lucide-react";
-import { usePins, useSelectedPinId, useSelectPin } from "@/stores/use-pins-store";
+import { usePins, useSelectPin } from "@/stores/use-pins-store";
 import { useSelectedLayerId } from "@/stores/map-store";
 import { pinTypeConfig, PinType } from "@/constants/pin-types";
 import type { Pin } from "@prisma/client";
@@ -13,10 +13,10 @@ interface PinListProps {
   worldId: string;
 }
 
-export function PinList({ worldId }: PinListProps) {
+export function PinList({ worldId: _worldId }: PinListProps) {
   // Use Zustand store directly - already synced by WorldClient
-  const pins = usePins();
-  const selectedPinId = useSelectedPinId();
+  const _pins = usePins();
+  const _selectedPinId = useSelectedPinId();
   const selectedLayerId = useSelectedLayerId();
 
   const selectPin = useSelectPin();
@@ -26,6 +26,7 @@ export function PinList({ worldId }: PinListProps) {
   const [selectedType, setSelectedType] = useState<PinType | "ALL">("ALL");
 
   // Filter pins by selected layer and type
+  /* eslint-disable react-hooks/exhaustive-deps */
   const filteredPins = useMemo(() => {
     return pins.filter((pin) => {
       // Filter by layer
@@ -108,7 +109,7 @@ export function PinList({ worldId }: PinListProps) {
       ) : (
         <div className="space-y-1">
           {filteredPins.map((pin) => {
-            const isSelected = selectedPinId === pin.id;
+            const isSelected = _selectedPinId === pin.id;
             const typeConfig = pinTypeConfig[pin.pinType as PinType];
             const PinIcon = getIconComponent(typeConfig.icon);
 

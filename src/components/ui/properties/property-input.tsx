@@ -88,7 +88,7 @@ export function PropertyInput({
   }, [autoFocus]);
 
   // Determine state based on props
-  const state = propState || (error ? "error" : "default");
+  const _state = propState || (error ? "error" : "default");
   const hasValue = value !== "" && value !== undefined && value !== null;
   const isInteractive = !disabled && !isLoading;
 

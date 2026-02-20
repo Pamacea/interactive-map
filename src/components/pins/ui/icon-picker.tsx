@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Search } from "lucide-react"
 import { getLucideIconNames, getLucideIcon } from "@/lib/icon-utils"
 import { useFocusTrap, useFocusReturn } from "@/hooks/accessibility"
 import { useIconPickerNavigation } from "../logic/use-icon-picker-navigation"
@@ -48,9 +47,9 @@ export function IconPicker({ onSelect, onClose, currentIcon }: IconPickerProps) 
   useFocusTrap(true, dialogRef as React.RefObject<HTMLElement>)
 
   const IconComponent = (iconName: string) => {
-    const Icon = getLucideIcon(iconName)
+    const _Icon = getLucideIcon(iconName)
     try {
-      return <Icon className="w-6 h-6" aria-hidden="true" />
+      return <_Icon className="w-6 h-6" aria-hidden="true" />
     } catch (error) {
       console.error(`Failed to render icon: ${iconName}`, error)
       return null

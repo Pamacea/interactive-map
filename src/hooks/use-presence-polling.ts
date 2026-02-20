@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { PresenceData, PresenceUsers } from '@/lib/presence';
 import { updatePresence, removePresence } from '@/actions/presence';
 
@@ -24,13 +24,13 @@ const PRESENCE_QUERY_KEY = 'presence';
 export function usePresencePolling({
   worldId,
   userId,
-  userName,
-  userImage,
+  _userName,
+  userImage: _userImage,
   enabled = true,
   onUserJoined,
   onUserLeft,
 }: UsePresencePollingOptions) {
-  const queryClient = useQueryClient();
+  const _queryClient = useQueryClient();
   const [sessionId] = useState(() =>
     typeof crypto !== 'undefined' && crypto.randomUUID
       ? `session-${crypto.randomUUID()}`

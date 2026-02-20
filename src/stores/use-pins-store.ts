@@ -127,9 +127,9 @@ export interface LegacyPinsStore {
   addPin: (pin: Pin) => void;
   updatePin: (pinId: string, updates: Partial<Pin>) => void;
   deletePin: (pinId: string) => void;
-  createPin: (data: any) => Promise<void>;
+  createPin: (data: Record<string, unknown>) => Promise<void>;
   deletePinServer: (pinId: string) => Promise<void>;
-  updatePinServer: (data: any) => Promise<void>;
+  updatePinServer: (data: Record<string, unknown>) => Promise<void>;
   setSearchTerm: (term: string) => void;
   setPinTypeFilter: (pinType: PinTypeEnum, value: boolean) => void;
   togglePinTypeFilter: (pinType: PinTypeEnum) => void;
@@ -150,8 +150,8 @@ export interface LegacyPinsStore {
  * Legacy composed hook for backward compatibility
  *
  * @deprecated Use individual hooks from @/stores/pins instead:
- *   const selectedPinId = useSelectedPinId();
- *   const pins = usePins();
+ *   const _selectedPinId = useSelectedPinId();
+ *   const _pins = usePins();
  *   const filteredPins = useFilteredPins();
  */
 export const usePinsStore = (): LegacyPinsStore => {
@@ -232,8 +232,8 @@ export const usePinsStore = (): LegacyPinsStore => {
 
 // Export a convenience hook for getting the selected pin
 export const useSelectedPin = () => {
-  const selectedPinId = useSelectedPinIdFromUI();
-  const pins = usePins();
+  const _selectedPinId = useSelectedPinIdFromUI();
+  const _pins = usePins();
 
   return selectedPinId
     ? pins.find((pin) => pin.id === selectedPinId)

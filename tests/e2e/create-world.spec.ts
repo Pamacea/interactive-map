@@ -78,7 +78,7 @@ test.describe('World Creation Flow', () => {
   test('should show correct helper text for visibility', async ({ page }) => {
     await worldHelpers.gotoCreateWorld();
 
-    const helperText = page.locator('text=/your world will be|only you can access/i');
+    page.locator('text=/your world will be|only you can access/i');
 
     // Default public text
     await expect(page.getByText(/visible to all explorers/i)).toBeVisible();
@@ -117,8 +117,7 @@ test.describe('World Creation Flow', () => {
   test('should allow file upload selection', async ({ page }) => {
     await worldHelpers.gotoCreateWorld();
 
-    // Create a temporary test file
-    const testFilePath = '/tmp/test-map.png';
+    // Note: In real tests, you'd create an actual test image file
 
     // Note: In real tests, you'd create an actual test image file
     // For now, just verify the input exists

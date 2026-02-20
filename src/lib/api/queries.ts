@@ -45,7 +45,7 @@ import {
 import type { OptimizedWorld, OptimizedWorldLayer } from "@/types/world.type";
 import type { Pin } from "@prisma/client";
 import type { LoreEntry } from "@prisma/client";
-import type { Character, CharacterPinRelation, CharacterRelationship } from "@prisma/client";
+import type { Character } from "@prisma/client";
 import type { GalleryItemWithRelations } from "@/types/gallery.type";
 import type { CommentWithUser } from "@/actions/comments";
 
@@ -101,7 +101,7 @@ export const queries = {
      * Get all worlds for current user
      */
     lists: async (filters: { userId?: string; search?: string } = {}) => {
-      const result = await getWorldsByUser(filters.userId ?? "");
+      const _result = await getWorldsByUser(filters.userId ?? "");
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -112,7 +112,7 @@ export const queries = {
      * Get world by ID
      */
     detail: async (id: string): Promise<OptimizedWorld | null> => {
-      const result = await getWorldById(id);
+      const _result = await getWorldById(id);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -124,7 +124,7 @@ export const queries = {
      * Use for initial world load
      */
     complete: async (id: string) => {
-      const result = await getWorldWithData(id);
+      const _result = await getWorldWithData(id);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -140,7 +140,7 @@ export const queries = {
      * Get all pins for a world
      */
     list: async (worldId: string): Promise<Pin[]> => {
-      const result = await getPinsByWorld(worldId);
+      const _result = await getPinsByWorld(worldId);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -151,7 +151,7 @@ export const queries = {
      * Get single pin by ID
      */
     detail: async (id: string): Promise<Pin> => {
-      const result = await getPinById(id);
+      const _result = await getPinById(id);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -164,8 +164,8 @@ export const queries = {
     byLayer: async (layerId: string): Promise<Pin[]> => {
       // Get all pins and filter by layer
       // TODO: Add dedicated server action for this
-      const worldId = ""; // Would need to be passed or derived
-      const result = await getPinsByWorld(worldId);
+      const _worldId = ""; // Would need to be passed or derived
+      const _result = await getPinsByWorld(worldId);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -181,7 +181,7 @@ export const queries = {
      * Get all layers for a world
      */
     list: async (worldId: string): Promise<OptimizedWorldLayer[]> => {
-      const result = await getLayersByWorld(worldId);
+      const _result = await getLayersByWorld(worldId);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -192,7 +192,7 @@ export const queries = {
      * Get single layer by ID
      */
     detail: async (id: string): Promise<OptimizedWorldLayer> => {
-      const result = await getLayerById(id);
+      const _result = await getLayerById(id);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -208,7 +208,7 @@ export const queries = {
      * Get all lore entries for a world
      */
     list: async (worldId: string): Promise<LoreEntry[]> => {
-      const result = await getLoreEntriesByWorld(worldId);
+      const _result = await getLoreEntriesByWorld(worldId);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -219,7 +219,7 @@ export const queries = {
      * Get single lore entry by ID
      */
     detail: async (id: string): Promise<LoreEntry> => {
-      const result = await getLoreEntryById(id);
+      const _result = await getLoreEntryById(id);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -230,7 +230,7 @@ export const queries = {
      * Get lore entries by category
      */
     byCategory: async (worldId: string, category: string): Promise<LoreEntry[]> => {
-      const result = await getLoreEntriesByWorld(worldId);
+      const _result = await getLoreEntriesByWorld(worldId);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -246,7 +246,7 @@ export const queries = {
      * Get all characters for a world
      */
     list: async (worldId: string): Promise<Character[]> => {
-      const result = await getCharactersByWorld(worldId);
+      const _result = await getCharactersByWorld(worldId);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -257,7 +257,7 @@ export const queries = {
      * Get single character by ID
      */
     detail: async (id: string): Promise<Character> => {
-      const result = await getCharacterById(id);
+      const _result = await getCharacterById(id);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -268,7 +268,7 @@ export const queries = {
      * Get characters by type
      */
     byType: async (worldId: string, type: string): Promise<Character[]> => {
-      const result = await getCharactersByWorld(worldId);
+      const _result = await getCharactersByWorld(worldId);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -279,7 +279,7 @@ export const queries = {
      * Get characters by faction
      */
     byFaction: async (worldId: string, faction: string): Promise<Character[]> => {
-      const result = await getCharactersByWorld(worldId);
+      const _result = await getCharactersByWorld(worldId);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -295,7 +295,7 @@ export const queries = {
      * Get all gallery items for a world
      */
     list: async (worldId: string): Promise<GalleryItemWithRelations[]> => {
-      const result = await getGalleryItemsByWorld(worldId);
+      const _result = await getGalleryItemsByWorld(worldId);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -306,7 +306,7 @@ export const queries = {
      * Get single gallery item by ID
      * (Not directly available, would need to be added to actions)
      */
-    detail: async (id: string): Promise<GalleryItemWithRelations | null> => {
+    detail: async (_id: string): Promise<GalleryItemWithRelations | null> => {
       // Get all and filter - not ideal but works for now
       // TODO: Add getGalleryItemById to actions
       return null;
@@ -315,7 +315,7 @@ export const queries = {
     /**
      * Get gallery items for a pin
      */
-    byPin: async (pinId: string): Promise<GalleryItemWithRelations[]> => {
+    byPin: async (_pinId: string): Promise<GalleryItemWithRelations[]> => {
       // Get world from pin and filter
       // TODO: Add dedicated server action
       return [];
@@ -324,7 +324,7 @@ export const queries = {
     /**
      * Get gallery items for a lore entry
      */
-    byLore: async (loreId: string): Promise<GalleryItemWithRelations[]> => {
+    byLore: async (_loreId: string): Promise<GalleryItemWithRelations[]> => {
       // TODO: Add dedicated server action
       return [];
     },
@@ -338,7 +338,7 @@ export const queries = {
      * Get all comments for a world
      */
     list: async (worldId: string): Promise<CommentWithUser[]> => {
-      const result = await getCommentsByWorld(worldId);
+      const _result = await getCommentsByWorld(worldId);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -349,7 +349,7 @@ export const queries = {
      * Get comments for a specific pin
      */
     byPin: async (pinId: string): Promise<CommentWithUser[]> => {
-      const result = await getCommentsByPin(pinId);
+      const _result = await getCommentsByPin(pinId);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -365,7 +365,7 @@ export const queries = {
      * Get all versions for a world
      */
     list: async (worldId: string) => {
-      const result = await getWorldVersions(worldId);
+      const _result = await getWorldVersions(worldId);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -383,7 +383,7 @@ export const queries = {
  */
 export const createQueryHook = <TArgs extends unknown[], TResult>(
   queryFn: (...args: TArgs) => Promise<TResult>,
-  getDefaultOptions: () => import("@tanstack/react-query").UseQueryOptions<TResult> = () => ({})
+  _getDefaultOptions: () => import("@tanstack/react-query").UseQueryOptions<TResult> = () => ({})
 ) => {
   return (...args: TArgs) => {
     // This would be used with useQuery

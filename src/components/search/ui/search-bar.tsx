@@ -54,7 +54,7 @@ export function SearchBar({ worldId, onResultClick, className }: SearchBarProps)
       setError(null);
 
       try {
-        const result = await searchWorld({
+        const _result = await searchWorld({
           worldId,
           query: debouncedQuery,
           limit: 50,
@@ -67,7 +67,7 @@ export function SearchBar({ worldId, onResultClick, className }: SearchBarProps)
           setError(result.error.message);
           setResults(null);
         }
-      } catch (err) {
+      } catch {
         setError("Search failed. Please try again.");
         setResults(null);
       } finally {
@@ -90,7 +90,7 @@ export function SearchBar({ worldId, onResultClick, className }: SearchBarProps)
       }
 
       try {
-        const result = await getSearchSuggestions(worldId, query, 8);
+        const _result = await getSearchSuggestions(worldId, query, 8);
         if (result.success && result.data.length > 0) {
           setSuggestions(result.data);
           setShowSuggestions(true);
@@ -98,7 +98,7 @@ export function SearchBar({ worldId, onResultClick, className }: SearchBarProps)
           setSuggestions([]);
           setShowSuggestions(false);
         }
-      } catch (err) {
+      } catch {
         setSuggestions([]);
       }
     };

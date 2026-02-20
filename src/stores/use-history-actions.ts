@@ -32,7 +32,7 @@ export function useCreatePinWithHistory(
 
   return useCallback(
     async (data: unknown & { gameWorldId?: string }) => {
-      const result = await createPinFn(data);
+      const _result = await createPinFn(data);
 
       if (result) {
         addHistory({
@@ -72,7 +72,7 @@ export function useDeletePinWithHistory(
   createPinFn?: (data: unknown) => Promise<Pin | null>
 ) {
   const addHistory = useHistoryStore((state) => state.addHistory);
-  const pins = useHistoryStore((state) => state.past); // We'll need to get pins from pins store
+  const _pins = useHistoryStore((state) => state.past); // We'll need to get pins from pins store
 
   return useCallback(
     async (pinId: string, pinData?: Pin) => {
@@ -160,7 +160,7 @@ export function useUpdatePinWithHistory(
       const pinId = data.id;
       const changes = { ...data };
 
-      const result = await updatePinFn(data);
+      const _result = await updatePinFn(data);
 
       if (result && previousData) {
         addHistory({
@@ -198,7 +198,7 @@ export function useCreateLayerWithHistory(
 
   return useCallback(
     async (worldId: string, data: unknown) => {
-      const result = await createLayerFn(worldId, data);
+      const _result = await createLayerFn(worldId, data);
 
       if (result) {
         addHistory({
@@ -310,7 +310,7 @@ export function useCreateRegionWithHistory(
 
   return useCallback(
     async (layerId: string, data: unknown) => {
-      const result = await createRegionFn(layerId, data);
+      const _result = await createRegionFn(layerId, data);
 
       if (result) {
         addHistory({

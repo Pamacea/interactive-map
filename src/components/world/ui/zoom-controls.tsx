@@ -12,7 +12,7 @@ interface ZoomControlsProps {
   onReset: () => void;
 }
 
-const SCALE_OPTIONS = ["1:1000", "1:500", "1:100"] as const;
+const _SCALE_OPTIONS = ["1:1000", "1:500", "1:100"] as const;
 
 export function ZoomControls({ scale, onZoomIn, onZoomOut, onReset }: ZoomControlsProps) {
   const mapScale = useScale();

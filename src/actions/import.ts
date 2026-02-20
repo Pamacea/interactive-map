@@ -1,7 +1,7 @@
 'use server';
 
 import { prisma } from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
+import { Prisma, PinType } from '@prisma/client';
 import { safeAsync, type Result } from '@/lib/errors';
 import { getAuthenticatedUser, verifyWorldPermission } from '@/lib/server-helpers';
 import { safeLogCollaborationEvent } from '@/actions/presence';
@@ -57,7 +57,7 @@ async function processJSONImport(
   worldId: string,
   rawData: unknown
 ): Promise<ProcessResult> {
-  const data = rawData as {
+  const _data = rawData as {
     world?: { title?: string; description?: string };
     pins?: Array<unknown>;
     layers?: Array<unknown>;
@@ -112,7 +112,7 @@ async function processJSONImport(
           description: p.description,
           latitude: p.latitude ?? 0,
           longitude: p.longitude ?? 0,
-          pinType: (p.pinType?.toUpperCase() as any) ?? 'CUSTOM',
+          pinType: ((p.pinType?.toUpperCase() ?? 'CUSTOM') as PinType),
           icon: p.icon,
           color: p.color ?? '#e74c3c',
           size: p.size ?? 32,
@@ -177,7 +177,7 @@ async function processGeoJSONImport(
   worldId: string,
   rawData: unknown
 ): Promise<ProcessResult> {
-  const data = rawData as { type?: string; features?: Array<unknown> };
+  const _data = rawData as { type?: string; features?: Array<unknown> };
 
   if (data.type !== 'FeatureCollection' || !Array.isArray(data.features)) {
     throw new Error('Invalid GeoJSON format. Expected FeatureCollection.');
@@ -233,7 +233,7 @@ async function processImageImport(
     throw new Error('Invalid image data: rawData is undefined or not an object');
   }
 
-  const data = rawData as { filename?: string; url?: string };
+  const _data = rawData as { filename?: string; url?: string };
 
   if (!data.url) {
     throw new Error('Invalid image data: missing URL');
@@ -348,12 +348,12 @@ export async function processImportJob(
 
       revalidatePath(`/world/${job.worldId}`);
       return { status: updated.status, result };
-    } catch (error: any) {
+    } catch (error) {
       await prisma.importJob.update({
         where: { id: input.jobId },
         data: {
           status: 'FAILED',
-          error: error.message,
+          error: error instanceof Error ? error.message : 'Unknown error',
         },
       });
       throw error;

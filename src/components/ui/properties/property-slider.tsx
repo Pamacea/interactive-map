@@ -150,8 +150,8 @@ export interface PropertySliderRangeProps {
 
 export function PropertySliderRange({
   label,
-  min,
-  max,
+  min: _min,
+  max: _max,
   minValue,
   maxValue,
   onMinChange,
@@ -206,7 +206,7 @@ export function PropertySliderRange({
           max={maxLimit}
           value={minValue}
           onChange={(e) => {
-            const val = parseInt(e.target.value);
+            const _val = parseInt(e.target.value);
             if (val < maxValue) onMinChange(val);
           }}
           disabled={disabled}
@@ -230,7 +230,7 @@ export function PropertySliderRange({
           max={maxLimit}
           value={maxValue}
           onChange={(e) => {
-            const val = parseInt(e.target.value);
+            const _val = parseInt(e.target.value);
             if (val > minValue) onMaxChange(val);
           }}
           disabled={disabled}

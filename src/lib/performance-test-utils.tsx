@@ -39,7 +39,7 @@ export function useRenderCount(componentName: string): number {
         `[Performance] ${componentName} rendered (count: ${rendersRef.current})`
       );
     }
-  });
+  }, [componentName]);
 
   return renderCount;
 }
@@ -51,7 +51,7 @@ export function useRenderCount(componentName: string): number {
  * @param componentName - Name of component for logging
  * @param props - Current props to track
  */
-export function useRenderTracker<T extends Record<string, any>>(
+export function useRenderTracker<T extends Record<string, unknown>>(
   componentName: string,
   props: T
 ): void {
@@ -94,7 +94,7 @@ export function PerformanceMonitor({
   logThreshold?: number;
 }) {
   const startTimeRef = useRef<number>(0);
-  const [, setRenderKey] = useState(0);
+  const [, _setRenderKey] = useState(0);
 
   // Set start time using useEffect to avoid ref access during render
   useEffect(() => {
@@ -155,7 +155,7 @@ export function FPSCounter() {
     rafId = requestAnimationFrame(updateFPS);
 
     return () => cancelAnimationFrame(rafId);
-  }, [isInitialized]);
+  }, []);
 
   if (process.env.NODE_ENV !== 'development') {
     return null;
@@ -296,7 +296,7 @@ export function usePerformanceTracker() {
  * Development-mode performance testing helper
  * Wrap any function to measure its execution time
  */
-export function measurePerformance<T extends (...args: any[]) => any>(
+export function measurePerformance<T extends (...args: unknown[]) => unknown>(
   fn: T,
   name: string = fn.name
 ): T {
@@ -304,9 +304,9 @@ export function measurePerformance<T extends (...args: any[]) => any>(
     return fn;
   }
 
-  return ((...args: any[]) => {
+  return ((...args: unknown[]) => {
     const start = performance.now();
-    const result = fn(...args);
+    const _result = fn(...args);
     const end = performance.now();
 
     console.log(`[Performance] ${name} took ${(end - start).toFixed(2)}ms`);

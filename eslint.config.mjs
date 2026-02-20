@@ -9,8 +9,9 @@ const eslintConfig = defineConfig([
     rules: {
       // Customize rules if needed
       '@typescript-eslint/no-unused-vars': ['warn', {
-        argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_'
+        argsIgnorePattern: '^_+',
+        varsIgnorePattern: '^_+',
+        caughtErrorsIgnorePattern: '^_+'
       }],
       '@typescript-eslint/no-explicit-any': 'warn',
     },

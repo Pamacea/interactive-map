@@ -4,8 +4,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { auth } from "@/lib/auth";
 import { AuthenticationError, AuthorizationError, NotFoundError } from "@/lib/errors";
 
 /**
@@ -13,7 +12,7 @@ import { AuthenticationError, AuthorizationError, NotFoundError } from "@/lib/er
  * @throws AuthenticationError if not authenticated or user not found
  */
 export async function getAuthenticatedUser() {
-  const session = await getServerSession(authOptions);
+  const _session = await auth();
 
   if (!session?.user?.id) {
     throw new AuthenticationError();
@@ -209,7 +208,7 @@ export async function verifyGalleryPermission(itemId: string, userId: string) {
     throw new NotFoundError("Gallery item");
   }
 
-  const worldId = item.pin?.gameWorldId || item.loreEntry?.gameWorldId || item.character?.gameWorldId;
+  const _worldId = item.pin?.gameWorldId || item.loreEntry?.gameWorldId || item.character?.gameWorldId;
 
   if (worldId) {
     const world = await prisma.gameWorld.findUnique({

@@ -26,7 +26,8 @@ const BADGE_CONFIG: Record<
   images: {
     bg: "bg-emerald-500/20",
     text: "text-emerald-400",
-    icon: <Image className="w-2 h-2" />,
+    // eslint-disable-next-line jsx-a11y/alt-text
+    icon: <Image className="w-2 h-2" aria-hidden="true" />,
   },
   regions: {
     bg: "bg-purple-500/20",

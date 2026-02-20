@@ -35,8 +35,8 @@ export function CommentForm({
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   const maxLength = 5000;
 
-  const addComment = useCommentsStore((s) => s.addComment);
-  const updateCommentStore = useCommentsStore((s) => s.updateComment);
+  const _addComment = useCommentsStore((s) => s.addComment);
+  const _updateCommentStore = useCommentsStore((s) => s.updateComment);
 
   React.useEffect(() => {
     if (textareaRef.current) {
@@ -59,7 +59,7 @@ export function CommentForm({
 
     try {
       if (editId) {
-        const result = await updateComment({
+        const _result = await updateComment({
           commentId: editId,
           content: trimmed,
         });
@@ -71,7 +71,7 @@ export function CommentForm({
           setError(result.error?.message || 'Failed to update comment');
         }
       } else {
-        const result = await createComment({
+        const _result = await createComment({
           worldId,
           pinId,
           latitude,

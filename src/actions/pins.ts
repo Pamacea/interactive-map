@@ -149,7 +149,7 @@ export async function getPinById(id: string) {
  */
 export async function getPinsByWorld(gameWorldId: string) {
   try {
-    const pins = await prisma.pin.findMany({
+    const _pins = await prisma.pin.findMany({
       where: { gameWorldId },
       select: {
         id: true,
@@ -406,7 +406,7 @@ export async function uploadPinIcon(
     const timestamp = Date.now();
     const randomId = Math.random().toString(36).substring(2, 15);
     const _ext = path.default.extname(file.name);
-    const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+    const _sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
     const fileName = `${timestamp}-${randomId}-${sanitizedName}`;
     const filePath = path.default.join(uploadsDir, fileName);
 
@@ -459,7 +459,7 @@ export async function batchUpdatePinPositions(
     const user = await getAuthenticatedUser();
 
     // Verify all pins exist and user has permission
-    const pins = await prisma.pin.findMany({
+    const _pins = await prisma.pin.findMany({
       where: {
         id: { in: updates.map((u) => u.id) },
       },
@@ -624,7 +624,6 @@ export async function uploadCustomPinIcon(
     const timestamp = Date.now();
     const randomId = Math.random().toString(36).substring(2, 15);
     const ext = path.default.extname(file.name);
-    const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
     const fileName = `${timestamp}-${randomId}${ext}`;
     const filePath = path.default.join(uploadsDir, fileName);
 

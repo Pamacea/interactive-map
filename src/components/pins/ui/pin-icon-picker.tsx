@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import {
-  Upload,
   X,
   Check,
   Search,
@@ -27,7 +26,6 @@ import {
   Trophy,
   Key,
   Package, // Chest doesn't exist, using Package instead
-  Flame as Campfire, // Campfire doesn't exist, using Flame with alias
   Tent,
   Anchor,
   Binoculars,
@@ -244,7 +242,7 @@ export function PinIconPicker({
   const [selectedIcon, setSelectedIcon] = React.useState(currentIcon || "📍");
   const [iconType, setIconType] = React.useState<IconType>("emoji");
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [selectedCategory, setSelectedCategory] = React.useState<string>("all");
+  const [_selectedCategory, _setSelectedCategory] = React.useState<string>("all");
 
   // Custom icon upload mutations
   const uploadIconMutation = useMutation({

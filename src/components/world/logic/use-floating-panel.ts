@@ -61,7 +61,7 @@ export function useFloatingPanel({
   }, [panelId, bringToFront, dragState.isDragging, dragState.isResizing]);
 
   // Drag handlers
-  const handleDragStart = useCallback(
+  const _handleDragStart = useCallback(
     (e: React.PointerEvent) => {
       // Only left mouse button
       if (e.button !== 0) return;
@@ -136,7 +136,7 @@ export function useFloatingPanel({
 
           // Boundary constraints (keep panel at least partially visible)
           const panelWidth = panelState.size.width;
-          const panelHeight = panelState.size.height;
+          const _panelHeight = panelState.size.height;
           const maxX = window.innerWidth - 50;
           const maxY = window.innerHeight - 50;
 

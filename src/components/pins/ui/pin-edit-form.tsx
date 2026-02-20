@@ -63,8 +63,8 @@ export function PinEditForm({
     setIsUpdating(true);
 
     try {
-      const data = form.getSubmitData();
-      await updatePinMutation(data as any);
+      const _data = form.getSubmitData();
+      await updatePinMutation(data);
       showToast("Pin updated successfully!", "success");
       onSuccess?.();
     } catch (error) {

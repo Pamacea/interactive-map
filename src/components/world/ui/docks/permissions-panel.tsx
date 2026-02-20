@@ -92,7 +92,7 @@ const PERMISSION_COLORS: Record<Permission, string> = {
  * - View and revoke pending invites
  */
 export function PermissionsPanel({ worldId, isOwner, userId }: PermissionsPanelProps) {
-  const queryClient = useQueryClient();
+  const _queryClient = useQueryClient();
   const [inviteEmail, setInviteEmail] = React.useState("");
   const [invitePermission, setInvitePermission] = React.useState<Permission>("READER");
   const [showInviteDialog, setShowInviteDialog] = React.useState(false);
@@ -171,7 +171,7 @@ export function PermissionsPanel({ worldId, isOwner, userId }: PermissionsPanelP
     },
   });
 
-  const handleAddMember = () => {
+  const _handleAddMember = () => {
     if (inviteEmail.trim()) {
       addMemberMutation.mutate({ email: inviteEmail, permission: invitePermission });
     }
@@ -252,8 +252,8 @@ export function PermissionsPanel({ worldId, isOwner, userId }: PermissionsPanelP
                   updatePermissionMutation.mutate({ memberId: member.id, permission })
                 }
                 onRemove={() => removeMemberMutation.mutate(member.id)}
-                isUpdating={updatePermissionMutation.isPending}
-                isRemoving={removeMemberMutation.isPending}
+                _isUpdating={updatePermissionMutation.isPending}
+                _isRemoving={removeMemberMutation.isPending}
               />
             ))}
           </div>
@@ -273,7 +273,7 @@ export function PermissionsPanel({ worldId, isOwner, userId }: PermissionsPanelP
 
           {/* Pending Invites List */}
           <div className="space-y-1">
-            {invites.map((invite: any) => (
+            {invites.map((invite: { id: string; email: string; permission: string }) => (
               <div
                 key={invite.id}
                 className="flex items-center gap-2 px-3 py-2 rounded-sm bg-black/20 border border-border-subtle group"
@@ -456,7 +456,7 @@ function MemberRow({
   currentUserId,
   onUpdatePermission,
   onRemove,
-  isUpdating,
+  isUpdating: _isUpdating,
   isRemoving,
 }: MemberRowProps) {
   const isCurrentUser = member.user.id === currentUserId;

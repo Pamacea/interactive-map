@@ -76,7 +76,7 @@ export function PropertyTagsInput({
   const [showSuggestions, setShowSuggestions] = React.useState(false);
 
   const inputRef = React.useRef<HTMLInputElement>(null);
-  const containerRef = React.useRef<HTMLDivElement>(null);
+  const _containerRef = React.useRef<HTMLDivElement>(null);
   const suggestionsRef = React.useRef<HTMLUListElement>(null);
 
   const isDisabled = disabled || isLoading || tags.length >= maxTags;

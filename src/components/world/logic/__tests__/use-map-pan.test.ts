@@ -1,13 +1,16 @@
-import { renderHook, act, waitFor } from "@testing-library/react";
+import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useMapPan, type Transform } from "../use-map-pan";
+
+// Create mock functions before the mock
+const mockSetZoom = vi.fn();
 
 // Mock dependencies
 vi.mock("@/stores/map-store", () => ({
   useMapStore: vi.fn((selector) => {
-    const state = {
+    const _state = {
       zoom: 1,
-      setZoom: vi.fn(),
+      setZoom: mockSetZoom,
     };
     return selector(state);
   }),
@@ -25,21 +28,10 @@ vi.mock("@/lib/input-manager", () => ({
   },
 }));
 
-const mockSetZoom = vi.fn();
-
-vi.doMock("@/stores/map-store", () => ({
-  useMapStore: vi.fn((selector) => {
-    const state = {
-      zoom: 1,
-      setZoom: mockSetZoom,
-    };
-    return selector(state);
-  }),
-}));
-
 describe("useMapPan", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockSetZoom.mockClear();
   });
 
   describe("initial state", () => {
@@ -153,7 +145,7 @@ describe("useMapPan", () => {
 
   describe("centerToPin", () => {
     it("should do nothing if containerRef is null", () => {
-      const containerRef = { current: null };
+      const _containerRef = { current: null };
       const { result } = renderHook(() => useMapPan());
 
       act(() => {
@@ -166,7 +158,7 @@ describe("useMapPan", () => {
     });
 
     it("should calculate correct translation to center pin", () => {
-      const containerRef = {
+      const _containerRef = {
         current: {
           getBoundingClientRect: vi.fn(() => ({
             width: 800,

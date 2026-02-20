@@ -31,15 +31,15 @@ export interface MapInitializationResult {
 export function useMapInitialization(
   options: UseMapInitializationOptions
 ): MapInitializationResult {
-  const { mapImage, worldId } = options;
+  const { mapImage: _mapImage, worldId: _worldId } = options;
 
-  const containerRef = useRef<HTMLDivElement>(null);
+  const _containerRef = useRef<HTMLDivElement>(null);
   const { setMapElement } = useMapExport();
 
   // Store selectors
   const grid = useMapStore((state) => state.grid);
   const scale = useMapStore((state) => state.scale);
-  const layers = useMapStore((state) => state.layers);
+  const _layers = useMapStore((state) => state.layers);
   const selectedLayerId = useMapStore((state) => state.selectedLayerId);
   const baseMapVisible = useMapStore((state) => state.baseMapVisible);
 

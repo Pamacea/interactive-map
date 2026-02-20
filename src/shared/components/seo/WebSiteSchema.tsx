@@ -2,7 +2,7 @@ import { JsonLd } from "./JsonLd"
 import { siteConfig } from "@/config/site"
 
 export function WebSiteSchema() {
-  const data = {
+  const _data = {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: siteConfig.name,

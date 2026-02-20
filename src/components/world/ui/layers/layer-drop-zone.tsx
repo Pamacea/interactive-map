@@ -6,7 +6,6 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { cn } from "@/lib/utils";
 import { Plus, Layers } from "lucide-react";
 
 export type DraggableItemType = "pin" | "image" | "region";
@@ -40,14 +39,14 @@ interface LayerDropZoneProps {
 export function LayerDropZone({
   layerId,
   layerName,
-  layerType = "CUSTOM",
+  layerType: _layerType = "CUSTOM",
   isLocked = false,
   isBaseMap = false,
   acceptedTypes = ["pin", "image", "region"],
   onItemDropped,
-  onToggleVisibility,
-  onToggleLock,
-  onDelete,
+  onToggleVisibility: _onToggleVisibility,
+  onToggleLock: _onToggleLock,
+  onDelete: _onDelete,
   className,
   children,
 }: LayerDropZoneProps) {
@@ -92,7 +91,7 @@ export function LayerDropZone({
     }
   }, [isLocked, isBaseMap, acceptedTypes, layerId, onItemDropped]);
 
-  const handleDragStart = useCallback((e: React.DragEvent, item: DraggableItem) => {
+  const _handleDragStart = useCallback((e: React.DragEvent, item: DraggableItem) => {
     e.dataTransfer.setData("application/json", JSON.stringify(item));
     e.dataTransfer.effectAllowed = "move";
   }, []);
@@ -114,7 +113,7 @@ export function LayerDropZone({
         <div className="absolute inset-0 bg-accent-gold/10 rounded-sm pointer-events-none flex items-center justify-center">
           <div className="bg-accent-gold text-void px-3 py-1.5 rounded-sm text-sm font-display flex items-center gap-2">
             <Layers className="w-4 h-4" />
-            Drop to move to "{layerName}"
+            Drop to move to &quot;{layerName}&quot;
           </div>
         </div>
       )}
@@ -135,7 +134,7 @@ interface DraggableItemWrapperProps {
 }
 
 export function DraggableItemWrapper({ item, children, className, disabled = false }: DraggableItemWrapperProps) {
-  const handleDragStart = useCallback((e: React.DragEvent) => {
+  const _handleDragStart = useCallback((e: React.DragEvent) => {
     if (disabled) {
       e.preventDefault();
       return;
@@ -147,7 +146,7 @@ export function DraggableItemWrapper({ item, children, className, disabled = fal
   return (
     <div
       draggable={!disabled}
-      onDragStart={handleDragStart}
+      onDragStart={_handleDragStart}
       className={cn(
         disabled && "cursor-not-allowed opacity-50",
         !disabled && "cursor-grab active:cursor-grabbing",
@@ -171,7 +170,7 @@ interface LayerContentWithDragProps {
 }
 
 export function LayerContentWithDrag({
-  layerId,
+  layerId: _layerId,
   items,
   onRemoveItem,
   onItemClick,

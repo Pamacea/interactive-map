@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Tag, X, Plus, Link, Image as ImageIcon, User, MapPin, Search } from "lucide-react";
+import { Tag, X, Plus, Link, Image as ImageIcon, User, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,15 +42,15 @@ export function PinTagsSection({
   availablePins = [],
   availableCharacters = [],
 }: PinTagsSectionProps) {
-  const queryClient = useQueryClient();
+  const _queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [searchTerm, setSearchTerm] = React.useState("");
   const [selectedType, setSelectedType] = React.useState<ReferenceType>("CUSTOM");
-  const [selectedTargetId, setSelectedTargetId] = React.useState<string | null>(null);
+  const [_selectedTargetId, _setSelectedTargetId] = React.useState<string | null>(null);
   const [tagInput, setTagInput] = React.useState("");
 
   // Fetch existing tag relations for this pin
-  const { data: relations = [], refetch } = useQuery({
+  const { data: relations = [] } = useQuery({
     queryKey: ["pin-tags", pinId],
     queryFn: async () => {
       const { getPinTagRelations } = await import("@/actions/tags");
@@ -262,7 +262,7 @@ export function PinTagsSection({
                           className="w-full flex items-center gap-2 px-3 py-2 hover:bg-accent-gold/10 text-left text-accent-gold"
                         >
                           <Plus className="h-3 w-3" />
-                          <span className="text-sm">Create "{tagInput}"</span>
+                          <span className="text-sm">Create &quot;{tagInput}&quot;</span>
                         </button>
                       )}
                     </div>
@@ -357,7 +357,7 @@ export function PinTagsSection({
                 {/* Notes indicator */}
                 {relation.notes && (
                   <span className="text-xs text-text-muted italic" title={relation.notes}>
-                    "{relation.notes.slice(0, 20)}{relation.notes.length > 20 ? "..." : ""}"
+                    &quot;{relation.notes.slice(0, 20)}{relation.notes.length > 20 ? '...' : ''}&quot;
                   </span>
                 )}
 

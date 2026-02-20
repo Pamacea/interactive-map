@@ -21,7 +21,7 @@ import {
   deleteRegion as deleteRegionServer,
   toggleRegionVisibility,
   getRegionsByWorld,
-} from "@/actions/regions";
+} from "@/features/world-editor/actions";
 import { useHistoryStore } from "@/stores/history-store";
 
 // ============== Types ==============
@@ -127,7 +127,7 @@ export const useRegionsDataStore = create<RegionDataStore>()(
         const { trackHistory = true } = options || {};
         set({ isLoading: true, error: null });
         try {
-          const result = await createRegion(layerId, data);
+          const _result = await createRegion(layerId, data);
           if (result.success && result.data) {
             const newRegion = result.data;
             set((state) => ({
@@ -139,8 +139,8 @@ export const useRegionsDataStore = create<RegionDataStore>()(
             if (trackHistory && !useHistoryStore.getState().isExecuting) {
               const addHistory = useHistoryStore.getState().addHistory;
               const regionId = newRegion.id;
-              const regionData = { ...newRegion };
-              const worldId = newRegion.gameWorldId;
+              const _regionData = { ...newRegion };
+              const _worldId = newRegion.gameWorldId;
 
               addHistory({
                 type: "region",
@@ -185,7 +185,7 @@ export const useRegionsDataStore = create<RegionDataStore>()(
       update: async (regionId, data) => {
         set({ isLoading: true, error: null });
         try {
-          const result = await updateRegion(regionId, data);
+          const _result = await updateRegion(regionId, data);
           if (result.success && result.data) {
             set((state) => ({
               regions: state.regions.map((r) =>
@@ -214,7 +214,7 @@ export const useRegionsDataStore = create<RegionDataStore>()(
         const previousCoordinates = region?.coordinates ? { ...region.coordinates } : undefined;
 
         try {
-          const result = await updateRegionPosition(regionId, coordinates);
+          const _result = await updateRegionPosition(regionId, coordinates);
           if (result.success && result.data) {
             set((state) => ({
               regions: state.regions.map((r) =>
@@ -263,11 +263,11 @@ export const useRegionsDataStore = create<RegionDataStore>()(
 
         // Capture region data for history before deleting
         const regionToDelete = get().regions.find((r) => r.id === regionId);
-        const regionData = regionToDelete ? { ...regionToDelete } : null;
+        const _regionData = regionToDelete ? { ...regionToDelete } : null;
         const layerId = regionData?.layerId;
 
         try {
-          const result = await deleteRegionServer(regionId);
+          const _result = await deleteRegionServer(regionId);
           if (result.success) {
             set((state) => ({
               regions: state.regions.filter((r) => r.id !== regionId),
@@ -277,7 +277,7 @@ export const useRegionsDataStore = create<RegionDataStore>()(
             // Add history entry for undo
             if (trackHistory && regionData && !useHistoryStore.getState().isExecuting) {
               const addHistory = useHistoryStore.getState().addHistory;
-              const worldId = regionData.gameWorldId;
+              const _worldId = regionData.gameWorldId;
 
               addHistory({
                 type: "region",
@@ -331,7 +331,7 @@ export const useRegionsDataStore = create<RegionDataStore>()(
 
       toggleVisibility: async (regionId) => {
         try {
-          const result = await toggleRegionVisibility(regionId);
+          const _result = await toggleRegionVisibility(regionId);
           if (result.success && result.data) {
             set((state) => ({
               regions: state.regions.map((r) =>

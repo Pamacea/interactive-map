@@ -288,7 +288,7 @@ export async function updateGalleryItem(data: GalleryItemUpdateInput): Promise<R
     const existingItem = await verifyGalleryPermission(validated.id, user.id);
 
     // Get worldId for revalidation
-    const worldId = existingItem.pin?.gameWorldId || existingItem.loreEntry?.gameWorldId;
+    const _worldId = existingItem.pin?.gameWorldId || existingItem.loreEntry?.gameWorldId;
 
     // Build update data
     const updateData: Partial<GalleryItem> = {};
@@ -328,7 +328,7 @@ export async function deleteGalleryItem(id: string): Promise<Result<{ itemId: st
     const item = await verifyGalleryPermission(id, user.id);
 
     // Get worldId for revalidation
-    const worldId = item.pin?.gameWorldId || item.loreEntry?.gameWorldId;
+    const _worldId = item.pin?.gameWorldId || item.loreEntry?.gameWorldId;
 
     // Delete file from disk
     const { unlink } = await import("fs/promises");
@@ -818,7 +818,7 @@ export async function removeItemsFromCollection(
     // Verify world access
     await verifyWorldPermission(collection.worldId, user.id);
 
-    const result = await prisma.collectionItem.deleteMany({
+    const _result = await prisma.collectionItem.deleteMany({
       where: {
         collectionId,
         galleryItemId: { in: itemIds },
@@ -888,7 +888,7 @@ export async function updateItemTags(
       data: { tags },
     });
 
-    const worldId = item.pin?.gameWorldId || item.loreEntry?.gameWorldId || item.worldId;
+    const _worldId = item.pin?.gameWorldId || item.loreEntry?.gameWorldId || item.worldId;
     if (worldId) {
       revalidatePath(`/world/${worldId}`);
     }
@@ -1009,7 +1009,7 @@ export async function updateGalleryItemCaption(
     });
 
     // Revalidate if needed
-    const worldId = item.pin?.gameWorldId || item.loreEntry?.gameWorldId || item.worldId;
+    const _worldId = item.pin?.gameWorldId || item.loreEntry?.gameWorldId || item.worldId;
     if (worldId) {
       revalidatePath(`/world/${worldId}`);
     }

@@ -73,7 +73,7 @@ export function PinGallerySection({
         formData.append("gameWorldId", worldId);
         formData.append("pinId", pinId);
 
-        const result = await uploadGalleryImage(formData);
+        const _result = await uploadGalleryImage(formData);
         if (result.success) {
           results.push(result.data.galleryItem);
         } else {
@@ -107,7 +107,7 @@ export function PinGallerySection({
   const handleLinkImage = async (imageId: string) => {
     setLinkingImageId(imageId);
     try {
-      const result = await linkGalleryItemToPin(imageId, pinId);
+      const _result = await linkGalleryItemToPin(imageId, pinId);
       if (result.success) {
         const linkedImage = allGalleryItems.find((img) => img.id === imageId);
         if (linkedImage) {
@@ -127,7 +127,7 @@ export function PinGallerySection({
     setUnlinkingImageId(imageId);
     try {
       const { updateGalleryItem: updateItem } = await import("@/actions/gallery");
-      const result = await updateItem({ id: imageId, pinId: null });
+      const _result = await updateItem({ id: imageId, pinId: null });
       if (result.success) {
         onImageUnlinked?.(imageId);
       }
@@ -153,7 +153,7 @@ export function PinGallerySection({
 
   const handleTitleUpdate = async (imageId: string, title: string) => {
     try {
-      const result = await updateGalleryItem({ id: imageId, title });
+      const _result = await updateGalleryItem({ id: imageId, title });
       if (result.success) {
         const updatedImage = linkedImages.find(img => img.id === imageId);
         if (updatedImage) {

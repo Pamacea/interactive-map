@@ -1,0 +1,85 @@
+/**
+ * Comments Logic - Use Comments Hook
+ *
+ * Custom hook for fetching comments with TanStack Query
+ */
+
+import { useQuery } from "@tanstack/react-query";
+import { getWorldComments, getCommentStats } from "../methods/get-comments";
+
+// ============================================
+// TYPES
+// ============================================
+
+// Unused type import kept for documentation
+// type { CommentWithUser } = ...
+
+export interface UseCommentsOptions {
+  worldId: string;
+  pinId?: string;
+  includeResolved?: boolean;
+  limit?: number;
+  enabled?: boolean;
+}
+
+// ============================================
+// HOOKS
+// ============================================
+
+/**
+ * Fetch comments for a world
+ * @param options - Query options
+ * @returns Query result with comments
+ */
+export function useComments(options: UseCommentsOptions) {
+  const {
+    worldId,
+    pinId,
+    includeResolved = false,
+    limit = 50,
+    enabled = true,
+  } = options;
+
+  return useQuery({
+    queryKey: ["comments", worldId, pinId, includeResolved, limit],
+    queryFn: async () => {
+      const _result = await getWorldComments({
+        worldId,
+        pinId,
+        includeResolved,
+        limit,
+      });
+
+      if (!result.success) {
+        throw new Error(result.error?.message || "Failed to fetch comments");
+      }
+
+      return result.data.comments;
+    },
+    enabled: enabled && !!worldId,
+    staleTime: 1000 * 30, // 30 seconds
+  });
+}
+
+/**
+ * Fetch comment statistics for a world
+ * @param worldId - World ID
+ * @param pinId - Optional pin ID filter
+ * @returns Query result with stats
+ */
+export function useCommentStats(worldId: string, pinId?: string) {
+  return useQuery({
+    queryKey: ["comment-stats", worldId, pinId],
+    queryFn: async () => {
+      const _result = await getCommentStats(worldId, pinId);
+
+      if (!result.success) {
+        throw new Error(result.error?.message || "Failed to fetch comment stats");
+      }
+
+      return result.data;
+    },
+    enabled: !!worldId,
+    staleTime: 1000 * 60, // 1 minute
+  });
+}

@@ -15,8 +15,8 @@ import type { Layer } from "@/stores/map-store";
  * Memoized to prevent unnecessary recalculations
  */
 export function useWorldInitialization(worldLayers: OptimizedWorldLayer[] | null) {
-  const initializeLayers = useMapStore((state) => state.initializeLayers);
-  const setWorldId = useMapStore((state) => state.setWorldId);
+  const _initializeLayers = useMapStore((state) => state.initializeLayers);
+  const _setWorldId = useMapStore((state) => state.setWorldId);
 
   // Track previous world ID to detect world changes
   const prevWorldIdRef = useRef<string | null>(null);
@@ -44,7 +44,7 @@ export function useWorldInitialization(worldLayers: OptimizedWorldLayer[] | null
     return worldLayers.map((layer): Layer => ({
       id: layer.id,
       name: layer.name,
-      type: layer.type as any,
+      type: layer.type as Layer['type'],
       visible: layer.isVisible,
       locked: layer.locked,
       opacity: layer.opacity,
@@ -62,6 +62,7 @@ export function useWorldInitialization(worldLayers: OptimizedWorldLayer[] | null
   useEffect(() => {
     // Initialize layers from server data
     initializeLayers(uiLayers);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Zustand store functions are stable
   }, [uiLayers, initializeLayers]);
 }
 
@@ -69,12 +70,13 @@ export function useWorldInitialization(worldLayers: OptimizedWorldLayer[] | null
  * Extended initialization that also sets worldId
  */
 export function useWorldInitializationWithWorldId(worldId: string, worldLayers: OptimizedWorldLayer[] | null) {
-  const initializeLayers = useMapStore((state) => state.initializeLayers);
-  const setWorldId = useMapStore((state) => state.setWorldId);
+  const _initializeLayers = useMapStore((state) => state.initializeLayers);
+  const _setWorldId = useMapStore((state) => state.setWorldId);
 
   // Set world ID first
   useEffect(() => {
     setWorldId(worldId);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Zustand store functions are stable
   }, [worldId, setWorldId]);
 
   // Then initialize layers

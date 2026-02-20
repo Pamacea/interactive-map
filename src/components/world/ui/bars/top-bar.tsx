@@ -64,7 +64,7 @@ function ActionMenu({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
+  const _router = useRouter();
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -201,7 +201,7 @@ export const TopBar = memo(function TopBar({
   worldTitle,
   worldId,
   isOwner = false,
-  canEdit = false,
+  canEdit: _canEdit = false,
   className,
 }: TopBarProps) {
   const { getMapElement } = useMapExport();

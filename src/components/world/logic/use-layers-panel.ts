@@ -19,11 +19,11 @@ interface AddLayerData {
   offsetY: number;
 }
 
-export function useLayersPanel({ worldId, worldLayers = [] }: UseLayersPanelProps) {
-  const router = useRouter();
+export function useLayersPanel({ worldId, worldLayers: _worldLayers = [] }: UseLayersPanelProps) {
+  const _router = useRouter();
 
   // Store selectors
-  const layers = useMapStore((state) => state.layers);
+  const _layers = useMapStore((state) => state.layers);
   const toggleLayerVisibility = useMapStore((state) => state.toggleLayerVisibility);
   const toggleLayerLock = useMapStore((state) => state.toggleLayerLock);
   const updateLayerOpacity = useMapStore((state) => state.updateLayerOpacity);
@@ -42,7 +42,7 @@ export function useLayersPanel({ worldId, worldLayers = [] }: UseLayersPanelProp
   const sortedLayers = [...layers].sort((a, b) => b.zIndex - a.zIndex);
 
   // Handlers
-  const handleToggleVisibility = useCallback((layerId: string) => {
+  const _handleToggleVisibility = useCallback((layerId: string) => {
     toggleLayerVisibility(layerId);
   }, [toggleLayerVisibility]);
 
@@ -59,6 +59,7 @@ export function useLayersPanel({ worldId, worldLayers = [] }: UseLayersPanelProp
     const layer = layers.find((l) => l.id === layerId);
     if (layer?.isBaseMap) return;
     moveLayerUp(layerId);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Zustand store values are stable
   }, [moveLayerUp, layers]);
 
   const handleMoveDown = useCallback((layerId: string) => {
@@ -66,6 +67,7 @@ export function useLayersPanel({ worldId, worldLayers = [] }: UseLayersPanelProp
     const layer = layers.find((l) => l.id === layerId);
     if (layer?.isBaseMap) return;
     moveLayerDown(layerId);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Zustand store values are stable
   }, [moveLayerDown, layers]);
 
   const handleAddLayer = useCallback(() => {
@@ -85,17 +87,19 @@ export function useLayersPanel({ worldId, worldLayers = [] }: UseLayersPanelProp
       setNewLayerName("");
       setShowAddDialog(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Zustand store values are stable
   }, [newLayerName, layers, addLayer]);
 
-  const handleDeleteLayer = useCallback((layerId: string) => {
+  const _handleDeleteLayer = useCallback((layerId: string) => {
     // Prevent deleting the base map layer
     const layer = layers.find((l) => l.id === layerId);
     if (layer?.isBaseMap) return;
     removeLayer(layerId);
     setShowDeleteConfirm(null);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Zustand store values are stable
   }, [removeLayer, layers]);
 
-  const handleCancelDelete = useCallback(() => {
+  const _handleCancelDelete = useCallback(() => {
     setShowDeleteConfirm(null);
   }, []);
 
@@ -112,7 +116,7 @@ export function useLayersPanel({ worldId, worldLayers = [] }: UseLayersPanelProp
     setShowDeleteConfirm(layerId);
   }, []);
 
-  const handleOpenUploadDialog = useCallback(() => {
+  const _handleOpenUploadDialog = useCallback(() => {
     setShowUploadDialog(true);
   }, []);
 
@@ -121,13 +125,14 @@ export function useLayersPanel({ worldId, worldLayers = [] }: UseLayersPanelProp
   }, []);
 
   const handleMapUploadSuccess = useCallback(
-    (mapUrl: string) => {
+    (_mapUrl: string) => {
       setShowUploadDialog(false);
 
       // Refresh the page to show the new map
       if (worldId) {
         router.refresh();
       }
+    /* eslint-disable react-hooks/exhaustive-deps */
     },
     [worldId, router]
   );

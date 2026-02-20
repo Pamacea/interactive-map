@@ -1,0 +1,201 @@
+"use client";
+
+import React, { useCallback, useEffect } from "react";
+import { Search } from "lucide-react";
+import { useDebounce } from "@/hooks/use-debounce";
+import { searchWorld, getSearchSuggestions } from "@/actions/search";
+import { useSearchStore } from "@/store/use-search-store";
+import { SearchInput } from "./search-input";
+import { SearchSuggestions } from "./search-suggestions";
+import { SearchResults } from "./search-results";
+import { useSearchForm } from "../logic/use-search-form";
+import { cn } from "@/lib/utils";
+import type { SearchResultItem } from "@/lib/search-types";
+import { Button } from "@/components/ui/button";
+
+export interface SearchBarProps {
+  worldId: string;
+  onResultClick?: (result: SearchResultItem) => void;
+  className?: string;
+}
+
+export function SearchBar({ worldId, onResultClick, className }: SearchBarProps) {
+  const {
+    isOpen,
+    results,
+    isLoading,
+    error,
+    activeTab,
+    setActiveTab,
+    suggestions,
+    showSuggestions,
+    highlightedIndex,
+    setShowSuggestions,
+    openSearch,
+    closeSearch,
+    setResults,
+    setLoading,
+    setError,
+    setSuggestions,
+  } = useSearchStore();
+
+  const debouncedQuery = useDebounce(useSearchStore((state) => state.query), 300);
+
+  // Perform search when debounced query changes
+  useEffect(() => {
+    const performSearch = async () => {
+      if (!debouncedQuery || debouncedQuery.length < 2) {
+        setResults(null);
+        setShowSuggestions(false);
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+
+      try {
+        const result = await searchWorld({
+          worldId,
+          query: debouncedQuery,
+          limit: 50,
+        });
+
+        if (result.success) {
+          setResults(result.data);
+          setShowSuggestions(false);
+        } else {
+          setError(result.error.message);
+          setResults(null);
+        }
+      } catch {
+        setError("Search failed. Please try again.");
+        setResults(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    performSearch();
+  }, [debouncedQuery, worldId, setResults, setLoading, setError, setShowSuggestions]);
+
+  // Fetch suggestions when query changes
+  useEffect(() => {
+    const query = useSearchStore.getState().query;
+
+    const fetchSuggestions = async () => {
+      if (!query || query.length < 2) {
+        setSuggestions([]);
+        setShowSuggestions(false);
+        return;
+      }
+
+      try {
+        const result = await getSearchSuggestions(worldId, query, 8);
+        if (result.success && result.data.length > 0) {
+          setSuggestions(result.data);
+          setShowSuggestions(true);
+        } else {
+          setSuggestions([]);
+          setShowSuggestions(false);
+        }
+      } catch {
+        setSuggestions([]);
+      }
+    };
+
+    fetchSuggestions();
+  }, [worldId, setSuggestions, setShowSuggestions]);
+
+  // Handle result click
+  const handleResultClick = useCallback(
+    (result: SearchResultItem) => {
+      if (onResultClick) {
+        onResultClick(result);
+      }
+      closeSearch();
+    },
+    [onResultClick, closeSearch]
+  );
+
+  // Handle suggestion click
+  const handleSuggestionClick = useCallback(
+    (suggestion: string) => {
+      useSearchStore.getState().setQuery(suggestion);
+      setShowSuggestions(false);
+    },
+    [setShowSuggestions]
+  );
+
+  // Use search form hook for input handling
+  const { inputRef, query, handleKeyDown, handleInputChange, handleClear } = useSearchForm({
+    worldId,
+    onClear: () => {
+      // Optional: Additional clear logic if needed
+    },
+  });
+
+  // Render closed state
+  if (!isOpen) {
+    return (
+      <Button
+        variant="outline"
+        onClick={openSearch}
+        className={cn("flex items-center gap-2", className)}
+        aria-label="Open search (Ctrl+K)"
+      >
+        <Search className="w-4 h-4" />
+        <span>Search...</span>
+        <kbd className="ml-auto px-1.5 py-0.5 bg-background-elevated border border-border-subtle rounded text-xs">
+          Ctrl K
+        </kbd>
+      </Button>
+    );
+  }
+
+  // Render open state
+  return (
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 px-4">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={closeSearch}
+        aria-hidden="true"
+      />
+
+      {/* Search panel */}
+      <div className="relative w-full  bg-background-card border border-border-ornate rounded-sm shadow-xl overflow-hidden">
+        {/* Search input */}
+        <SearchInput
+          inputRef={inputRef}
+          query={query}
+          isLoading={isLoading}
+          onKeyDown={handleKeyDown}
+          onInputChange={handleInputChange}
+          onClear={handleClear}
+        />
+
+        {/* Suggestions dropdown */}
+        {showSuggestions && !results && (
+          <SearchSuggestions
+            suggestions={suggestions}
+            highlightedIndex={highlightedIndex}
+            onSuggestionClick={handleSuggestionClick}
+          />
+        )}
+
+        {/* Results */}
+        <div className="max-h-96">
+          <SearchResults
+            results={results}
+            isLoading={isLoading}
+            error={error}
+            query={query}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            onResultClick={handleResultClick}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}

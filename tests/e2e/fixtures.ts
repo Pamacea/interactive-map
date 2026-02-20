@@ -4,6 +4,9 @@
  * Shared fixtures and setup for E2E tests.
  */
 
+/* eslint-disable react-hooks/rules-of-hooks */
+// The `use` function here is Playwright's fixture API, not React's use() hook
+
 import { test as base } from '@playwright/test';
 import { createAuthHelpers } from './helpers/auth-helpers';
 import { createWorldHelpers } from './helpers/world-helpers';

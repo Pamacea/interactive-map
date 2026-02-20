@@ -103,7 +103,7 @@ interface ToastItemProps {
 
 function ToastItem({ toast, onRemove }: ToastItemProps) {
   const config = TOAST_CONFIG[toast.type];
-  const Icon = config.icon;
+  const _Icon = config.icon;
   const [progress, setProgress] = useState(100);
 
   const duration = toast.duration ?? DEFAULT_DURATION;
@@ -148,7 +148,7 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
       )}
     >
       {/* Icon */}
-      <Icon className={cn("w-5 h-5 flex-shrink-0", config.iconColor)} />
+      {_Icon && <_Icon className={cn("w-5 h-5 flex-shrink-0", config.iconColor)} />}
 
       {/* Message */}
       <p className={cn("flex-1 text-sm leading-relaxed", config.text)}>

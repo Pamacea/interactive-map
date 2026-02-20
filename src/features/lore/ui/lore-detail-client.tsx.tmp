@@ -1,0 +1,341 @@
+"use client";
+
+import * as React from "react";
+import Link from "next/link";
+import { ArrowLeft, Calendar, User, Edit, Link2, MapPin } from "lucide-react";
+import { sanitizeHtml } from "@/shared/lib/sanitize";
+import { LoreCategory } from "@prisma/client";
+import type { LoreEntry } from "@/types/lore.type";
+import { MarkdownRenderer } from "./markdown-renderer";
+import { RelatedEntries } from "./related-entries";
+import { LoreTableOfContents } from "./lore-table-of-contents";
+import { LoreLinkPreview } from "./lore-link-preview";
+
+interface LinkedPin {
+  id: string;
+  title: string;
+  color: string;
+  pinType?: string;
+  relationType?: string;
+}
+
+interface LoreDetailClientProps {
+  lore: LoreEntry & {
+    references?: Array<LoreEntry & { linkText?: string; linkType?: string }>;
+    referencedBy?: Array<LoreEntry & { linkText?: string; linkType?: string }>;
+    linkedPins?: LinkedPin[];
+  };
+  world: {
+    id: string;
+    title: string;
+    slug?: string;
+    map?: string;
+  };
+  allLoreEntries: LoreEntry[];
+  isAuthenticated: boolean;
+  isOwner: boolean;
+  isWorldMember: boolean;
+  currentUserId?: string;
+}
+
+const categoryColors: Record<LoreCategory, string> = {
+  GENERAL: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+  HISTORY: "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300",
+  GEOGRAPHY: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
+  CHARACTERS: "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300",
+  FACTIONS: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
+  MAGIC: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300",
+  ITEMS: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300",
+  QUESTS: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
+  CUSTOM: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
+};
+
+export function LoreDetailClient({
+  lore,
+  world,
+  allLoreEntries,
+  isAuthenticated: _isAuthenticated,
+  isOwner,
+  isWorldMember,
+  currentUserId: _currentUserId,
+}: LoreDetailClientProps) {
+  const [showPrintView, setShowPrintView] = React.useState(false);
+
+  // Process content to replace wiki-style links with actual links
+  // Note: This is client-side processing for rendering. The content is already
+  // stored in the database and will be sanitized by MarkdownRenderer.
+  const processedContent = React.useMemo(() => {
+    // Replace [[Entry Title]] with links
+    return (lore.content || "").replace(
+      /\[\[([^\]]+)\]\]/g,
+      (match, entryTitle) => {
+        const linkedEntry = allLoreEntries.find(
+          (e) => e.title.toLowerCase() === entryTitle.toLowerCase()
+        );
+
+        if (linkedEntry) {
+          const safeId = sanitizeHtml(linkedEntry.id);
+          const safeSlug = sanitizeHtml(linkedEntry.slug);
+          const safeTitle = sanitizeHtml(linkedEntry.title);
+          const safeLinkText = sanitizeHtml(entryTitle);
+          return `<wiki-link data-id="${safeId}" data-slug="${safeSlug}" data-title="${safeTitle}">${safeLinkText}</wiki-link>`;
+        }
+
+        // Keep the brackets if entry not found (could indicate a draft/to-do)
+        const safeLinkText = sanitizeHtml(entryTitle);
+        return `<span class="text-red-500" title="Lore entry not found">[[${safeLinkText}]]</span>`;
+      }
+    );
+  }, [lore.content, allLoreEntries]);
+
+  const handleWikiLinkClick = (slug: string) => {
+    window.location.href = `/world/${world.id}/lore/${slug}`;
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  if (showPrintView) {
+    return (
+      <div className="print:max-w-none print:p-8 print:text-black">
+        <div className="max-w-2/3 mx-auto p-6 bg-white text-black">
+          <div className="flex justify-between items-center mb-6 print:hidden">
+            <button
+              onClick={() => setShowPrintView(false)}
+              className="px-4 py-2 border rounded-sm hover:bg-gray-100"
+            >
+              Back to View
+            </button>
+            <button
+              onClick={handlePrint}
+              className="px-4 py-2 bg-slate-900 text-white rounded-sm hover:bg-slate-700"
+            >
+              Print
+            </button>
+          </div>
+
+          <h1 className="text-4xl font-bold mb-2">{lore.title}</h1>
+          <div className="flex items-center gap-4 text-sm text-gray-600 mb-6">
+            <span>{new Date(lore.createdAt).toLocaleDateString()}</span>
+            <span>•</span>
+            <span>{lore.category}</span>
+          </div>
+
+          <div
+            className="prose prose-lg max-w-none"
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(processedContent) }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[var(--color-background-base)]">
+      {/* Header */}
+      <header className="sticky top-0 z-40 bg-obsidian/80 border-b border-[var(--color-border-subtle)]">
+        <div className="max-w-2/3 mx-auto px-4 py-4 flex items-center justify-between">
+          <Link
+            href={`/world/${world.id}`}
+            className="flex items-center gap-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span>Back to World</span>
+          </Link>
+
+          <div className="flex items-center gap-2">
+            {(isOwner || isWorldMember) && (
+              <Link
+                href={`/world/${world.id}`}
+                className="flex items-center gap-2 px-3 py-2 border border-[var(--color-border-subtle)] rounded-sm hover:bg-[var(--color-background-elevated)] transition-colors"
+              >
+                <Edit className="w-4 h-4" />
+                <span>Edit</span>
+              </Link>
+            )}
+            <button
+              onClick={() => setShowPrintView(true)}
+              className="p-2 hover:bg-[var(--color-background-elevated)] rounded-sm transition-colors"
+              aria-label="Print view"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polyline points="6 9 6 2 18 2 18 9" />
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                <rect x="6" y="14" width="12" height="8" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-2/3 mx-auto px-4 py-8 flex gap-8">
+        {/* Main Content */}
+        <main className="flex-1 min-w-0">
+          {/* Title */}
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-4">
+              <span
+                className={cn(
+                  "px-2 py-1 text-xs font-medium rounded-sm",
+                  categoryColors[lore.category]
+                )}
+              >
+                {lore.category}
+              </span>
+              {!lore.isVisible && (
+                <span className="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300 rounded-sm">
+                  Draft
+                </span>
+              )}
+            </div>
+
+            <h1 className="text-4xl font-bold text-[var(--color-text-primary)] mb-4">
+              {lore.title}
+            </h1>
+
+            {/* Meta info */}
+            <div className="flex flex-wrap items-center gap-6 text-sm text-[var(--color-text-secondary)]">
+              <div className="flex items-center gap-2">
+                <User className="w-4 h-4" />
+                <span>{lore.user?.name || "Unknown"}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                <span>
+                  Created {new Date(lore.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+              {lore.updatedAt.getTime() !== lore.createdAt.getTime() && (
+                <div className="flex items-center gap-2">
+                  <span>Updated {new Date(lore.updatedAt).toLocaleDateString()}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Content */}
+          <article className="bg-obsidian/80 border border-[var(--color-border-subtle)] rounded-sm p-8 mb-8">
+            <MarkdownRenderer
+              content={processedContent}
+              onWikiLinkClick={handleWikiLinkClick}
+            />
+          </article>
+
+          {/* Linked Pins */}
+          {lore.linkedPins && lore.linkedPins.length > 0 && (
+            <div className="bg-obsidian/80 border border-[var(--color-border-subtle)] rounded-sm p-6 mb-8">
+              <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4 flex items-center gap-2">
+                <MapPin className="w-5 h-5" />
+                Linked Locations
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {lore.linkedPins.map((pin) => (
+                  <Link
+                    key={pin.id}
+                    href={`/world/${world.id}`}
+                    onClick={() => {
+                      // Could add logic to focus on this pin
+                    }}
+                    className="flex items-center gap-3 p-3 rounded-sm border border-[var(--color-border-subtle)] hover:bg-[var(--color-background-elevated)] transition-colors"
+                  >
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center"
+                      style={{ backgroundColor: pin.color }}
+                    >
+                      <span className="text-white text-xs">
+                        {pin.pinType?.[0] || "P"}
+                      </span>
+                    </div>
+                    <div>
+                      <div className="font-medium text-[var(--color-text-primary)]">
+                        {pin.title}
+                      </div>
+                      <div className="text-xs text-[var(--color-text-secondary)]">
+                        {pin.relationType || "REFERENCES"}
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+        </main>
+
+        {/* Sidebar */}
+        <aside className="w-72 flex-shrink-0 space-y-6">
+          {/* Table of Contents */}
+          <LoreTableOfContents content={processedContent} />
+
+          {/* References (Outgoing) */}
+          {(lore.references || []).length > 0 && (
+            <div className="bg-obsidian/80 border border-[var(--color-border-subtle)] rounded-sm p-4">
+              <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-3 flex items-center gap-2">
+                <Link2 className="w-4 h-4" />
+                See Also
+              </h3>
+              <ul className="space-y-2">
+                {lore.references?.map((entry) => (
+                  <li key={entry.id}>
+                    <Link
+                      href={`/world/${world.id}/lore/${entry.slug}`}
+                      className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-accent-gold)] transition-colors line-clamp-2"
+                    >
+                      {entry.linkText || entry.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Back-references (Incoming) */}
+          {(lore.referencedBy || []).length > 0 && (
+            <div className="bg-obsidian/80 border border-[var(--color-border-subtle)] rounded-sm p-4">
+              <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-3">
+                Referenced By
+              </h3>
+              <ul className="space-y-2">
+                {lore.referencedBy?.map((entry) => (
+                  <li key={entry.id}>
+                    <Link
+                      href={`/world/${world.id}/lore/${entry.slug}`}
+                      className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-accent-gold)] transition-colors line-clamp-2"
+                    >
+                      {entry.title}
+                    </Link>
+                    {entry.user?.name && (
+                      <span className="text-xs text-[var(--color-text-tertiary)] block">
+                        by {entry.user.name}
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Related Entries */}
+          <RelatedEntries
+            currentEntry={lore}
+            allEntries={allLoreEntries}
+            worldId={world.id}
+          />
+        </aside>
+      </div>
+
+      {/* Wiki Link Preview */}
+      <LoreLinkPreview worldId={world.id} />
+    </div>
+  );
+}

@@ -12,7 +12,7 @@ import { Upload, Globe, Lock, MapPin, X } from "lucide-react";
 import { createWorld } from "../methods/create-world";
 
 export function CreateWorldForm() {
-  const router = useRouter();
+  const _router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -33,7 +33,7 @@ export function CreateWorldForm() {
     e.preventDefault();
 
     try {
-      const result = await mutation.mutateAsync({
+      const _result = await mutation.mutateAsync({
         title: formData.name,
         description: formData.description,
         isPublic: formData.isPublic,

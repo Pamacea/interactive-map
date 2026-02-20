@@ -54,13 +54,13 @@ interface WorldClientProps {
   worldOwnerId: string;
 }
 
-function FloatingUI({ world, pins, currentUserId, worldOwnerId }: {
+function FloatingUI({ world, _pins, currentUserId, worldOwnerId }: {
   world: OptimizedWorld;
   pins: Pin[];
   currentUserId?: string;
   worldOwnerId: string;
 }) {
-  const hasLayers = !!world.layers && world.layers.length > 0;
+  const _hasLayers = !!world.layers && world.layers.length > 0;
 
   return (
     <>
@@ -146,7 +146,7 @@ export const WorldClient = memo(function WorldClient({
   // Initialize pins in store
   useEffect(() => {
     if (pins && pins.length > 0) {
-      setPins(pins as any);
+      setPins(pins as unknown);
     }
   }, [pins, setPins]);
 
@@ -154,7 +154,7 @@ export const WorldClient = memo(function WorldClient({
   const toggleSearch = useSearchStore((state) => state.toggleSearch);
 
   // Handle search result clicks
-  const handleSearchResultClick = useCallback(
+  const _handleSearchResultClick = useCallback(
     (result: SearchResultItem) => {
       if (result.type === "pin") {
         // Select the pin and center on it
@@ -185,7 +185,7 @@ export const WorldClient = memo(function WorldClient({
   const worldState = useAutosavePreparation(pins.length);
 
   // Setup autosave with authentication state
-  const { status } = useAutosave(
+  const { status: _status } = useAutosave(
     `world-${world.id}`,
     worldState,
     async (data) => {
@@ -224,7 +224,7 @@ export const WorldClient = memo(function WorldClient({
               console.error("[MapCanvas ErrorBoundary] Stack:", error.stack);
               console.error("[MapCanvas ErrorBoundary] Component stack:", errorInfo.componentStack);
               // Store error globally for debugging
-              (window as any).__lastError = {
+              (window as unknown).__lastError = {
                 message: error.message,
                 stack: error.stack,
                 componentStack: errorInfo.componentStack

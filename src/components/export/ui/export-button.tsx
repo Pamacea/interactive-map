@@ -24,7 +24,7 @@ export function ExportButton({ worldId, worldTitle, mapElement }: ExportButtonPr
       if (newOpen && !worldData) {
         setLoading(true);
         try {
-          const result = await getWorldExportData(worldId);
+          const _result = await getWorldExportData(worldId);
           if (!result.success) {
             console.error("[ExportButton] Failed to load world data:", result.error);
             setLoading(false);

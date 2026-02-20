@@ -4,9 +4,12 @@
  * Tests for the floating panel component with snap-to-edges functionality
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderHook, act, waitFor } from "@testing-library/react";
+import { describe, it, expect, beforeEach } from "vitest";
+import { renderHook, act } from "@testing-library/react";
 import { useFloatingPanelsStore, usePanelState } from "@/store/use-floating-panels-store";
+
+// Unused import kept for potential async tests
+// import { vi } from "vitest";
 
 describe("FloatingPanelsStore", () => {
   beforeEach(() => {
@@ -128,7 +131,7 @@ describe("FloatingPanelsStore", () => {
 
   describe("Available panels", () => {
     it("should have only the expected floating panels", () => {
-      const state = useFloatingPanelsStore.getState();
+      const _state = useFloatingPanelsStore.getState();
       const panelIds = Object.keys(state.panels);
 
       // These panels should exist (floating modules)
@@ -171,11 +174,11 @@ describe("FloatingPanel snap-to-edges", () => {
     const getSnappedPosition = (
       x: number,
       y: number,
-      width: number,
-      height: number
+      _width: number,
+      _height: number
     ) => {
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
+      const _viewportWidth = window.innerWidth;
+      const _viewportHeight = window.innerHeight;
 
       let newX = x;
       const newY = y;
@@ -228,7 +231,7 @@ describe("FloatingPanel snap-to-edges", () => {
       width: number,
       _height: number
     ) => {
-      const viewportWidth = window.innerWidth;
+      const _viewportWidth = window.innerWidth;
 
       let newX = x;
       let snapped = false;
@@ -243,7 +246,7 @@ describe("FloatingPanel snap-to-edges", () => {
     };
 
     // Panel width 400, should snap when x > 1500 (1920 - 20 - 400)
-    const result = getSnappedPosition(1505, 100, 400, 300);
+    const _result = getSnappedPosition(1505, 100, 400, 300);
     expect(result.snapped).toBe(true);
     expect(result.x).toBe(1520);
 

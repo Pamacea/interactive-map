@@ -31,7 +31,7 @@ export function MiniMap({
   onTransformChange,
   className,
 }: MiniMapProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const _containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [imageSize, setImageSize] = useState<{ width: number; height: number } | null>(null);
   const [viewportRect, setViewportRect] = useState({ x: 0, y: 0, width: 0, height: 0 });
@@ -57,13 +57,10 @@ export function MiniMap({
     // Mini-map scale (how much the image is scaled down)
     const mapAspectRatio = imageSize.width / imageSize.height;
     let miniMapWidth: number;
-    let miniMapHeight: number;
 
     if (mapAspectRatio > 1) {
       miniMapWidth = MINIMAP_SIZE;
-      miniMapHeight = MINIMAP_SIZE / mapAspectRatio;
     } else {
-      miniMapHeight = MINIMAP_SIZE;
       miniMapWidth = MINIMAP_SIZE * mapAspectRatio;
     }
 
@@ -99,13 +96,10 @@ export function MiniMap({
       // Mini-map dimensions
       const mapAspectRatio = imageSize.width / imageSize.height;
       let miniMapWidth: number;
-      let miniMapHeight: number;
 
       if (mapAspectRatio > 1) {
         miniMapWidth = MINIMAP_SIZE;
-        miniMapHeight = MINIMAP_SIZE / mapAspectRatio;
       } else {
-        miniMapHeight = MINIMAP_SIZE;
         miniMapWidth = MINIMAP_SIZE * mapAspectRatio;
       }
 
@@ -156,13 +150,10 @@ export function MiniMap({
       // Mini-map dimensions
       const mapAspectRatio = imageSize.width / imageSize.height;
       let miniMapWidth: number;
-      let miniMapHeight: number;
 
       if (mapAspectRatio > 1) {
         miniMapWidth = MINIMAP_SIZE;
-        miniMapHeight = MINIMAP_SIZE / mapAspectRatio;
       } else {
-        miniMapHeight = MINIMAP_SIZE;
         miniMapWidth = MINIMAP_SIZE * mapAspectRatio;
       }
 
@@ -206,13 +197,10 @@ export function MiniMap({
 
   const mapAspectRatio = imageSize ? imageSize.width / imageSize.height : 1;
   let miniMapWidth: number;
-  let miniMapHeight: number;
 
   if (mapAspectRatio > 1) {
     miniMapWidth = MINIMAP_SIZE;
-    miniMapHeight = MINIMAP_SIZE / mapAspectRatio;
   } else {
-    miniMapHeight = MINIMAP_SIZE;
     miniMapWidth = MINIMAP_SIZE * mapAspectRatio;
   }
 

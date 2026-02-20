@@ -1,6 +1,5 @@
 'use client';
 
-import { use } from 'react';
 import { useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { MembersList } from '@/components/members';
@@ -22,7 +21,7 @@ export function PresenceMembersList({
   worldOwnerId,
   currentUserId,
 }: PresenceMembersListProps) {
-  const session = useSession();
+  const _session = useSession();
   const user = session?.user;
 
   // Only enable presence if authenticated

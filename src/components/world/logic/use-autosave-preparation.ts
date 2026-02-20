@@ -5,7 +5,7 @@ import { useMapStore } from "@/stores/map-store";
  * Returns a stable object reference for autosave comparison
  */
 export function useAutosavePreparation(pinCount: number) {
-  const layers = useMapStore((state) => state.layers);
+  const _layers = useMapStore((state) => state.layers);
   const grid = useMapStore((state) => state.grid);
   const snap = useMapStore((state) => state.snap);
   const scale = useMapStore((state) => state.scale);

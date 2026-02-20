@@ -1,0 +1,588 @@
+import { create } from "zustand";
+import { devtools } from "zustand/middleware";
+import type {
+  Character,
+  CharacterType,
+  CharacterRole,
+  CharacterPinRelation,
+  CharacterRelationship,
+} from "@prisma/client";
+import {
+  createCharacter as createCharacterAction,
+  updateCharacter as updateCharacterAction,
+  deleteCharacter as deleteCharacterAction,
+  toggleCharacterVisibility,
+  linkCharacterToPin as linkCharacterToPinAction,
+  unlinkCharacterFromPin as unlinkCharacterFromPinAction,
+  createCharacterRelationship,
+  updateCharacterRelationship,
+  deleteCharacterRelationship as deleteCharacterRelationshipAction,
+} from "@/features/characters/actions";
+
+// UI State for character interactions
+export interface CharacterUIState {
+  selectedCharacterId: string | null;
+  isCreating: boolean;
+  isEditing: boolean;
+  isRelationshipMode: boolean;
+  expandedCharacterIds: Set<string>;
+}
+
+// Filter state for characters
+export interface CharacterFilters {
+  searchTerm: string;
+  typeFilters: Record<string, boolean>;
+  roleFilters: Record<string, boolean>;
+  factionFilters: Record<string, boolean>;
+  showVisibleOnly: boolean;
+}
+
+// Character data stored in client state (synced with server)
+interface CharacterDataState {
+  characters: Character[];
+  filteredCharacters: Character[];
+  isLoading: boolean;
+  error: string | null;
+  linkedPins: Map<string, CharacterPinRelation[]>; // characterId -> pins
+  relationships: Map<string, CharacterRelationship[]>; // characterId -> relationships
+}
+
+interface CharacterStore extends CharacterUIState, CharacterFilters, CharacterDataState {
+  // Selection state
+  selectCharacter: (characterId: string | null) => void;
+  clearSelection: () => void;
+  toggleExpanded: (characterId: string) => void;
+
+  // Creation/editing state
+  startCreating: () => void;
+  stopCreating: () => void;
+  startEditing: () => void;
+  stopEditing: () => void;
+  toggleRelationshipMode: () => void;
+
+  // Character CRUD operations (local state)
+  setCharacters: (characters: Character[]) => void;
+  addCharacter: (character: Character) => void;
+  updateCharacter: (characterId: string, updates: Partial<Character>) => void;
+  deleteCharacter: (characterId: string) => void;
+
+  // Character CRUD operations (server sync with optimistic updates)
+  createCharacter: (
+    data: Parameters<typeof createCharacterAction>[0]
+  ) => Promise<Character>;
+  deleteCharacterServer: (characterId: string) => Promise<void>;
+  updateCharacterServer: (
+    data: Parameters<typeof updateCharacterAction>[0]
+  ) => Promise<Character | void>;
+  toggleVisibility: (characterId: string) => Promise<void>;
+
+  // Pin linking
+  linkToPin: (
+    characterId: string,
+    pinId: string,
+    relationType?: string,
+    notes?: string
+  ) => Promise<void>;
+  unlinkFromPin: (characterId: string, pinId: string) => Promise<void>;
+  setLinkedPins: (characterId: string, pins: CharacterPinRelation[]) => void;
+
+  // Relationships
+  createRelationship: (
+    data: Parameters<typeof createCharacterRelationship>[0]
+  ) => Promise<CharacterRelationship>;
+  updateRelationship: (
+    data: Parameters<typeof updateCharacterRelationship>[0]
+  ) => Promise<void>;
+  deleteRelationship: (sourceId: string, targetId: string) => Promise<void>;
+  setRelationships: (characterId: string, relationships: CharacterRelationship[]) => void;
+
+  // Filter actions
+  setSearchTerm: (term: string) => void;
+  setTypeFilter: (type: string, value: boolean) => void;
+  toggleTypeFilter: (type: string) => void;
+  setRoleFilter: (role: string, value: boolean) => void;
+  toggleRoleFilter: (role: string) => void;
+  addFactionFilter: (faction: string) => void;
+  removeFactionFilter: (faction: string) => void;
+  toggleShowVisibleOnly: () => void;
+  resetFilters: () => void;
+  applyFilters: () => void;
+
+  // Loading and error state
+  setLoading: (isLoading: boolean) => void;
+  setError: (error: string | null) => void;
+
+  // Reset all
+  reset: () => void;
+}
+
+// Helper function to create default type filters
+const createDefaultTypeFilters = (): Record<string, boolean> => ({
+  PLAYER: true,
+  NPC: true,
+  ENEMY: true,
+  MERCHANT: true,
+  QUEST_GIVER: true,
+  COMPANION: true,
+  BOSS: true,
+  CUSTOM: true,
+});
+
+// Helper function to create default role filters
+const createDefaultRoleFilters = (): Record<string, boolean> => ({
+  PROTAGONIST: true,
+  ANTAGONIST: true,
+  SUPPORTING: true,
+  BACKGROUND: true,
+  MENTOR: true,
+  ALLY: true,
+  NEUTRAL: true,
+  HOSTILE: true,
+  CUSTOM: true,
+});
+
+const initialState: CharacterUIState & CharacterFilters & CharacterDataState = {
+  // UI State
+  selectedCharacterId: null,
+  isCreating: false,
+  isEditing: false,
+  isRelationshipMode: false,
+  expandedCharacterIds: new Set(),
+
+  // Filters
+  searchTerm: "",
+  typeFilters: createDefaultTypeFilters(),
+  roleFilters: createDefaultRoleFilters(),
+  factionFilters: {},
+  showVisibleOnly: false,
+
+  // Data
+  characters: [],
+  filteredCharacters: [],
+  isLoading: false,
+  error: null,
+  linkedPins: new Map(),
+  relationships: new Map(),
+};
+
+export const useCharacterStore = create<CharacterStore>()(
+  devtools(
+    (set, get) => ({
+      ...initialState,
+
+      // Selection actions
+      selectCharacter: (characterId) =>
+        set({ selectedCharacterId: characterId }, false, "selectCharacter"),
+
+      clearSelection: () =>
+        set({ selectedCharacterId: null }, false, "clearSelection"),
+
+      toggleExpanded: (characterId) =>
+        set((state) => {
+          const newExpanded = new Set(state.expandedCharacterIds);
+          if (newExpanded.has(characterId)) {
+            newExpanded.delete(characterId);
+          } else {
+            newExpanded.add(characterId);
+          }
+          return { expandedCharacterIds: newExpanded };
+        }, false, "toggleExpanded"),
+
+      // Creation/editing actions
+      startCreating: () =>
+        set({
+          isCreating: true,
+          isEditing: false,
+          selectedCharacterId: null,
+        }, false, "startCreating"),
+
+      stopCreating: () =>
+        set({ isCreating: false }, false, "stopCreating"),
+
+      startEditing: () =>
+        set({ isEditing: true }, false, "startEditing"),
+
+      stopEditing: () =>
+        set({ isEditing: false }, false, "stopEditing"),
+
+      toggleRelationshipMode: () =>
+        set((state) => ({ isRelationshipMode: !state.isRelationshipMode }), false, "toggleRelationshipMode"),
+
+      // Character data management
+      setCharacters: (characters) =>
+        set({ characters }, false, "setCharacters"),
+
+      addCharacter: (character) =>
+        set((state) => ({
+          characters: [...state.characters, character],
+        }), false, "addCharacter"),
+
+      updateCharacter: (characterId, updates) =>
+        set((state) => ({
+          characters: state.characters.map((c) =>
+            c.id === characterId ? { ...c, ...updates } : c
+          ),
+        }), false, "updateCharacter"),
+
+      deleteCharacter: (characterId) =>
+        set((state) => ({
+          characters: state.characters.filter((c) => c.id !== characterId),
+          selectedCharacterId: state.selectedCharacterId === characterId ? null : state.selectedCharacterId,
+        }), false, "deleteCharacter"),
+
+      // Server operations with optimistic updates
+      createCharacter: async (data) => {
+        // Optimistic update - add to local state immediately
+        const tempId = `temp-${Date.now()}`;
+        const tempCharacter: Character = {
+          id: tempId,
+          name: data.name,
+          shortName: data.shortName ?? null,
+          characterType: data.characterType ?? "NPC",
+          role: data.role ?? "SUPPORTING",
+          portraitUrl: data.portraitUrl ?? null,
+          age: data.age ?? null,
+          gender: data.gender ?? null,
+          species: data.species ?? null,
+          height: data.height ?? null,
+          build: data.build ?? null,
+          level: data.level ?? null,
+          class: data.class ?? null,
+          faction: data.faction ?? null,
+          stats: data.stats ?? null,
+          skills: data.skills ?? null,
+          equipment: data.equipment ?? null,
+          personality: data.personality ?? null,
+          background: data.background ?? null,
+          goals: data.goals ?? null,
+          fears: data.fears ?? null,
+          dialogue: data.dialogue ?? null,
+          quests: data.quests ?? null,
+          shopInventory: data.shopInventory ?? null,
+          isVisible: data.isVisible ?? true,
+          isPublic: data.isPublic ?? true,
+          order: 0,
+          userId: "", // Will be filled by server
+          gameWorldId: data.gameWorldId,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+
+        set((state) => ({
+          characters: [...state.characters, tempCharacter],
+        }), false, "createCharacter");
+
+        try {
+          const result = await createCharacterAction(data);
+          if (result.success) {
+            // Replace temp with real character
+            set((state) => ({
+              characters: state.characters.map((c) =>
+                c.id === tempId ? result.data.character : c
+              ),
+            }), false, "createCharacterSuccess");
+            return result.data.character;
+          }
+          throw result.error;
+        } catch (error) {
+          // Rollback on error
+          set((state) => ({
+            characters: state.characters.filter((c) => c.id !== tempId),
+          }), false, "createCharacterError");
+          throw error;
+        }
+      },
+
+      deleteCharacterServer: async (characterId) => {
+        // Optimistic update
+        const prevCharacters = get().characters;
+        set((state) => ({
+          characters: state.characters.filter((c) => c.id !== characterId),
+        }), false, "deleteCharacter");
+
+        try {
+          const result = await deleteCharacterAction(characterId);
+          if (!result.success) {
+            // Rollback
+            set({ characters: prevCharacters }, false, "deleteCharacterRollback");
+            throw result.error;
+          }
+        } catch (error) {
+          set({ characters: prevCharacters }, false, "deleteCharacterRollback");
+          throw error;
+        }
+      },
+
+      updateCharacterServer: async (data) => {
+        const prevCharacters = get().characters;
+        // Optimistic update
+        set((state) => ({
+          characters: state.characters.map((c) =>
+            c.id === data.id ? { ...c, ...data } : c
+          ),
+        }), false, "updateCharacter");
+
+        try {
+          const result = await updateCharacterAction(data);
+          if (result.success) {
+            set((state) => ({
+              characters: state.characters.map((c) =>
+                c.id === data.id ? result.data : c
+              ),
+            }), false, "updateCharacterSuccess");
+            return result.data;
+          }
+          // Rollback
+          set({ characters: prevCharacters }, false, "updateCharacterRollback");
+          throw result.error;
+        } catch (error) {
+          set({ characters: prevCharacters }, false, "updateCharacterRollback");
+          throw error;
+        }
+      },
+
+      toggleVisibility: async (characterId) => {
+        const prevCharacters = get().characters;
+        const character = prevCharacters.find((c) => c.id === characterId);
+        if (!character) return;
+
+        // Optimistic update
+        set((state) => ({
+          characters: state.characters.map((c) =>
+            c.id === characterId ? { ...c, isVisible: !c.isVisible } : c
+          ),
+        }), false, "toggleVisibility");
+
+        try {
+          const result = await toggleCharacterVisibility(characterId);
+          if (!result.success) {
+            set({ characters: prevCharacters }, false, "toggleVisibilityRollback");
+            throw result.error;
+          }
+        } catch (error) {
+          set({ characters: prevCharacters }, false, "toggleVisibilityRollback");
+          throw error;
+        }
+      },
+
+      // Pin linking
+      linkToPin: async (characterId, pinId, relationType = "LOCATION", notes) => {
+        try {
+          const result = await linkCharacterToPinAction(characterId, pinId, relationType, notes);
+          if (result.success) {
+            set((state) => {
+              const newLinkedPins = new Map(state.linkedPins);
+              const existingPins = newLinkedPins.get(characterId) || [];
+              newLinkedPins.set(characterId, [...existingPins, result.data]);
+              return { linkedPins: newLinkedPins };
+            }, false, "linkToPin");
+          }
+          throw result.error;
+        } catch (error) {
+          throw error;
+        }
+      },
+
+      unlinkFromPin: async (characterId, pinId) => {
+        try {
+          const result = await unlinkCharacterFromPinAction(characterId, pinId);
+          if (result.success) {
+            set((state) => {
+              const newLinkedPins = new Map(state.linkedPins);
+              const existingPins = newLinkedPins.get(characterId) || [];
+              newLinkedPins.set(
+                characterId,
+                existingPins.filter((p) => p.pinId !== pinId)
+              );
+              return { linkedPins: newLinkedPins };
+            }, false, "unlinkFromPin");
+          }
+          throw result.error;
+        } catch (error) {
+          throw error;
+        }
+      },
+
+      setLinkedPins: (characterId, pins) =>
+        set((state) => {
+          const newLinkedPins = new Map(state.linkedPins);
+          newLinkedPins.set(characterId, pins);
+          return { linkedPins: newLinkedPins };
+        }, false, "setLinkedPins"),
+
+      // Relationships
+      createRelationship: async (data) => {
+        try {
+          const result = await createCharacterRelationship(data);
+          if (result.success) {
+            set((state) => {
+              const newRelationships = new Map(state.relationships);
+              const existing = newRelationships.get(data.sourceId) || [];
+              newRelationships.set(data.sourceId, [...existing, result.data]);
+              return { relationships: newRelationships };
+            }, false, "createRelationship");
+          }
+          throw result.error;
+        } catch (error) {
+          throw error;
+        }
+      },
+
+      updateRelationship: async (data) => {
+        try {
+          const result = await updateCharacterRelationship(data);
+          if (result.success) {
+            set((state) => {
+              const newRelationships = new Map(state.relationships);
+              const existing = newRelationships.get(data.sourceId) || [];
+              newRelationships.set(
+                data.sourceId,
+                existing.map((r) =>
+                  r.sourceId === data.sourceId && r.targetId === data.targetId
+                    ? result.data
+                    : r
+                )
+              );
+              return { relationships: newRelationships };
+            }, false, "updateRelationship");
+          }
+          throw result.error;
+        } catch (error) {
+          throw error;
+        }
+      },
+
+      deleteRelationship: async (sourceId, targetId) => {
+        try {
+          const result = await deleteCharacterRelationshipAction(sourceId, targetId);
+          if (result.success) {
+            set((state) => {
+              const newRelationships = new Map(state.relationships);
+              const existing = newRelationships.get(sourceId) || [];
+              newRelationships.set(
+                sourceId,
+                existing.filter((r) => !(r.sourceId === sourceId && r.targetId === targetId))
+              );
+              return { relationships: newRelationships };
+            }, false, "deleteRelationship");
+          }
+          throw result.error;
+        } catch (error) {
+          throw error;
+        }
+      },
+
+      setRelationships: (characterId, relationships) =>
+        set((state) => {
+          const newRelationships = new Map(state.relationships);
+          newRelationships.set(characterId, relationships);
+          return { relationships: newRelationships };
+        }, false, "setRelationships"),
+
+      // Filter actions
+      setSearchTerm: (term) =>
+        set({ searchTerm: term }, false, "setSearchTerm"),
+
+      setTypeFilter: (type, value) =>
+        set((state) => ({
+          typeFilters: { ...state.typeFilters, [type]: value },
+        }), false, "setTypeFilter"),
+
+      toggleTypeFilter: (type) =>
+        set((state) => ({
+          typeFilters: { ...state.typeFilters, [type]: !state.typeFilters[type] },
+        }), false, "toggleTypeFilter"),
+
+      setRoleFilter: (role, value) =>
+        set((state) => ({
+          roleFilters: { ...state.roleFilters, [role]: value },
+        }), false, "setRoleFilter"),
+
+      toggleRoleFilter: (role) =>
+        set((state) => ({
+          roleFilters: { ...state.roleFilters, [role]: !state.roleFilters[role] },
+        }), false, "toggleRoleFilter"),
+
+      addFactionFilter: (faction) =>
+        set((state) => ({
+          factionFilters: { ...state.factionFilters, [faction]: true },
+        }), false, "addFactionFilter"),
+
+      removeFactionFilter: (faction) =>
+        set((state) => {
+          const newFilters = { ...state.factionFilters };
+          delete newFilters[faction];
+          return { factionFilters: newFilters };
+        }, false, "removeFactionFilter"),
+
+      toggleShowVisibleOnly: () =>
+        set((state) => ({ showVisibleOnly: !state.showVisibleOnly }), false, "toggleShowVisibleOnly"),
+
+      resetFilters: () =>
+        set({
+          searchTerm: "",
+          typeFilters: createDefaultTypeFilters(),
+          roleFilters: createDefaultRoleFilters(),
+          factionFilters: {},
+          showVisibleOnly: false,
+        }, false, "resetFilters"),
+
+      applyFilters: () =>
+        set((state) => {
+          let filtered = [...state.characters];
+
+          // Search term filter
+          if (state.searchTerm) {
+            const term = state.searchTerm.toLowerCase();
+            filtered = filtered.filter(
+              (c) =>
+                c.name.toLowerCase().includes(term) ||
+                c.shortName?.toLowerCase().includes(term) ||
+                c.faction?.toLowerCase().includes(term)
+            );
+          }
+
+          // Type filters
+          const activeTypes = Object.entries(state.typeFilters)
+            .filter(([_, active]) => active)
+            .map(([type]) => type);
+          if (activeTypes.length < Object.keys(state.typeFilters).length) {
+            filtered = filtered.filter((c) => activeTypes.includes(c.characterType));
+          }
+
+          // Role filters
+          const activeRoles = Object.entries(state.roleFilters)
+            .filter(([_, active]) => active)
+            .map(([role]) => role);
+          if (activeRoles.length < Object.keys(state.roleFilters).length) {
+            filtered = filtered.filter((c) => activeRoles.includes(c.role));
+          }
+
+          // Faction filters
+          const activeFactions = Object.keys(state.factionFilters);
+          if (activeFactions.length > 0) {
+            filtered = filtered.filter((c) => c.faction && activeFactions.includes(c.faction));
+          }
+
+          // Visibility filter
+          if (state.showVisibleOnly) {
+            filtered = filtered.filter((c) => c.isVisible);
+          }
+
+          return { filteredCharacters: filtered };
+        }, false, "applyFilters"),
+
+      // Loading and error state
+      setLoading: (isLoading) =>
+        set({ isLoading }, false, "setLoading"),
+
+      setError: (error) =>
+        set({ error }, false, "setError"),
+
+      // Reset
+      reset: () =>
+        set(initialState, false, "reset"),
+    }),
+    { name: "CharacterStore" }
+  )
+);

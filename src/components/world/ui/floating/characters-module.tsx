@@ -46,7 +46,7 @@ export function CharactersModule({ worldId }: CharactersModuleProps) {
     const fetchCharacters = async () => {
       setIsLoading(true);
       try {
-        const data = await getCharactersByWorld(worldId);
+        const _data = await getCharactersByWorld(worldId);
         setCharactersState(data);
         setCharactersStore(data);
         setHasLoaded(true);
@@ -67,7 +67,7 @@ export function CharactersModule({ worldId }: CharactersModuleProps) {
   // Refetch callback for after mutations
   const refetchCharacters = useCallback(async () => {
     try {
-      const data = await getCharactersByWorld(worldId);
+      const _data = await getCharactersByWorld(worldId);
       setCharactersState(data);
       setCharactersStore(data);
 

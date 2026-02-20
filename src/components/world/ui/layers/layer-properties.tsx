@@ -55,7 +55,7 @@ export function LayerProperties({
                 type="number"
                 value={layer.offsetX}
                 onChange={(e) => {
-                  const val = parseInt(e.target.value) || 0;
+                  const _val = parseInt(e.target.value) || 0;
                   // Would need position change action
                   console.log("X offset:", val);
                 }}
@@ -78,7 +78,7 @@ export function LayerProperties({
                 type="number"
                 value={layer.offsetY}
                 onChange={(e) => {
-                  const val = parseInt(e.target.value) || 0;
+                  const _val = parseInt(e.target.value) || 0;
                   console.log("Y offset:", val);
                 }}
                 className="w-full h-8 px-2 text-sm bg-void border border-iron rounded-sm focus:outline-none focus:ring-1 focus:ring-accent-gold text-bone"

@@ -105,7 +105,7 @@ export const InlineEditText = memo(function InlineEditText({
     }
 
     if (validate) {
-      const result = validate(trimmed);
+      const _result = validate(trimmed);
       if (result !== true) {
         setError(result);
         return;
@@ -301,7 +301,7 @@ export const InlineEditNumber = memo(function InlineEditNumber({
   // Sync editValue when external value changes, but only when not editing
   useEffect(() => {
     if (!isEditing && prevValueRef.current !== value) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- Sync prop to state when not editing
+       
       setEditValue(value.toString());
     }
     prevValueRef.current = value;

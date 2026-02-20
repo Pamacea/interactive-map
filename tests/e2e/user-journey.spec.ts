@@ -9,7 +9,7 @@ import { test, expect } from './fixtures';
 import { generateTestWorldName } from './helpers/test-data';
 
 test.describe('New User Journey', () => {
-  test('should navigate from home to create world', async ({ page, worldHelpers }) => {
+  test('should navigate from home to create world', async ({ page, _worldHelpers }) => {
     // Start at home
     await page.goto('/');
 
@@ -62,7 +62,7 @@ test.describe('New User Journey', () => {
 });
 
 test.describe('Authenticated User Journey', () => {
-  test.beforeEach(async ({ page, authHelpers }) => {
+  test.beforeEach(async ({ _page, authHelpers }) => {
     // Note: In real E2E tests, you would:
     // 1. Set up a test account
     // 2. Use OAuth mocking
@@ -122,11 +122,6 @@ test.describe('Map Editor Journey', () => {
 
     // Check for key UI elements
     await expect(page.locator('canvas, [class*="map"]').first()).toBeVisible();
-
-    // Check for controls
-    const zoomControls = page.locator('button').filter({ hasText: /[+-]/ }).or(
-      page.locator('[class*="zoom"]')
-    );
 
     // At least map container should be present
     const mapContainer = await mapHelpers.getMapContainer();

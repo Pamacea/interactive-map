@@ -106,7 +106,7 @@ export async function generateMissingSlugs(): Promise<
     };
 
     // Pins
-    const pins = await prisma.pin.findMany({
+    const _pins = await prisma.pin.findMany({
       where: { slug: null },
       select: { id: true, title: true, gameWorldId: true },
     });

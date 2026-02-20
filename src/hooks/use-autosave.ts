@@ -83,7 +83,7 @@ export function useAutosave<T>(
     }
 
     // Mark as unsaved - defer to avoid setState in effect
-    const markUnsavedTimer = setTimeout(() => setStatus("unsaved"), 0);
+    const _markUnsavedTimer = setTimeout(() => setStatus("unsaved"), 0);
 
     // Clear any existing timeout
     clearSaveTimeout();

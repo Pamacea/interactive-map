@@ -8,7 +8,7 @@ export async function createWorld(data: {
   isPublic: boolean;
   map?: File;
 }) {
-  const result = await createWorldAction(data);
+  const _result = await createWorldAction(data);
 
   // Extract the worldId from the Result type
   if (!result.success) {

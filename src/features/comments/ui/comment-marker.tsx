@@ -1,0 +1,89 @@
+'use client';
+
+import { memo } from 'react';
+import { MessageSquare } from 'lucide-react';
+import { cn } from '@/shared/lib/utils';
+import { useCommentsStore } from '@/features/use-comments-store';
+import { useSelectedComment } from '@/features/use-comments-store';
+
+// Unused import - kept for future features
+// import { useCommentMarkers } from '@/features/use-comments-store';
+
+interface CommentMarkerProps {
+  commentId: string;
+  latitude: number;
+  longitude: number;
+  count: number;
+  hasUnresolved: boolean;
+}
+
+export const CommentMarker = memo<CommentMarkerProps>(function CommentMarker({
+  commentId,
+  latitude,
+  longitude,
+  count,
+  hasUnresolved,
+}) {
+  const selectedCommentId = useSelectedComment();
+  const isSelected = selectedCommentId === commentId;
+  const setSelectedComment = useCommentsStore((s) => s.setSelectedComment);
+
+  // Convert normalized coordinates (0-1) to percentages
+  const left = longitude * 100;
+  const top = latitude * 100;
+
+  return (
+    <div
+      className={cn(
+        'absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer group z-10',
+        'transition-all duration-200'
+      )}
+      style={{ left: `${left}%`, top: `${top}%` }}
+      onClick={(e) => {
+        e.stopPropagation();
+        setSelectedComment(commentId);
+      }}
+    >
+      {/* Outer glow ring for unresolved */}
+      {hasUnresolved && (
+        <span className="absolute inset-0 rounded-full bg-accent-gold/20 animate-ping" />
+      )}
+
+      {/* Main marker */}
+      <div className={cn(
+        'relative flex items-center justify-center',
+        'w-7 h-7 rounded-sm border-2 transition-all duration-200',
+        'shadow-lg hover:shadow-glow-medium',
+        isSelected
+          ? 'bg-accent-gold border-accent-gold text-obsidian scale-110 shadow-glow-medium'
+          : hasUnresolved
+            ? 'bg-obsidian/90 border-accent-gold text-accent-gold hover:bg-accent-gold/20'
+            : 'bg-obsidian/90 border-bone-dark/40 text-bone-dark/60 hover:border-bone-dark/60'
+      )}>
+        <MessageSquare size={14} strokeWidth={2} />
+
+        {/* Count badge */}
+        {count > 1 && (
+          <span className={cn(
+            'absolute -top-1.5 -right-1.5',
+            'flex items-center justify-center',
+            'w-4 h-4 text-[10px] font-bold rounded-sm',
+            isSelected
+              ? 'bg-obsidian text-accent-gold'
+              : 'bg-accent-gold text-obsidian'
+          )}>
+            {count > 9 ? '9+' : count}
+          </span>
+        )}
+
+        {/* Ornate corner for selected state */}
+        {isSelected && (
+          <>
+            <span className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-obsidian/50" />
+            <span className="absolute bottom-0 right-0 w-1.5 h-1.5 border-b border-r border-obsidian/50" />
+          </>
+        )}
+      </div>
+    </div>
+  );
+});

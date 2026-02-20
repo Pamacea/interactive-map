@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Link } from "next/navigation";
+import Image from "next/image";
 import {
   User,
   Edit,
@@ -89,7 +90,7 @@ export function CharacterDetail({ characterId, worldId, characters, onClose }: C
       try {
         const response = await fetch(`/api/characters/${characterId}`);
         if (response.ok) {
-          const data = await response.json();
+          const _data = await response.json();
           setFullCharacter(data);
         }
       } catch (error) {
@@ -124,7 +125,7 @@ export function CharacterDetail({ characterId, worldId, characters, onClose }: C
     }
   };
 
-  const handleToggleVisibility = async () => {
+  const _handleToggleVisibility = async () => {
     try {
       await toggleVisibility(character.id);
     } catch (error) {
@@ -139,7 +140,7 @@ export function CharacterDetail({ characterId, worldId, characters, onClose }: C
       // Refetch character data
       const response = await fetch(`/api/characters/${characterId}`);
       if (response.ok) {
-        const data = await response.json();
+        const _data = await response.json();
         setFullCharacter(data);
       }
     } catch (error) {
@@ -154,7 +155,7 @@ export function CharacterDetail({ characterId, worldId, characters, onClose }: C
       // Refetch character data
       const response = await fetch(`/api/characters/${characterId}`);
       if (response.ok) {
-        const data = await response.json();
+        const _data = await response.json();
         setFullCharacter(data);
       }
     } catch (error) {
@@ -192,9 +193,11 @@ export function CharacterDetail({ characterId, worldId, characters, onClose }: C
           {/* Portrait */}
           {character.portraitUrl ? (
             <div className="flex-shrink-0 w-20 h-20 rounded-sm overflow-hidden bg-obsidian/60 border border-border-subtle">
-              <img
+              <Image
                 src={character.portraitUrl}
                 alt={character.name}
+                width={80}
+                height={80}
                 className="w-full h-full object-cover"
               />
             </div>

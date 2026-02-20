@@ -68,8 +68,8 @@ export function PinCreateForm({
     setIsCreating(true);
 
     try {
-      const data = form.getSubmitData();
-      await createPinMutation(data as any);
+      const _data = form.getSubmitData();
+      await createPinMutation(data);
       showToast("Pin created successfully!", "success");
       onSuccess?.();
     } catch (error) {

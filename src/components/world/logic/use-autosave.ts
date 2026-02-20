@@ -122,7 +122,7 @@ export function useAutosave<T = unknown>(
     errorMessage = "Failed to save changes",
     onSaveSuccess,
     onSaveError,
-    optimistic = false,
+    optimistic: _optimistic = false,
   } = options;
 
   const { toast } = useToast();
@@ -135,7 +135,7 @@ export function useAutosave<T = unknown>(
   // Cleanup on unmount
   React.useEffect(() => {
     return () => {
-      timeoutRef.current && clearTimeout(timeoutRef.current);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
       abortControllerRef.current?.abort();
     };
   }, []);
@@ -143,7 +143,7 @@ export function useAutosave<T = unknown>(
   const save = React.useCallback(
     async (data: T): Promise<void> => {
       // Cancel any pending operation
-      timeoutRef.current && clearTimeout(timeoutRef.current);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
       abortControllerRef.current?.abort();
 
       // Create new abort controller for this save
@@ -204,7 +204,7 @@ export function useAutosave<T = unknown>(
       pendingDataRef.current = data;
 
       // Clear existing timeout
-      timeoutRef.current && clearTimeout(timeoutRef.current);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
       setStatus("debouncing");
 
@@ -219,7 +219,7 @@ export function useAutosave<T = unknown>(
   );
 
   const cancel = React.useCallback(() => {
-    timeoutRef.current && clearTimeout(timeoutRef.current);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
     abortControllerRef.current?.abort();
     setStatus("idle");
     setError(null);

@@ -74,9 +74,10 @@ function getLayerIcon(layer: UILayer) {
   }
 
   const iconMap = {
-    "MARKERS": <MapPin className="w-3.5 h-3.5" />,
-    "IMAGES": <Image className="w-3.5 h-3.5" />,
-    "REGIONS": <Square className="w-3.5 h-3.5" />,
+    "MARKERS": <MapPin className="w-3.5 h-3.5" aria-hidden="true" />,
+    // eslint-disable-next-line jsx-a11y/alt-text
+    "IMAGES": <Image className="w-3.5 h-3.5" aria-hidden="true" />,
+    "REGIONS": <Square className="w-3.5 h-3.5" aria-hidden="true" />,
   };
 
   return iconMap[layer.type || "CUSTOM"] || (
@@ -109,9 +110,10 @@ function CountBadge({ type, count }: { type: string; count: number }) {
   if (count === 0) return null;
 
   const badgeConfig = {
-    pins: { bg: "bg-amber-500/20", text: "text-amber-400", icon: <MapPin className="w-2 h-2" /> },
-    images: { bg: "bg-emerald-500/20", text: "text-emerald-400", icon: <Image className="w-2 h-2" /> },
-    regions: { bg: "bg-purple-500/20", text: "text-purple-400", icon: <Square className="w-2 h-2" /> },
+    pins: { bg: "bg-amber-500/20", text: "text-amber-400", icon: <MapPin className="w-2 h-2" aria-hidden="true" /> },
+    // eslint-disable-next-line jsx-a11y/alt-text
+    images: { bg: "bg-emerald-500/20", text: "text-emerald-400", icon: <Image className="w-2 h-2" aria-hidden="true" /> },
+    regions: { bg: "bg-purple-500/20", text: "text-purple-400", icon: <Square className="w-2 h-2" aria-hidden="true" /> },
   };
 
   const config = badgeConfig[type as keyof typeof badgeConfig];
@@ -144,7 +146,7 @@ export function LayerItemCompact({
   const canMoveUp = index > 0 && !layer.isBaseMap;
   const canMoveDown = index < totalLayers - 1 && !layer.isBaseMap;
 
-  const handleToggleVisibility = useCallback((e: React.MouseEvent) => {
+  const _handleToggleVisibility = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     actions.onToggleVisibility(layer.id);
   }, [actions, layer.id]);

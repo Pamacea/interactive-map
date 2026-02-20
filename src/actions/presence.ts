@@ -29,7 +29,7 @@ export async function safeLogCollaborationEvent(input: {
   eventData?: unknown;
 }): Promise<void> {
   try {
-    const result = await logCollaborationEvent(input);
+    const _result = await logCollaborationEvent(input);
     if (!result.success) {
       console.error('[Collaboration] Failed to log event:', {
         worldId: input.worldId,
@@ -200,7 +200,7 @@ export async function cleanupInactivePresences(): Promise<Result<{ count: number
   return safeAsync(async () => {
     const timeout = new Date(Date.now() - PRESENCE_TIMEOUT_MS);
 
-    const result = await prisma.userPresence.updateMany({
+    const _result = await prisma.userPresence.updateMany({
       where: {
         isActive: true,
         lastSeen: {

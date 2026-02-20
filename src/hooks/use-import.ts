@@ -7,7 +7,7 @@ import {
   getWorldImportJobs,
   cancelImportJob,
 } from '@/actions/import';
-import type { Result, ImportSourceType } from '@/actions/import';
+import type { Result } from '@/actions/import';
 
 export type ImportJob = {
   id: string;
@@ -30,7 +30,7 @@ export function useImportJobs(worldId: string, enabled = true) {
     queryKey: ['importJobs', worldId],
     queryFn: async () => {
       try {
-        const result = await getWorldImportJobs(worldId);
+        const _result = await getWorldImportJobs(worldId);
         if (!result.success) {
           if (result.error?.code === 'AUTHENTICATION_ERROR') {
             return [];
@@ -38,10 +38,11 @@ export function useImportJobs(worldId: string, enabled = true) {
           throw new Error(result.error?.message || 'Failed to fetch import jobs');
         }
         return result.data;
-      } catch (error: any) {
-        if (error?.code === 'AUTHENTICATION_ERROR' ||
-            error?.message?.includes('Authentication') ||
-            error?.message?.includes('logged in')) {
+      } catch (error: unknown) {
+        const err = error as { code?: string; message?: string };
+        if (err.code === 'AUTHENTICATION_ERROR' ||
+            err.message?.includes('Authentication') ||
+            err.message?.includes('logged in')) {
           return [];
         }
         throw error;
@@ -71,7 +72,7 @@ export function useCreateImportJob(): UseMutationResult<
   Error,
   Parameters<typeof createImportJob>[0]
 > {
-  const queryClient = useQueryClient();
+  const _queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: createImportJob,
@@ -86,7 +87,7 @@ export function useProcessImportJob(): UseMutationResult<
   Error,
   Parameters<typeof processImportJob>[0]
 > {
-  const queryClient = useQueryClient();
+  const _queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: processImportJob,
@@ -107,7 +108,7 @@ export function useCancelImportJob(): UseMutationResult<
   Error,
   Parameters<typeof cancelImportJob>[0]
 > {
-  const queryClient = useQueryClient();
+  const _queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: cancelImportJob,

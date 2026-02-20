@@ -5,7 +5,7 @@ import {
   createLoreEntry as createLoreAction,
   deleteLoreEntry as deleteLoreAction,
   updateLoreEntry as updateLoreAction,
-} from "@/actions/lore";
+} from "@/features/lore";
 
 // UI State for lore interactions
 export interface LoreUIState {
@@ -189,7 +189,7 @@ export const useLoreStore = create<LoreStore>()(
 
       // Lore CRUD operations (server sync with optimistic updates)
       createLoreEntry: async (data) => {
-        const state = get();
+        const _state = get();
 
         // Optimistic update
         const tempId = `temp-${Date.now()}`;
@@ -216,7 +216,7 @@ export const useLoreStore = create<LoreStore>()(
         );
 
         try {
-          const result = await createLoreAction(data);
+          const _result = await createLoreAction(data);
 
           if (!result.success) {
             throw new Error(result.error.message);
@@ -255,7 +255,7 @@ export const useLoreStore = create<LoreStore>()(
       },
 
       deleteLoreEntryServer: async (loreId) => {
-        const state = get();
+        const _state = get();
         const originalLore = state.loreEntries.find((lore) => lore.id === loreId);
 
         // Optimistic delete
@@ -292,7 +292,7 @@ export const useLoreStore = create<LoreStore>()(
       },
 
       updateLoreEntryServer: async (data) => {
-        const state = get();
+        const _state = get();
         const originalLore = state.loreEntries.find(
           (lore) => lore.id === data.id
         );
@@ -316,7 +316,7 @@ export const useLoreStore = create<LoreStore>()(
         );
 
         try {
-          const result = await updateLoreAction(data);
+          const _result = await updateLoreAction(data);
 
           if (!result.success) {
             throw new Error(result.error.message);
@@ -425,7 +425,7 @@ export const useLoreStore = create<LoreStore>()(
         ),
 
       applyFilters: () => {
-        const state = get();
+        const _state = get();
         const { loreEntries, searchTerm, categoryFilters, showVisibleOnly } =
           state;
 
@@ -456,7 +456,7 @@ export const useLoreStore = create<LoreStore>()(
       },
 
       getVisibleCategories: () => {
-        const state = get();
+        const _state = get();
         return Object.entries(state.categoryFilters)
           .filter(([_, enabled]) => enabled)
           .map(([category]) => category as LoreCategory);

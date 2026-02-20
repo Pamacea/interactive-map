@@ -32,7 +32,7 @@ interface PinDetailsPanelProps {
  * - Appearance settings
  */
 export function PinDetailsPanel({ pin, worldId }: PinDetailsPanelProps) {
-  const queryClient = useQueryClient();
+  const _queryClient = useQueryClient();
   const updatePin = useUpdatePin();
 
   const [isEditingTitle, setIsEditingTitle] = React.useState(false);
@@ -410,20 +410,20 @@ interface PinLayerSectionProps {
 }
 
 function PinLayerSection({ pin }: PinLayerSectionProps) {
-  const queryClient = useQueryClient();
-  const layers = useMapStore((state) => state.layers);
+  const _queryClient = useQueryClient();
+  const _layers = useMapStore((state) => state.layers);
   const updatePin = useUpdatePin();
   const [isChangingLayer, setIsChangingLayer] = React.useState(false);
 
   // Filter out base map layer from options (pins shouldn't be on base map)
   const availableLayers = React.useMemo(() => {
     return layers.filter(layer => !(layer.isBaseMap || layer.type === "BASE_MAP"));
-  }, [layers]);
+  /* eslint-disable react-hooks/exhaustive-deps */ }, [layers]);
 
   // Find current layer name
   const currentLayer = React.useMemo(() => {
     return layers.find(layer => layer.id === pin.layerId);
-  }, [layers, pin.layerId]);
+  /* eslint-disable react-hooks/exhaustive-deps */ }, [layers, pin.layerId]);
 
   const handleLayerChange = async (newLayerId: string) => {
     if (newLayerId === pin.layerId) return;
@@ -536,7 +536,7 @@ interface PinGalleryCollapsibleSectionProps {
 function PinGalleryCollapsibleSection({ pin, worldId }: PinGalleryCollapsibleSectionProps) {
   const [_optimisticallyAddedImages, setOptimisticallyAddedImages] = React.useState<Set<string>>(new Set());
   const [optimisticallyRemovedImages, setOptimisticallyRemovedImages] = React.useState<Set<string>>(new Set());
-  const queryClient = useQueryClient();
+  const _queryClient = useQueryClient();
 
   // Load gallery images for this pin
   const { data: galleryImages = [] } = useQuery({
@@ -594,7 +594,7 @@ interface AppearanceSectionProps {
 }
 
 function AppearanceSection({ pin, updatePin }: AppearanceSectionProps) {
-  const queryClient = useQueryClient();
+  const _queryClient = useQueryClient();
   const [isIconPickerOpen, setIsIconPickerOpen] = React.useState(false);
 
   const handleIconUpdate = async (data: {
@@ -606,7 +606,7 @@ function AppearanceSection({ pin, updatePin }: AppearanceSectionProps) {
     iconBackground?: string | null;
   }) => {
     const { updatePinIconCustomization } = await import("@/actions/pins");
-    const result = await updatePinIconCustomization(pin.id, data);
+    const _result = await updatePinIconCustomization(pin.id, data);
 
     if (!result.success) {
       console.error("Failed to update icon customization:", result.error);

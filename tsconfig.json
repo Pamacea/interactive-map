@@ -7,6 +7,7 @@
     ],
     "allowJs": true,
     "skipLibCheck": true,
+    "typeRoots": ["node_modules/@types"],
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
@@ -54,8 +55,8 @@
       "@/store/*": [
         "./src/store/*"
       ],
-      "@/stores/*": [
-        "./src/stores/*"
+      "@/features/*": [
+        "./src/features/*"
       ]
     },
     "target": "ES2017"

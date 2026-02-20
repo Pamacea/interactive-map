@@ -20,7 +20,7 @@ export function ArticleSchema({
   dateModified,
   author = siteConfig.author.name,
 }: ArticleSchemaProps) {
-  const data = {
+  const _data = {
     "@context": "https://schema.org",
     "@type": "Article",
     name,

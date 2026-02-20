@@ -10,7 +10,7 @@ interface BreadcrumbSchemaProps {
 }
 
 export function BreadcrumbSchema({ items }: BreadcrumbSchemaProps) {
-  const data = {
+  const _data = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: items.map((item, index) => ({

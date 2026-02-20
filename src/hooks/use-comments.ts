@@ -9,7 +9,7 @@ export function useComments(worldId: string, pinId?: string, enabled = true) {
     queryKey: ['comments', worldId, pinId],
     queryFn: async () => {
       try {
-        const result = await getWorldComments({ worldId, pinId });
+        const _result = await getWorldComments({ worldId, pinId });
         if (!result.success) {
           // For auth errors, return empty array
           // This allows the UI to show "No comments" instead of crashing
@@ -19,11 +19,12 @@ export function useComments(worldId: string, pinId?: string, enabled = true) {
           throw new Error(result.error?.message || 'Failed to fetch comments');
         }
         return result.data.comments;
-      } catch (error: any) {
+      } catch (error: unknown) {
         // Check for authentication error in the caught exception
-        if (error?.code === 'AUTHENTICATION_ERROR' ||
-            error?.message?.includes('Authentication') ||
-            error?.message?.includes('logged in')) {
+        const err = error as { code?: string; message?: string };
+        if (err.code === 'AUTHENTICATION_ERROR' ||
+            err.message?.includes('Authentication') ||
+            err.message?.includes('logged in')) {
           return [];
         }
         throw error;
@@ -49,7 +50,7 @@ export function useCommentStats(worldId: string, pinId?: string) {
     queryKey: ['comment-stats', worldId, pinId],
     queryFn: async () => {
       try {
-        const result = await getCommentStats({ worldId, pinId });
+        const _result = await getCommentStats({ worldId, pinId });
         if (!result.success) {
           if (result.error?.code === 'AUTHENTICATION_ERROR') {
             return { total: 0, unresolved: 0 };
@@ -57,9 +58,10 @@ export function useCommentStats(worldId: string, pinId?: string) {
           throw new Error(result.error?.message || 'Failed to fetch comment stats');
         }
         return result.data;
-      } catch (error: any) {
-        if (error?.code === 'AUTHENTICATION_ERROR' ||
-            error?.message?.includes('Authentication')) {
+      } catch (error: unknown) {
+        const err = error as { code?: string; message?: string };
+        if (err.code === 'AUTHENTICATION_ERROR' ||
+            err.message?.includes('Authentication')) {
           return { total: 0, unresolved: 0 };
         }
         throw error;

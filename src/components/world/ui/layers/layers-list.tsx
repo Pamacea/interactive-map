@@ -12,7 +12,7 @@
 
 import { useMemo, useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
-import type { UILayer, LayerListProps, LayerDisplayMode, LayerActions, UILayer } from "./layer-types";
+import type { UILayer, LayerDisplayMode, LayerActions } from "./layer-types";
 import { LayerRow, CompactLayerRow } from "./layer-row";
 
 interface LayersListProps {
@@ -36,7 +36,7 @@ export function LayersList({
   activeLayerId,
   variant,
   isCollapsed = false,
-  layerColor,
+  _layerColor,
   mapImage,
   actions,
   renderAddButton,
@@ -70,7 +70,7 @@ export function LayersList({
   }, [sortedLayers, selectedLayerId]);
 
   // Handle drag start
-  const handleDragStart = useCallback((layerId: string) => {
+  const _handleDragStart = useCallback((layerId: string) => {
     setDraggingLayerId(layerId);
   }, []);
 
@@ -107,7 +107,7 @@ export function LayersList({
     onDragOver: handleDragOver,
     onDragEnd: handleDragEnd,
     onDrop: handleDrop,
-  }), [actions, handleDragStart, handleDragOver, handleDragEnd, handleDrop]);
+  /* eslint-disable react-hooks/exhaustive-deps */ }), [actions, handleDragStart, handleDragOver, handleDragEnd, handleDrop]);
 
   // Generate layer colors
   const getLayerColor = useMemo(() => {

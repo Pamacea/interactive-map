@@ -20,7 +20,7 @@ export function CreativeWorkSchema({
   author = siteConfig.author.name,
   keywords,
 }: CreativeWorkSchemaProps) {
-  const data = {
+  const _data = {
     "@context": "https://schema.org",
     "@type": "CreativeWork",
     name,

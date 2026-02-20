@@ -1,0 +1,822 @@
+"use server";
+
+import { prisma } from "@/shared/lib/prisma";
+import { revalidatePath } from "next/cache";
+import {
+  CreateCharacterSchema,
+  UpdateCharacterSchema,
+  CreateCharacterRelationshipSchema,
+  UpdateCharacterRelationshipSchema,
+  type CreateCharacterInput,
+  type UpdateCharacterInput,
+  type CreateCharacterRelationshipInput,
+} from "@/features/characters/logic/character-schemas";
+import {
+  safeAsync,
+  ValidationError,
+  type Result,
+} from "@/shared/lib/errors";
+import {
+  getAuthenticatedUser,
+  verifyWorldPermission,
+  verifyCharacterPermission,
+  verifyPinPermission,
+} from "@/shared/lib/server-helpers";
+import type {
+  Character,
+  CharacterPinRelation,
+  CharacterRelationship,
+  Pin,
+} from "@prisma/client";
+
+// Type includes for relations
+type CharacterWithRelations = Character & {
+  user: { id: string; name: string | null; image: string | null } | null;
+  gameWorld: { id: string; title: string } | null;
+  gallery: Array<{ id: string; title: string; imageUrl: string }>;
+  pinLinks: Array<CharacterPinRelation & { pin: Pin }>;
+  relationshipsAsSource: Array<CharacterRelationship & { target: Character }>;
+  relationshipsAsTarget: Array<CharacterRelationship & { source: Character }>;
+};
+
+type CharacterPinRelationWithInclude = CharacterPinRelation & {
+  pin: Pin;
+  character: Character;
+};
+
+type CharacterRelationshipWithInclude = CharacterRelationship & {
+  source: Character;
+  target: Character;
+};
+
+/**
+ * Create a new character in a world
+ */
+export async function createCharacter(
+  data: CreateCharacterInput
+): Promise<Result<{ characterId: string; character: Character }>> {
+  return safeAsync(async () => {
+    const validated = CreateCharacterSchema.parse(data);
+    const user = await getAuthenticatedUser();
+
+    await verifyWorldPermission(validated.gameWorldId, user.id);
+
+    // Get the highest order value for existing characters in this world
+    const maxOrder = await prisma.character.findFirst({
+      where: { gameWorldId: validated.gameWorldId },
+      select: { order: true },
+      orderBy: { order: "desc" },
+    });
+
+    const character = await prisma.character.create({
+      data: {
+        name: validated.name,
+        shortName: validated.shortName,
+        characterType: validated.characterType,
+        role: validated.role,
+        portraitUrl: validated.portraitUrl,
+        age: validated.age,
+        gender: validated.gender,
+        species: validated.species,
+        height: validated.height,
+        build: validated.build,
+        level: validated.level,
+        class: validated.class,
+        faction: validated.faction,
+        stats: validated.stats,
+        skills: validated.skills,
+        equipment: validated.equipment,
+        personality: validated.personality,
+        background: validated.background,
+        goals: validated.goals,
+        fears: validated.fears,
+        dialogue: validated.dialogue,
+        quests: validated.quests,
+        shopInventory: validated.shopInventory,
+        isVisible: validated.isVisible ?? true,
+        isPublic: validated.isPublic ?? true,
+        order: (maxOrder?.order ?? -1) + 1,
+        userId: user.id,
+        gameWorldId: validated.gameWorldId,
+      },
+    });
+
+    revalidatePath(`/world/${validated.gameWorldId}`);
+
+    return { characterId: character.id, character };
+  }, "createCharacter");
+}
+
+/**
+ * Get a character by ID with full relations
+ */
+export async function getCharacterById(id: string): Promise<CharacterWithRelations | null> {
+  try {
+    const character = await prisma.character.findUnique({
+      where: { id },
+      include: {
+        user: {
+          select: {
+            name: true,
+            image: true,
+          },
+        },
+        gameWorld: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+        gallery: {
+          orderBy: { order: "asc" },
+        },
+        pinLinks: {
+          include: {
+            pin: {
+              include: {
+                layer: true,
+              },
+            },
+          },
+          orderBy: { order: "asc" },
+        },
+        relationshipsAsSource: {
+          include: {
+            target: {
+              select: {
+                id: true,
+                name: true,
+                shortName: true,
+                portraitUrl: true,
+                characterType: true,
+              },
+            },
+          },
+        },
+        relationshipsAsTarget: {
+          include: {
+            source: {
+              select: {
+                id: true,
+                name: true,
+                shortName: true,
+                portraitUrl: true,
+                characterType: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return character;
+  } catch (error) {
+    console.error("[getCharacterById] Failed to fetch character:", error);
+    return null;
+  }
+}
+
+/**
+ * Get all characters for a world
+ */
+export async function getCharactersByWorld(gameWorldId: string) {
+  try {
+    const characters = await prisma.character.findMany({
+      where: { gameWorldId },
+      orderBy: [{ order: "asc" }, { name: "asc" }],
+      include: {
+        user: {
+          select: {
+            name: true,
+            image: true,
+          },
+        },
+      },
+    });
+
+    return characters;
+  } catch (error) {
+    console.error("[getCharactersByWorld] Failed to fetch characters:", error);
+    return [];
+  }
+}
+
+/**
+ * Get characters filtered by criteria
+ */
+export async function getCharactersFiltered(filters: {
+  gameWorldId: string;
+  characterTypes?: string[];
+  roles?: string[];
+  factions?: string[];
+  searchTerm?: string;
+  showVisibleOnly?: boolean;
+}) {
+  try {
+    const where: Record<string, unknown> = {
+      gameWorldId: filters.gameWorldId,
+    };
+
+    if (filters.showVisibleOnly) {
+      where.isVisible = true;
+    }
+
+    if (filters.characterTypes && filters.characterTypes.length > 0) {
+      where.characterType = { in: filters.characterTypes };
+    }
+
+    if (filters.roles && filters.roles.length > 0) {
+      where.role = { in: filters.roles };
+    }
+
+    if (filters.factions && filters.factions.length > 0) {
+      where.faction = { in: filters.factions };
+    }
+
+    if (filters.searchTerm) {
+      where.OR = [
+        { name: { contains: filters.searchTerm, mode: "insensitive" } },
+        { shortName: { contains: filters.searchTerm, mode: "insensitive" } },
+        { faction: { contains: filters.searchTerm, mode: "insensitive" } },
+      ];
+    }
+
+    const characters = await prisma.character.findMany({
+      where,
+      orderBy: [{ order: "asc" }, { name: "asc" }],
+      include: {
+        user: {
+          select: {
+            name: true,
+            image: true,
+          },
+        },
+      },
+    });
+
+    return characters;
+  } catch (error) {
+    console.error("[getCharactersFiltered] Failed to fetch characters:", error);
+    return [];
+  }
+}
+
+/**
+ * Update an existing character
+ */
+export async function updateCharacter(
+  data: UpdateCharacterInput
+): Promise<Result<Character>> {
+  return safeAsync(async () => {
+    const validated = UpdateCharacterSchema.parse(data);
+    const user = await getAuthenticatedUser();
+
+    const existingCharacter = await verifyCharacterPermission(validated.id, user.id);
+
+    // Build update data
+    const updateData: Partial<Character> = {};
+    if (validated.name !== undefined) updateData.name = validated.name;
+    if (validated.shortName !== undefined) updateData.shortName = validated.shortName;
+    if (validated.characterType !== undefined) updateData.characterType = validated.characterType;
+    if (validated.role !== undefined) updateData.role = validated.role;
+    if (validated.portraitUrl !== undefined) updateData.portraitUrl = validated.portraitUrl;
+    if (validated.age !== undefined) updateData.age = validated.age;
+    if (validated.gender !== undefined) updateData.gender = validated.gender;
+    if (validated.species !== undefined) updateData.species = validated.species;
+    if (validated.height !== undefined) updateData.height = validated.height;
+    if (validated.build !== undefined) updateData.build = validated.build;
+    if (validated.level !== undefined) updateData.level = validated.level;
+    if (validated.class !== undefined) updateData.class = validated.class;
+    if (validated.faction !== undefined) updateData.faction = validated.faction;
+    if (validated.stats !== undefined) updateData.stats = validated.stats;
+    if (validated.skills !== undefined) updateData.skills = validated.skills;
+    if (validated.equipment !== undefined) updateData.equipment = validated.equipment;
+    if (validated.personality !== undefined) updateData.personality = validated.personality;
+    if (validated.background !== undefined) updateData.background = validated.background;
+    if (validated.goals !== undefined) updateData.goals = validated.goals;
+    if (validated.fears !== undefined) updateData.fears = validated.fears;
+    if (validated.dialogue !== undefined) updateData.dialogue = validated.dialogue;
+    if (validated.quests !== undefined) updateData.quests = validated.quests;
+    if (validated.shopInventory !== undefined) updateData.shopInventory = validated.shopInventory;
+    if (validated.isVisible !== undefined) updateData.isVisible = validated.isVisible;
+    if (validated.isPublic !== undefined) updateData.isPublic = validated.isPublic;
+    if (validated.order !== undefined) updateData.order = validated.order;
+
+    const character = await prisma.character.update({
+      where: { id: validated.id },
+      data: updateData,
+    });
+
+    revalidatePath(`/world/${existingCharacter.gameWorldId}`);
+
+    return character;
+  }, "updateCharacter");
+}
+
+/**
+ * Delete a character
+ */
+export async function deleteCharacter(id: string): Promise<Result<{ characterId: string }>> {
+  return safeAsync(async () => {
+    const user = await getAuthenticatedUser();
+    const character = await verifyCharacterPermission(id, user.id);
+
+    await prisma.character.delete({
+      where: { id },
+    });
+
+    revalidatePath(`/world/${character.gameWorldId}`);
+
+    return { characterId: id };
+  }, "deleteCharacter");
+}
+
+/**
+ * Toggle character visibility
+ */
+export async function toggleCharacterVisibility(id: string): Promise<Result<Character>> {
+  return safeAsync(async () => {
+    const user = await getAuthenticatedUser();
+    const character = await verifyCharacterPermission(id, user.id);
+
+    const updated = await prisma.character.update({
+      where: { id },
+      data: { isVisible: !character.isVisible },
+    });
+
+    revalidatePath(`/world/${character.gameWorldId}`);
+
+    return updated;
+  }, "toggleCharacterVisibility");
+}
+
+/**
+ * Batch update character orders
+ */
+export async function reorderCharacters(
+  updates: Array<{ id: string; order: number }>
+): Promise<Result<Character[]>> {
+  return safeAsync(async () => {
+    await getAuthenticatedUser();
+
+    const updatedCharacters = await Promise.all(
+      updates.map(({ id, order }) =>
+        prisma.character.update({
+          where: { id },
+          data: { order },
+        })
+      )
+    );
+
+    return updatedCharacters;
+  }, "reorderCharacters");
+}
+
+// ============================================
+// CHARACTER-PIN LINKING
+// ============================================
+
+/**
+ * Link a character to a pin
+ */
+export async function linkCharacterToPin(
+  characterId: string,
+  pinId: string,
+  relationType: string = "LOCATION",
+  notes?: string
+): Promise<Result<CharacterPinRelationWithInclude>> {
+  return safeAsync(async () => {
+    const user = await getAuthenticatedUser();
+
+    const character = await verifyCharacterPermission(characterId, user.id);
+    await verifyPinPermission(pinId, user.id);
+
+    // Verify same world
+    if (character.gameWorldId) {
+      const pin = await prisma.pin.findUnique({ where: { id: pinId } });
+      if (pin?.gameWorldId !== character.gameWorldId) {
+        throw new ValidationError("Character and pin must belong to the same world");
+      }
+    }
+
+    const existing = await prisma.characterPinRelation.findUnique({
+      where: {
+        characterId_pinId: { characterId, pinId },
+      },
+    });
+
+    if (existing) {
+      throw new ValidationError("Character is already linked to this pin");
+    }
+
+    const link = await prisma.characterPinRelation.create({
+      data: {
+        characterId,
+        pinId,
+        relationType,
+        notes,
+      },
+      include: {
+        pin: true,
+        character: true,
+      },
+    });
+
+    revalidatePath(`/world/${character.gameWorldId}`);
+
+    return link;
+  }, "linkCharacterToPin");
+}
+
+/**
+ * Unlink a character from a pin
+ */
+export async function unlinkCharacterFromPin(
+  characterId: string,
+  pinId: string
+): Promise<Result<{ linkId: string }>> {
+  return safeAsync(async () => {
+    const user = await getAuthenticatedUser();
+
+    const character = await verifyCharacterPermission(characterId, user.id);
+    await verifyPinPermission(pinId, user.id);
+
+    const link = await prisma.characterPinRelation.findUnique({
+      where: {
+        characterId_pinId: { characterId, pinId },
+      },
+    });
+
+    if (!link) {
+      throw new ValidationError("Link does not exist");
+    }
+
+    await prisma.characterPinRelation.delete({
+      where: {
+        characterId_pinId: { characterId, pinId },
+      },
+    });
+
+    revalidatePath(`/world/${character.gameWorldId}`);
+
+    return { linkId: link.id };
+  }, "unlinkCharacterFromPin");
+}
+
+/**
+ * Get all pins linked to a character
+ */
+export async function getPinsForCharacter(characterId: string) {
+  try {
+    const links = await prisma.characterPinRelation.findMany({
+      where: { characterId },
+      include: {
+        pin: {
+          include: {
+            layer: true,
+          },
+        },
+      },
+      orderBy: { order: "asc" },
+    });
+
+    return links.map((link) => ({
+      ...link.pin,
+      relationType: link.relationType,
+      notes: link.notes,
+      linkId: link.id,
+    }));
+  } catch (error) {
+    console.error("[getPinsForCharacter] Failed to fetch pins:", error);
+    return [];
+  }
+}
+
+/**
+ * Get all characters linked to a pin
+ */
+export async function getCharactersForPin(pinId: string) {
+  try {
+    const links = await prisma.characterPinRelation.findMany({
+      where: { pinId },
+      include: {
+        character: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                image: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: { order: "asc" },
+    });
+
+    return links.map((link) => ({
+      ...link.character,
+      relationType: link.relationType,
+      notes: link.notes,
+      linkId: link.id,
+    }));
+  } catch (error) {
+    console.error("[getCharactersForPin] Failed to fetch characters:", error);
+    return [];
+  }
+}
+
+/**
+ * Update character-pin link order
+ */
+export async function reorderCharacterPinLinks(
+  links: Array<{ linkId: string; order: number }>
+): Promise<Result<CharacterPinRelation[]>> {
+  return safeAsync(async () => {
+    await getAuthenticatedUser();
+
+    const updates = await Promise.all(
+      links.map(({ linkId, order }) =>
+        prisma.characterPinRelation.update({
+          where: { id: linkId },
+          data: { order },
+        })
+      )
+    );
+
+    return updates;
+  }, "reorderCharacterPinLinks");
+}
+
+// ============================================
+// CHARACTER RELATIONSHIPS
+// ============================================
+
+/**
+ * Create a relationship between two characters
+ */
+export async function createCharacterRelationship(
+  data: CreateCharacterRelationshipInput
+): Promise<Result<CharacterRelationshipWithInclude>> {
+  return safeAsync(async () => {
+    const validated = CreateCharacterRelationshipSchema.parse(data);
+    const user = await getAuthenticatedUser();
+
+    // Verify permissions for both characters
+    const sourceCharacter = await verifyCharacterPermission(validated.sourceId, user.id);
+    await verifyCharacterPermission(validated.targetId, user.id);
+
+    // Verify same world
+    if (sourceCharacter.gameWorldId) {
+      const targetCharacter = await prisma.character.findUnique({
+        where: { id: validated.targetId },
+      });
+
+      if (targetCharacter?.gameWorldId !== sourceCharacter.gameWorldId) {
+        throw new ValidationError("Characters must belong to the same world");
+      }
+    }
+
+    const existing = await prisma.characterRelationship.findUnique({
+      where: {
+        sourceId_targetId: {
+          sourceId: validated.sourceId,
+          targetId: validated.targetId,
+        },
+      },
+    });
+
+    if (existing) {
+      // Update existing relationship
+      const updated = await prisma.characterRelationship.update({
+        where: { id: existing.id },
+        data: {
+          relationshipType: validated.relationshipType,
+          description: validated.description,
+          strength: validated.strength,
+          isVisible: validated.isVisible,
+        },
+        include: {
+          source: true,
+          target: true,
+        },
+      });
+
+      revalidatePath(`/world/${sourceCharacter.gameWorldId}`);
+
+      return updated;
+    }
+
+    const relationship = await prisma.characterRelationship.create({
+      data: {
+        sourceId: validated.sourceId,
+        targetId: validated.targetId,
+        relationshipType: validated.relationshipType,
+        description: validated.description,
+        strength: validated.strength,
+        isVisible: validated.isVisible,
+      },
+      include: {
+        source: true,
+        target: true,
+      },
+    });
+
+    revalidatePath(`/world/${sourceCharacter.gameWorldId}`);
+
+    return relationship;
+  }, "createCharacterRelationship");
+}
+
+/**
+ * Update a character relationship
+ */
+export async function updateCharacterRelationship(
+  data: UpdateCharacterRelationshipInput
+): Promise<Result<CharacterRelationship>> {
+  return safeAsync(async () => {
+    const validated = UpdateCharacterRelationshipSchema.parse(data);
+    const user = await getAuthenticatedUser();
+
+    const relationship = await prisma.characterRelationship.findUnique({
+      where: {
+        sourceId_targetId: {
+          sourceId: validated.sourceId,
+          targetId: validated.targetId,
+        },
+      },
+    });
+
+    if (!relationship) {
+      throw new ValidationError("Relationship not found");
+    }
+
+    await verifyCharacterPermission(validated.sourceId, user.id);
+
+    const updateData: Partial<CharacterRelationship> = {};
+    if (validated.relationshipType !== undefined) updateData.relationshipType = validated.relationshipType;
+    if (validated.description !== undefined) updateData.description = validated.description;
+    if (validated.strength !== undefined) updateData.strength = validated.strength;
+    if (validated.isVisible !== undefined) updateData.isVisible = validated.isVisible;
+
+    const updated = await prisma.characterRelationship.update({
+      where: {
+        sourceId_targetId: {
+          sourceId: validated.sourceId,
+          targetId: validated.targetId,
+        },
+      },
+      data: updateData,
+    });
+
+    // Get world ID for revalidation
+    const character = await prisma.character.findUnique({
+      where: { id: validated.sourceId },
+    });
+
+    if (character) {
+      revalidatePath(`/world/${character.gameWorldId}`);
+    }
+
+    return updated;
+  }, "updateCharacterRelationship");
+}
+
+/**
+ * Delete a character relationship
+ */
+export async function deleteCharacterRelationship(
+  sourceId: string,
+  targetId: string
+): Promise<Result<{ relationshipId: string }>> {
+  return safeAsync(async () => {
+    const user = await getAuthenticatedUser();
+    const character = await verifyCharacterPermission(sourceId, user.id);
+
+    await prisma.characterRelationship.delete({
+      where: {
+        sourceId_targetId: { sourceId, targetId },
+      },
+    });
+
+    revalidatePath(`/world/${character.gameWorldId}`);
+
+    return { relationshipId: `${sourceId}-${targetId}` };
+  }, "deleteCharacterRelationship");
+}
+
+/**
+ * Get all relationships for a character
+ */
+export async function getCharacterRelationships(characterId: string) {
+  try {
+    const [asSource, asTarget] = await Promise.all([
+      prisma.characterRelationship.findMany({
+        where: { sourceId: characterId },
+        include: {
+          target: {
+            select: {
+              id: true,
+              name: true,
+              shortName: true,
+              portraitUrl: true,
+              characterType: true,
+            },
+          },
+        },
+        orderBy: { strength: "desc" },
+      }),
+      prisma.characterRelationship.findMany({
+        where: { targetId: characterId },
+        include: {
+          source: {
+            select: {
+              id: true,
+              name: true,
+              shortName: true,
+              portraitUrl: true,
+              characterType: true,
+            },
+          },
+        },
+        orderBy: { strength: "desc" },
+      }),
+    ]);
+
+    return {
+      asSource,
+      asTarget,
+    };
+  } catch (error) {
+    console.error("[getCharacterRelationships] Failed to fetch relationships:", error);
+    return { asSource: [], asTarget: [] };
+  }
+}
+
+// ============================================
+// PORTRAIT UPLOAD
+// ============================================
+
+/**
+ * Upload a character portrait
+ */
+export async function uploadCharacterPortrait(
+  characterId: string,
+  formData: FormData
+): Promise<Result<{ portraitUrl: string; character: Character }>> {
+  return safeAsync(async () => {
+    const user = await getAuthenticatedUser();
+    const character = await verifyCharacterPermission(characterId, user.id);
+
+    const file = formData.get("file") as File;
+
+    if (!file) {
+      throw new ValidationError("No file provided");
+    }
+
+    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+    if (!validTypes.includes(file.type)) {
+      throw new ValidationError("Invalid file type. Please upload a JPEG, PNG, WebP, or GIF image.");
+    }
+
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      throw new ValidationError("File size must be less than 5MB");
+    }
+
+    const { writeFile, mkdir } = await import("fs/promises");
+    const path = await import("path");
+    const uploadsDir = path.default.join(process.cwd(), "public", "uploads", "characters", "portraits");
+
+    try {
+      await mkdir(uploadsDir, { recursive: true });
+    } catch {
+      // Directory might already exist
+    }
+
+    const timestamp = Date.now();
+    const randomId = Math.random().toString(36).substring(2, 15);
+    const _ext = path.default.extname(file.name);
+    const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+    const fileName = `${characterId}-${timestamp}-${randomId}${_ext}`;
+    const filePath = path.default.join(uploadsDir, fileName);
+
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    await writeFile(filePath, buffer);
+
+    const portraitPath = `/uploads/characters/portraits/${fileName}`;
+
+    const updatedCharacter = await prisma.character.update({
+      where: { id: characterId },
+      data: { portraitUrl: portraitPath },
+    });
+
+    revalidatePath(`/world/${character.gameWorldId}`);
+
+    return {
+      portraitUrl: portraitPath,
+      character: updatedCharacter,
+    };
+  }, "uploadCharacterPortrait");
+}

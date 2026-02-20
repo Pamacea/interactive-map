@@ -57,11 +57,11 @@ export function useKeyboardShortcuts(config: KeyboardShortcutConfig = {}) {
   } = config;
 
   // Store access
-  const selectedPinId = useSelectedPinId();
+  const _selectedPinId = useSelectedPinId();
   const clearSelection = useClearSelection();
   const deletePinServer = useDeletePinServer();
   const hidePanel = useHidePanel();
-  const pins = usePins();
+  const _pins = usePins();
 
   // Tools store access for measurement and selection states
   const isMeasuring = useIsMeasuring();
@@ -82,7 +82,7 @@ export function useKeyboardShortcuts(config: KeyboardShortcutConfig = {}) {
   const panels = useFloatingPanelsStore((state) => state.panels);
 
   // Get selected pin data
-  const selectedPin = selectedPinId
+  const _selectedPin = selectedPinId
     ? pins.find((pin) => pin.id === selectedPinId)
     : null;
 
@@ -120,6 +120,7 @@ export function useKeyboardShortcuts(config: KeyboardShortcutConfig = {}) {
     }
 
     return handled;
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Zustand store values are stable
   }, [panels, hidePanel, selectedPinId, clearSelection, onSelectionCleared, isMeasuring, measurePoints, clearMeasure, isSelecting, selectionRect, selectedPinIds, clearToolSelection]);
 
   // Handle Delete/Backspace - delete selected pin
@@ -133,6 +134,7 @@ export function useKeyboardShortcuts(config: KeyboardShortcutConfig = {}) {
         console.error("Failed to delete pin:", error);
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Zustand store values are stable
   }, [selectedPinId, selectedPin, deletePinServer, clearSelection, onPinDeleted]);
 
   // Handle Ctrl+Z - undo
@@ -188,6 +190,7 @@ export function useKeyboardShortcuts(config: KeyboardShortcutConfig = {}) {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Zustand store values are stable
   }, [enabled, selectedPinId, handleEscape, handleDelete, handleUndo, handleRedo, canUndo, canRedo]);
 
   return {

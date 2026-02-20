@@ -1,0 +1,385 @@
+"use client";
+
+import * as React from "react";
+import { useSession } from "next-auth/react";
+import {
+  Globe,
+  Edit2,
+  Palette,
+  Image as ImageIcon,
+  Settings,
+  Shield,
+  Eye,
+  EyeOff,
+  Lock,
+} from "lucide-react";
+import { cn } from "@/shared/utils";
+import { Button } from "@/shared/ui/button";
+import { CollapsibleSection } from "./shared/collapsible-section";
+import { PropertyColorPicker } from "@/shared/ui/properties/property-color-picker";
+import { useBackgroundColor, useMapStore } from "@/features/world-editor/store/map-store";
+import { PermissionsPanel } from "./permissions/permissions-panel";
+import type { GameWorld } from "@/types/world.type";
+
+// Background color presets for map backgrounds
+const BACKGROUND_COLOR_PRESETS = [
+  { name: "Obsidian", value: "#1a1a1a" },
+  { name: "Deep Space", value: "#0d0d1a" },
+  { name: "Forest Night", value: "#0a1f0a" },
+  { name: "Ocean Depth", value: "#0a1a2f" },
+  { name: "Desert Sand", value: "#c2b280" },
+  { name: "Parchment", value: "#f5f5dc" },
+  { name: "Vellum", value: "#e8e4c9" },
+  { name: "Charcoal", value: "#36454f" },
+  { name: "Slate", value: "#708090" },
+  { name: "Blood Red", value: "#4a0404" },
+  { name: "Royal Purple", value: "#2e1a4a" },
+  { name: "Pure White", value: "#ffffff" },
+] as const;
+
+interface MapPropertiesPanelProps {
+  world: GameWorld | null;
+  worldId: string;
+  onUpdate?: (data: Partial<GameWorld>) => void;
+}
+
+/**
+ * MapPropertiesPanel - World/map properties when no pin is selected
+ *
+ * Shows:
+ * - Name, description (editable)
+ * - Map size
+ * - Background settings
+ * - Permissions info
+ */
+export function MapPropertiesPanel({
+  world,
+  worldId,
+  onUpdate,
+}: MapPropertiesPanelProps) {
+  const { data: session } = useSession();
+  const currentUserId = session?.user?.id;
+  const isOwner = world?.userId === currentUserId;
+
+  const [isEditingName, setIsEditingName] = React.useState(false);
+  const [isEditingDesc, setIsEditingDesc] = React.useState(false);
+  const [editedName, setEditedName] = React.useState(world?.title ?? "");
+  const [editedDesc, setEditedDesc] = React.useState(world?.description ?? "");
+  const nameInputRef = React.useRef<HTMLInputElement>(null);
+
+  const backgroundColor = useBackgroundColor();
+  const setBackgroundColor = useMapStore((state) => state.setBackgroundColor);
+
+  React.useEffect(() => {
+    if (world) {
+      setEditedName(world.title);
+      setEditedDesc(world.description ?? "");
+    }
+  }, [world]);
+
+  React.useEffect(() => {
+    if (isEditingName) {
+      nameInputRef.current?.focus();
+      nameInputRef.current?.select();
+    }
+  }, [isEditingName]);
+
+  const handleSaveName = async () => {
+    if (editedName.trim() && editedName !== world?.title) {
+      // TODO: Implement server action to update world name
+      onUpdate?.({ ...world!, title: editedName.trim() });
+    }
+    setIsEditingName(false);
+  };
+
+  const handleSaveDesc = async () => {
+    if (editedDesc !== (world?.description ?? "")) {
+      // TODO: Implement server action to update world description
+      onUpdate?.({ ...world!, description: editedDesc });
+    }
+    setIsEditingDesc(false);
+  };
+
+  const handleBackgroundColorChange = async (color: string) => {
+    // Update local state immediately for responsive UI
+    // Note: For now, background color is stored in Zustand + localStorage
+    // TODO: Add backgroundColor field to GameWorld schema for DB persistence
+    setBackgroundColor(color);
+  };
+
+  const handleKeyDown = (
+    e: React.KeyboardEvent,
+    action: () => void
+  ) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      action();
+    } else if (e.key === "Escape") {
+      setIsEditingName(false);
+      setIsEditingDesc(false);
+      setEditedName(world?.title ?? "");
+      setEditedDesc(world?.description ?? "");
+    }
+  };
+
+  if (!world) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full min-h-40 p-6 text-center">
+        <Globe className="w-10 h-10 text-text-muted mb-3" />
+        <p className="text-sm text-text-secondary">World not found</p>
+      </div>
+    );
+  }
+
+  // Format date nicely
+  const formatDate = (date: Date) => {
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }).format(new Date(date));
+  };
+
+  return (
+    <div className="h-full flex flex-col">
+      {/* World Header */}
+      <div className="p-4 border-b border-iron bg-obsidian/50">
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-accent-gold/20 border border-accent-gold/40 flex-shrink-0">
+            <Globe className="w-5 h-5 text-accent-gold" />
+          </div>
+          <div className="flex-1 min-w-0">
+            {isEditingName ? (
+              <div className="flex items-center gap-2">
+                <input
+                  ref={nameInputRef}
+                  id="world-name-input"
+                  name="worldName"
+                  type="text"
+                  value={editedName}
+                  onChange={(e) => setEditedName(e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(e, handleSaveName)}
+                  className="flex-1 bg-transparent text-base font-semibold text-text-primary border-b-2 border-accent-gold outline-none px-1 py-0.5"
+                  aria-label="World name"
+                  data-no-shortcut="true"
+                />
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={handleSaveName}
+                  className="h-6 w-6 text-green-500 hover:text-green-400"
+                >
+                  ✓
+                </Button>
+              </div>
+            ) : (
+              <div
+                className="group cursor-pointer py-1 px-2 rounded hover:bg-white/5 transition-colors -ml-2"
+                onClick={() => setIsEditingName(true)}
+              >
+                <h2 className="text-base font-display font-semibold text-text-primary truncate">
+                  {world.title}
+                </h2>
+              </div>
+            )}
+            <div className="flex items-center gap-2 mt-1">
+              <span
+                className={cn(
+                  "inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium",
+                  world.isPublished
+                    ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                    : "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                )}
+              >
+                {world.isPublished ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                {world.isPublished ? "Published" : "Draft"}
+              </span>
+              <span
+                className={cn(
+                  "inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium",
+                  world.isPublic
+                    ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                    : "bg-purple-500/20 text-purple-400 border border-purple-500/30"
+                )}
+              >
+                <Lock className="w-3 h-3" />
+                {world.isPublic ? "Public" : "Private"}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-y-auto">
+        <CollapsibleSection
+          title="Description"
+          icon={<Edit2 className="w-4 h-4" />}
+          defaultOpen={true}
+          storageKey={`world-${worldId}-description`}
+        >
+          {!isEditingDesc ? (
+            <div
+              className="cursor-pointer rounded-sm p-3 -mx-1 border border-transparent hover:border-border-subtle hover:bg-white/5 transition-all min-h-16 group"
+              onClick={() => setIsEditingDesc(true)}
+            >
+              {world.description ? (
+                <p className="text-sm text-text-secondary whitespace-pre-wrap">
+                  {world.description}
+                </p>
+              ) : (
+                <p className="text-sm text-text-muted italic group-hover:not-italic">
+                  Add a description...
+                </p>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <textarea
+                id="world-description-input"
+                name="worldDescription"
+                value={editedDesc}
+                onChange={(e) => setEditedDesc(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Escape") {
+                    setEditedDesc(world.description ?? "");
+                    setIsEditingDesc(false);
+                  } else if (e.key === "Enter" && e.metaKey) {
+                    handleSaveDesc();
+                  }
+                }}
+                className="w-full px-3 py-2 bg-background-input border border-border-subtle rounded-sm text-sm text-text-primary placeholder:text-text-muted focus:border-accent-gold focus:outline-none resize-y min-h-24"
+                placeholder="Add a description..."
+                aria-label="World description"
+                data-no-shortcut="true"
+              />
+              <div className="flex items-center justify-end gap-2">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    setEditedDesc(world.description ?? "");
+                    setIsEditingDesc(false);
+                  }}
+                  className="h-7 text-xs text-text-muted"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleSaveDesc}
+                  className="h-7 text-xs bg-accent-gold/20 text-accent-gold hover:bg-accent-gold/30"
+                >
+                  Save
+                </Button>
+              </div>
+            </div>
+          )}
+        </CollapsibleSection>
+
+        <CollapsibleSection
+          title="Appearance"
+          icon={<Palette className="w-4 h-4" />}
+          defaultOpen={true}
+          storageKey={`world-${worldId}-appearance`}
+        >
+          <div className="space-y-4">
+            {/* Background color picker */}
+            <PropertyColorPicker
+              label="Map Background"
+              value={backgroundColor}
+              onChange={handleBackgroundColorChange}
+              presets={BACKGROUND_COLOR_PRESETS}
+              showPresets={true}
+              showHexInput={true}
+            />
+
+            {/* Background image */}
+            {world.map ? (
+              <div className="rounded-sm overflow-hidden border border-border-subtle">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={world.map}
+                  alt="World map"
+                  className="w-full h-24 object-cover"
+                />
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-24 rounded-sm bg-black/20 border border-dashed border-border-subtle">
+                <div className="text-center">
+                  <ImageIcon className="w-6 h-6 text-text-muted mx-auto mb-1" />
+                  <p className="text-xs text-text-muted">No background image</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </CollapsibleSection>
+
+        <CollapsibleSection
+          title="Map Info"
+          icon={<Settings className="w-4 h-4" />}
+          defaultOpen={false}
+          storageKey={`world-${worldId}-info`}
+        >
+          <div className="space-y-2">
+            <InfoRow label="World ID" value={world.id} mono />
+            <InfoRow label="Created" value={formatDate(world.createdAt)} />
+            <InfoRow label="Last Updated" value={formatDate(world.updatedAt)} />
+            <InfoRow
+              label="Status"
+              value={world.isPublished ? "Published" : "Draft"}
+              className={
+                world.isPublished
+                  ? "text-green-400"
+                  : "text-amber-400"
+              }
+            />
+          </div>
+        </CollapsibleSection>
+
+        <CollapsibleSection
+          title="Permissions"
+          icon={<Shield className="w-4 h-4" />}
+          defaultOpen={false}
+          storageKey={`world-${worldId}-permissions`}
+        >
+          {currentUserId ? (
+            <PermissionsPanel
+              worldId={worldId}
+              isOwner={isOwner}
+              userId={currentUserId}
+            />
+          ) : (
+            <div className="text-center py-4">
+              <p className="text-xs text-text-muted">Sign in to manage permissions</p>
+            </div>
+          )}
+        </CollapsibleSection>
+      </div>
+    </div>
+  );
+}
+
+interface InfoRowProps {
+  label: string;
+  value: string | React.ReactNode;
+  mono?: boolean;
+  className?: string;
+}
+
+function InfoRow({ label, value, mono, className }: InfoRowProps) {
+  return (
+    <div className="flex items-start justify-between gap-3 py-2 px-3 rounded hover:bg-white/5">
+      <span className="text-xs text-text-muted">{label}</span>
+      <span
+        className={cn(
+          "text-xs text-text-secondary text-right",
+          mono && "font-mono",
+          className
+        )}
+      >
+        {value}
+      </span>
+    </div>
+  );
+}

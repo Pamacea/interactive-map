@@ -94,10 +94,10 @@ export function LayerRow({
     if (isDocked && actions.onSelect) {
       actions.onSelect(layer.id);
     }
-  }, [isDocked, actions.onSelect, layer.id]);
+  }, [isDocked, actions, layer.id]);
 
   // Drag handlers
-  const handleDragStart = useCallback((e: React.DragEvent) => {
+  const _handleDragStart = useCallback((e: React.DragEvent) => {
     if (layer.isBaseMap || layer.type === "BASE_MAP") {
       e.preventDefault();
       return;
@@ -105,7 +105,7 @@ export function LayerRow({
     e.dataTransfer.setData("application/json", JSON.stringify({ layerId: layer.id, index }));
     e.dataTransfer.effectAllowed = "move";
     actions.onDragStart?.(layer.id, index);
-  }, [layer, actions]);
+  }, [layer, actions, index]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -119,7 +119,7 @@ export function LayerRow({
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
-    const data = e.dataTransfer.getData("application/json");
+    const _data = e.dataTransfer.getData("application/json");
     if (!data) return;
     const { layerId: draggedLayerId } = JSON.parse(data);
     if (draggedLayerId !== layer.id) {

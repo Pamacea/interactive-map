@@ -77,7 +77,7 @@ export const CommentPopup = memo<CommentPopupProps>(function CommentPopup({
   onToggleResolved,
 }) {
   const popupRef = React.useRef<HTMLDivElement>(null);
-  const replyingToId = useCommentsStore((s) => s.replyingToId);
+  const _replyingToId = useCommentsStore((s) => s.replyingToId);
   const editingId = useCommentsStore((s) => s.editingId);
   const setReplyingTo = useCommentsStore((s) => s.setReplyingTo);
   const setEditing = useCommentsStore((s) => s.setEditing);

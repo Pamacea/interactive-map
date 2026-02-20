@@ -58,13 +58,6 @@ import {
 // Types
 // ============================================================================
 
-import type { Pin } from "@prisma/client";
-import type { OptimizedWorldLayer } from "@/types/world.type";
-import type { LoreEntry } from "@prisma/client";
-import type { Character } from "@prisma/client";
-import type { GalleryItemWithRelations } from "@/types/gallery.type";
-import type { CommentWithUser } from "@/actions/comments";
-
 // ============================================================================
 // Mutation Functions
 // ============================================================================
@@ -78,7 +71,7 @@ export const mutations = {
      * Create a new pin
      */
     create: async (data: Parameters<typeof createPin>[0]) => {
-      const result = await createPin(data);
+      const _result = await createPin(data);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -89,7 +82,7 @@ export const mutations = {
      * Update an existing pin
      */
     update: async (data: Parameters<typeof updatePin>[0]) => {
-      const result = await updatePin(data);
+      const _result = await updatePin(data);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -100,7 +93,7 @@ export const mutations = {
      * Delete a pin
      */
     delete: async (id: string) => {
-      const result = await deletePin(id);
+      const _result = await deletePin(id);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -116,7 +109,7 @@ export const mutations = {
      * Create a new layer
      */
     create: async (data: Parameters<typeof createLayer>[0]) => {
-      const result = await createLayer(data);
+      const _result = await createLayer(data);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -127,7 +120,7 @@ export const mutations = {
      * Update an existing layer
      */
     update: async (data: Parameters<typeof updateLayer>[0]) => {
-      const result = await updateLayer(data);
+      const _result = await updateLayer(data);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -138,7 +131,7 @@ export const mutations = {
      * Delete a layer
      */
     delete: async (id: string) => {
-      const result = await deleteLayer(id);
+      const _result = await deleteLayer(id);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -149,7 +142,7 @@ export const mutations = {
      * Reorder layers
      */
     reorder: async (data: Parameters<typeof reorderLayers>[0]) => {
-      const result = await reorderLayers(data);
+      const _result = await reorderLayers(data);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -165,7 +158,7 @@ export const mutations = {
      * Create a new lore entry
      */
     create: async (data: Parameters<typeof createLoreEntry>[0]) => {
-      const result = await createLoreEntry(data);
+      const _result = await createLoreEntry(data);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -176,7 +169,7 @@ export const mutations = {
      * Update an existing lore entry
      */
     update: async (data: Parameters<typeof updateLoreEntry>[0]) => {
-      const result = await updateLoreEntry(data);
+      const _result = await updateLoreEntry(data);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -187,7 +180,7 @@ export const mutations = {
      * Delete a lore entry
      */
     delete: async (id: string) => {
-      const result = await deleteLoreEntry(id);
+      const _result = await deleteLoreEntry(id);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -203,7 +196,7 @@ export const mutations = {
      * Create a new character
      */
     create: async (data: Parameters<typeof createCharacter>[0]) => {
-      const result = await createCharacter(data);
+      const _result = await createCharacter(data);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -214,7 +207,7 @@ export const mutations = {
      * Update an existing character
      */
     update: async (data: Parameters<typeof updateCharacter>[0]) => {
-      const result = await updateCharacter(data);
+      const _result = await updateCharacter(data);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -225,7 +218,7 @@ export const mutations = {
      * Delete a character
      */
     delete: async (id: string) => {
-      const result = await deleteCharacter(id);
+      const _result = await deleteCharacter(id);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -236,7 +229,7 @@ export const mutations = {
      * Toggle character visibility
      */
     toggleVisibility: async (id: string) => {
-      const result = await toggleCharacterVisibility(id);
+      const _result = await toggleCharacterVisibility(id);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -247,7 +240,7 @@ export const mutations = {
      * Reorder characters
      */
     reorder: async (data: Parameters<typeof reorderCharacters>[0]) => {
-      const result = await reorderCharacters(data);
+      const _result = await reorderCharacters(data);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -263,7 +256,7 @@ export const mutations = {
      * Update a gallery item
      */
     update: async (data: Parameters<typeof updateGalleryItem>[0]) => {
-      const result = await updateGalleryItem(data);
+      const _result = await updateGalleryItem(data);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -274,7 +267,7 @@ export const mutations = {
      * Delete a gallery item
      */
     delete: async (id: string) => {
-      const result = await deleteGalleryItem(id);
+      const _result = await deleteGalleryItem(id);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -285,7 +278,7 @@ export const mutations = {
      * Reorder gallery items
      */
     reorder: async (data: Parameters<typeof reorderGalleryItems>[0]) => {
-      const result = await reorderGalleryItems(data);
+      const _result = await reorderGalleryItems(data);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -301,7 +294,7 @@ export const mutations = {
      * Create a new comment
      */
     create: async (data: Parameters<typeof createComment>[0]) => {
-      const result = await createComment(data);
+      const _result = await createComment(data);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -312,7 +305,7 @@ export const mutations = {
      * Update a comment
      */
     update: async (data: Parameters<typeof updateComment>[0]) => {
-      const result = await updateComment(data);
+      const _result = await updateComment(data);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -323,7 +316,7 @@ export const mutations = {
      * Delete a comment
      */
     delete: async (id: string) => {
-      const result = await deleteComment(id);
+      const _result = await deleteComment(id);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -334,7 +327,7 @@ export const mutations = {
      * Toggle comment resolved status
      */
     toggleResolved: async (id: string) => {
-      const result = await toggleCommentResolved(id);
+      const _result = await toggleCommentResolved(id);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -350,7 +343,7 @@ export const mutations = {
      * Create a new version
      */
     create: async (data: Parameters<typeof createVersion>[0]) => {
-      const result = await createVersion(data);
+      const _result = await createVersion(data);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -361,7 +354,7 @@ export const mutations = {
      * Restore a version
      */
     restore: async (data: Parameters<typeof restoreVersion>[0]) => {
-      const result = await restoreVersion(data);
+      const _result = await restoreVersion(data);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -372,7 +365,7 @@ export const mutations = {
      * Delete a version
      */
     delete: async (id: string) => {
-      const result = await deleteVersion(id);
+      const _result = await deleteVersion(id);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -383,7 +376,7 @@ export const mutations = {
      * Update a version
      */
     update: async (data: Parameters<typeof updateVersion>[0]) => {
-      const result = await updateVersion(data);
+      const _result = await updateVersion(data);
       if (!result.success) {
         throw new Error(result.error.message);
       }
@@ -413,27 +406,27 @@ export const getInvalidationKeys = {
   ],
 
   // Lore mutations affect lore queries
-  lore: (worldId: string) => [
+  lore: (_worldId: string) => [
     ["lore"],
   ],
 
   // Character mutations affect characters queries
-  character: (worldId: string) => [
+  character: (_worldId: string) => [
     ["characters"],
   ],
 
   // Gallery mutations affect gallery queries
-  gallery: (worldId: string) => [
+  gallery: (_worldId: string) => [
     ["gallery"],
   ],
 
   // Comment mutations affect comments queries
-  comment: (worldId: string) => [
+  comment: (_worldId: string) => [
     ["comments"],
   ],
 
   // Version mutations affect versions queries and possibly world data
-  version: (worldId: string) => [
+  version: (_worldId: string) => [
     ["versions"],
     ["worlds"],
   ],

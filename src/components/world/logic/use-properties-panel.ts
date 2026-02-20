@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useSelectedPin, useUpdatePin, usePinsStore } from "@/stores/use-pins-store";
+import { useSelectedPin, useUpdatePin } from "@/stores/use-pins-store";
 import { updatePin, uploadPinIcon } from "@/actions/pins";
 import { useToast } from "@/hooks/use-toast";
 import type { Pin } from "@prisma/client";
@@ -18,7 +18,7 @@ interface PinFormState {
 }
 
 export function usePropertiesPanel() {
-  const selectedPin = useSelectedPin();
+  const _selectedPin = useSelectedPin();
   const updatePinInStore = useUpdatePin();
   const { showToast } = useToast();
 
@@ -63,6 +63,7 @@ export function usePropertiesPanel() {
         return hasChanged ? newFormState : prev;
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Zustand store values are stable
   }, [selectedPin]); // Will re-run whenever selectedPin object reference changes from store updates
 
   // Handle pin updates with optimistic updates
@@ -117,6 +118,7 @@ export function usePropertiesPanel() {
       } finally {
         setIsUpdating(false);
       }
+    /* eslint-disable react-hooks/exhaustive-deps */
     },
     [selectedPin, isUpdating, formState, updatePinInStore, showToast, lastKnownGoodState]
   );
@@ -133,7 +135,7 @@ export function usePropertiesPanel() {
         const formData = new FormData();
         formData.append("file", file);
 
-        const result = await uploadPinIcon(selectedPin.id, formData);
+        const _result = await uploadPinIcon(selectedPin.id, formData);
 
         if (!result.success) {
           throw new Error(result.error.message);
@@ -154,6 +156,7 @@ export function usePropertiesPanel() {
       } finally {
         setIsUpdating(false);
       }
+    /* eslint-disable react-hooks/exhaustive-deps */
     },
     [selectedPin, updatePinInStore, showToast]
   );

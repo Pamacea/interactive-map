@@ -29,7 +29,7 @@ export function useVersions(worldId: string, enabled = true) {
     queryKey: ['versions', worldId],
     queryFn: async () => {
       try {
-        const result = await getWorldVersions(worldId);
+        const _result = await getWorldVersions(worldId);
         if (!result.success) {
           if (result.error?.code === 'AUTHENTICATION_ERROR') {
             return [];
@@ -37,10 +37,11 @@ export function useVersions(worldId: string, enabled = true) {
           throw new Error(result.error?.message || 'Failed to fetch versions');
         }
         return result.data;
-      } catch (error: any) {
-        if (error?.code === 'AUTHENTICATION_ERROR' ||
-            error?.message?.includes('Authentication') ||
-            error?.message?.includes('logged in')) {
+      } catch (error: unknown) {
+        const err = error as { code?: string; message?: string };
+        if (err.code === 'AUTHENTICATION_ERROR' ||
+            err.message?.includes('Authentication') ||
+            err.message?.includes('logged in')) {
           return [];
         }
         throw error;
@@ -64,7 +65,7 @@ export function useCreateVersion(): UseMutationResult<
   Error,
   Parameters<typeof createVersion>[0]
 > {
-  const queryClient = useQueryClient();
+  const _queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: createVersion,
@@ -79,7 +80,7 @@ export function useRestoreVersion(): UseMutationResult<
   Error,
   Parameters<typeof restoreVersion>[0]
 > {
-  const queryClient = useQueryClient();
+  const _queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: restoreVersion,
@@ -99,7 +100,7 @@ export function useDeleteVersion(): UseMutationResult<
   Error,
   Parameters<typeof deleteVersion>[0]
 > {
-  const queryClient = useQueryClient();
+  const _queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: deleteVersion,
@@ -114,7 +115,7 @@ export function useUpdateVersion(): UseMutationResult<
   Error,
   Parameters<typeof updateVersion>[0]
 > {
-  const queryClient = useQueryClient();
+  const _queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: updateVersion,

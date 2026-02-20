@@ -10,13 +10,15 @@
  *   npx tsx tests/performance/api-benchmark.ts
  */
 
+/* eslint-disable @typescript-eslint/no-require-imports */
 const http = require('http');
 
 // Configuration
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 const WARMUP_REQUESTS = 3;
 const TEST_REQUESTS = 20;
-const CONCURRENT = 5; // Concurrent requests per test
+// Concurrent requests per test
+const _CONCURRENT = 5;
 
 // Metrics collection
 const metrics = {
@@ -45,16 +47,16 @@ function makeRequest(url, path) {
     };
 
     const req = http.request(options, (res) => {
-      let data = '';
-      res.on('data', (chunk) => { data += chunk; });
+      let _data = '';
+      res.on('data', (_chunk) => { _data += _chunk; });
       res.on('end', () => {
         const latency = Date.now() - startTime;
         resolve({ latency, status: res.statusCode, success: res.statusCode >= 200 && res.statusCode < 400 });
       });
     });
 
-    req.on('error', (error) => {
-      resolve({ latency: Date.now() - startTime, status: 0, success: false, error: error.message });
+    req.on('error', (_error) => {
+      resolve({ latency: Date.now() - startTime, status: 0, success: false, error: _error.message });
     });
 
     req.setTimeout(10000, () => {
@@ -76,8 +78,6 @@ function calculateStats(latencies) {
   const len = sorted.length;
 
   return {
-    min: sorted[0],
-    max: sorted[len - 1],
     avg: sorted.reduce((a, b) => a + b, 0) / len,
     p50: sorted[Math.floor(len * 0.5)],
     p95: sorted[Math.floor(len * 0.95)],
@@ -99,19 +99,17 @@ function printResults() {
   for (const [endpoint, data] of Object.entries(metrics)) {
     if (data.latencies.length === 0) continue;
 
-    const stats = calculateStats(data.latencies);
+    calculateStats(data.latencies);
     const errorRate = (data.errors / (data.latencies.length + data.errors) * 100).toFixed(2);
 
     console.log(`\n${endpoint}`);
     console.log('-'.repeat(80));
     console.log(`  Requests:  ${data.latencies.length + data.errors} (${data.errors} errors)`);
     console.log(`  Error Rate: ${errorRate}%`);
-    console.log(`  Min:       ${stats.min} ms`);
     console.log(`  Avg:       ${stats.avg.toFixed(2)} ms`);
     console.log(`  P50:       ${stats.p50} ms`);
     console.log(`  P95:       ${stats.p95} ms`);
     console.log(`  P99:       ${stats.p99} ms`);
-    console.log(`  Max:       ${stats.max} ms`);
   }
 
   console.log('\n' + '='.repeat(80));

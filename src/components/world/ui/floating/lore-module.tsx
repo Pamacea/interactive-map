@@ -48,7 +48,7 @@ export function LoreModule({ worldId }: LoreModuleProps) {
     const fetchLoreEntries = async () => {
       setIsLoading(true);
       try {
-        const data = await getLoreEntriesByWorld(worldId);
+        const _data = await getLoreEntriesByWorld(worldId);
         setLoreEntriesState(data);
         setLoreStore(data);
         setHasLoaded(true);
@@ -69,7 +69,7 @@ export function LoreModule({ worldId }: LoreModuleProps) {
   // Refetch callback for after mutations
   const refetchLoreEntries = useCallback(async () => {
     try {
-      const data = await getLoreEntriesByWorld(worldId);
+      const _data = await getLoreEntriesByWorld(worldId);
       setLoreEntriesState(data);
       setLoreStore(data);
 

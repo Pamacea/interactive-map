@@ -59,7 +59,7 @@ interface LoreCardProps {
 export function LoreCard({ lore, isSelected, onSelect, categoryLabel }: LoreCardProps) {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const toggleExpanded = useLoreStore((state) => state.toggleExpanded);
+  const _toggleExpanded = useLoreStore((state) => state.toggleExpanded);
   const startEditing = useLoreStore((state) => state.startEditing);
   const deleteLoreEntryServer = useLoreStore((state) => state.deleteLoreEntryServer);
   const selectLore = useLoreStore((state) => state.selectLore);
@@ -86,7 +86,7 @@ export function LoreCard({ lore, isSelected, onSelect, categoryLabel }: LoreCard
     }
   };
 
-  const handleToggleVisibility = async (e: React.MouseEvent) => {
+  const _handleToggleVisibility = async (e: React.MouseEvent) => {
     e.stopPropagation();
     try {
       const store = useLoreStore.getState();

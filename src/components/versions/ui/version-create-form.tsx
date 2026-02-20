@@ -28,7 +28,7 @@ export function VersionCreateForm({ worldId, onCancel, onSuccess }: VersionCreat
     }
 
     try {
-      const result = await createVersion({
+      const _result = await createVersion({
         worldId,
         title,
         changelog,
@@ -40,8 +40,9 @@ export function VersionCreateForm({ worldId, onCancel, onSuccess }: VersionCreat
       } else if (result.error) {
         setError(result.error.message);
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to create version');
+    } catch (err: unknown) {
+      const error = err as { message?: string };
+      setError(error.message || 'Failed to create version');
     }
   };
 

@@ -128,25 +128,23 @@ export function PropertyTextarea({
   const [copied, setCopied] = React.useState(false);
   const [mode, setMode] = React.useState<PropertyTextareaMode>(defaultMode);
 
-  // Autosave integration
-  const autosave = autosaveConfig
-    ? useAutosave({
-        onSave: autosaveConfig.onSave,
-        debounceMs: autosaveConfig.debounceMs ?? 500,
-        showToasts: false,
-      })
-    : null;
+  // Autosave integration - ALWAYS call hook, but use no-op onSave if not configured
+  const autosave = useAutosave({
+    onSave: autosaveConfig?.onSave ?? (async () => {}),
+    debounceMs: autosaveConfig?.debounceMs ?? 500,
+    showToasts: false,
+  });
 
   // Handle change with autosave
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     props.onChange?.(e);
-    if (autosave && typeof value === "string") {
+    if (autosaveConfig && typeof value === "string") {
       autosave.debouncedSave({ value: e.target.value });
     }
   };
 
   // Determine state
-  const state = propState || (error ? "error" : autosave?.status === "error" ? "error" : "default");
+  const _state = propState || (error ? "error" : autosave?.status === "error" ? "error" : "default");
   const hasValue = value !== "" && value !== undefined && value !== null;
   const isInteractive = !disabled && !isLoading;
 
@@ -270,7 +268,7 @@ export function PropertyTextarea({
   // Autosave status indicator
   const AutosaveStatus = () => {
     if (!autosave) return null;
-    const status = autosave.status;
+    const _status = autosave.status;
 
     if (status === "idle") return null;
 
@@ -282,11 +280,11 @@ export function PropertyTextarea({
     };
 
     const config = statusConfig[status as keyof typeof statusConfig];
-    const Icon = config.icon;
+    const _Icon = config.icon;
 
     return (
       <span className={cn("flex items-center gap-1 text-xs", config.color)}>
-        {Icon && <Icon className="h-3 w-3 animate-spin" />}
+        {_Icon && <_Icon className="h-3 w-3 animate-spin" />}
         {config.text}
       </span>
     );

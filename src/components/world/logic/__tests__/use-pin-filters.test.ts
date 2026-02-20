@@ -17,7 +17,7 @@ vi.mock("@/stores/use-pins-store", () => ({
   useVisiblePinTypes: () => mockVisibleTypes,
 }));
 
-let mockFilters: Record<number, boolean>;
+let mockFilters: Record<string, boolean>;
 let mockShowAll: boolean;
 let mockVisibleTypes: number[];
 
@@ -186,7 +186,7 @@ describe("usePinFilters", () => {
   describe("edge cases", () => {
     it("should handle all filters hidden", () => {
       Object.keys(mockFilters).forEach((key) => {
-        mockFilters[Number(key)] = false;
+        mockFilters[key] = false;
       });
 
       const { result } = renderHook(() => usePinFilters());
@@ -202,7 +202,7 @@ describe("usePinFilters", () => {
 
       expect(result.current.isTypeVisible(PinType.CITY)).toBe(false);
       expect(result.current.isTypeVisible(PinType.DUNGEON)).toBe(false);
-      expect(result.current.isTypeVisible(PinType.TOWN)).toBe(true);
+      expect(result.current.isTypeVisible(PinType.VILLAGE)).toBe(true);
     });
   });
 });
@@ -244,7 +244,7 @@ describe("useFilteredPins", () => {
   });
 
   it("should filter pins by visible types", () => {
-    const pins = [
+    const _pins = [
       { id: "1", pinType: PinType.CITY },
       { id: "2", pinType: PinType.DUNGEON },
       { id: "3", pinType: PinType.TOWN },
@@ -259,7 +259,7 @@ describe("useFilteredPins", () => {
   it("should return empty array when no types visible", () => {
     mockVisibleTypes = [];
 
-    const pins = [
+    const _pins = [
       { id: "1", pinType: PinType.CITY },
       { id: "2", pinType: PinType.DUNGEON },
     ] as Array<{ id: string; pinType: number }>;
@@ -272,7 +272,7 @@ describe("useFilteredPins", () => {
   it("should return all pins when all types visible", () => {
     mockVisibleTypes = Object.values(PinType);
 
-    const pins = [
+    const _pins = [
       { id: "1", pinType: PinType.CITY },
       { id: "2", pinType: PinType.DUNGEON },
       { id: "3", pinType: PinType.TOWN },

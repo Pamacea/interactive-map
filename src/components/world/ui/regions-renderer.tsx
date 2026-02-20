@@ -50,10 +50,10 @@ function getRegionStyle(
   const coords = coordinates ?? {};
 
   // Apply layer transforms
-  const layerScale = region.layerScale ?? 1;
-  const layerOffsetX = region.layerOffsetX ?? 0;
-  const layerOffsetY = region.layerOffsetY ?? 0;
-  const layerOpacity = region.layerOpacity ?? 1;
+  const _layerScale = region.layerScale ?? 1;
+  const _layerOffsetX = region.layerOffsetX ?? 0;
+  const _layerOffsetY = region.layerOffsetY ?? 0;
+  const _layerOpacity = region.layerOpacity ?? 1;
 
   // Null safety for region properties
   const regionColor = color ?? "#3b82f6";
@@ -140,9 +140,9 @@ function getPolygonPoints(
   const points = coords.points ?? [];
 
   // Apply layer transforms with null safety
-  const layerScale = region.layerScale ?? 1;
-  const layerOffsetX = region.layerOffsetX ?? 0;
-  const layerOffsetY = region.layerOffsetY ?? 0;
+  const _layerScale = region.layerScale ?? 1;
+  const _layerOffsetX = region.layerOffsetX ?? 0;
+  const _layerOffsetY = region.layerOffsetY ?? 0;
 
   const combinedScale = scale * layerScale;
   const combinedX = translateX + layerOffsetX * scale;
@@ -257,7 +257,7 @@ const PolygonRegion = memo(function PolygonRegion({
   const regionOpacity = region?.opacity ?? 0.5;
   const regionBorderWidth = region?.borderWidth ?? 2;
   const regionLocked = region?.locked ?? false;
-  const layerOpacity = region?.layerOpacity ?? 1;
+  const _layerOpacity = region?.layerOpacity ?? 1;
 
   return (
     <svg
@@ -318,7 +318,7 @@ export const RegionMarker = memo(function RegionMarker(props: RegionMarkerProps)
 
   // Check if region is visible with null safety
   const regionVisible = region.visible ?? true;
-  const layerVisible = region.layerVisible ?? true;
+  const _layerVisible = region.layerVisible ?? true;
   const regionType = region.type ?? "RECTANGLE";
 
   if (!regionVisible || !layerVisible) {

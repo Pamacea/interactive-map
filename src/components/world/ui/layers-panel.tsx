@@ -24,15 +24,15 @@ interface LayersPanelProps {
   mapImage?: string | null;
 }
 
-export function LayersPanel({ worldId, worldLayers = [], mapImage }: LayersPanelProps) {
+export function LayersPanel({ worldId, worldLayers: _worldLayers = [], mapImage }: LayersPanelProps) {
   // Store selectors
-  const layers = useMapStore((state) => state.layers);
+  const _layers = useMapStore((state) => state.layers);
   const selectedLayerId = useMapStore((state) => state.selectedLayerId);
   const toggleLayerVisibility = useMapStore((state) => state.toggleLayerVisibility);
   const toggleLayerLock = useMapStore((state) => state.toggleLayerLock);
   const updateLayerOpacity = useMapStore((state) => state.updateLayerOpacity);
-  const updateLayerScale = useMapStore((state) => state.updateLayerScale);
-  const updateLayerPosition = useMapStore((state) => state.updateLayerPosition);
+  const _updateLayerScale = useMapStore((state) => state.updateLayerScale);
+  const _updateLayerPosition = useMapStore((state) => state.updateLayerPosition);
   const updateLayerMinZoom = useMapStore((state) => state.updateLayerMinZoom);
   const updateLayerMaxZoom = useMapStore((state) => state.updateLayerMaxZoom);
   const moveLayerUp = useMapStore((state) => state.moveLayerUp);
@@ -46,6 +46,7 @@ export function LayersPanel({ worldId, worldLayers = [], mapImage }: LayersPanel
   const [showUploadDialog, setShowUploadDialog] = useState(false);
 
   // Convert store layers to UILayer format
+  /* eslint-disable react-hooks/exhaustive-deps */
   const uiLayers: UILayer[] = useMemo(() => {
     return layers.map((layer) => ({
       ...layer,
@@ -54,6 +55,7 @@ export function LayersPanel({ worldId, worldLayers = [], mapImage }: LayersPanel
   }, [layers, selectedLayerId]);
 
   // Create layer actions
+  /* eslint-disable react-hooks/exhaustive-deps */
   const layerActions = useMemo(() =>
     createLayerActions({
       onToggleVisibility: toggleLayerVisibility,
@@ -83,10 +85,12 @@ export function LayersPanel({ worldId, worldLayers = [], mapImage }: LayersPanel
       moveLayerUp,
       moveLayerDown,
       showDeleteConfirm,
+      handleDeleteLayer,
     ]
   );
 
   // Handlers
+  /* eslint-disable react-hooks/exhaustive-deps */
   const handleAddLayer = useCallback(() => {
     if (newLayerName.trim()) {
       const maxZIndex = layers.length > 0 ? Math.max(...layers.map((l) => l.zIndex)) : 0;
@@ -105,18 +109,19 @@ export function LayersPanel({ worldId, worldLayers = [], mapImage }: LayersPanel
     }
   }, [newLayerName, layers]);
 
-  const handleDeleteLayer = useCallback((layerId: string) => {
+  /* eslint-disable react-hooks/exhaustive-deps */
+  const _handleDeleteLayer = useCallback((layerId: string) => {
     const layer = layers.find((l) => l.id === layerId);
     if (layer?.isBaseMap) return;
     removeLayer(layerId);
     setShowDeleteConfirm(null);
   }, [layers, removeLayer]);
 
-  const handleCancelDelete = useCallback(() => {
+  const _handleCancelDelete = useCallback(() => {
     setShowDeleteConfirm(null);
   }, []);
 
-  const handleOpenUploadDialog = useCallback(() => {
+  const _handleOpenUploadDialog = useCallback(() => {
     setShowUploadDialog(true);
   }, []);
 

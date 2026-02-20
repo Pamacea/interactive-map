@@ -2,8 +2,6 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import type {
   Character,
-  CharacterType,
-  CharacterRole,
   CharacterPinRelation,
   CharacterRelationship,
 } from "@prisma/client";
@@ -12,13 +10,12 @@ import {
   updateCharacter as updateCharacterAction,
   deleteCharacter as deleteCharacterAction,
   toggleCharacterVisibility,
-  reorderCharacters,
   linkCharacterToPin as linkCharacterToPinAction,
   unlinkCharacterFromPin as unlinkCharacterFromPinAction,
   createCharacterRelationship,
   updateCharacterRelationship,
   deleteCharacterRelationship as deleteCharacterRelationshipAction,
-} from "@/actions/characters";
+} from "@/features/characters/actions";
 
 // UI State for character interactions
 export interface CharacterUIState {

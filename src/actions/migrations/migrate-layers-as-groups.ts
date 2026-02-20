@@ -212,7 +212,7 @@ async function migrateWorld(worldId: string) {
  */
 export async function POST() {
   try {
-    const result = await runLayersAsGroupsMigration();
+    const _result = await runLayersAsGroupsMigration();
 
     return Response.json({
       success: result.success,

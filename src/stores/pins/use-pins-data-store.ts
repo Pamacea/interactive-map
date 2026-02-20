@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import type { Pin } from "@prisma/client";
-import { createPin as createPinAction, deletePin as deletePinAction, updatePin as updatePinAction } from "@/actions/pins";
+import { createPin as createPinAction, deletePin as deletePinAction, updatePin as updatePinAction } from "@/features/pins/actions";
 import { usePinsFilterStore } from "./use-pins-filter-store";
 import { useHistoryStore } from "@/stores/history-store";
 
@@ -135,7 +135,7 @@ export const usePinsDataStore = create<PinDataStore>()(
         get().addPin(optimisticPin);
 
         // Server call
-        const result = await createPinAction(data);
+        const _result = await createPinAction(data);
 
         // Roll back on failure
         if (!result.success) {
@@ -162,8 +162,8 @@ export const usePinsDataStore = create<PinDataStore>()(
         if (trackHistory && !useHistoryStore.getState().isExecuting) {
           const addHistory = useHistoryStore.getState().addHistory;
           const pinId = createdPin.id;
-          const pinData = { ...createdPin };
-          const worldId = data.gameWorldId;
+          const _pinData = { ...createdPin };
+          const _worldId = data.gameWorldId;
 
           addHistory({
             type: "pin",
@@ -201,12 +201,12 @@ export const usePinsDataStore = create<PinDataStore>()(
         }
 
         // Capture pin data for history before deleting
-        const pinData = { ...pinToDelete };
+        const _pinData = { ...pinToDelete };
 
         get().deletePin(pinId);
 
         // Server call
-        const result = await deletePinAction(pinId);
+        const _result = await deletePinAction(pinId);
 
         // Roll back on failure
         if (!result.success) {
@@ -218,7 +218,7 @@ export const usePinsDataStore = create<PinDataStore>()(
         // Add history entry for undo
         if (trackHistory && !useHistoryStore.getState().isExecuting) {
           const addHistory = useHistoryStore.getState().addHistory;
-          const worldId = pinData.gameWorldId;
+          const _worldId = pinData.gameWorldId;
 
           addHistory({
             type: "pin",
@@ -272,7 +272,7 @@ export const usePinsDataStore = create<PinDataStore>()(
         get().updatePin(data.id, data as Partial<Pin>);
 
         // Server call
-        const result = await updatePinAction(data);
+        const _result = await updatePinAction(data);
 
         // Roll back on failure
         if (!result.success) {

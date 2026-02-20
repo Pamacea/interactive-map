@@ -1,0 +1,417 @@
+'use server';
+
+import { prisma } from '@/shared/lib/prisma';
+import { Prisma } from '@prisma/client';
+import { safeAsync, type Result } from '@/shared/lib/errors';
+import { getAuthenticatedUser, verifyWorldPermission } from '@/shared/lib/server-helpers';
+import { safeLogCollaborationEvent } from '@/features/presence/actions';
+import { revalidatePath } from 'next/cache';
+
+export type ImportSourceType = 'JSON' | 'GEOJSON' | 'IMAGE' | 'KML' | 'URL';
+
+export interface CreateImportJobInput {
+  worldId: string;
+  sourceType: ImportSourceType;
+  filename?: string;
+  rawData: unknown;
+  settings?: Record<string, unknown>;
+}
+
+export async function createImportJob(
+  input: CreateImportJobInput
+): Promise<Result<{ id: string; status: string }>> {
+  return safeAsync(async () => {
+    const user = await getAuthenticatedUser();
+    await verifyWorldPermission(input.worldId, user.id, 'EDITOR');
+
+    const job = await prisma.importJob.create({
+      data: {
+        worldId: input.worldId,
+        sourceType: input.sourceType,
+        filename: input.filename,
+        rawData: input.rawData as Prisma.InputJsonValue,
+        settings: input.settings as Prisma.InputJsonValue,
+        createdBy: user.id,
+      },
+    });
+
+    await safeLogCollaborationEvent({
+      worldId: input.worldId,
+      eventType: 'PIN_CREATED', // Reuse existing event type
+      targetId: job.id,
+      targetType: 'import',
+      eventData: { sourceType: input.sourceType },
+    });
+
+    return { id: job.id, status: job.status };
+  }, 'createImportJob');
+}
+
+interface ProcessResult {
+  pins: number;
+  layers: number;
+  lore?: number;
+}
+
+async function processJSONImport(
+  worldId: string,
+  rawData: unknown
+): Promise<ProcessResult> {
+  const _data = rawData as {
+    world?: { title?: string; description?: string };
+    pins?: Array<unknown>;
+    layers?: Array<unknown>;
+    lore?: Array<unknown>;
+  };
+
+  // Validate JSON structure
+  if (!data || typeof data !== 'object') {
+    throw new Error('Invalid JSON format');
+  }
+
+  let importedPins = 0;
+  let importedLayers = 0;
+
+  // Update world metadata if present
+  if (data.world?.title || data.world?.description) {
+    await prisma.gameWorld.update({
+      where: { id: worldId },
+      data: {
+        ...(data.world.title && { title: data.world.title }),
+        ...(data.world.description && { description: data.world.description }),
+      },
+    });
+  }
+
+  // Import pins
+  if (Array.isArray(data.pins)) {
+    for (const pinData of data.pins) {
+      if (typeof pinData !== 'object' || pinData === null) continue;
+
+      const p = pinData as {
+        title?: string;
+        description?: string;
+        latitude?: number;
+        longitude?: number;
+        pinType?: string;
+        icon?: string;
+        color?: string;
+        size?: number;
+        opacity?: number;
+        isVisible?: boolean;
+        minZoom?: number;
+        maxZoom?: number;
+      };
+
+      await prisma.pin.create({
+        data: {
+          worldId,
+          gameWorldId: worldId,
+          userId: (await getAuthenticatedUser()).id,
+          title: p.title ?? 'Imported Pin',
+          description: p.description,
+          latitude: p.latitude ?? 0,
+          longitude: p.longitude ?? 0,
+          pinType: (p.pinType?.toUpperCase() as 'CITY' | 'DUNGEON' | 'LANDMARK' | 'POI' | 'CUSTOM' | 'REGION' | 'SHOP' | 'TEMPLE') ?? 'CUSTOM',
+          icon: p.icon,
+          color: p.color ?? '#e74c3c',
+          size: p.size ?? 32,
+          opacity: p.opacity ?? 1,
+          isVisible: p.isVisible ?? true,
+          minZoom: p.minZoom ?? 0,
+          maxZoom: p.maxZoom ?? 200,
+        },
+      });
+      importedPins++;
+    }
+  }
+
+  // Import layers
+  if (Array.isArray(data.layers)) {
+    // Get current max zIndex
+    const maxLayer = await prisma.mapLayer.findFirst({
+      where: { gameWorldId: worldId },
+      orderBy: { zIndex: 'desc' },
+    });
+    let nextZIndex = (maxLayer?.zIndex ?? -1) + 1;
+
+    for (const layerData of data.layers) {
+      if (typeof layerData !== 'object' || layerData === null) continue;
+
+      const l = layerData as {
+        name?: string;
+        imageUrl?: string;
+        offsetX?: number;
+        offsetY?: number;
+        scale?: number;
+        opacity?: number;
+        isVisible?: boolean;
+        minZoom?: number;
+        maxZoom?: number;
+      };
+
+      await prisma.mapLayer.create({
+        data: {
+          worldId,
+          gameWorldId: worldId,
+          name: l.name ?? 'Imported Layer',
+          imageUrl: l.imageUrl ?? l.description, // Handle potential typo in export
+          offsetX: l.offsetX ?? 0,
+          offsetY: l.offsetY ?? 0,
+          scale: l.scale ?? 1,
+          opacity: l.opacity ?? 1,
+          zIndex: nextZIndex++,
+          isVisible: l.isVisible ?? true,
+          minZoom: l.minZoom ?? 0,
+          maxZoom: l.maxZoom ?? 200,
+        },
+      });
+      importedLayers++;
+    }
+  }
+
+  return { pins: importedPins, layers: importedLayers };
+}
+
+async function processGeoJSONImport(
+  worldId: string,
+  rawData: unknown
+): Promise<ProcessResult> {
+  const _data = rawData as { type?: string; features?: Array<unknown> };
+
+  if (data.type !== 'FeatureCollection' || !Array.isArray(data.features)) {
+    throw new Error('Invalid GeoJSON format. Expected FeatureCollection.');
+  }
+
+  let imported = 0;
+  const userId = (await getAuthenticatedUser()).id;
+
+  for (const feature of data.features) {
+    if (typeof feature !== 'object' || feature === null) continue;
+
+    const f = feature as {
+      geometry?: { type?: string; coordinates?: [number, number] | [number, number, number] };
+      properties?: Record<string, unknown>;
+    };
+
+    if (f.geometry?.type === 'Point' && Array.isArray(f.geometry.coordinates)) {
+      const coords = f.geometry.coordinates;
+      const lon = coords[0];
+      const lat = coords[1];
+      const props = f.properties ?? {};
+
+      await prisma.pin.create({
+        data: {
+          worldId,
+          gameWorldId: worldId,
+          userId,
+          title: (props.name as string) ?? (props.title as string) ?? 'Imported Location',
+          description: (props.description as string),
+          latitude: lat ?? 0,
+          longitude: lon ?? 0,
+          pinType: 'CUSTOM',
+          icon: (props.markerIcon as string),
+          color: (props.markerColor as string) ?? '#e74c3c',
+          size: (props.markerSize as number) ?? 32,
+          opacity: 1,
+          isVisible: true,
+        },
+      });
+      imported++;
+    }
+  }
+
+  return { pins: imported, layers: 0 };
+}
+
+async function processImageImport(
+  worldId: string,
+  rawData: unknown
+): Promise<ProcessResult> {
+  // Validate rawData structure
+  if (!rawData || typeof rawData !== 'object') {
+    throw new Error('Invalid image data: rawData is undefined or not an object');
+  }
+
+  const _data = rawData as { filename?: string; url?: string };
+
+  if (!data.url) {
+    throw new Error('Invalid image data: missing URL');
+  }
+
+  // Get current max zIndex
+  const maxLayer = await prisma.mapLayer.findFirst({
+    where: { gameWorldId: worldId },
+    orderBy: { zIndex: 'desc' },
+  });
+  const nextZIndex = (maxLayer?.zIndex ?? -1) + 1;
+
+  // Create the image layer
+  await prisma.mapLayer.create({
+    data: {
+      worldId,
+      gameWorldId: worldId,
+      name: data.filename ?? 'Imported Image Layer',
+      imageUrl: data.url,
+      offsetX: 0,
+      offsetY: 0,
+      scale: 1,
+      opacity: 1,
+      zIndex: nextZIndex,
+      isVisible: true,
+      minZoom: 0,
+      maxZoom: 200,
+    },
+  });
+
+  return { pins: 0, layers: 1 };
+}
+
+export interface ProcessImportJobInput {
+  jobId: string;
+}
+
+export async function processImportJob(
+  input: ProcessImportJobInput
+): Promise<Result<{ status: string; result?: ProcessResult }>> {
+  return safeAsync(async () => {
+    const user = await getAuthenticatedUser();
+
+    const job = await prisma.importJob.findUnique({
+      where: { id: input.jobId },
+      include: { world: true },
+    });
+
+    if (!job) {
+      throw new Error('Import job not found');
+    }
+
+    // Verify permissions
+    if (job.world.userId !== user.id) {
+      await verifyWorldPermission(job.worldId, user.id, 'EDITOR');
+    }
+
+    if (job.status !== 'PENDING') {
+      throw new Error('Job has already been processed');
+    }
+
+    // Update status to processing
+    await prisma.importJob.update({
+      where: { id: input.jobId },
+      data: {
+        status: 'PROCESSING',
+        startedAt: new Date(),
+        progress: 10,
+      },
+    });
+
+    try {
+      let result: ProcessResult;
+
+      switch (job.sourceType) {
+        case 'JSON':
+          result = await processJSONImport(job.worldId, job.rawData);
+          break;
+        case 'GEOJSON':
+          result = await processGeoJSONImport(job.worldId, job.rawData);
+          break;
+        case 'IMAGE':
+          result = await processImageImport(job.worldId, job.rawData);
+          break;
+        case 'KML':
+          throw new Error('KML import is not yet supported');
+        default:
+          throw new Error(`Unsupported import type: ${job.sourceType}`);
+      }
+
+      // Mark as completed
+      const updated = await prisma.importJob.update({
+        where: { id: input.jobId },
+        data: {
+          status: 'COMPLETED',
+          progress: 100,
+          completedAt: new Date(),
+          processed: result as Prisma.InputJsonValue,
+        },
+      });
+
+      await safeLogCollaborationEvent({
+        worldId: job.worldId,
+        eventType: 'LAYER_CREATED', // Reuse existing event type
+        targetId: job.id,
+        targetType: 'import',
+        eventData: { completed: true, result },
+      });
+
+      revalidatePath(`/world/${job.worldId}`);
+      return { status: updated.status, result };
+    } catch (error: unknown) {
+      const err = error as { message?: string };
+      await prisma.importJob.update({
+        where: { id: input.jobId },
+        data: {
+          status: 'FAILED',
+          error: err.message ?? 'Unknown error',
+        },
+      });
+      throw error;
+    }
+  }, 'processImportJob');
+}
+
+export async function getWorldImportJobs(
+  worldId: string
+): Promise<Result<Array<{ id: string; sourceType: string; filename: string | null; status: string; progress: number; error: string | null; processed: { pins?: number; layers?: number } | null; createdAt: Date; user: { id: string; name: string | null; image: string | null } }>>> {
+  return safeAsync(async () => {
+    const user = await getAuthenticatedUser();
+    await verifyWorldPermission(worldId, user.id, 'READER');
+
+    const jobs = await prisma.importJob.findMany({
+      where: { worldId },
+      include: {
+        user: {
+          select: { id: true, name: true, image: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+    });
+
+    return jobs;
+  }, 'getWorldImportJobs');
+}
+
+export interface CancelImportJobInput {
+  jobId: string;
+}
+
+export async function cancelImportJob(
+  input: CancelImportJobInput
+): Promise<Result<{ success: boolean }>> {
+  return safeAsync(async () => {
+    const user = await getAuthenticatedUser();
+
+    const job = await prisma.importJob.findUnique({
+      where: { id: input.jobId },
+    });
+
+    if (!job) {
+      throw new Error('Import job not found');
+    }
+
+    if (job.createdBy !== user.id) {
+      throw new Error('You can only cancel your own imports');
+    }
+
+    if (job.status !== 'PENDING' && job.status !== 'PROCESSING') {
+      throw new Error('Cannot cancel a completed job');
+    }
+
+    await prisma.importJob.update({
+      where: { id: input.jobId },
+      data: { status: 'CANCELLED' },
+    });
+
+    return { success: true };
+  }, 'cancelImportJob');
+}

@@ -1,0 +1,240 @@
+/**
+ * useAutosave - Automatic saving hook for property panels
+ *
+ * Features:
+ * - Configurable debounce delay
+ * - Save status tracking (idle, saving, saved, error)
+ * - Optimistic updates support
+ * - Toast notifications
+ * - Abort controller for cancellation
+ */
+
+import * as React from "react";
+import { useToast } from "@/shared/hooks/use-toast";
+
+export type AutosaveStatus = "idle" | "debouncing" | "saving" | "saved" | "error";
+
+export interface AutosaveOptions<T> {
+  /**
+   * Debounce delay in milliseconds
+   * @default 500
+   */
+  debounceMs?: number;
+
+  /**
+   * Function to save the data
+   */
+  onSave: (data: T) => Promise<void>;
+
+  /**
+   * Enable toast notifications
+   * @default true
+   */
+  showToasts?: boolean;
+
+  /**
+   * Success message for toast
+   * @default "Changes saved"
+   */
+  successMessage?: string;
+
+  /**
+   * Error message for toast (fallback)
+   * @default "Failed to save changes"
+   */
+  errorMessage?: string;
+
+  /**
+   * Callback when save completes successfully
+   */
+  onSaveSuccess?: () => void;
+
+  /**
+   * Callback when save fails
+   */
+  onSaveError?: (error: Error) => void;
+
+  /**
+   * Enable optimistic updates
+   * If true, updates local state immediately before server response
+   */
+  optimistic?: boolean;
+}
+
+export interface AutosaveReturn<T> {
+  /**
+   * Trigger a save immediately (bypasses debounce)
+   */
+  save: (data: T) => Promise<void>;
+
+  /**
+   * Current autosave status
+   */
+  status: AutosaveStatus;
+
+  /**
+   * Whether currently saving or debouncing
+   */
+  isPending: boolean;
+
+  /**
+   * Last error that occurred
+   */
+  error: Error | null;
+
+  /**
+   * Cancel pending save
+   */
+  cancel: () => void;
+
+  /**
+   * Debounced save function
+   */
+  debouncedSave: (data: T) => void;
+}
+
+/**
+ * useAutosave hook
+ *
+ * @example
+ * ```tsx
+ * const { debouncedSave, status, error } = useAutosave({
+ *   debounceMs: 500,
+ *   onSave: async (data) => {
+ *     await updatePin(pinId, data);
+ *   },
+ * });
+ *
+ * const handleChange = (value: string) => {
+ *   setTitle(value);
+ *   debouncedSave({ title: value });
+ * };
+ * ```
+ */
+export function useAutosave<T = unknown>(
+  options: AutosaveOptions<T>
+): AutosaveReturn<T> {
+  const {
+    debounceMs = 500,
+    onSave,
+    showToasts = true,
+    successMessage = "Changes saved",
+    errorMessage = "Failed to save changes",
+    onSaveSuccess,
+    onSaveError,
+    _optimistic = false,
+  } = options;
+
+  const { toast } = useToast();
+  const [status, setStatus] = React.useState<AutosaveStatus>("idle");
+  const [error, setError] = React.useState<Error | null>(null);
+  const abortControllerRef = React.useRef<AbortController | null>(null);
+  const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingDataRef = React.useRef<T | null>(null);
+
+  // Cleanup on unmount
+  React.useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      abortControllerRef.current?.abort();
+    };
+  }, []);
+
+  const save = React.useCallback(
+    async (data: T): Promise<void> => {
+      // Cancel any pending operation
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      abortControllerRef.current?.abort();
+
+      // Create new abort controller for this save
+      const abortController = new AbortController();
+      abortControllerRef.current = abortController;
+
+      setStatus("saving");
+      setError(null);
+
+      try {
+        await onSave(data);
+
+        if (!abortController.signal.aborted) {
+          setStatus("saved");
+          setError(null);
+
+          if (showToasts) {
+            toast({
+              title: successMessage,
+              variant: "default",
+              duration: 2000,
+            });
+          }
+
+          onSaveSuccess?.();
+
+          // Reset to idle after a short delay
+          timeoutRef.current = setTimeout(() => {
+            if (!abortController.signal.aborted) {
+              setStatus("idle");
+            }
+          }, 1500);
+        }
+      } catch (err) {
+        if (!abortController.signal.aborted) {
+          const error =
+            err instanceof Error ? err : new Error(String(err));
+          setStatus("error");
+          setError(error);
+
+          if (showToasts) {
+            toast({
+              title: errorMessage,
+              description: error.message,
+              variant: "destructive",
+            });
+          }
+
+          onSaveError?.(error);
+        }
+      }
+    },
+    [onSave, showToasts, successMessage, errorMessage, onSaveSuccess, onSaveError, toast]
+  );
+
+  const debouncedSave = React.useCallback(
+    (data: T) => {
+      pendingDataRef.current = data;
+
+      // Clear existing timeout
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+      setStatus("debouncing");
+
+      // Set new timeout
+      timeoutRef.current = setTimeout(() => {
+        if (pendingDataRef.current) {
+          save(pendingDataRef.current);
+        }
+      }, debounceMs);
+    },
+    [debounceMs, save]
+  );
+
+  const cancel = React.useCallback(() => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    abortControllerRef.current?.abort();
+    setStatus("idle");
+    setError(null);
+    pendingDataRef.current = null;
+  }, []);
+
+  return {
+    save,
+    status,
+    isPending: status === "debouncing" || status === "saving",
+    error,
+    cancel,
+    debouncedSave,
+  };
+}
+
+// Note: AutosaveIndicator component is in autosave-indicator.tsx
+// This .ts file contains only the hook logic

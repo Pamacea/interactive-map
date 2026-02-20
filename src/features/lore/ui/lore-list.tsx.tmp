@@ -1,0 +1,163 @@
+"use client";
+
+import { useState, useMemo } from "react";
+import { BookOpen, Plus, Search } from "lucide-react";
+import { useLoreStore } from "@/features/lore/store/use-lore-store";
+import { LoreCategory } from "@/types/lore.type";
+import { LoreCard } from "./lore-card";
+// import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+
+interface LoreListProps {
+  worldId: string;
+}
+
+export function LoreList({ worldId: _worldId }: LoreListProps) {
+  const loreEntries = useLoreStore((state) => state.loreEntries);
+  const selectedLoreId = useLoreStore((state) => state.selectedLoreId);
+  const searchTerm = useLoreStore((state) => state.searchTerm);
+  const categoryFilters = useLoreStore((state) => state.categoryFilters);
+  const showVisibleOnly = useLoreStore((state) => state.showVisibleOnly);
+
+  const selectLore = useLoreStore((state) => state.selectLore);
+  const setSearchTerm = useLoreStore((state) => state.setSearchTerm);
+  const toggleCategoryFilter = useLoreStore((state) => state.toggleCategoryFilter);
+  const toggleShowVisibleOnly = useLoreStore((state) => state.toggleShowVisibleOnly);
+  const startCreating = useLoreStore((state) => state.startCreating);
+
+  const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
+
+  const filteredLoreEntries = useMemo(() => {
+    return loreEntries.filter((lore) => {
+      if (searchTerm) {
+        const searchLower = searchTerm.toLowerCase();
+        const matchesSearch =
+          lore.title.toLowerCase().includes(searchLower) ||
+          lore.content.toLowerCase().includes(searchLower);
+        if (!matchesSearch) return false;
+      }
+
+      if (!categoryFilters[lore.category]) {
+        return false;
+      }
+
+      if (showVisibleOnly && !lore.isVisible) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [loreEntries, searchTerm, categoryFilters, showVisibleOnly]);
+
+  const categoryLabels: Record<LoreCategory, string> = {
+    GENERAL: "General",
+    HISTORY: "History",
+    GEOGRAPHY: "Geography",
+    CHARACTERS: "Characters",
+    FACTIONS: "Factions",
+    MAGIC: "Magic",
+    ITEMS: "Items",
+    QUESTS: "Quests",
+    CUSTOM: "Custom",
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setLocalSearchTerm(value);
+    setSearchTerm(value);
+  };
+
+  const loreCount = filteredLoreEntries.length;
+  const totalCount = loreEntries.length;
+
+  return (
+    <div className="flex flex-col h-full gap-3">
+      {/* Header */}
+      <div className="flex items-center justify-between px-1">
+        <h2 className="text-sm font-display font-semibold text-accent-gold">Lore</h2>
+        <button
+          onClick={startCreating}
+          className="p-1.5 text-bone-dark hover:text-accent-gold hover:bg-accent-gold/10 rounded-sm transition-colors"
+          title="Add lore"
+        >
+          <Plus className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-bone-dark" />
+        <Input
+          type="text"
+          placeholder="Search..."
+          value={localSearchTerm}
+          onChange={handleSearchChange}
+          className="pl-9 h-8 bg-obsidian/60 border-iron text-bone placeholder:text-bone-dark/50 text-xs focus:border-accent-gold/50"
+        />
+      </div>
+
+      {/* Filters */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <button
+          onClick={toggleShowVisibleOnly}
+          className={`
+            px-2 py-1 text-xs font-display rounded-sm border transition-colors
+            ${showVisibleOnly
+              ? "bg-accent-gold/20 text-accent-gold border-accent-gold/50"
+              : "bg-obsidian/60 text-bone-dark border-iron hover:border-accent-gold/50"
+            }
+          `}
+        >
+          Visible Only
+        </button>
+        <div className="ml-auto text-xs font-display text-accent-gold">
+          {loreCount}/{totalCount}
+        </div>
+      </div>
+
+      {/* Category Filters */}
+      <div className="flex flex-wrap gap-1">
+        {Object.entries(categoryLabels).map(([category, label]) => {
+          const isEnabled = categoryFilters[category as LoreCategory];
+          return (
+            <button
+              key={category}
+              onClick={() => toggleCategoryFilter(category as LoreCategory)}
+              className={`
+                px-2 py-1 text-xs font-display rounded-sm border transition-colors
+                ${isEnabled
+                  ? "bg-obsidian/70 text-bone border-iron hover:border-accent-gold/50"
+                  : "bg-void text-bone-dark/50 border-iron/30 opacity-60 hover:opacity-100"
+                }
+              `}
+            >
+              {label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Lore List */}
+      {filteredLoreEntries.length === 0 ? (
+        <div className="flex-1 flex items-center justify-center px-4 py-8">
+          <div className="flex flex-col items-center gap-2 text-center">
+            <BookOpen className="w-10 h-10 text-bone-dark/50" />
+            <p className="text-sm text-bone-dark">No lore entries found</p>
+          </div>
+        </div>
+      ) : (
+        <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+          {filteredLoreEntries.map((lore) => (
+            <LoreCard
+              key={lore.id}
+              lore={lore}
+              isSelected={selectedLoreId === lore.id}
+              onSelect={() => selectLore(lore.id)}
+              categoryLabel={categoryLabels[lore.category]}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

@@ -62,7 +62,7 @@ export function LayerItemWithCount({
   // Generate display name with fallback
   const displayName = useMemo(() => getLayerDisplayName(layer), [layer]);
 
-  const handleToggleVisibility = useCallback((e: React.MouseEvent) => {
+  const _handleToggleVisibility = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     actions.onToggleVisibility(layer.id);
   }, [actions, layer.id]);
@@ -97,11 +97,12 @@ export function LayerItemWithCount({
     }
     switch (layer.type) {
       case "MARKERS":
-        return <MapPin className="w-3.5 h-3.5" />;
+        return <MapPin className="w-3.5 h-3.5" aria-hidden="true" />;
       case "IMAGES":
-        return <Image className="w-3.5 h-3.5" />;
+        // eslint-disable-next-line jsx-a11y/alt-text
+        return <Image className="w-3.5 h-3.5" aria-hidden="true" />;
       case "REGIONS":
-        return <Square className="w-3.5 h-3.5" />;
+        return <Square className="w-3.5 h-3.5" aria-hidden="true" />;
       default:
         return <div className="w-3.5 h-3.5 rounded-sm bg-current" />;
     }
@@ -186,7 +187,8 @@ export function LayerItemWithCount({
                 className="text-xs px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono"
                 title={`${counts.images} images`}
               >
-                <Image className="w-2.5 h-2.5 inline mr-0.5" />
+                {/* eslint-disable-next-line jsx-a11y/alt-text */}
+                <Image className="w-2.5 h-2.5 inline mr-0.5" aria-hidden="true" />
                 {counts.images}
               </span>
             )}
@@ -305,7 +307,7 @@ interface CompactLayerItemProps {
 }
 
 export function CompactLayerItem({ layer, isActive, actions }: CompactLayerItemProps) {
-  const handleToggleVisibility = useCallback(() => {
+  const _handleToggleVisibility = useCallback(() => {
     actions.onToggleVisibility(layer.id);
   }, [actions, layer.id]);
 

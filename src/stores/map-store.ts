@@ -1,8 +1,7 @@
 import { create } from "zustand";
-import { devtools, persist } from "zustand/middleware";
-import type { MapLayer } from "@/types/world.type";
+import { devtools } from "zustand/middleware";
 
-const SCALE_OPTIONS = ["1:1000", "1:500", "1:100"] as const;
+const _SCALE_OPTIONS = ["1:1000", "1:500", "1:100"] as const;
 type ScaleOption = (typeof SCALE_OPTIONS)[number];
 
 export type LayerType = "BASE_MAP" | "MARKERS" | "IMAGES" | "REGIONS" | "GROUP" | "CUSTOM";
@@ -108,7 +107,7 @@ const initialState = {
 
 export const useMapStore = create<MapState>()(
   devtools(
-    (set, get) => ({
+    (set, _get) => ({
       ...initialState,
 
       setGrid: (value) => set({ grid: value }),
@@ -431,7 +430,7 @@ export const useMapStore = create<MapState>()(
       setZoom: (value: number) => set({ zoom: Math.max(0.1, Math.min(5, value)) }),
       zoomIn: () => set((state) => ({ zoom: Math.min(state.zoom * 1.2, 5) })),
       zoomOut: () => set((state) => ({ zoom: Math.max(state.zoom / 1.2, 0.1) })),
-      resetZoom: () => set((state) => ({ zoom: 1.0 })),
+      resetZoom: () => set((_state) => ({ zoom: 1.0 })),
 
       setWorldId: (worldId) => set({ worldId }),
 

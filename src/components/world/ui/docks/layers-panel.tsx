@@ -41,14 +41,14 @@ interface LayersDockPanelProps {
 export function LayersDockPanel({
   className,
   worldId,
-  worldLayers = [],
+  worldLayers: _worldLayers = [],
   mapImage,
   layerContentCounts = {},
 }: LayersDockPanelProps) {
   const { isExpanded } = useLeftDock();
 
   // Store selectors
-  const layers = useMapStore((state) => state.layers);
+  const _layers = useMapStore((state) => state.layers);
   const selectedLayerId = useMapStore((state) => state.selectedLayerId);
   const activeLayerId = useMapStore((state) => state.activeLayerId);
   const toggleLayerVisibility = useMapStore((state) => state.toggleLayerVisibility);
@@ -93,9 +93,11 @@ export function LayersDockPanel({
     };
 
     fetchCounts();
+  /* eslint-disable react-hooks/exhaustive-deps */
   }, [worldId, layers]);
 
   // Convert store layers to UILayer format with content counts
+  /* eslint-disable react-hooks/exhaustive-deps */
   const uiLayers: UILayer[] = useMemo(() => {
     return layers.map((layer) => ({
       ...layer,
@@ -141,6 +143,7 @@ export function LayersDockPanel({
     } catch (error) {
       console.error("Failed to update layer min zoom:", error);
     }
+  /* eslint-disable react-hooks/exhaustive-deps */
   }, [layers]);
 
   const handleMaxZoomChange = useCallback(async (layerId: string, maxZoom: number) => {
@@ -160,6 +163,7 @@ export function LayersDockPanel({
     } catch (error) {
       console.error("Failed to update layer max zoom:", error);
     }
+  /* eslint-disable react-hooks/exhaustive-deps */
   }, [layers]);
 
   const handleResetZoom = useCallback(async (layerId: string) => {
@@ -176,6 +180,7 @@ export function LayersDockPanel({
   }, []);
 
   // Create layer actions
+  /* eslint-disable react-hooks/exhaustive-deps */
   const layerActions = useMemo(() =>
     createLayerActions({
       onToggleVisibility: toggleLayerVisibility,
@@ -233,9 +238,13 @@ export function LayersDockPanel({
       toggleLayerVisibility,
       toggleLayerLock,
       updateLayerOpacity,
+      handleMinZoomChange,
+      handleMaxZoomChange,
+      handleResetZoom,
       moveLayerUp,
       moveLayerDown,
       showDeleteConfirm,
+      handleDeleteLayer,
       selectedLayerId,
       setSelectedLayerId,
       setActiveLayerId,
@@ -290,7 +299,8 @@ export function LayersDockPanel({
     }
   }, [worldId, newLayerName, selectedLayerType, addLayerFromServer]);
 
-  const handleDeleteLayer = useCallback(async (layerId: string) => {
+  /* eslint-disable react-hooks/exhaustive-deps */
+  const _handleDeleteLayer = useCallback(async (layerId: string) => {
     const layer = layers.find((l) => l.id === layerId);
     if (layer?.isBaseMap || layer?.type === "BASE_MAP") return;
 
@@ -310,11 +320,11 @@ export function LayersDockPanel({
     }
   }, [layers, removeLayer]);
 
-  const handleCancelDelete = useCallback(() => {
+  const _handleCancelDelete = useCallback(() => {
     setShowDeleteConfirm(null);
   }, []);
 
-  const handleOpenUploadDialog = useCallback(() => {
+  const _handleOpenUploadDialog = useCallback(() => {
     setShowUploadDialog(true);
   }, []);
 

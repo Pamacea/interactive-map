@@ -44,10 +44,10 @@ export function PinMarker({
   onPinClick,
 }: PinMarkerProps) {
   // Store access
-  const layers = useMapStore((state) => state.layers);
+  const _layers = useMapStore((state) => state.layers);
   const selectPin = useSelectPin();
   const clearSelection = useClearSelection();
-  const selectedPinId = useSelectedPinId();
+  const _selectedPinId = useSelectedPinId();
 
   // Get real-time pin data from store (for position updates during drag)
   const latestPin = usePinById(pin.id);
@@ -57,7 +57,7 @@ export function PinMarker({
   // Get layer info for lock state and opacity
   const layer = pin.layerId ? layers.find((layer) => layer.id === pin.layerId) : null;
   const isLayerLocked = layer?.locked ?? false;
-  const layerOpacity = layer?.opacity ?? 1;
+  const _layerOpacity = layer?.opacity ?? 1;
 
   // Unified drag handling using input manager
   const { isDragging, dragPosition, handleMouseDown: handleDragMouseDown, justFinishedDragRef } = usePinDragInput({
@@ -103,7 +103,7 @@ export function PinMarker({
   });
 
   // Icon configuration
-  const pinConfig = getPinTypeConfig(pin.pinType as any) || { icon: "MapPin", color: "#3b82f6", label: "Pin" };
+  const pinConfig = getPinTypeConfig(pin.pinType) || { icon: "MapPin", color: "#3b82f6", label: "Pin" };
   const iconName = pin.icon || pinConfig.icon;
   const isCustomImage = iconName?.startsWith("/");
 
@@ -140,7 +140,7 @@ export function PinMarker({
 
     // Delegate to drag handler
     handleDragMouseDown(e);
-  }, [isLayerLocked, handleDragMouseDown, pin.id]);
+  }, [isLayerLocked, handleDragMouseDown]);
 
   if (!shouldRender) {
     return null;

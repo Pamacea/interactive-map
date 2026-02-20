@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import Image from "next/image";
 import { Users, UserPlus, Crown, Shield, Eye, MoreVertical, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -33,7 +34,6 @@ import {
   updateWorldMemberPermission,
   removeWorldMember,
 } from "@/actions/worlds";
-import { galleryKeys } from "@/components/gallery/logic/use-gallery-query";
 import { cn } from "@/lib/utils";
 
 interface Member {
@@ -55,7 +55,7 @@ interface MembersListProps {
 }
 
 export function MembersList({ worldId, worldOwnerId, currentUserId, className }: MembersListProps) {
-  const queryClient = useQueryClient();
+  const _queryClient = useQueryClient();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newMemberEmail, setNewMemberEmail] = useState("");
   const [newMemberPermission, setNewMemberPermission] = useState<"READER" | "EDITOR">("READER");
@@ -120,7 +120,7 @@ export function MembersList({ worldId, worldOwnerId, currentUserId, className }:
     }
   };
 
-  const handleAddMember = async (e: React.FormEvent) => {
+  const _handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMemberEmail.trim()) return;
     await addMemberMutation.mutateAsync();
@@ -232,9 +232,11 @@ export function MembersList({ worldId, worldOwnerId, currentUserId, className }:
                   {/* Avatar */}
                   <div className="w-8 h-8 rounded-full bg-background-elevated flex items-center justify-center flex-shrink-0">
                     {member.user.image ? (
-                      <img
+                      <Image
                         src={member.user.image}
                         alt={member.user.name || "User"}
+                        width={32}
+                        height={32}
                         className="w-8 h-8 rounded-full object-cover"
                       />
                     ) : (

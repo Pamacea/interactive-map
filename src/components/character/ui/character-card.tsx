@@ -1,7 +1,8 @@
 "use client";
 
-import { User, Clock, Eye, EyeOff, Edit, Trash2, Shield, Sword } from "lucide-react";
-import type { Character, CharacterType, CharacterRole } from "@prisma/client";
+import Image from "next/image";
+import { Clock, Eye, EyeOff, Edit, Trash2, Shield } from "lucide-react";
+import type { Character, CharacterType } from "@prisma/client";
 import { useCharacterStore } from "@/stores/use-character-store";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -69,18 +70,6 @@ const CHARACTER_TYPE_COLORS: Record<CharacterType, string> = {
   CUSTOM: "bg-pink-500/20 text-pink-400",
 };
 
-const ROLE_LABELS: Record<CharacterRole, string> = {
-  PROTAGONIST: "Hero",
-  ANTAGONIST: "Villain",
-  SUPPORTING: "Supporting",
-  BACKGROUND: "Background",
-  MENTOR: "Mentor",
-  ALLY: "Ally",
-  NEUTRAL: "Neutral",
-  HOSTILE: "Hostile",
-  CUSTOM: "Custom",
-};
-
 interface CharacterCardProps {
   character: Character;
   isSelected: boolean;
@@ -111,7 +100,7 @@ export function CharacterCard({ character, isSelected, onSelect }: CharacterCard
     }
   };
 
-  const handleToggleVisibility = async (e: React.MouseEvent) => {
+  const _handleToggleVisibility = async (e: React.MouseEvent) => {
     e.stopPropagation();
     try {
       await toggleVisibility(character.id);
@@ -124,7 +113,6 @@ export function CharacterCard({ character, isSelected, onSelect }: CharacterCard
   const timeAgo = formatTimeAgo(new Date(character.updatedAt));
   const typeIcon = CHARACTER_TYPE_ICONS[character.characterType];
   const typeColor = CHARACTER_TYPE_COLORS[character.characterType];
-  const roleLabel = ROLE_LABELS[character.role];
 
   return (
     <Card
@@ -142,9 +130,11 @@ export function CharacterCard({ character, isSelected, onSelect }: CharacterCard
         {/* Portrait or Icon */}
         {character.portraitUrl ? (
           <div className="flex-shrink-0 w-10 h-10 rounded-sm overflow-hidden bg-obsidian/60">
-            <img
+            <Image
               src={character.portraitUrl}
               alt={character.name}
+              width={40}
+              height={40}
               className="w-full h-full object-cover"
             />
           </div>

@@ -53,7 +53,7 @@ export function ImportDialog({ worldId, onClose }: ImportDialogProps) {
       }
 
       // Create and process job
-      const result = await createJob({
+      const _result = await createJob({
         worldId,
         sourceType,
         filename: file.name,
@@ -67,8 +67,8 @@ export function ImportDialog({ worldId, onClose }: ImportDialogProps) {
       } else if (result.error) {
         setError(result.error.message);
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to process file');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to process file');
     }
   };
 

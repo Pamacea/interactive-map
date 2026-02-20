@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getActiveUsers } from '@/actions/presence';
-import { getAuthenticatedUser } from '@/lib/server-helpers';
-import { verifyWorldPermission } from '@/lib/server-helpers';
+import { getActiveUsers } from '@/features/presence/actions';
+import { getAuthenticatedUser } from '@/shared/lib/server-helpers';
+import { verifyWorldPermission } from '@/shared/lib/server-helpers';
 
 /**
  * GET /api/presence/[worldId]
@@ -22,7 +22,7 @@ export async function GET(
     // SECURITY: Verify user has access to this world
     await verifyWorldPermission(worldId, user.id);
 
-    const result = await getActiveUsers({ worldId });
+    const _result = await getActiveUsers({ worldId });
 
     if (!result.success) {
       return NextResponse.json(

@@ -54,7 +54,7 @@ test.describe('Map Editor Flow', () => {
     await expect(page.locator('text=/filters/i').or(page.locator('[class*="filter"]'))).toBeVisible();
   });
 
-  test('should have map container with correct dimensions', async ({ page }) => {
+  test('should have map container with correct dimensions', async ({ _page }) => {
     await mapHelpers.waitForMapReady();
 
     const mapContainer = await mapHelpers.getMapContainer();
@@ -65,7 +65,7 @@ test.describe('Map Editor Flow', () => {
     expect(box!.height).toBeGreaterThan(0);
   });
 
-  test('should respond to mouse clicks on map', async ({ page }) => {
+  test('should respond to mouse clicks on map', async ({ _page }) => {
     await mapHelpers.waitForMapReady();
 
     // Click at center of map
@@ -112,7 +112,7 @@ test.describe('Map Editor Flow', () => {
 
     // Get initial dimensions
     const mapContainer = await mapHelpers.getMapContainer();
-    const initialBox = await mapContainer.boundingBox();
+    await mapContainer.boundingBox();
 
     // Resize window
     await page.setViewportSize({ width: 800, height: 600 });
@@ -143,7 +143,7 @@ test.describe('Pin Creation and Interaction', () => {
     await mapHelpers.gotoWorldMap(TEST_WORLD_ID);
     await mapHelpers.waitForMapReady();
 
-    const initialPinCount = await mapHelpers.countVisiblePins();
+    await mapHelpers.countVisiblePins();
 
     // Double-click to create pin
     await mapHelpers.doubleClickMapAt(30, 40);
@@ -204,7 +204,7 @@ test.describe('Pin Creation and Interaction', () => {
 
     // Look for form elements
     const nameInput = page.getByLabel(/name/i);
-    const descInput = page.getByLabel(/description/i);
+    page.getByLabel(/description/i);
 
     // These might not be visible without auth
     const isVisible = await nameInput.isVisible().catch(() => false);

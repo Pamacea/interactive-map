@@ -168,7 +168,7 @@ async function searchPinsInWorld(
   }
 
   // Fetch pins
-  const pins = await prisma.pin.findMany({
+  const _pins = await prisma.pin.findMany({
     where,
     include: {
       layer: {

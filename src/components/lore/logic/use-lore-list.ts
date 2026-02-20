@@ -35,7 +35,7 @@ export function useLoreList({
     setError(null);
 
     try {
-      const data = await getLoreEntriesByWorld(worldId);
+      const _data = await getLoreEntriesByWorld(worldId);
       setLoreEntries(data);
     } catch (err) {
       console.error("Failed to fetch lore entries:", err);
@@ -53,6 +53,7 @@ export function useLoreList({
     } else if (enabled && worldId) {
       fetchLoreEntries();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [worldId, enabled]);
 
   return {

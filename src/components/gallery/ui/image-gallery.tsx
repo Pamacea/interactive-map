@@ -1,19 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Filter, Grid3x3, List } from "lucide-react";
+import { Search, Grid3x3, List, Filter } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 import { ImageCard } from "./image-card";
 import { ImageLightbox } from "./image-lightbox";
 import { ImageUploadZone } from "./image-upload-zone";
 import { DeleteConfirmDialog } from "@/components/ui/delete-confirm-dialog";
 import { useGalleryStore } from "@/stores/use-gallery-store";
 import { useGallery } from "../logic/use-gallery-query";
-import { galleryKeys } from "../logic/use-gallery-query";
 // import type { GalleryItemWithRelations } from "@/types/gallery.type"; // Not used yet
 
 export interface ImageGalleryProps {
@@ -28,7 +27,7 @@ export function ImageGallery({ worldId, className }: ImageGalleryProps) {
 
   // TanStack Query for data fetching
   const { data: galleryItems = [], isLoading: isLoadingQuery, refetch } = useGallery(worldId);
-  const queryClient = useQueryClient();
+  const _queryClient = useQueryClient();
 
   const galleryStore = useGalleryStore();
 
@@ -223,10 +222,10 @@ export function ImageGallery({ worldId, className }: ImageGalleryProps) {
         onClose={closeLightbox}
         onNext={nextImage}
         onPrevious={previousImage}
-        onLinkToPin={(image) => {
+        onLinkToPin={() => {
           /* TODO: Implement link to pin dialog */
         }}
-        onLinkToLore={(image) => {
+        onLinkToLore={() => {
           /* TODO: Implement link to lore dialog */
         }}
       />

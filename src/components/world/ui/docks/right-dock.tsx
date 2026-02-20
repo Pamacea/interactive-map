@@ -32,7 +32,7 @@ const DEFAULT_RIGHT_DOCK_WIDTH = 320; // w-80 in Tailwind
  * - Resets to expanded state when world changes
  */
 export function RightDock({ worldId, world }: RightDockProps) {
-  const selectedPinId = useSelectedPinId();
+  const _selectedPinId = useSelectedPinId();
   const clearSelection = useClearSelection();
   const pin = usePinById(selectedPinId ?? "");
 
