@@ -1,6 +1,6 @@
-import { fixWorldPermissions } from "@/actions/migrations";
+import { fixWorldPermissions } from "@/features/migrations";
 import { NextResponse } from "next/server";
-import { getAuthenticatedUser } from "@/lib/server-helpers";
+import { getAuthenticatedUser } from "@/shared/lib/server-helpers";
 import { Role } from "@prisma/client";
 
 /**

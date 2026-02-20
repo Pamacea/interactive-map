@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Layout } from "@/components/@config/Layout";
-import { GlobalErrorHandler } from "@/components/@config/error-handler";
+import { Layout } from "@/shared/ui/layout";
+import { GlobalErrorHandler } from "@/shared/ui/global-error-handler";
 import { siteConfig } from "@/config/site";
 import { WebSiteSchema, OrganizationSchema } from "@/shared/components/seo";
 

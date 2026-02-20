@@ -2,9 +2,6 @@ import type { NextConfig } from "next";
 import path from "path";
 
 const nextConfig: NextConfig = {
-  // Add metadataBase for social open graph images
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
-
   experimental: {
     serverActions: {
       bodySizeLimit: '10mb', // Allow file uploads up to 10MB
@@ -15,6 +12,8 @@ const nextConfig: NextConfig = {
       '@radix-ui/react-dialog',
       '@radix-ui/react-dropdown-menu',
       '@tanstack/react-query',
+      'react-markdown',
+      '@uiw/react-md-editor',
     ],
   },
 
@@ -106,7 +105,7 @@ const nextConfig: NextConfig = {
           chunks: 'all',
           enforce: true,
         },
-        // Separate Turf.js (geospatial analysis library)
+        // Separate Turf.js geospatial library (if used in future)
         turf: {
           test: /[\\/]node_modules[\\/]@turf/,
           name: 'turf',
@@ -122,11 +121,27 @@ const nextConfig: NextConfig = {
           chunks: 'all',
           enforce: true,
         },
+        // Separate markdown libraries
+        markdown: {
+          test: /[\\/]node_modules[\\/](react-markdown|remark-gfm|rehype-sanitize|@uiw)/,
+          name: 'markdown',
+          priority: 7,
+          chunks: 'all',
+          enforce: true,
+        },
         // Separate TanStack Query
         tanstack: {
           test: /[\\/]node_modules[\\/]@tanstack/,
           name: 'tanstack',
-          priority: 7,
+          priority: 6,
+          chunks: 'all',
+          enforce: true,
+        },
+        // Separate export libraries (html2canvas, jsPDF)
+        export: {
+          test: /[\\/]node_modules[\\/](html2canvas|jspdf)/,
+          name: 'export',
+          priority: 5,
           chunks: 'all',
           enforce: true,
         },

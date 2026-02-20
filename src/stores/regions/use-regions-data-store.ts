@@ -21,7 +21,7 @@ import {
   deleteRegion as deleteRegionServer,
   toggleRegionVisibility,
   getRegionsByWorld,
-} from "@/actions/regions";
+} from "@/features/world-editor/actions";
 import { useHistoryStore } from "@/stores/history-store";
 
 // ============== Types ==============

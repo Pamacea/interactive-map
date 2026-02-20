@@ -1,12 +1,12 @@
 import { lazy, Suspense } from "react";
 
 const FloatingParticles = lazy(() =>
-  import("@/components/ui/particles").then(m => ({ default: m.FloatingParticles }))
+  import("@/shared/ui/particles").then(m => ({ default: m.FloatingParticles }))
 );
-import { AppHeader } from "@/components/ui/app-header";
-import { Footer } from "@/components/home/ui/footer";
+import { AppHeader } from "@/shared/ui/app-header";
+import { Footer } from "@/features/home/ui/footer";
 import { ExploreClient } from "./explore-client";
-import { getAllWorlds } from "@/actions/worlds";
+import { getAllWorlds } from "@/features/worlds";
 import { Compass } from "lucide-react";
 import type { Metadata } from "next";
 import { siteConfig } from "@/config/site";

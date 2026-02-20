@@ -1,0 +1,170 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { User, Search, Filter, ChevronDown } from "lucide-react";
+import type { Character, CharacterType } from "@prisma/client";
+import { useCharacterStore } from "@/features/characters/store/use-character-store";
+import { CharacterCard } from "./character-card";
+import { Input } from "@/shared/ui/input";
+import { Badge } from "@/shared/ui/badge";
+
+const CHARACTER_TYPES: CharacterType[] = [
+  "PLAYER",
+  "NPC",
+  "ENEMY",
+  "MERCHANT",
+  "QUEST_GIVER",
+  "COMPANION",
+  "BOSS",
+  "CUSTOM",
+];
+
+const TYPE_ICONS: Record<CharacterType, string> = {
+  PLAYER: "🎭",
+  NPC: "👤",
+  ENEMY: "⚔️",
+  MERCHANT: "💰",
+  QUEST_GIVER: "❓",
+  COMPANION: "🤝",
+  BOSS: "👑",
+  CUSTOM: "⭐",
+};
+
+interface CharacterListCompactProps {
+  worldId: string;
+  characters: Character[];
+}
+
+export function CharacterListCompact({ worldId, characters }: CharacterListCompactProps) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+
+  const {
+    selectedCharacterId,
+    selectCharacter,
+    typeFilters,
+    roleFilters,
+    showVisibleOnly,
+    toggleTypeFilter,
+    toggleShowVisibleOnly,
+    applyFilters,
+    filteredCharacters,
+    setCharacters,
+  } = useCharacterStore();
+
+  // Update characters when prop changes
+  useEffect(() => {
+    setCharacters(characters);
+  }, [characters, setCharacters]);
+
+  // Apply filters when dependencies change
+  useEffect(() => {
+    applyFilters();
+  }, [searchTerm, typeFilters, roleFilters, showVisibleOnly, characters, applyFilters]);
+
+  // Update search term in store
+  useEffect(() => {
+    useCharacterStore.setState({ searchTerm });
+  }, [searchTerm]);
+
+  const activeFilterCount = Object.values(typeFilters).filter((v) => !v).length + (showVisibleOnly ? 1 : 0);
+
+  return (
+    <div className="flex flex-col h-full">
+      {/* Search and Filters */}
+      <div className="px-3 py-2">
+        {/* Search */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-bone-dark" />
+          <Input
+            type="text"
+            placeholder="Search characters..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-9 h-8 text-sm bg-obsidian/60 border-iron text-bone placeholder:text-bone-dark/50"
+          />
+        </div>
+
+        {/* Filter Toggle */}
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          className="flex items-center gap-2 mt-2 text-xs text-bone-dark hover:text-bone transition-colors"
+        >
+          <Filter className="w-3 h-3" />
+          <span>Filters</span>
+          {activeFilterCount > 0 && (
+            <Badge variant="outline" className="text-xs px-1.5 py-0 border-iron/50 text-bone-dark">
+              {activeFilterCount}
+            </Badge>
+          )}
+          <ChevronDown
+            className={`w-3 h-3 transition-transform ${showFilters ? "rotate-180" : ""}`}
+          />
+        </button>
+
+        {/* Filter Options */}
+        {showFilters && (
+          <div className="mt-2 space-y-2">
+            {/* Type Filters */}
+            <div className="flex flex-wrap gap-1.5">
+              {CHARACTER_TYPES.map((type) => {
+                const isActive = typeFilters[type];
+                return (
+                  <button
+                    key={type}
+                    onClick={() => toggleTypeFilter(type)}
+                    className={`
+                      flex items-center gap-1 px-2 py-1 rounded-sm text-xs transition-all
+                      ${isActive
+                        ? "bg-accent-gold/20 text-accent-gold border border-accent-gold/30"
+                        : "bg-obsidian/60 text-bone-dark border border-transparent"
+                      }
+                    `}
+                  >
+                    <span>{TYPE_ICONS[type]}</span>
+                    <span className="capitalize">{type.toLowerCase().replace("_", " ")}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Visible Only Toggle */}
+            <button
+              onClick={toggleShowVisibleOnly}
+              className={`
+                flex items-center gap-2 px-3 py-1.5 rounded-sm text-xs transition-all
+                ${showVisibleOnly
+                  ? "bg-accent-gold/20 text-accent-gold border border-accent-gold/30"
+                  : "bg-obsidian/60 text-bone-dark border border-transparent"
+                }
+              `}
+            >
+              <span>{showVisibleOnly ? "✓" : "○"}</span>
+              <span>Visible only</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Character List */}
+      <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2">
+        {filteredCharacters.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-48 text-bone-dark">
+            <User className="w-12 h-12 mb-2 opacity-50" />
+            <p className="text-sm">No characters found</p>
+            <p className="text-xs mt-1">Create your first character to get started</p>
+          </div>
+        ) : (
+          filteredCharacters.map((character) => (
+            <CharacterCard
+              key={character.id}
+              character={character}
+              isSelected={selectedCharacterId === character.id}
+              onSelect={() => selectCharacter(character.id)}
+            />
+          ))
+        )}
+      </div>
+    </div>
+  );
+}

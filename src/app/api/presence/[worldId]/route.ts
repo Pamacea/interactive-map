@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getActiveUsers } from '@/actions/presence';
-import { getAuthenticatedUser } from '@/lib/server-helpers';
-import { verifyWorldPermission } from '@/lib/server-helpers';
+import { getActiveUsers } from '@/features/presence/actions';
+import { getAuthenticatedUser } from '@/shared/lib/server-helpers';
+import { verifyWorldPermission } from '@/shared/lib/server-helpers';
 
 /**
  * GET /api/presence/[worldId]

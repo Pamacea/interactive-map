@@ -1,16 +1,16 @@
 "use client";
 
 import { lazy, Suspense } from "react";
-import { HeroSection } from "@/components/home/ui/hero-section";
-import { FeaturesSection } from "@/components/home/ui/features-section";
-import { Footer } from "@/components/home/ui/footer";
-import { AuthButton } from "@/components/home/ui/auth-button";
-import { useCursorTrail } from "@/hooks/use-cursor-trail";
-import { useScrollIndicator } from "@/hooks/use-scroll-indicator";
+import { HeroSection } from "@/features/home/ui/hero-section";
+import { FeaturesSection } from "@/features/home/ui/features-section";
+import { Footer } from "@/features/home/ui/footer";
+import { AuthButton } from "@/features/home/ui/auth-button";
+import { useCursorTrail } from "@/shared/hooks/use-cursor-trail";
+import { useScrollIndicator } from "@/shared/hooks/use-scroll-indicator";
 
 // Lazy load non-critical sections for better initial load performance
 const CTASection = lazy(() =>
-  import("@/components/home/ui/cta-section").then(m => ({ default: m.CTASection }))
+  import("@/features/home/ui/cta-section").then(m => ({ default: m.CTASection }))
 );
 
 const NAV_ITEMS = [

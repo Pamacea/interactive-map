@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import type { Pin } from "@prisma/client";
-import { createPin as createPinAction, deletePin as deletePinAction, updatePin as updatePinAction } from "@/actions/pins";
+import { createPin as createPinAction, deletePin as deletePinAction, updatePin as updatePinAction } from "@/features/pins/actions";
 import { usePinsFilterStore } from "./use-pins-filter-store";
 import { useHistoryStore } from "@/stores/history-store";
 

@@ -2,13 +2,13 @@
 
 import { useState, lazy, Suspense } from "react";
 import { signIn } from "next-auth/react";
-import { CrownButton } from "@/components/ui/crown-button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { CrownButton } from "@/shared/ui/crown-button";
+import { Alert, AlertDescription } from "@/shared/ui/alert";
 import { LogIn, Crown } from "lucide-react";
 
 // Lazy load particles for better initial render performance
 const FloatingParticles = lazy(() =>
-  import("@/components/ui/particles").then(m => ({ default: m.FloatingParticles }))
+  import("@/shared/ui/particles").then(m => ({ default: m.FloatingParticles }))
 );
 
 export default function SignInPage() {

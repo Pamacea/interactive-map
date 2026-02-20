@@ -1,12 +1,12 @@
 import { lazy, Suspense } from "react";
-import { AppHeader } from "@/components/ui/app-header";
-import { Footer } from "@/components/home/ui/footer";
-import { CreateWorldForm } from "@/components/create/ui";
+import { AppHeader } from "@/shared/ui/app-header";
+import { Footer } from "@/features/home/ui/footer";
+import { CreateWorldForm } from "@/features/create/ui";
 import { Sparkles } from "lucide-react";
 
 // Lazy load particles for better performance
 const FloatingParticles = lazy(() =>
-  import("@/components/ui/particles").then(m => ({ default: m.FloatingParticles }))
+  import("@/shared/ui/particles").then(m => ({ default: m.FloatingParticles }))
 );
 
 export default function CreatePage() {

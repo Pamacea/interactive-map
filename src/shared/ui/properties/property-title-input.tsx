@@ -1,0 +1,104 @@
+/**
+ * PropertyTitleInput - Specialized input for titles
+ *
+ * Features:
+ * - Larger, bolder text
+ * - Auto-focus on mount
+ * - Character counter
+ * - Clear button
+ * - Validation feedback
+ * - Optimized for short, impactful text (names, titles)
+ */
+
+import * as React from "react";
+import { cn } from "@/shared/utils";
+import { Check, X } from "lucide-react";
+import { PropertyInput, type PropertyInputProps } from "./property-input";
+
+export interface PropertyTitleInputProps extends Omit<PropertyInputProps, "size" | "variant"> {
+  maxLength?: number;
+  showCounter?: boolean;
+  autoFocus?: boolean;
+  validate?: (value: string) => string | undefined;
+}
+
+export function PropertyTitleInput({
+  maxLength = 60,
+  showCounter = true,
+  autoFocus = true,
+  validate,
+  value,
+  onChange,
+  ...props
+}: PropertyTitleInputProps) {
+  const [error, setError] = React.useState<string | undefined>();
+  const [touched, setTouched] = React.useState(false);
+  const hasValue = value !== "" && value !== undefined && value !== null;
+
+  // Validate on change if touched
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    if (touched && validate) {
+      setError(validate(newValue));
+    }
+    onChange?.(e);
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    setTouched(true);
+    if (validate) {
+      setError(validate(String(value || "")));
+    }
+    props.onBlur?.(e);
+  };
+
+  return (
+    <PropertyInput
+      {...props}
+      size="lg"
+      variant="filled"
+      value={value}
+      onChange={handleChange}
+      onBlur={handleBlur}
+      error={error}
+      maxLength={maxLength}
+      showCounter={showCounter}
+      autoFocus={autoFocus}
+      state={error ? "error" : touched && hasValue ? "success" : "default"}
+      className={cn(
+        "font-display font-semibold text-lg",
+        "placeholder:font-normal",
+        props.className
+      )}
+    />
+  );
+}
+
+/**
+ * PropertyTitleField - Internal state version
+ */
+export interface PropertyTitleFieldProps extends Omit<PropertyTitleInputProps, "value" | "onChange"> {
+  initialValue?: string;
+  onChangeValue?: (value: string) => void;
+}
+
+export function PropertyTitleField({
+  initialValue = "",
+  onChangeValue,
+  ...props
+}: PropertyTitleFieldProps) {
+  const [value, setValue] = React.useState(initialValue);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
+    onChangeValue?.(e.target.value);
+  };
+
+  return (
+    <PropertyTitleInput
+      {...props}
+      value={value}
+      onChange={handleChange}
+    />
+  );
+}

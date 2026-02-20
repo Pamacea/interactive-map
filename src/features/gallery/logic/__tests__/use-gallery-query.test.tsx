@@ -1,0 +1,227 @@
+import { renderHook, act, waitFor } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import React from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  useGallery,
+  usePinGallery,
+  useLoreGallery,
+  useUploadGallery,
+  useDeleteGallery,
+  useUpdateGallery,
+  galleryKeys,
+} from "../use-gallery-query";
+
+// Mock server actions
+vi.mock("@/features/gallery", () => ({
+  getGalleryItemsByWorld: vi.fn(),
+  uploadGalleryImage: vi.fn(),
+  deleteGalleryItem: vi.fn(),
+  updateGalleryItem: vi.fn(),
+}));
+
+// Mock cache times
+vi.mock("@/shared/lib/providers", () => ({
+  CACHE_TIMES: {
+    WORLD: 1000 * 60 * 5, // 5 minutes
+  },
+}));
+
+import { getGalleryItemsByWorld, uploadGalleryImage, deleteGalleryItem, updateGalleryItem } from "@/features/gallery";
+
+// Create wrapper
+const createWrapper = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
+
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
+};
+
+describe("galleryKeys", () => {
+  describe("query key factories", () => {
+    it("should create all key", () => {
+      expect(galleryKeys.all).toEqual(["gallery"]);
+    });
+
+    it("should create worlds key", () => {
+      expect(galleryKeys.worlds()).toEqual(["gallery", "worlds"]);
+    });
+
+    it("should create world-specific key", () => {
+      expect(galleryKeys.world("world-123")).toEqual(["gallery", "worlds", "world-123"]);
+    });
+
+    it("should create pin-specific key", () => {
+      expect(galleryKeys.pins("pin-456")).toEqual(["gallery", "pin", "pin-456"]);
+    });
+
+    it("should create lore-specific key", () => {
+      expect(galleryKeys.lore("lore-789")).toEqual(["gallery", "lore", "lore-789"]);
+    });
+  });
+});
+
+describe("useGallery", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should fetch gallery items for a world", async () => {
+    const mockData = [
+      { id: "1", url: "image1.jpg" },
+      { id: "2", url: "image2.jpg" },
+    ] as any[];
+
+    (getGalleryItemsByWorld as any).mockResolvedValue(mockData);
+
+    const { result } = renderHook(() => useGallery("world-123"), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
+
+    expect(getGalleryItemsByWorld).toHaveBeenCalledWith("world-123");
+  });
+
+  it("should be disabled when worldId is empty", () => {
+    const { result } = renderHook(() => useGallery(""), {
+      wrapper: createWrapper(),
+    });
+
+    expect(result.current.fetchStatus).toBe("idle");
+  });
+});
+
+describe("usePinGallery", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should fetch gallery items for a pin", async () => {
+    const mockData = [{ id: "1", url: "image1.jpg" }] as any[];
+    (getGalleryItemsByWorld as any).mockResolvedValue(mockData);
+
+    const { result } = renderHook(() => usePinGallery("pin-456"), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
+
+    expect(getGalleryItemsByWorld).toHaveBeenCalledWith("pin-456");
+  });
+
+  it("should be disabled when pinId is empty", () => {
+    const { result } = renderHook(() => usePinGallery(""), {
+      wrapper: createWrapper(),
+    });
+
+    expect(result.current.fetchStatus).toBe("idle");
+  });
+});
+
+describe("useLoreGallery", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should fetch gallery items for a lore entry", async () => {
+    const mockData = [{ id: "1", url: "image1.jpg" }] as any[];
+    (getGalleryItemsByWorld as any).mockResolvedValue(mockData);
+
+    const { result } = renderHook(() => useLoreGallery("lore-789"), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
+
+    expect(getGalleryItemsByWorld).toHaveBeenCalledWith("lore-789");
+  });
+
+  it("should be disabled when loreId is empty", () => {
+    const { result } = renderHook(() => useLoreGallery(""), {
+      wrapper: createWrapper(),
+    });
+
+    expect(result.current.fetchStatus).toBe("idle");
+  });
+});
+
+describe("useUploadGallery", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should upload gallery image", async () => {
+    const mockResult = {
+      data: {
+        galleryItem: {
+          pin: { gameWorldId: "world-123" },
+        },
+      },
+    };
+
+    (uploadGalleryImage as any).mockResolvedValue(mockResult);
+
+    const { result } = renderHook(() => useUploadGallery(), {
+      wrapper: createWrapper(),
+    });
+
+    await act(async () => {
+      await result.current.mutateAsync({ file: new File([""], "test.jpg") });
+    });
+
+    expect(uploadGalleryImage).toHaveBeenCalled();
+  });
+});
+
+describe("useDeleteGallery", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should delete gallery item", async () => {
+    (deleteGalleryItem as any).mockResolvedValue({ success: true });
+
+    const { result } = renderHook(() => useDeleteGallery(), {
+      wrapper: createWrapper(),
+    });
+
+    await act(async () => {
+      await result.current.mutateAsync("gallery-item-123");
+    });
+
+    expect(deleteGalleryItem).toHaveBeenCalled();
+  });
+});
+
+describe("useUpdateGallery", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should update gallery item", async () => {
+    (updateGalleryItem as any).mockResolvedValue({ success: true });
+
+    const { result } = renderHook(() => useUpdateGallery(), {
+      wrapper: createWrapper(),
+    });
+
+    await act(async () => {
+      await result.current.mutateAsync({ id: "gallery-item-123", caption: "Updated" });
+    });
+
+    expect(updateGalleryItem).toHaveBeenCalled();
+  });
+});

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { generateMissingSlugs } from "@/actions/migrations";
+import { generateMissingSlugs } from "@/features/migrations";
 
 /**
  * Generate slugs for existing entities

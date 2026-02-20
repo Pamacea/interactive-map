@@ -1,8 +1,8 @@
-import { WorldClient } from "@/components/world/ui/world-client";
-import { getWorldWithData } from "@/actions/worlds";
-import { getLoreEntriesByWorld } from "@/actions/lore";
-import { getCharactersByWorld } from "@/actions/characters";
-import { auth } from "@/lib/auth";
+import { WorldClient } from "@/features/world-editor/ui/world-client";
+import { getWorldWithData } from "@/features/worlds";
+import { getLoreEntriesByWorld } from "@/features/lore";
+import { getCharactersByWorld } from "@/features/characters";
+import { auth } from "@/shared/lib/auth";
 import { notFound } from "next/navigation";
 import type { Pin } from "@/types/pin.type";
 import type { LoreEntry } from "@/types/lore.type";

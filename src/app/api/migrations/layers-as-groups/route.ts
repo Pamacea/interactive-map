@@ -7,10 +7,8 @@
  * to the new "layers as groups" architecture.
  */
 
-import { POST } from "@/actions/migrations/migrate-layers-as-groups";
-import { getAuthenticatedUser } from "@/lib/server-helpers";
-
-export { POST };
+import { migrateLayersAsGroups } from "@/features/migrations";
+import { getAuthenticatedUser } from "@/shared/lib/server-helpers";
 
 // Restrict to admin users only
 export async function GET() {
@@ -37,6 +35,53 @@ export async function GET() {
         error: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 401 }
+    );
+  }
+}
+
+export async function POST() {
+  try {
+    const user = await getAuthenticatedUser();
+
+    // Check if user is admin
+    // @ts-ignore - role exists on User
+    if (user.role !== "ADMIN") {
+      return Response.json(
+        { success: false, error: "Unauthorized. Admin access required." },
+        { status: 403 }
+      );
+    }
+
+    const result = await migrateLayersAsGroups();
+
+    if (!result.success) {
+      console.error("[Migration] Failed:", result.error);
+      return Response.json(
+        { success: false, error: "Migration failed" },
+        { status: 500 }
+      );
+    }
+
+    return Response.json({
+      success: true,
+      message: "Layers as groups migration completed successfully",
+      data: result.data,
+    });
+  } catch (error: unknown) {
+    console.error("[Migration] Unexpected error:", error);
+
+    if (
+      error &&
+      typeof error === "object" &&
+      "message" in error &&
+      error.message === "Unauthorized"
+    ) {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    return Response.json(
+      { error: "Internal server error" },
+      { status: 500 }
     );
   }
 }

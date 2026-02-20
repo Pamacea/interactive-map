@@ -1,5 +1,5 @@
-import type { PinWithLayer } from "@/components/world/logic/use-pins-filtering";
-import type { Transform } from "@/components/world/logic/use-map-pan";
+import type { PinWithLayer } from "@/features/world-editor/logic/use-pins-filtering";
+import type { Transform } from "@/features/world-editor/logic/use-map-pan";
 import type { MapLayer } from "@/types/world.type";
 
 /**

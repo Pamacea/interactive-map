@@ -4,8 +4,8 @@ import { siteConfig } from "@/config/site"
 // Helper to fetch public worlds for sitemap
 async function getPublicWorlds() {
   try {
-    const { db } = await import("@/lib/db")
-    const worlds = await db.gameWorld.findMany({
+    const { prisma } = await import("@/shared/lib/prisma")
+    const worlds = await prisma.gameWorld.findMany({
       where: {
         isPublished: true,
         isPublic: true,

@@ -1,6 +1,6 @@
-import { AppHeader } from "@/components/ui/app-header";
-import { Footer } from "@/components/home/ui/footer";
-import { FloatingParticles } from "@/components/ui/particles";
+import { AppHeader } from "@/shared/ui/app-header";
+import { Footer } from "@/features/home/ui/footer";
+import { FloatingParticles } from "@/shared/ui/particles";
 
 export default function TermsPage() {
   return (

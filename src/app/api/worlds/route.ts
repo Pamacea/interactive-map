@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { getAuthenticatedUser } from "@/lib/server-helpers";
+import { prisma } from "@/shared/lib/prisma";
+import { getAuthenticatedUser } from "@/shared/lib/server-helpers";
 import { z } from "zod";
 
 // Validation schema for world creation

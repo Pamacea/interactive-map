@@ -1,0 +1,316 @@
+/**
+ * Performance testing utilities for validating MemoizedPinMarker
+ *
+ * Usage:
+ * 1. Import in your component
+ * 2. Wrap component with <PerformanceMonitor>
+ * 3. Check console for render counts
+ *
+ * Example:
+ * ```tsx
+ * import { PerformanceMonitor, useRenderCount } from '@/shared/lib/performance-test-utils'
+ *
+ * function MyComponent() {
+ *   const renders = useRenderCount('MyComponent')
+ *   return <div>Renders: {renders}</div>
+ * }
+ */
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+
+/**
+ * Hook to track render counts for a component
+ * Useful for verifying memo optimization is working
+ *
+ * @param componentName - Name of component for logging
+ * @returns Current render count
+ */
+export function useRenderCount(componentName: string): number {
+  const rendersRef = useRef(0);
+  const [renderCount, setRenderCount] = useState(0);
+
+  useEffect(() => {
+    rendersRef.current += 1;
+    setRenderCount(rendersRef.current);
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log(
+        `[Performance] ${componentName} rendered (count: ${rendersRef.current})`
+      );
+    }
+  });
+
+  return renderCount;
+}
+
+/**
+ * Hook to track why a component re-rendered
+ * Helps identify which prop changes caused re-render
+ *
+ * @param componentName - Name of component for logging
+ * @param props - Current props to track
+ */
+export function useRenderTracker<T extends Record<string, any>>(
+  componentName: string,
+  props: T
+): void {
+  const prevPropsRef = useRef<T>(props);
+
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'development') return;
+
+    const changedProps: string[] = [];
+    const prevProps = prevPropsRef.current;
+
+    for (const key in props) {
+      if (props[key] !== prevProps[key]) {
+        changedProps.push(key);
+      }
+    }
+
+    if (changedProps.length > 0) {
+      console.log(
+        `[Performance] ${componentName} re-rendered due to changed props:`,
+        changedProps
+      );
+    }
+
+    prevPropsRef.current = props;
+  });
+}
+
+/**
+ * Performance boundary wrapper
+ * Measures render time for children
+ */
+export function PerformanceMonitor({
+  name,
+  children,
+  logThreshold = 16, // Log if render takes >16ms (60fps threshold)
+}: {
+  name: string;
+  children: React.ReactNode;
+  logThreshold?: number;
+}) {
+  const startTimeRef = useRef<number>(0);
+  const [, setRenderKey] = useState(0);
+
+  // Set start time using useEffect to avoid ref access during render
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      startTimeRef.current = performance.now();
+    }
+
+    return () => {
+      if (process.env.NODE_ENV !== 'development') return;
+
+      const endTime = performance.now();
+      const renderTime = endTime - startTimeRef.current;
+
+      if (renderTime > logThreshold) {
+        console.warn(
+          `[Performance] Slow render detected in ${name}: ${renderTime.toFixed(2)}ms (threshold: ${logThreshold}ms)`
+        );
+      }
+    };
+  }, [name, logThreshold]);
+
+  return <>{children}</>;
+}
+
+/**
+ * FPS counter component
+ * Displays real-time frame rate during interactions
+ */
+export function FPSCounter() {
+  const [fps, setFps] = useState(60);
+  const framesRef = useRef(0);
+  const isInitializedRef = useRef(false);
+
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'development') return;
+
+    // Initialize lastTime in useEffect to avoid impure call during render
+    if (!isInitializedRef.current) {
+      isInitializedRef.current = true;
+    }
+
+    let rafId: number;
+    let lastTime = performance.now();
+
+    function updateFPS() {
+      const now = performance.now();
+      framesRef.current++;
+
+      if (now >= lastTime + 1000) {
+        setFps(Math.round((framesRef.current * 1000) / (now - lastTime)));
+        framesRef.current = 0;
+        lastTime = now;
+      }
+
+      rafId = requestAnimationFrame(updateFPS);
+    }
+
+    rafId = requestAnimationFrame(updateFPS);
+
+    return () => cancelAnimationFrame(rafId);
+  }, [isInitialized]);
+
+  if (process.env.NODE_ENV !== 'development') {
+    return null;
+  }
+
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        bottom: 10,
+        right: 10,
+        background: 'rgba(0, 0, 0, 0.8)',
+        color: fps >= 55 ? '#4ade80' : fps >= 30 ? '#fbbf24' : '#ef4444',
+        padding: '8px 12px',
+        borderRadius: '6px',
+        fontFamily: 'monospace',
+        fontSize: '14px',
+        fontWeight: 'bold',
+        zIndex: 9999,
+        pointerEvents: 'none',
+      }}
+    >
+      {fps} FPS
+    </div>
+  );
+}
+
+/**
+ * Log performance metrics for a batch operation
+ * Useful for testing bulk operations like loading 100 pins
+ */
+export class PerformanceLogger {
+  private startTime: number;
+  private markers: Map<string, number>;
+
+  constructor(operation: string) {
+    this.startTime = performance.now();
+    this.markers = new Map();
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[Performance] Started operation: ${operation}`);
+    }
+  }
+
+  /**
+   * Mark a checkpoint within the operation
+   */
+  mark(markerName: string): void {
+    const time = performance.now();
+    this.markers.set(markerName, time - this.startTime);
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log(
+        `[Performance] Checkpoint "${markerName}": ${(time - this.startTime).toFixed(2)}ms`
+      );
+    }
+  }
+
+  /**
+   * End the operation and log summary
+   */
+  end(): void {
+    const totalTime = performance.now() - this.startTime;
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[Performance] Operation completed in ${totalTime.toFixed(2)}ms`);
+
+      if (this.markers.size > 0) {
+        console.table(
+          Array.from(this.markers.entries()).map(([name, time]) => ({
+            Checkpoint: name,
+            'Time (ms)': time.toFixed(2),
+            '% of Total': ((time / totalTime) * 100).toFixed(1),
+          }))
+        );
+      }
+    }
+  }
+}
+
+/**
+ * Utility to measure render count changes during an operation
+ *
+ * Example:
+ * ```tsx
+ * const { getRenderCounts, compareRenderCounts } = useRenderTracker()
+ *
+ * // Before operation
+ * const before = getRenderCounts()
+ *
+ * // Perform operation
+ * await someAsyncOperation()
+ *
+ * // After operation
+ * const report = compareRenderCounts(before)
+ * ```
+ */
+export function usePerformanceTracker() {
+  const [renderCounts, setRenderCounts] = useState<Record<string, number>>({});
+
+  const getRenderCounts = () => ({ ...renderCounts });
+
+  const updateRenderCount = (componentName: string) => {
+    setRenderCounts((prev) => ({
+      ...prev,
+      [componentName]: (prev[componentName] || 0) + 1,
+    }));
+  };
+
+  const compareRenderCounts = (before: Record<string, number>) => {
+    const after = renderCounts;
+    const report: Record<string, { before: number; after: number; delta: number }> = {};
+
+    const allKeys = new Set([...Object.keys(before), ...Object.keys(after)]);
+
+    allKeys.forEach((key) => {
+      const beforeCount = before[key] || 0;
+      const afterCount = after[key] || 0;
+      report[key] = {
+        before: beforeCount,
+        after: afterCount,
+        delta: afterCount - beforeCount,
+      };
+    });
+
+    return report;
+  };
+
+  return {
+    renderCounts,
+    updateRenderCount,
+    getRenderCounts,
+    compareRenderCounts,
+  };
+}
+
+/**
+ * Development-mode performance testing helper
+ * Wrap any function to measure its execution time
+ */
+export function measurePerformance<T extends (...args: any[]) => any>(
+  fn: T,
+  name: string = fn.name
+): T {
+  if (process.env.NODE_ENV !== 'development') {
+    return fn;
+  }
+
+  return ((...args: any[]) => {
+    const start = performance.now();
+    const result = fn(...args);
+    const end = performance.now();
+
+    console.log(`[Performance] ${name} took ${(end - start).toFixed(2)}ms`);
+
+    return result;
+  }) as T;
+}

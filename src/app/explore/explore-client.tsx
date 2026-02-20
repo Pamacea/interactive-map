@@ -2,12 +2,12 @@
 
 import { useState, useMemo, memo, useCallback, useEffect } from "react";
 import { Search } from "lucide-react";
-import { FilterSidebar } from "@/components/explore/ui/filter-sidebar";
-import { ResultsHeader } from "@/components/explore/ui/results-header";
-import { WorldsGrid } from "@/components/explore/ui/worlds-grid";
-import { useExploreFilters } from "@/components/explore/logic/use-explore-filters";
-import { filterWorlds } from "@/components/explore/methods/filter-worlds";
-import { useDebounce } from "@/hooks/use-debounce";
+import { FilterSidebar } from "@/features/explore/ui/filter-sidebar";
+import { ResultsHeader } from "@/features/explore/ui/results-header";
+import { WorldsGrid } from "@/features/explore/ui/worlds-grid";
+import { useExploreFilters } from "@/features/explore/logic/use-explore-filters";
+import { filterWorlds } from "@/features/explore/methods/filter-worlds";
+import { useDebounce } from "@/shared/hooks/use-debounce";
 import type { GameWorld } from "@/types/world.type";
 
 export const ExploreClient = memo(function ExploreClient({ initialWorlds }: { initialWorlds: GameWorld[] }) {

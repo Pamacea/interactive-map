@@ -5,16 +5,16 @@ import { useRouter } from "next/navigation";
 import { useEffect, lazy, Suspense, useMemo } from "react";
 import { Sparkles, Plus, AlertCircle, Crown } from "lucide-react";
 import Link from "next/link";
-import { CrownButton } from "@/components/ui/crown-button";
-import { AppHeader } from "@/components/ui/app-header";
-import { Footer } from "@/components/home/ui/footer";
-import { WorldCard } from "@/components/ui/world-card";
-import { SkeletonGrid } from "@/components/ui/skeleton";
-import { useMyWorlds } from "@/components/worlds/logic/use-my-worlds";
+import { CrownButton } from "@/shared/ui/crown-button";
+import { AppHeader } from "@/shared/ui/app-header";
+import { Footer } from "@/features/home/ui/footer";
+import { WorldCard } from "@/shared/ui/world-card";
+import { SkeletonGrid } from "@/shared/ui/skeleton";
+import { useMyWorlds } from "@/features/worlds/logic/use-my-worlds";
 
 // Lazy load particles for better performance
 const FloatingParticles = lazy(() =>
-  import("@/components/ui/particles").then(m => ({ default: m.FloatingParticles }))
+  import("@/shared/ui/particles").then(m => ({ default: m.FloatingParticles }))
 );
 
 export default function MyWorldsPage() {

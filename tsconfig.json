@@ -54,8 +54,8 @@
       "@/store/*": [
         "./src/store/*"
       ],
-      "@/stores/*": [
-        "./src/stores/*"
+      "@/features/*": [
+        "./src/features/*"
       ]
     },
     "target": "ES2017"

@@ -5,7 +5,7 @@ import {
   createLoreEntry as createLoreAction,
   deleteLoreEntry as deleteLoreAction,
   updateLoreEntry as updateLoreAction,
-} from "@/actions/lore";
+} from "@/features/lore";
 
 // UI State for lore interactions
 export interface LoreUIState {

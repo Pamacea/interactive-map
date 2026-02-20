@@ -1,8 +1,8 @@
-import { getLoreEntryBySlug, getLoreEntriesByWorld } from "@/actions/lore";
-import { getWorldWithData } from "@/actions/worlds";
-import { auth } from "@/lib/auth";
+import { getLoreEntryBySlug, getLoreEntriesByWorld } from "@/features/lore";
+import { getWorldWithData } from "@/features/worlds";
+import { auth } from "@/shared/lib/auth";
 import { notFound } from "next/navigation";
-import { LoreDetailClient } from "@/components/lore/ui/lore-detail-client";
+import { LoreDetailClient } from "@/features/lore/ui/lore-detail-client";
 import type { Metadata } from "next";
 import { siteConfig } from "@/config/site";
 import { ArticleSchema } from "@/shared/components/seo";
