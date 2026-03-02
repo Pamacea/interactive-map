@@ -10,6 +10,7 @@ import { BottomBar } from "./bottom-bar";
 import { MiniMap } from "./mini-map";
 import { useHistoryStore } from "@/features/world-editor/store/history-store";
 import { useMapStore } from "@/features/world-editor/store/map-store";
+import { useToast } from "@/shared/hooks/use-toast";
 import type { ScaleOption } from "./scale-selector";
 
 export interface BarsContainerProps {
@@ -28,6 +29,7 @@ export function BarsContainer({ mapImage, _worldId, onHelpToggle }: BarsContaine
   const canRedo = useHistoryStore((state) => state.future.length > 0);
   const undo = useHistoryStore((state) => state.undo);
   const redo = useHistoryStore((state) => state.redo);
+  const { showToast } = useToast();
 
   // Local state for scale option
   const [scaleOption, setScaleOption] = useState<ScaleOption>("1:100");
@@ -66,20 +68,24 @@ export function BarsContainer({ mapImage, _worldId, onHelpToggle }: BarsContaine
   );
 
   // Handle undo
-  const handleUndo = useCallback(() => {
+  const handleUndo = useCallback(async () => {
     const entry = undo();
     if (entry) {
-      // TODO: Implement actual undo logic based on entry type
+      // The actual undo logic is executed by the entry.undo() function
+      // Just show feedback to the user
+      showToast("Action undone", "success");
     }
-  }, [undo]);
+  }, [undo, showToast]);
 
   // Handle redo
-  const handleRedo = useCallback(() => {
+  const handleRedo = useCallback(async () => {
     const entry = redo();
     if (entry) {
-      // TODO: Implement actual redo logic based on entry type
+      // The actual redo logic is executed by the entry.redo() function
+      // Just show feedback to the user
+      showToast("Action redone", "success");
     }
-  }, [redo]);
+  }, [redo, showToast]);
 
   // Transform state for mini-map (sync with map pan)
   const [transform, setTransform] = useState({

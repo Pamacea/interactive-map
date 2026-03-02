@@ -32,6 +32,7 @@ import { useMapExport } from "@/features/export/utils/use-map-export-context";
 import { ExportDialog } from "@/features/export/ui/export-dialog";
 import { getWorldExportData } from "@/features/export/actions";
 import type { WorldExportData } from "@/features/export/actions";
+import { useToast } from "@/shared/hooks/use-toast";
 
 const GENESIS_LOGO = (
   <div className="flex items-center gap-2">
@@ -87,8 +88,8 @@ function ActionMenu({
     const url = window.location.href;
     navigator.clipboard.writeText(url);
     setIsOpen(false);
-    // TODO: Show toast notification
-  }, []);
+    showToast("Link copied to clipboard", "success");
+  }, [showToast]);
 
   const handleSignOut = useCallback(async () => {
     await signOut({ callbackUrl: "/login" });
@@ -207,6 +208,7 @@ export const TopBar = memo(function TopBar({
   const { getMapElement } = useMapExport();
   const [exportOpen, setExportOpen] = useState(false);
   const [worldData, setWorldData] = useState<WorldExportData | null>(null);
+  const { showToast } = useToast();
 
   // Prevent map interactions when interacting with the top bar
   const handleInteraction = useCallback((e: React.MouseEvent | React.TouchEvent) => {
