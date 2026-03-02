@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { X, Trash2, MapPin, Edit3, Check } from "lucide-react";
+import { X, Trash2, MapPin, Edit3, Check, Copy } from "lucide-react";
 import { cn } from "@/shared/utils";
 import type { Pin } from "@prisma/client";
 import { Button } from "@/shared/ui/button";
@@ -10,12 +10,14 @@ import { stopPropagation } from "@/shared/lib/event-manager";
 import { getPinEmoji } from "../utils/pin-popup-utils";
 import { useFocusReturn } from "@/shared/hooks/accessibility";
 import { useEventCapture } from "@/shared/hooks/use-event-capture";
+import { duplicatePin } from "@/features/pins/actions/duplicate";
 
 interface PinPopupProps {
   pin: Pin;
-  _worldId?: string;
+  worldId?: string;
   onClose?: () => void;
   onDelete?: () => void;
+  onDuplicate?: () => void;
   onTitleChange?: (newTitle: string) => void;
   onDescriptionChange?: (newDescription: string) => void;
   _onIconChange?: (newIcon: string) => void;
@@ -25,9 +27,10 @@ export type { PinPopupProps };
 
 export function PinPopup({
   pin,
-  _worldId,
+  worldId,
   onClose,
   onDelete,
+  onDuplicate,
   onTitleChange,
   onDescriptionChange,
   _onIconChange,
@@ -73,6 +76,18 @@ export function PinPopup({
       onDescriptionChange?.(editedDesc);
     }
     setIsEditingDesc(false);
+  };
+
+  const handleDuplicate = async () => {
+    try {
+      const result = await duplicatePin(pin.id);
+      if (result.success) {
+        onDuplicate?.();
+        onClose?.();
+      }
+    } catch (error) {
+      console.error("Failed to duplicate pin:", error);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent, action: () => void) => {
@@ -171,6 +186,15 @@ export function PinPopup({
 
           {/* Actions */}
           <div className="flex items-center gap-0.5 flex-shrink-0 -mr-1">
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={handleDuplicate}
+              className="h-8 w-8 text-text-muted hover:text-accent-gold hover:bg-accent-gold/10"
+              aria-label="Duplicate pin"
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
             {onDelete && (
               <Button
                 size="icon"

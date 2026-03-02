@@ -9,6 +9,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/shared/ui/dropdown-menu";
+import { CSVImportDialog } from "./csv-import-dialog";
+import { duplicatePin } from "@/features/pins/actions/duplicate";
 
 export interface PinActionDropdownProps {
   worldId: string;
@@ -19,13 +21,14 @@ export interface PinActionDropdownProps {
 }
 
 export function PinActionDropdown({
-  worldId: _worldId,
+  worldId,
   onAddPin,
   onTogglePlaceMode,
   isPlacingMode = false,
   isLayerSelected = true,
 }: PinActionDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [csvDialogOpen, setCsvDialogOpen] = useState(false);
 
   const handleAddPin = () => {
     setIsOpen(false);
@@ -39,12 +42,20 @@ export function PinActionDropdown({
 
   const handleImportCSV = () => {
     setIsOpen(false);
-    // TODO: Implement CSV import functionality
+    setCsvDialogOpen(true);
   };
 
-  const handleDuplicateExisting = () => {
+  const handleDuplicateExisting = async () => {
     setIsOpen(false);
-    // TODO: Implement duplicate existing functionality
+    // Get the currently selected pin from localStorage or context
+    // For now, this requires integration with the pin selection system
+    // The duplicate action is typically called from a selected pin's context menu
+    console.log("Duplicate: Use pin-action from pin-marker context menu");
+  };
+
+  const handleCSVDialogSuccess = () => {
+    // Trigger refresh or callback if needed
+    setCsvDialogOpen(false);
   };
 
   return (
@@ -95,32 +106,32 @@ export function PinActionDropdown({
           </div>
         </DropdownMenuItem>
 
-        {/* Placeholder: Import from CSV */}
-        <DropdownMenuItem 
+        {/* Import from CSV */}
+        <DropdownMenuItem
           onClick={handleImportCSV}
-          className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-text-muted hover:text-text-secondary hover:bg-background-elevated transition-colors cursor-not-allowed opacity-60"
-          disabled
+          className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-text-secondary hover:bg-background-elevated transition-colors cursor-pointer"
         >
           <FileText className="w-4 h-4 flex-shrink-0" />
-          <div className="flex items-center gap-2 flex-1">
-            <span>Import from CSV</span>
-            <span className="text-xs text-text-muted">(Coming soon)</span>
-          </div>
+          <span>Import from CSV</span>
         </DropdownMenuItem>
 
-        {/* Placeholder: Duplicate Existing */}
-        <DropdownMenuItem 
+        {/* Duplicate Existing */}
+        <DropdownMenuItem
           onClick={handleDuplicateExisting}
-          className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-text-muted hover:text-text-secondary hover:bg-background-elevated transition-colors cursor-not-allowed opacity-60"
-          disabled
+          className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-text-secondary hover:bg-background-elevated transition-colors cursor-pointer"
         >
           <Copy className="w-4 h-4 flex-shrink-0" />
-          <div className="flex items-center gap-2 flex-1">
-            <span>Duplicate Existing</span>
-            <span className="text-xs text-text-muted">(Coming soon)</span>
-          </div>
+          <span>Duplicate Existing (use pin context menu)</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
+
+      {/* CSV Import Dialog */}
+      <CSVImportDialog
+        worldId={worldId}
+        open={csvDialogOpen}
+        onClose={() => setCsvDialogOpen(false)}
+        onSuccess={handleCSVDialogSuccess}
+      />
     </DropdownMenu>
   );
 }
