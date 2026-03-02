@@ -61,13 +61,13 @@ export function useLoreGallery(loreId: string) {
  * Invalidates gallery queries on success
  */
 export function useUploadGallery() {
-  const _queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: uploadGalleryImage,
     onSuccess: (result) => {
       // Get worldId from the result data
-      const _worldId = result.data?.galleryItem?.pin?.gameWorldId ??
+      const worldId = result.data?.galleryItem?.pin?.gameWorldId ??
         result.data?.galleryItem?.loreEntry?.gameWorldId;
 
       if (worldId) {
@@ -82,7 +82,7 @@ export function useUploadGallery() {
  * Invalidates gallery queries on success
  */
 export function useDeleteGallery() {
-  const _queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: deleteGalleryItemAction,
@@ -98,7 +98,7 @@ export function useDeleteGallery() {
  * Invalidates gallery queries on success
  */
 export function useUpdateGallery() {
-  const _queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: updateGalleryItemAction,

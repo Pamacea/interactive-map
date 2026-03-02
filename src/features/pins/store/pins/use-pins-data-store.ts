@@ -135,13 +135,14 @@ export const usePinsDataStore = create<PinDataStore>()(
         get().addPin(optimisticPin);
 
         // Server call
-        const _result = await createPinAction(data);
+        const result = await createPinAction(data);
 
         // Roll back on failure
         if (!result.success) {
           get().deletePin(tempId);
-          get().setError(result.error.message);
-          throw new Error(result.error.message);
+          const errorMessage = result.error?.message ?? (typeof result.error === 'string' ? result.error : undefined) ?? "Failed to create pin";
+          get().setError(errorMessage);
+          throw new Error(errorMessage);
         }
 
         const createdPin = { ...result.data.pin, gameWorldId: data.gameWorldId } as Pin;
@@ -206,13 +207,14 @@ export const usePinsDataStore = create<PinDataStore>()(
         get().deletePin(pinId);
 
         // Server call
-        const _result = await deletePinAction(pinId);
+        const result = await deletePinAction(pinId);
 
         // Roll back on failure
         if (!result.success) {
           get().addPin(pinToDelete);
-          get().setError(result.error.message);
-          throw new Error(result.error.message);
+          const errorMessage = result.error?.message ?? (typeof result.error === 'string' ? result.error : undefined) ?? "Failed to delete pin";
+          get().setError(errorMessage);
+          throw new Error(errorMessage);
         }
 
         // Add history entry for undo
@@ -272,13 +274,14 @@ export const usePinsDataStore = create<PinDataStore>()(
         get().updatePin(data.id, data as Partial<Pin>);
 
         // Server call
-        const _result = await updatePinAction(data);
+        const result = await updatePinAction(data);
 
         // Roll back on failure
         if (!result.success) {
           get().updatePin(data.id, pinBeforeUpdate);
-          get().setError(result.error.message);
-          throw new Error(result.error.message);
+          const errorMessage = result.error?.message ?? (typeof result.error === 'string' ? result.error : undefined) ?? "Failed to update pin";
+          get().setError(errorMessage);
+          throw new Error(errorMessage);
         }
 
         // Add history entry for undo (only if there are actual changes)

@@ -51,8 +51,8 @@ function getRegionStyle(
 
   // Apply layer transforms
   const _layerScale = region.layerScale ?? 1;
-  const _layerOffsetX = region.layerOffsetX ?? 0;
-  const _layerOffsetY = region.layerOffsetY ?? 0;
+  const layerOffsetX = region.layerOffsetX ?? 0;
+  const layerOffsetY = region.layerOffsetY ?? 0;
   const _layerOpacity = region.layerOpacity ?? 1;
 
   // Null safety for region properties
@@ -141,8 +141,8 @@ function getPolygonPoints(
 
   // Apply layer transforms with null safety
   const _layerScale = region.layerScale ?? 1;
-  const _layerOffsetX = region.layerOffsetX ?? 0;
-  const _layerOffsetY = region.layerOffsetY ?? 0;
+  const layerOffsetX = region.layerOffsetX ?? 0;
+  const layerOffsetY = region.layerOffsetY ?? 0;
 
   const combinedScale = scale * layerScale;
   const combinedX = translateX + layerOffsetX * scale;

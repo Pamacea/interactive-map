@@ -4,11 +4,26 @@
  * Displays:
  * - Selection rectangle while dragging
  * - Selected pins count
+ * - Area dimensions and total area
  * - Snap hints
  */
 
 import { memo } from "react";
-import { useSelectionRect, useSelectedPinIds } from "@/features/tools";
+import { useSelectionRect, useSelectedPinIds } from "@/features/world-editor/store/tools";
+
+/**
+ * Calculate the area of a rectangle
+ */
+function calculateArea(width: number, height: number): number {
+  return Math.abs(width * height);
+}
+
+/**
+ * Format area number with thousand separators
+ */
+function formatArea(area: number): string {
+  return area.toLocaleString('en-US', { maximumFractionDigits: 0 });
+}
 
 export const SelectionRectangle = memo(function SelectionRectangle() {
   const selectionRect = useSelectionRect();
@@ -20,6 +35,7 @@ export const SelectionRectangle = memo(function SelectionRectangle() {
   const y = Math.min(selectionRect.startY, selectionRect.endY);
   const width = Math.abs(selectionRect.endX - selectionRect.startX);
   const height = Math.abs(selectionRect.endY - selectionRect.startY);
+  const area = calculateArea(width, height);
 
   return (
     <svg
@@ -70,19 +86,55 @@ export const SelectionRectangle = memo(function SelectionRectangle() {
 
       {/* Dimensions */}
       {(width > 30 || height > 30) && (
-        <text
-          x={x + width / 2}
-          y={y + height + 20}
-          fill="#b0b0b0"
-          fontSize={11}
-          textAnchor="middle"
-          className="font-mono"
-          style={{
-            textShadow: "0 1px 2px rgba(0,0,0,0.8)",
-          }}
-        >
-          {Math.round(width)} × {Math.round(height)} px
-        </text>
+        <g>
+          {/* Width × Height */}
+          <text
+            x={x + width / 2}
+            y={y + height + 20}
+            fill="#b0b0b0"
+            fontSize={11}
+            textAnchor="middle"
+            className="font-mono"
+            style={{
+              textShadow: "0 1px 2px rgba(0,0,0,0.8)",
+            }}
+          >
+            {Math.round(width)} × {Math.round(height)} px
+          </text>
+
+          {/* Area display */}
+          {width > 80 && height > 50 && (
+            <g>
+              {/* Background box for area */}
+              <rect
+                x={x + width / 2 - 70}
+                y={y + height + 30}
+                width={140}
+                height={24}
+                rx={4}
+                fill="rgba(244, 208, 63, 0.15)"
+                stroke="#f4d03f"
+                strokeWidth={1}
+                strokeDasharray="2,2"
+              />
+              {/* Area text */}
+              <text
+                x={x + width / 2}
+                y={y + height + 46}
+                fill="#f4d03f"
+                fontSize={12}
+                fontWeight="600"
+                textAnchor="middle"
+                className="font-mono"
+                style={{
+                  textShadow: "0 1px 3px rgba(0,0,0,0.9)",
+                }}
+              >
+                Area: {formatArea(area)} px²
+              </text>
+            </g>
+          )}
+        </g>
       )}
     </svg>
   );

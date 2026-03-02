@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useMapStore } from "@/features/map-store";
+import { useMapStore } from "@/stores/map-store";
 import type { OptimizedWorldLayer } from "@/types/world.type";
 
 interface UseLayersPanelProps {
@@ -20,10 +20,11 @@ interface AddLayerData {
 }
 
 export function useLayersPanel({ worldId, worldLayers: _worldLayers = [] }: UseLayersPanelProps) {
-  const _router = useRouter();
+  const router = useRouter();
 
   // Store selectors
   const _layers = useMapStore((state) => state.layers);
+  const layers = _layers; // Alias for consistency
   const toggleLayerVisibility = useMapStore((state) => state.toggleLayerVisibility);
   const toggleLayerLock = useMapStore((state) => state.toggleLayerLock);
   const updateLayerOpacity = useMapStore((state) => state.updateLayerOpacity);
@@ -42,7 +43,7 @@ export function useLayersPanel({ worldId, worldLayers: _worldLayers = [] }: UseL
   const sortedLayers = [...layers].sort((a, b) => b.zIndex - a.zIndex);
 
   // Handlers
-  const _handleToggleVisibility = useCallback((layerId: string) => {
+  const handleToggleVisibility = useCallback((layerId: string) => {
     toggleLayerVisibility(layerId);
   }, [toggleLayerVisibility]);
 
@@ -90,7 +91,7 @@ export function useLayersPanel({ worldId, worldLayers: _worldLayers = [] }: UseL
   // eslint-disable-next-line react-hooks/exhaustive-deps -- Zustand store values are stable
   }, [newLayerName, layers, addLayer]);
 
-  const _handleDeleteLayer = useCallback((layerId: string) => {
+  const handleDeleteLayer = useCallback((layerId: string) => {
     // Prevent deleting the base map layer
     const layer = layers.find((l) => l.id === layerId);
     if (layer?.isBaseMap) return;
@@ -99,7 +100,7 @@ export function useLayersPanel({ worldId, worldLayers: _worldLayers = [] }: UseL
   // eslint-disable-next-line react-hooks/exhaustive-deps -- Zustand store values are stable
   }, [removeLayer, layers]);
 
-  const _handleCancelDelete = useCallback(() => {
+  const handleCancelDelete = useCallback(() => {
     setShowDeleteConfirm(null);
   }, []);
 
@@ -116,7 +117,7 @@ export function useLayersPanel({ worldId, worldLayers: _worldLayers = [] }: UseL
     setShowDeleteConfirm(layerId);
   }, []);
 
-  const _handleOpenUploadDialog = useCallback(() => {
+  const handleOpenUploadDialog = useCallback(() => {
     setShowUploadDialog(true);
   }, []);
 

@@ -3,10 +3,7 @@
 // import Link from "next/link";
 import { ArrowRight, Map } from "lucide-react";
 import { CrownButton } from "@/shared/ui/crown-button";
-import { useState } from "react";
-
-// Unused import for potential future animation
-// import { useEffect } from "react";
+import { useState, useEffect } from "react";
 
 const stats = [
   { value: "10K+", label: "Worlds" },

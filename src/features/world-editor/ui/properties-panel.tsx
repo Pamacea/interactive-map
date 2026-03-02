@@ -4,7 +4,7 @@ import {
   useGrid,
   useSnap,
   useMapStore,
-} from "@/features/map-store";
+} from "@/stores/map-store";
 import { PinPropertiesSection } from "./pin-properties-section";
 import { MapPropertiesSection } from "./map-properties-section";
 import { usePropertiesPanel } from "../logic/use-properties-panel";

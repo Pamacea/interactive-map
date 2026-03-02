@@ -9,7 +9,7 @@ export function useComments(worldId: string, pinId?: string, enabled = true) {
     queryKey: ['comments', worldId, pinId],
     queryFn: async () => {
       try {
-        const _result = await getWorldComments({ worldId, pinId });
+        const result = await getWorldComments({ worldId, pinId });
         if (!result.success) {
           // For auth errors, return empty array
           // This allows the UI to show "No comments" instead of crashing
@@ -50,7 +50,7 @@ export function useCommentStats(worldId: string, pinId?: string) {
     queryKey: ['comment-stats', worldId, pinId],
     queryFn: async () => {
       try {
-        const _result = await getCommentStats({ worldId, pinId });
+        const result = await getCommentStats({ worldId, pinId });
         if (!result.success) {
           if (result.error?.code === 'AUTHENTICATION_ERROR') {
             return { total: 0, unresolved: 0 };

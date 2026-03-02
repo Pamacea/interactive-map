@@ -3,20 +3,50 @@
  */
 
 import { describe, it, expect } from "vitest";
-import type { Pin } from "@prisma/client";
-import { PinType } from "@/types/pin.type";
+import { PinType, IconShape } from "@prisma/client";
 import * as selectors from "../pin-selectors";
+
+// Type qui correspond au modèle Prisma Pin
+type TestPin = {
+  id: string;
+  title: string;
+  slug: string | null;
+  description: string | null;
+  pinType: PinType;
+  latitude: number;
+  longitude: number;
+  icon: string | null;
+  color: string;
+  size: number;
+  opacity: number;
+  isVisible: boolean;
+  minZoom: number;
+  maxZoom: number;
+  properties: unknown | null;
+  customIcon: string | null;
+  iconShape: IconShape;
+  iconSize: number;
+  iconBackground: string | null;
+  userId: string;
+  gameWorldId: string;
+  layerId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 describe("Pin Selectors", () => {
   // ============================================================================
   // Test Data
   // ============================================================================
 
-  const mockPins: Pin[] = [
+  const mockPins: TestPin[] = [
     {
       id: "1",
       title: "Capital City",
+      slug: null,
+      description: null,
       gameWorldId: "world1",
+      userId: "user1",
       latitude: 100,
       longitude: 100,
       pinType: PinType.CITY,
@@ -26,14 +56,23 @@ describe("Pin Selectors", () => {
       minZoom: 0,
       maxZoom: 200,
       layerId: "layer1",
-      order: 1,
+      icon: null,
+      color: "#c9a227",
+      properties: null,
+      customIcon: null,
+      iconShape: IconShape.CIRCLE,
+      iconSize: 32,
+      iconBackground: null,
       createdAt: new Date("2024-01-01"),
       updatedAt: new Date("2024-01-01"),
     },
     {
       id: "2",
       title: "Small Village",
+      slug: null,
+      description: null,
       gameWorldId: "world1",
+      userId: "user1",
       latitude: 200,
       longitude: 200,
       pinType: PinType.VILLAGE,
@@ -43,14 +82,23 @@ describe("Pin Selectors", () => {
       minZoom: 0,
       maxZoom: 200,
       layerId: "layer1",
-      order: 2,
+      icon: null,
+      color: "#8b7355",
+      properties: null,
+      customIcon: null,
+      iconShape: IconShape.CIRCLE,
+      iconSize: 24,
+      iconBackground: null,
       createdAt: new Date("2024-01-01"),
       updatedAt: new Date("2024-01-01"),
     },
     {
       id: "3",
       title: "Hidden Dungeon",
+      slug: null,
+      description: null,
       gameWorldId: "world1",
+      userId: "user1",
       latitude: 150,
       longitude: 150,
       pinType: PinType.DUNGEON,
@@ -60,14 +108,23 @@ describe("Pin Selectors", () => {
       minZoom: 0,
       maxZoom: 200,
       layerId: "layer2",
-      order: 3,
+      icon: null,
+      color: "#ef4444",
+      properties: null,
+      customIcon: null,
+      iconShape: IconShape.CIRCLE,
+      iconSize: 32,
+      iconBackground: null,
       createdAt: new Date("2024-01-01"),
       updatedAt: new Date("2024-01-01"),
     },
     {
       id: "4",
       title: "Forest of Elves",
+      slug: null,
+      description: null,
       gameWorldId: "world1",
+      userId: "user1",
       latitude: 300,
       longitude: 300,
       pinType: PinType.CUSTOM,
@@ -77,7 +134,13 @@ describe("Pin Selectors", () => {
       minZoom: 50,
       maxZoom: 200,
       layerId: "layer2",
-      order: 4,
+      icon: null,
+      color: "#64748b",
+      properties: null,
+      customIcon: null,
+      iconShape: IconShape.CIRCLE,
+      iconSize: 32,
+      iconBackground: null,
       createdAt: new Date("2024-01-01"),
       updatedAt: new Date("2024-01-01"),
     },
@@ -99,33 +162,33 @@ describe("Pin Selectors", () => {
 
   describe("selectPinById", () => {
     it("should return pin by ID", () => {
-      const _result = selectors.selectPinById(mockPins, "1");
+      const result = selectors.selectPinById(mockPins, "1");
       expect(result).toEqual(mockPins[0]);
       expect(result?.title).toBe("Capital City");
     });
 
     it("should return undefined for non-existent ID", () => {
-      const _result = selectors.selectPinById(mockPins, "999");
+      const result = selectors.selectPinById(mockPins, "999");
       expect(result).toBeUndefined();
     });
   });
 
   describe("selectPinsByLayer", () => {
     it("should return pins for layer", () => {
-      const _result = selectors.selectPinsByLayer(mockPins, "layer1");
+      const result = selectors.selectPinsByLayer(mockPins, "layer1");
       expect(result).toHaveLength(2);
       expect(result.map((p) => p.id)).toEqual(["1", "2"]);
     });
 
     it("should return empty array for layer with no pins", () => {
-      const _result = selectors.selectPinsByLayer(mockPins, "layer999");
+      const result = selectors.selectPinsByLayer(mockPins, "layer999");
       expect(result).toEqual([]);
     });
   });
 
   describe("selectPinsByType", () => {
     it("should return pins by type", () => {
-      const _result = selectors.selectPinsByType(mockPins, PinType.CITY);
+      const result = selectors.selectPinsByType(mockPins, PinType.CITY);
       expect(result).toHaveLength(1);
       expect(result[0].id).toBe("1");
     });
@@ -133,7 +196,7 @@ describe("Pin Selectors", () => {
 
   describe("selectVisiblePins", () => {
     it("should return only visible pins", () => {
-      const _result = selectors.selectVisiblePins(mockPins);
+      const result = selectors.selectVisiblePins(mockPins);
       expect(result).toHaveLength(3);
       expect(result.every((p) => p.isVisible)).toBe(true);
     });
@@ -141,7 +204,7 @@ describe("Pin Selectors", () => {
 
   describe("selectHiddenPins", () => {
     it("should return only hidden pins", () => {
-      const _result = selectors.selectHiddenPins(mockPins);
+      const result = selectors.selectHiddenPins(mockPins);
       expect(result).toHaveLength(1);
       expect(result[0].id).toBe("3");
     });
@@ -160,14 +223,15 @@ describe("Pin Selectors", () => {
     };
 
     it("should return all pins with no filters", () => {
-      const _result = selectors.selectFilteredPins(mockPins, defaultFilters);
+      const result = selectors.selectFilteredPins(mockPins, defaultFilters);
       expect(result).toHaveLength(4);
     });
 
     it("should filter by search term", () => {
       const filters = { ...defaultFilters, searchTerm: "City" };
-      const _result = selectors.selectFilteredPins(mockPins, filters);
-      expect(result).toHaveLength(2); // "Capital City" and "Small City"
+      const result = selectors.selectFilteredPins(mockPins, filters);
+      expect(result).toHaveLength(1); // "Capital City" only
+      expect(result[0].id).toBe("1");
     });
 
     it("should filter by pin type", () => {
@@ -175,20 +239,20 @@ describe("Pin Selectors", () => {
         ...defaultFilters,
         pinTypeFilters: { [PinType.VILLAGE]: false },
       };
-      const _result = selectors.selectFilteredPins(mockPins, filters);
+      const result = selectors.selectFilteredPins(mockPins, filters);
       expect(result.every((p) => p.pinType !== PinType.VILLAGE)).toBe(true);
     });
 
     it("should filter by layer", () => {
       const filters = { ...defaultFilters, layerIds: ["layer1"] };
-      const _result = selectors.selectFilteredPins(mockPins, filters);
+      const result = selectors.selectFilteredPins(mockPins, filters);
       expect(result).toHaveLength(2);
       expect(result.every((p) => p.layerId === "layer1")).toBe(true);
     });
 
     it("should filter visible only", () => {
       const filters = { ...defaultFilters, showVisibleOnly: true };
-      const _result = selectors.selectFilteredPins(mockPins, filters);
+      const result = selectors.selectFilteredPins(mockPins, filters);
       expect(result).toHaveLength(3);
       expect(result.every((p) => p.isVisible)).toBe(true);
     });
@@ -200,7 +264,7 @@ describe("Pin Selectors", () => {
         layerIds: ["layer1"],
         showVisibleOnly: true,
       };
-      const _result = selectors.selectFilteredPins(mockPins, filters);
+      const result = selectors.selectFilteredPins(mockPins, filters);
       expect(result).toHaveLength(1);
       expect(result[0].id).toBe("1");
     });
@@ -208,7 +272,7 @@ describe("Pin Selectors", () => {
 
   describe("selectPinCountByType", () => {
     it("should count pins by type", () => {
-      const _result = selectors.selectPinCountByType(mockPins);
+      const result = selectors.selectPinCountByType(mockPins);
       expect(result[PinType.CITY]).toBe(1);
       expect(result[PinType.VILLAGE]).toBe(1);
       expect(result[PinType.DUNGEON]).toBe(1);
@@ -222,13 +286,13 @@ describe("Pin Selectors", () => {
 
   describe("selectPinsAtZoom", () => {
     it("should return pins visible at zoom level", () => {
-      const _result = selectors.selectPinsAtZoom(mockPins, 100);
+      const result = selectors.selectPinsAtZoom(mockPins, 100);
       // Pin 4 has minZoom: 50, so it should be visible at 100
       expect(result.length).toBeGreaterThan(0);
     });
 
     it("should exclude pins outside zoom range", () => {
-      const _result = selectors.selectPinsAtZoom(mockPins, 25);
+      const result = selectors.selectPinsAtZoom(mockPins, 25);
       // Pin 4 has minZoom: 50, so it should NOT be visible at 25
       expect(result.every((p) => p.id !== "4")).toBe(true);
     });
@@ -241,26 +305,26 @@ describe("Pin Selectors", () => {
   describe("selectPinsInBounds", () => {
     it("should return pins within bounds", () => {
       const bounds = { minX: 50, minY: 50, maxX: 250, maxY: 250 };
-      const _result = selectors.selectPinsInBounds(mockPins, bounds);
+      const result = selectors.selectPinsInBounds(mockPins, bounds);
       expect(result.length).toBe(3); // Pins 1, 2, 3
     });
 
     it("should return empty array when no pins in bounds", () => {
       const bounds = { minX: 500, minY: 500, maxX: 600, maxY: 600 };
-      const _result = selectors.selectPinsInBounds(mockPins, bounds);
+      const result = selectors.selectPinsInBounds(mockPins, bounds);
       expect(result).toEqual([]);
     });
   });
 
   describe("selectPinsNearPosition", () => {
     it("should return pins near position", () => {
-      const _result = selectors.selectPinsNearPosition(mockPins, { x: 100, y: 100 }, 60);
+      const result = selectors.selectPinsNearPosition(mockPins, { x: 100, y: 100 }, 60);
       expect(result.length).toBeGreaterThanOrEqual(1);
       expect(result.some((p) => p.id === "1")).toBe(true);
     });
 
     it("should return empty array when no pins nearby", () => {
-      const _result = selectors.selectPinsNearPosition(mockPins, { x: 500, y: 500 }, 10);
+      const result = selectors.selectPinsNearPosition(mockPins, { x: 500, y: 500 }, 10);
       expect(result).toEqual([]);
     });
   });
@@ -271,7 +335,7 @@ describe("Pin Selectors", () => {
 
   describe("selectPinLayerIds", () => {
     it("should return unique layer IDs", () => {
-      const _result = selectors.selectPinLayerIds(mockPins);
+      const result = selectors.selectPinLayerIds(mockPins);
       expect(result).toEqual(expect.arrayContaining(["layer1", "layer2"]));
       expect(result).toHaveLength(2);
     });
@@ -279,7 +343,7 @@ describe("Pin Selectors", () => {
 
   describe("selectPinsSortedByTitle", () => {
     it("should sort pins alphabetically by title", () => {
-      const _result = selectors.selectPinsSortedByTitle(mockPins);
+      const result = selectors.selectPinsSortedByTitle(mockPins);
       expect(result[0].title).toBe("Capital City");
       expect(result[1].title).toBe("Forest of Elves");
       expect(result[2].title).toBe("Hidden Dungeon");
@@ -293,7 +357,7 @@ describe("Pin Selectors", () => {
 
   describe("selectPinsGroupedByLayer", () => {
     it("should group pins by layer", () => {
-      const _result = selectors.selectPinsGroupedByLayer(mockPins);
+      const result = selectors.selectPinsGroupedByLayer(mockPins);
       expect(result.get("layer1")).toHaveLength(2);
       expect(result.get("layer2")).toHaveLength(2);
     });
@@ -301,7 +365,7 @@ describe("Pin Selectors", () => {
 
   describe("selectPinsGroupedByType", () => {
     it("should group pins by type", () => {
-      const _result = selectors.selectPinsGroupedByType(mockPins);
+      const result = selectors.selectPinsGroupedByType(mockPins);
       expect(result.get(PinType.CITY)).toHaveLength(1);
       expect(result.get(PinType.VILLAGE)).toHaveLength(1);
       expect(result.get(PinType.DUNGEON)).toHaveLength(1);
@@ -312,19 +376,19 @@ describe("Pin Selectors", () => {
   describe("selectSearchHighlightPositions", () => {
     it("should return highlight positions for matching search", () => {
       const pin = mockPins[0]; // "Capital City"
-      const _result = selectors.selectSearchHighlightPositions(pin, "Capital");
+      const result = selectors.selectSearchHighlightPositions(pin, "Capital");
       expect(result).toEqual({ start: 0, end: 7 });
     });
 
     it("should return null for non-matching search", () => {
       const pin = mockPins[0];
-      const _result = selectors.selectSearchHighlightPositions(pin, "Dragon");
+      const result = selectors.selectSearchHighlightPositions(pin, "Dragon");
       expect(result).toBeNull();
     });
 
     it("should be case-insensitive", () => {
       const pin = mockPins[0];
-      const _result = selectors.selectSearchHighlightPositions(pin, "capital");
+      const result = selectors.selectSearchHighlightPositions(pin, "capital");
       expect(result).toEqual({ start: 0, end: 7 });
     });
   });

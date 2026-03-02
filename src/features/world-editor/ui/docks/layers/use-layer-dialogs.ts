@@ -43,7 +43,7 @@ export function useLayerDialogs() {
     setShowDeleteConfirm(null);
   }, []);
 
-  const _openUploadDialog = useCallback(() => {
+  const openUploadDialog = useCallback(() => {
     setShowUploadDialog(true);
   }, []);
 

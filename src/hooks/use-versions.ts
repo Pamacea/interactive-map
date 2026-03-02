@@ -29,7 +29,7 @@ export function useVersions(worldId: string, enabled = true) {
     queryKey: ['versions', worldId],
     queryFn: async () => {
       try {
-        const _result = await getWorldVersions(worldId);
+        const result = await getWorldVersions(worldId);
         if (!result.success) {
           if (result.error?.code === 'AUTHENTICATION_ERROR') {
             return [];

@@ -72,6 +72,7 @@ export function LayersDockPanel({
     setNewLayerName,
     setSelectedLayerType,
     resetAddDialog,
+    openAddDialog,
     toggleLayerExpansion,
     confirmDelete,
     cancelDelete,
@@ -143,9 +144,10 @@ export function LayersDockPanel({
           <button
             onClick={() => {
               if (worldId) {
-                // Reset to default values
+                // Reset to default values and open dialog
                 setNewLayerName("");
                 setSelectedLayerType("CUSTOM");
+                openAddDialog();
               }
             }}
             disabled={!worldId}
@@ -217,6 +219,7 @@ export function LayersDockPanel({
             onAddLayer={isExpanded && worldId ? () => {
               setNewLayerName("");
               setSelectedLayerType("CUSTOM");
+              openAddDialog();
             } : undefined}
           />
         )}

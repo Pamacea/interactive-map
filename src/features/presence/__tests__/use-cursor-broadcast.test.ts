@@ -34,7 +34,7 @@ describe('useCursorBroadcast (polling version)', () => {
   });
 
   it('should broadcast cursor position update', async () => {
-    const { updatePresence } = await import('@/actions/presence');
+    const { updatePresence } = await import('@/features/presence/actions');
     const { result } = renderHook(() =>
       useCursorBroadcast(mockProps),
     );
@@ -52,7 +52,7 @@ describe('useCursorBroadcast (polling version)', () => {
   });
 
   it('should clamp cursor values to valid range [0, 1]', async () => {
-    const { updatePresence } = await import('@/actions/presence');
+    const { updatePresence } = await import('@/features/presence/actions');
     const { result } = renderHook(() =>
       useCursorBroadcast(mockProps),
     );
@@ -112,7 +112,7 @@ describe('useCursorBroadcast (polling version)', () => {
   });
 
   it('should broadcast null selection change', async () => {
-    await import('@/features/presence/actions');
+    const { updatePresence } = await import('@/features/presence/actions');
     const { result } = renderHook(() =>
       useCursorBroadcast(mockProps),
     );
@@ -129,7 +129,7 @@ describe('useCursorBroadcast (polling version)', () => {
   });
 
   it('should not broadcast when disabled', async () => {
-    const { updatePresence } = await import('@/actions/presence');
+    const { updatePresence } = await import('@/features/presence/actions');
     const { result } = renderHook(() =>
       useCursorBroadcast({ ...mockProps, enabled: false }),
     );
@@ -143,7 +143,7 @@ describe('useCursorBroadcast (polling version)', () => {
 
   it('should call onError when update fails', async () => {
     const mockError = new Error('Update failed');
-    const { updatePresence } = await import('@/actions/presence');
+    const { updatePresence } = await import('@/features/presence/actions');
     (updatePresence as unknown).mockRejectedValue(mockError);
 
     const onError = vi.fn();
@@ -160,7 +160,7 @@ describe('useCursorBroadcast (polling version)', () => {
   });
 
   it('should skip viewport updates when position change is small', async () => {
-    const { updatePresence } = await import('@/actions/presence');
+    const { updatePresence } = await import('@/features/presence/actions');
     const { result } = renderHook(() =>
       useCursorBroadcast(mockProps),
     );
@@ -183,7 +183,7 @@ describe('useCursorBroadcast (polling version)', () => {
   });
 
   it('should handle NaN cursor values gracefully', async () => {
-    const { updatePresence } = await import('@/actions/presence');
+    const { updatePresence } = await import('@/features/presence/actions');
     const { result } = renderHook(() =>
       useCursorBroadcast(mockProps),
     );
@@ -192,12 +192,7 @@ describe('useCursorBroadcast (polling version)', () => {
       await result.current.updateCursor(NaN, NaN);
     });
 
-    // NaN should be ignored (undefined passed)
-    expect(updatePresence).toHaveBeenCalledWith({
-      worldId: mockProps.worldId,
-      sessionId: mockProps.sessionId,
-      cursorX: undefined,
-      cursorY: undefined,
-    });
+    // NaN should be ignored entirely - no call made
+    expect(updatePresence).not.toHaveBeenCalled();
   });
 });

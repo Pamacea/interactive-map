@@ -9,7 +9,7 @@
  */
 
 import { memo } from "react";
-import { useMeasurePoints, useMeasureSegments, useMeasureTotalDistance } from "@/features/tools";
+import { useMeasurePoints, useMeasureSegments, useMeasureTotalDistance } from "@/features/world-editor/store/tools";
 
 interface MeasureOverlayProps {
   containerRef: React.RefObject<HTMLDivElement | null>;

@@ -33,8 +33,8 @@ describe('usePinPosition', () => {
     layer: null,
   }
 
-  const _mockImageDimensions = { width: 1920, height: 1080 }
-  const _mockTransform = { scale: 1, translateX: 0, translateY: 0 }
+  const mockImageDimensions = { width: 1920, height: 1080 }
+  const mockTransform = { scale: 1, translateX: 0, translateY: 0 }
   const mockLayers = [
     { id: 'layer-1', offsetX: 100, offsetY: 50, locked: false },
     { id: 'layer-2', offsetX: -50, offsetY: -25, locked: true },

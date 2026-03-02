@@ -417,7 +417,7 @@ export const useGalleryStore = create<GalleryStore>()(
 
       applyFilters: () => {
         const _state = get();
-        const { galleryItems, searchTerm, type, linkedTo } = state;
+        const { galleryItems, searchTerm, type, linkedTo } = _state;
 
         const filtered = galleryItems.filter((item) => {
           // Search term filter

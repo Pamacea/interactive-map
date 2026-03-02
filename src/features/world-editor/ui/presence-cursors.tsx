@@ -1,8 +1,8 @@
 'use client';
 
 import { memo } from 'react';
-import { UserCursor } from '@/components/presence/ui/user-cursor';
-import { usePresence } from '@/components/presence/logic/use-presence';
+import { UserCursor } from '@/features/presence/ui/user-cursor';
+import { usePresence } from '@/features/presence/logic/use-presence';
 import { useSession } from 'next-auth/react';
 
 interface PresenceCursorsProps {

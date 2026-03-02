@@ -30,7 +30,7 @@ export function useImportJobs(worldId: string, enabled = true) {
     queryKey: ['importJobs', worldId],
     queryFn: async () => {
       try {
-        const _result = await getWorldImportJobs(worldId);
+        const result = await getWorldImportJobs(worldId);
         if (!result.success) {
           if (result.error?.code === 'AUTHENTICATION_ERROR') {
             return [];

@@ -121,7 +121,7 @@ describe("Pin CRUD Integration", () => {
 
   describe("createPin", () => {
     it("should create pin with valid data", async () => {
-      const _result = await createPin({
+      const result = await createPin({
         title: "New City",
         description: "A new city pin",
         pinType: "CITY",
@@ -151,7 +151,7 @@ describe("Pin CRUD Integration", () => {
     });
 
     it("should create pin without layer", async () => {
-      const _result = await createPin({
+      const result = await createPin({
         title: "Unlayered Pin",
         pinType: "POI",
         latitude: 0.1,
@@ -166,7 +166,7 @@ describe("Pin CRUD Integration", () => {
     });
 
     it("should reject invalid coordinates", async () => {
-      const _result = await createPin({
+      const result = await createPin({
         title: "Invalid Pin",
         pinType: "CITY",
         latitude: 150, // Invalid: > 90
@@ -178,7 +178,7 @@ describe("Pin CRUD Integration", () => {
     });
 
     it("should reject invalid color format", async () => {
-      const _result = await createPin({
+      const result = await createPin({
         title: "Bad Color Pin",
         pinType: "CITY",
         latitude: 0.5,
@@ -214,7 +214,7 @@ describe("Pin CRUD Integration", () => {
         },
       });
 
-      const _result = await createPin({
+      const result = await createPin({
         title: "Cross-World Pin",
         pinType: "CITY",
         latitude: 0.5,
@@ -237,7 +237,7 @@ describe("Pin CRUD Integration", () => {
     it("should reject unauthenticated request", async () => {
       mockGetServerSession.mockResolvedValueOnce(null);
 
-      const _result = await createPin({
+      const result = await createPin({
         title: "Should Fail",
         pinType: "CITY",
         latitude: 0.5,
@@ -252,7 +252,7 @@ describe("Pin CRUD Integration", () => {
     });
 
     it("should reject access to non-existent world", async () => {
-      const _result = await createPin({
+      const result = await createPin({
         title: "Orphan Pin",
         pinType: "CITY",
         latitude: 0.5,
@@ -264,7 +264,7 @@ describe("Pin CRUD Integration", () => {
     });
 
     it("should validate minZoom < maxZoom constraint", async () => {
-      const _result = await createPin({
+      const result = await createPin({
         title: "Bad Zoom Pin",
         pinType: "CITY",
         latitude: 0.5,
@@ -299,7 +299,7 @@ describe("Pin CRUD Integration", () => {
 
   describe("updatePin", () => {
     it("should update pin title and description", async () => {
-      const _result = await updatePin({
+      const result = await updatePin({
         id: testPinId,
         title: "Updated City",
         description: "Updated description",
@@ -319,7 +319,7 @@ describe("Pin CRUD Integration", () => {
     });
 
     it("should update pin position", async () => {
-      const _result = await updatePin({
+      const result = await updatePin({
         id: testPinId,
         latitude: 0.8,
         longitude: 0.2,
@@ -333,7 +333,7 @@ describe("Pin CRUD Integration", () => {
     });
 
     it("should update pin type and appearance", async () => {
-      const _result = await updatePin({
+      const result = await updatePin({
         id: testPinId,
         pinType: "DUNGEON",
         color: "#9333ea",
@@ -360,7 +360,7 @@ describe("Pin CRUD Integration", () => {
         },
       });
 
-      const _result = await updatePin({
+      const result = await updatePin({
         id: testPinId,
         layerId: newLayer.id,
       });
@@ -372,7 +372,7 @@ describe("Pin CRUD Integration", () => {
     });
 
     it("should move pin to no layer (null)", async () => {
-      const _result = await updatePin({
+      const result = await updatePin({
         id: testPinId,
         layerId: null,
       });
@@ -395,7 +395,7 @@ describe("Pin CRUD Integration", () => {
         user: { id: otherUser.id, name: "Unauthorized", email: otherUser.email },
       });
 
-      const _result = await updatePin({
+      const result = await updatePin({
         id: testPinId,
         title: "Hacked Title",
       });
@@ -410,7 +410,7 @@ describe("Pin CRUD Integration", () => {
     });
 
     it("should reject updating non-existent pin", async () => {
-      const _result = await updatePin({
+      const result = await updatePin({
         id: "non-existent-pin",
         title: "Ghost Pin",
       });
@@ -424,7 +424,7 @@ describe("Pin CRUD Integration", () => {
 
   describe("deletePin", () => {
     it("should delete pin successfully", async () => {
-      const _result = await deletePin(testPinId);
+      const result = await deletePin(testPinId);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -450,7 +450,7 @@ describe("Pin CRUD Integration", () => {
         user: { id: otherUser.id, name: "Attacker", email: otherUser.email },
       });
 
-      const _result = await deletePin(testPinId);
+      const result = await deletePin(testPinId);
 
       expect(result.success).toBe(false);
 
@@ -473,7 +473,7 @@ describe("Pin CRUD Integration", () => {
       });
       expect(initialPin?.isVisible).toBe(true);
 
-      const _result = await togglePinVisibility(testPinId);
+      const result = await togglePinVisibility(testPinId);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -488,7 +488,7 @@ describe("Pin CRUD Integration", () => {
         data: { isVisible: false },
       });
 
-      const _result = await togglePinVisibility(testPinId);
+      const result = await togglePinVisibility(testPinId);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -499,7 +499,7 @@ describe("Pin CRUD Integration", () => {
 
   describe("updatePinPosition", () => {
     it("should update pin position for drag operation", async () => {
-      const _result = await updatePinPosition(testPinId, 0.75, 0.25);
+      const result = await updatePinPosition(testPinId, 0.75, 0.25);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -509,7 +509,7 @@ describe("Pin CRUD Integration", () => {
     });
 
     it("should reject invalid coordinates (out of range)", async () => {
-      const _result = await updatePinPosition(testPinId, 1.5, 0.5);
+      const result = await updatePinPosition(testPinId, 1.5, 0.5);
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -518,7 +518,7 @@ describe("Pin CRUD Integration", () => {
     });
 
     it("should reject negative coordinates", async () => {
-      const _result = await updatePinPosition(testPinId, -0.1, 0.5);
+      const result = await updatePinPosition(testPinId, -0.1, 0.5);
 
       expect(result.success).toBe(false);
     });
@@ -557,7 +557,7 @@ describe("Pin CRUD Integration", () => {
     });
 
     it("should update multiple pin positions", async () => {
-      const _result = await batchUpdatePinPositions([
+      const result = await batchUpdatePinPositions([
         { id: testPinId, latitude: 0.9, longitude: 0.1 },
         { id: pin2Id, latitude: 0.8, longitude: 0.2 },
         { id: pin3Id, latitude: 0.7, longitude: 0.3 },
@@ -574,7 +574,7 @@ describe("Pin CRUD Integration", () => {
     });
 
     it("should reject if any pin is not found", async () => {
-      const _result = await batchUpdatePinPositions([
+      const result = await batchUpdatePinPositions([
         { id: testPinId, latitude: 0.5, longitude: 0.5 },
         { id: "non-existent-pin", latitude: 0.5, longitude: 0.5 },
       ]);
@@ -602,7 +602,7 @@ describe("Pin CRUD Integration", () => {
         },
       });
 
-      const _result = await batchUpdatePinPositions([
+      const result = await batchUpdatePinPositions([
         { id: testPinId, latitude: 0.5, longitude: 0.5 },
         { id: otherPin.id, latitude: 0.6, longitude: 0.6 },
       ]);
@@ -626,7 +626,7 @@ describe("Pin CRUD Integration", () => {
       const formData = new FormData();
       formData.append("file", mockFile);
 
-      const _result = await uploadPinIcon(testPinId, formData);
+      const result = await uploadPinIcon(testPinId, formData);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -641,7 +641,7 @@ describe("Pin CRUD Integration", () => {
       const formData = new FormData();
       formData.append("file", mockFile);
 
-      const _result = await uploadPinIcon(testPinId, formData);
+      const result = await uploadPinIcon(testPinId, formData);
 
       expect(result.success).toBe(false);
     });
@@ -653,7 +653,7 @@ describe("Pin CRUD Integration", () => {
       const formData = new FormData();
       formData.append("file", mockFile);
 
-      const _result = await uploadPinIcon(testPinId, formData);
+      const result = await uploadPinIcon(testPinId, formData);
 
       expect(result.success).toBe(false);
     });
@@ -674,7 +674,7 @@ describe("Pin CRUD Integration", () => {
       const formData = new FormData();
       formData.append("file", mockFile);
 
-      const _result = await uploadPinIcon(testPinId, formData);
+      const result = await uploadPinIcon(testPinId, formData);
 
       expect(result.success).toBe(false);
 
@@ -685,7 +685,7 @@ describe("Pin CRUD Integration", () => {
 
   describe("Zoom Constraints", () => {
     it("should respect minZoom and maxZoom on create", async () => {
-      const _result = await createPin({
+      const result = await createPin({
         title: "Zoomed Pin",
         pinType: "CITY",
         latitude: 0.5,
@@ -706,7 +706,7 @@ describe("Pin CRUD Integration", () => {
     });
 
     it("should update zoom constraints", async () => {
-      const _result = await updatePin({
+      const result = await updatePin({
         id: testPinId,
         minZoom: 25,
         maxZoom: 175,
@@ -729,7 +729,7 @@ describe("Pin CRUD Integration", () => {
         boss: true,
       };
 
-      const _result = await createPin({
+      const result = await createPin({
         title: "Dungeon Pin",
         pinType: "DUNGEON",
         latitude: 0.5,
@@ -751,7 +751,7 @@ describe("Pin CRUD Integration", () => {
         boss: false,
       };
 
-      const _result = await updatePin({
+      const result = await updatePin({
         id: testPinId,
         properties: newProps,
       });

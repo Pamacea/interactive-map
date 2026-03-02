@@ -235,7 +235,7 @@ export const useSelectedPin = () => {
   const _selectedPinId = useSelectedPinIdFromUI();
   const _pins = usePins();
 
-  return selectedPinId
-    ? pins.find((pin) => pin.id === selectedPinId)
+  return _selectedPinId
+    ? _pins.find((pin) => pin.id === _selectedPinId)
     : null;
 };

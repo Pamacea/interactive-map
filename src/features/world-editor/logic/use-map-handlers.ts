@@ -4,17 +4,20 @@ import { useCallback } from "react";
 import type { PinWithLayer } from "./use-pins-filtering";
 
 interface UseMapHandlersProps {
-  isCreatingPin: boolean;
+  isCreatingPin?: boolean;
   selectPin: (id: string | null) => void;
   clearSelection: () => void;
-  stopCreating: () => void;
-  startCreating: () => void;
+  stopCreating?: () => void;
+  startCreating?: () => void;
 }
+
+// Deprecated: isCreatingPin, stopCreating, startCreating are no longer used
+// Kept for backward compatibility - do not use
+export type DeprecatedMapHandlersProps = Omit<UseMapHandlersProps, 'selectPin' | 'clearSelection'>;
 
 interface MapHandlers {
   handlePinClick: (pin: PinWithLayer) => void;
   handlePopupClose: () => void;
-  handleToggleCreatePin: () => void;
 }
 
 export function useMapHandlers({
@@ -35,18 +38,8 @@ export function useMapHandlers({
     clearSelection();
   }, [clearSelection]);
 
-  const handleToggleCreatePin = useCallback(() => {
-    if (isCreatingPin) {
-      stopCreating();
-    } else {
-      selectPin(null);
-      startCreating();
-    }
-  }, [isCreatingPin, stopCreating, selectPin, startCreating]);
-
   return {
     handlePinClick,
     handlePopupClose,
-    handleToggleCreatePin,
   };
 }

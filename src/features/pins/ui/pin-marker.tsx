@@ -44,10 +44,10 @@ export function PinMarker({
   onPinClick,
 }: PinMarkerProps) {
   // Store access
-  const _layers = useMapStore((state) => state.layers);
+  const layers = useMapStore((state) => state.layers);
   const selectPin = useSelectPin();
   const clearSelection = useClearSelection();
-  const _selectedPinId = useSelectedPinId();
+  const selectedPinId = useSelectedPinId();
 
   // Get real-time pin data from store (for position updates during drag)
   const latestPin = usePinById(pin.id);
@@ -57,7 +57,7 @@ export function PinMarker({
   // Get layer info for lock state and opacity
   const layer = pin.layerId ? layers.find((layer) => layer.id === pin.layerId) : null;
   const isLayerLocked = layer?.locked ?? false;
-  const _layerOpacity = layer?.opacity ?? 1;
+  const layerOpacity = layer?.opacity ?? 1;
 
   // Unified drag handling using input manager
   const { isDragging, dragPosition, handleMouseDown: handleDragMouseDown, justFinishedDragRef } = usePinDragInput({

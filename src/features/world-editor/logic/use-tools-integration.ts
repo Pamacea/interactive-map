@@ -16,10 +16,7 @@ import { useMemo, useCallback } from "react";
 import { useToolMode } from "@/features/tools";
 import type { UseMapEventsOptions } from "./use-map-events";
 
-export interface UseToolsIntegrationOptions extends Omit<UseMapEventsOptions, "onCreatePin"> {
-  // Additional props for tools integration
-  onCreatePin?: UseMapEventsOptions["onCreatePin"];
-}
+export type UseToolsIntegrationOptions = Omit<UseMapEventsOptions, "onCreatePin">;
 
 export interface UseToolsIntegrationReturn {
   // Combined handlers for MapContainer
@@ -58,8 +55,6 @@ export function useToolsIntegration(
     switch (toolMode) {
       case "select":
         return "cursor-default";
-      case "create-pin":
-        return "cursor-crosshair";
       case "pan":
         return "cursor-grab";
       case "measure":
@@ -97,8 +92,6 @@ export function useToolCursorClass(): string {
     switch (toolMode) {
       case "select":
         return "cursor-default";
-      case "create-pin":
-        return "cursor-crosshair";
       case "pan":
         return "cursor-grab";
       case "measure":
@@ -121,8 +114,6 @@ export function useToolActiveCursorClass(): string {
     switch (toolMode) {
       case "select":
         return "cursor-default";
-      case "create-pin":
-        return "cursor-crosshair";
       case "pan":
         return "cursor-grabbing";
       case "measure":

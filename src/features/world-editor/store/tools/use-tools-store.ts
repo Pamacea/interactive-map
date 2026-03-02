@@ -2,7 +2,7 @@
  * Tools Store - State management for all map tools
  *
  * This store manages:
- * - Active tool mode (select, create-pin, pan, measure, area)
+ * - Active tool mode (select, pan, measure, area)
  * - Tool-specific states (measurements, selections, etc.)
  * - Cursor states for each tool
  * - Tool transitions and cleanup
@@ -19,7 +19,7 @@ import { usePinsUIStore } from "@/features/pins/store";
 
 // ============== Types ==============
 
-export type ToolMode = "select" | "create-pin" | "pan" | "measure" | "area";
+export type ToolMode = "select" | "pan" | "measure" | "area";
 
 export interface MeasurePoint {
   x: number;
@@ -96,7 +96,6 @@ type ToolsStore = ToolsState & ToolsActions;
 
 export const TOOL_CURSORS: Record<ToolMode, string> = {
   select: "default",
-  "create-pin": "crosshair",
   pan: "grab",
   measure: "crosshair",
   area: "crosshair",
@@ -104,7 +103,6 @@ export const TOOL_CURSORS: Record<ToolMode, string> = {
 
 export const TOOL_ACTIVE_CURSORS: Record<ToolMode, string> = {
   select: "default",
-  "create-pin": "crosshair",
   pan: "grabbing",
   measure: "crosshair",
   area: "crosshair",
@@ -153,6 +151,12 @@ export const useToolsStore = create<ToolsStore>()(
           // Also clear the UI store's single pin selection
           // Use getState() to access the store's clearSelection action
           usePinsUIStore.getState().clearSelection();
+        }
+
+        // Initialize new tool state
+        if (mode === "measure" && currentMode !== "measure") {
+          stateUpdates.isMeasuring = true;
+          stateUpdates.measurePoints = [];
         }
 
         set(stateUpdates);
@@ -283,6 +287,8 @@ export function useToolCursor(isDragging = false): string {
 
 /**
  * Calculate total distance of all measurement segments
+ * Uses normalized coordinates (lat/lng) for consistent distance measurement
+ * regardless of pan/zoom state.
  */
 export function useMeasureTotalDistance(): { pixels: number; world: number } {
   const points = useMeasurePoints();
@@ -291,22 +297,27 @@ export function useMeasureTotalDistance(): { pixels: number; world: number } {
     return { pixels: 0, world: 0 };
   }
 
-  let totalPixelDistance = 0;
+  let totalNormalizedDistance = 0;
 
   for (let i = 1; i < points.length; i++) {
-    const dx = points[i].x - points[i - 1].x;
-    const dy = points[i].y - points[i - 1].y;
-    totalPixelDistance += Math.sqrt(dx * dx + dy * dy);
+    // Use normalized coordinates (lat/lng) for consistent measurement
+    const dx = points[i].lng - points[i - 1].lng;
+    const dy = points[i].lat - points[i - 1].lat;
+    totalNormalizedDistance += Math.sqrt(dx * dx + dy * dy);
   }
 
-  // Convert pixels to world units (assuming 100px = 1 world unit)
-  const worldDistance = totalPixelDistance / 100;
+  // Convert normalized distance to world units
+  // Assuming a reference image size of 1000px for scaling
+  const referencePixelSize = 1000;
+  const pixelDistance = totalNormalizedDistance * referencePixelSize;
+  const worldDistance = pixelDistance / 100; // 100px = 1 world unit
 
-  return { pixels: totalPixelDistance, world: worldDistance };
+  return { pixels: pixelDistance, world: worldDistance };
 }
 
 /**
  * Get all measurement segments
+ * Uses normalized coordinates (lat/lng) for consistent distance measurement
  */
 export function useMeasureSegments() {
   const points = useMeasurePoints();
@@ -315,11 +326,15 @@ export function useMeasureSegments() {
   for (let i = 1; i < points.length; i++) {
     const start = points[i - 1];
     const end = points[i];
-    // Use normalized coordinates (lat/lng) for consistent rendering
+    // Use normalized coordinates (lat/lng) for consistent measurement
     const dx = end.lng - start.lng;
     const dy = end.lat - start.lat;
-    const pixelDistance = Math.sqrt(dx * dx + dy * dy);
-    const worldDistance = pixelDistance / 100;
+    const normalizedDistance = Math.sqrt(dx * dx + dy * dy);
+
+    // Convert to actual pixel distance using reference size
+    const referencePixelSize = 1000;
+    const pixelDistance = normalizedDistance * referencePixelSize;
+    const worldDistance = pixelDistance / 100; // 100px = 1 world unit
 
     segments.push({ start, end, pixelDistance, worldDistance });
   }

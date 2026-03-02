@@ -112,7 +112,7 @@ export async function safeAsync<T>(
 ): Promise<Result<T>> {
   try {
     const _data = await fn();
-    return ok(data);
+    return ok(_data);
   } catch (error) {
     console.error(`[${context}] Operation failed:`, error);
 
@@ -121,13 +121,29 @@ export async function safeAsync<T>(
       return err(error);
     }
 
-    // If it's a Zod validation error, convert to ValidationError
-    if (error instanceof Error && error.name === "ZodError") {
-      return err(new ValidationError("Invalid input data"));
+    // If it's a Zod validation error, extract details and convert to ValidationError
+    if (error instanceof Error) {
+      // Check for ZodError by checking for specific Zod properties
+      if ("issues" in error && Array.isArray((error as any).issues)) {
+        const zodError = error as any;
+        const firstIssue = zodError.issues[0];
+        const errorMessage = firstIssue?.message || "Invalid input data";
+        const errorPath = firstIssue?.path?.join(".") || "unknown";
+        console.error(`[${context}] Validation error:`, errorMessage, "at path:", errorPath);
+        return err(new ValidationError(`${errorMessage} (field: ${errorPath})`));
+      }
+
+      // Log other error details
+      console.error(`[${context}] Error details:`, {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+      });
     }
 
-    // Otherwise, wrap in a generic DatabaseError
-    return err(new DatabaseError("An unexpected error occurred"));
+    // Otherwise, wrap in a generic DatabaseError with more context
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    return err(new DatabaseError(`An unexpected error occurred: ${errorMessage}`));
   }
 }
 

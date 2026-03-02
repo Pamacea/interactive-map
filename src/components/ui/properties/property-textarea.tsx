@@ -270,7 +270,7 @@ export function PropertyTextarea({
     if (!autosave) return null;
     const _status = autosave.status;
 
-    if (status === "idle") return null;
+    if (_status === "idle") return null;
 
     const statusConfig = {
       debouncing: { icon: null, text: "Waiting...", color: "text-text-muted" },
@@ -279,7 +279,7 @@ export function PropertyTextarea({
       error: { icon: X, text: "Failed", color: "text-status-error" },
     };
 
-    const config = statusConfig[status as keyof typeof statusConfig];
+    const config = statusConfig[_status as keyof typeof statusConfig];
     const _Icon = config.icon;
 
     return (

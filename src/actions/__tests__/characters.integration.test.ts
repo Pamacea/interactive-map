@@ -152,7 +152,7 @@ describe("Character CRUD Integration", () => {
 
   describe("createCharacter", () => {
     it("should create character with valid data", async () => {
-      const _result = await createCharacter({
+      const result = await createCharacter({
         name: "Aragorn",
         shortName: "Strider",
         characterType: "PLAYER",
@@ -187,7 +187,7 @@ describe("Character CRUD Integration", () => {
     });
 
     it("should create character with default values", async () => {
-      const _result = await createCharacter({
+      const result = await createCharacter({
         name: "Basic Character",
         characterType: "NPC",
         gameWorldId: testWorldId,
@@ -211,7 +211,7 @@ describe("Character CRUD Integration", () => {
         charisma: 14,
       };
 
-      const _result = await createCharacter({
+      const result = await createCharacter({
         name: "Stat Character",
         characterType: "NPC",
         gameWorldId: testWorldId,
@@ -230,7 +230,7 @@ describe("Character CRUD Integration", () => {
         { name: "Perception", level: 4, description: "Notice things" },
       ];
 
-      const _result = await createCharacter({
+      const result = await createCharacter({
         name: "Skill Character",
         characterType: "NPC",
         gameWorldId: testWorldId,
@@ -249,7 +249,7 @@ describe("Character CRUD Integration", () => {
         { name: "Chain Mail", type: "armor", description: "AC 16" },
       ];
 
-      const _result = await createCharacter({
+      const result = await createCharacter({
         name: "Equipped Character",
         characterType: "NPC",
         gameWorldId: testWorldId,
@@ -263,7 +263,7 @@ describe("Character CRUD Integration", () => {
     });
 
     it("should create character with personality and background", async () => {
-      const _result = await createCharacter({
+      const result = await createCharacter({
         name: "Deep Character",
         characterType: "NPC",
         gameWorldId: testWorldId,
@@ -288,7 +288,7 @@ describe("Character CRUD Integration", () => {
         { name: "Mana Potion", price: 75, quantity: 5 },
       ];
 
-      const _result = await createCharacter({
+      const result = await createCharacter({
         name: "Shopkeeper",
         characterType: "MERCHANT",
         gameWorldId: testWorldId,
@@ -310,7 +310,7 @@ describe("Character CRUD Integration", () => {
       });
 
       // Create second character
-      const _result = await createCharacter({
+      const result = await createCharacter({
         name: "Second",
         characterType: "NPC",
         gameWorldId: testWorldId,
@@ -325,7 +325,7 @@ describe("Character CRUD Integration", () => {
     it("should reject unauthenticated request", async () => {
       mockGetServerSession.mockResolvedValueOnce(null);
 
-      const _result = await createCharacter({
+      const result = await createCharacter({
         name: "Should Fail",
         characterType: "NPC",
         gameWorldId: testWorldId,
@@ -504,7 +504,7 @@ describe("Character CRUD Integration", () => {
 
   describe("updateCharacter", () => {
     it("should update character basic fields", async () => {
-      const _result = await updateCharacter({
+      const result = await updateCharacter({
         id: testCharacterId,
         name: "Updated Name",
         shortName: "Updated",
@@ -520,7 +520,7 @@ describe("Character CRUD Integration", () => {
     });
 
     it("should update character type and role", async () => {
-      const _result = await updateCharacter({
+      const result = await updateCharacter({
         id: testCharacterId,
         characterType: "BOSS",
         role: "ANTAGONIST",
@@ -537,7 +537,7 @@ describe("Character CRUD Integration", () => {
       const newStats = { strength: 20, dexterity: 18 };
       const newEquipment = [{ name: "Excalibur", type: "weapon" }];
 
-      const _result = await updateCharacter({
+      const result = await updateCharacter({
         id: testCharacterId,
         stats: newStats,
         equipment: newEquipment,
@@ -551,7 +551,7 @@ describe("Character CRUD Integration", () => {
     });
 
     it("should update visibility flags", async () => {
-      const _result = await updateCharacter({
+      const result = await updateCharacter({
         id: testCharacterId,
         isVisible: false,
         isPublic: false,
@@ -565,7 +565,7 @@ describe("Character CRUD Integration", () => {
     });
 
     it("should update order", async () => {
-      const _result = await updateCharacter({
+      const result = await updateCharacter({
         id: testCharacterId,
         order: 10,
       });
@@ -588,7 +588,7 @@ describe("Character CRUD Integration", () => {
         user: { id: otherUser.id, name: "Unauthorized", email: otherUser.email },
       });
 
-      const _result = await updateCharacter({
+      const result = await updateCharacter({
         id: testCharacterId,
         name: "Hacked",
       });
@@ -602,7 +602,7 @@ describe("Character CRUD Integration", () => {
 
   describe("deleteCharacter", () => {
     it("should delete character successfully", async () => {
-      const _result = await deleteCharacter(testCharacterId);
+      const result = await deleteCharacter(testCharacterId);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -628,7 +628,7 @@ describe("Character CRUD Integration", () => {
         user: { id: otherUser.id, name: "Attacker", email: otherUser.email },
       });
 
-      const _result = await deleteCharacter(testCharacterId);
+      const result = await deleteCharacter(testCharacterId);
 
       expect(result.success).toBe(false);
 
@@ -644,7 +644,7 @@ describe("Character CRUD Integration", () => {
         data: { isVisible: true },
       });
 
-      const _result = await toggleCharacterVisibility(testCharacterId);
+      const result = await toggleCharacterVisibility(testCharacterId);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -658,7 +658,7 @@ describe("Character CRUD Integration", () => {
         data: { isVisible: false },
       });
 
-      const _result = await toggleCharacterVisibility(testCharacterId);
+      const result = await toggleCharacterVisibility(testCharacterId);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -669,7 +669,7 @@ describe("Character CRUD Integration", () => {
 
   describe("Character-Pin Linking", () => {
     it("should link character to pin", async () => {
-      const _result = await linkCharacterToPin(
+      const result = await linkCharacterToPin(
         testCharacterId,
         testPinId,
         "HOME",
@@ -688,7 +688,7 @@ describe("Character CRUD Integration", () => {
     it("should reject duplicate link", async () => {
       await linkCharacterToPin(testCharacterId, testPinId);
 
-      const _result = await linkCharacterToPin(testCharacterId, testPinId);
+      const result = await linkCharacterToPin(testCharacterId, testPinId);
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -699,7 +699,7 @@ describe("Character CRUD Integration", () => {
     it("should unlink character from pin", async () => {
       await linkCharacterToPin(testCharacterId, testPinId);
 
-      const _result = await unlinkCharacterFromPin(testCharacterId, testPinId);
+      const result = await unlinkCharacterFromPin(testCharacterId, testPinId);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -710,7 +710,7 @@ describe("Character CRUD Integration", () => {
     it("should get pins for character", async () => {
       await linkCharacterToPin(testCharacterId, testPinId, "WORK");
 
-      const _pins = await getPinsForCharacter(testCharacterId);
+      const pins = await getPinsForCharacter(testCharacterId);
 
       expect(pins).toBeInstanceOf(Array);
       expect(pins.length).toBe(1);
@@ -745,7 +745,7 @@ describe("Character CRUD Integration", () => {
     });
 
     it("should create relationship", async () => {
-      const _result = await createCharacterRelationship({
+      const result = await createCharacterRelationship({
         sourceId: testCharacterId,
         targetId: targetCharacterId,
         relationshipType: "FRIEND",
@@ -770,7 +770,7 @@ describe("Character CRUD Integration", () => {
         relationshipType: "FRIEND",
       });
 
-      const _result = await updateCharacterRelationship({
+      const result = await updateCharacterRelationship({
         sourceId: testCharacterId,
         targetId: targetCharacterId,
         relationshipType: "ENEMY",
@@ -792,7 +792,7 @@ describe("Character CRUD Integration", () => {
         relationshipType: "MENTOR",
       });
 
-      const _result = await deleteCharacterRelationship(testCharacterId, targetCharacterId);
+      const result = await deleteCharacterRelationship(testCharacterId, targetCharacterId);
 
       expect(result.success).toBe(true);
     });
@@ -833,7 +833,7 @@ describe("Character CRUD Integration", () => {
       const formData = new FormData();
       formData.append("file", mockFile);
 
-      const _result = await uploadCharacterPortrait(testCharacterId, formData);
+      const result = await uploadCharacterPortrait(testCharacterId, formData);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -848,7 +848,7 @@ describe("Character CRUD Integration", () => {
       const formData = new FormData();
       formData.append("file", mockFile);
 
-      const _result = await uploadCharacterPortrait(testCharacterId, formData);
+      const result = await uploadCharacterPortrait(testCharacterId, formData);
 
       expect(result.success).toBe(false);
     });
@@ -859,7 +859,7 @@ describe("Character CRUD Integration", () => {
       const formData = new FormData();
       formData.append("file", mockFile);
 
-      const _result = await uploadCharacterPortrait(testCharacterId, formData);
+      const result = await uploadCharacterPortrait(testCharacterId, formData);
 
       expect(result.success).toBe(false);
     });
@@ -895,7 +895,7 @@ describe("Character CRUD Integration", () => {
     });
 
     it("should reorder multiple characters", async () => {
-      const _result = await reorderCharacters([
+      const result = await reorderCharacters([
         { id: testCharacterId, order: 2 },
         { id: char2Id, order: 0 },
         { id: char3Id, order: 1 },
@@ -913,7 +913,7 @@ describe("Character CRUD Integration", () => {
     const characterTypes = ["PLAYER", "NPC", "ENEMY", "MERCHANT", "QUEST_GIVER", "BOSS", "COMPANION"];
 
     it.each(characterTypes)("should create character with type %s", async (type) => {
-      const _result = await createCharacter({
+      const result = await createCharacter({
         name: `${type} Character`,
         characterType: type as CharacterType,
         gameWorldId: testWorldId,

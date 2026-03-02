@@ -5,13 +5,13 @@ import { SearchHighlight } from "../search-highlight";
 describe("SearchHighlight", () => {
   it("should render plain text when no query is provided", () => {
     render(<SearchHighlight text="Hello world" query="" />);
-    const _result = screen.getByText("Hello world");
+    const result = screen.getByText("Hello world");
     expect(result).toBeInTheDocument();
   });
 
   it("should render plain text when query does not match", () => {
     render(<SearchHighlight text="Hello world" query="foo" />);
-    const _result = screen.getByText("Hello world");
+    const result = screen.getByText("Hello world");
     expect(result).toBeInTheDocument();
   });
 
@@ -48,7 +48,7 @@ describe("SearchHighlight", () => {
   it("should truncate long text and show ellipsis", () => {
     const longText = "a".repeat(300);
     render(<SearchHighlight text={longText} query="match" />);
-    const _result = screen.queryByText(/.*\.\.\..*/);
+    const result = screen.queryByText(/.*\.\.\..*/);
     expect(result).toBeInTheDocument();
   });
 

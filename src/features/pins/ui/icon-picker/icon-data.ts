@@ -77,6 +77,40 @@ export const EMOJI_ICONS = {
  * Lucide Icon Components
  * Import and export all available Lucide icons for pin markers
  */
+import {
+  MapPin,
+  Home,
+  Sword,
+  Gem,
+  ScrollText,
+  ShoppingBag,
+  User,
+  Mountain,
+  TreePine,
+  MountainSnow,
+  Castle,
+  Church,
+  Landmark,
+  Flame,
+  Droplets,
+  Zap,
+  Skull,
+  Shield,
+  Trophy,
+  Key,
+  Package,
+  Tent,
+  Anchor,
+  Binoculars,
+  Compass,
+  Flag,
+  Ghost,
+  Sparkles,
+  CircleDollarSign,
+  FlaskConical,
+} from "lucide-react";
+
+// Re-export for convenience
 export {
   MapPin,
   Home,

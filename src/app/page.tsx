@@ -3,7 +3,6 @@
 import { lazy, Suspense } from "react";
 import { HeroSection } from "@/features/home/ui/hero-section";
 import { FeaturesSection } from "@/features/home/ui/features-section";
-import { Footer } from "@/features/home/ui/footer";
 import { AuthButton } from "@/features/home/ui/auth-button";
 import { useCursorTrail } from "@/shared/hooks/use-cursor-trail";
 import { useScrollIndicator } from "@/shared/hooks/use-scroll-indicator";
@@ -115,8 +114,6 @@ export default function Home() {
             </h2>
           </div>
         </section>
-
-        <Footer />
       </main>
     </div>
   );

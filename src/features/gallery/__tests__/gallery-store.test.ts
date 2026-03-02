@@ -3,8 +3,17 @@
  * Unit tests for the gallery Zustand store (local state only)
  */
 
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
+
+// Mock server actions before importing the store
+vi.mock("@/features/gallery/actions", () => ({
+  createGalleryItem: vi.fn(),
+  updateGalleryItem: vi.fn(),
+  deleteGalleryItem: vi.fn(),
+  reorderGalleryItems: vi.fn(),
+}));
+
 import { useGalleryStore } from "../store/use-gallery-store";
 import type { GalleryItemWithRelations, MediaType } from "@/types/gallery.type";
 

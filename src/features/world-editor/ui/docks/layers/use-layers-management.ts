@@ -27,12 +27,12 @@ export function useLayersManagement({ worldId }: UseLayersManagementProps) {
 
   // Fetch content counts for all layers
   useEffect(() => {
-    if (!worldId || layers.length === 0) return;
+    if (!worldId || _layers.length === 0) return;
 
     const fetchCounts = async () => {
       const counts: Record<string, LayerContentCounts> = {};
       await Promise.all(
-        layers.map(async (layer) => {
+        _layers.map(async (layer) => {
           if (layer.isBaseMap || layer.type === "BASE_MAP") return;
           try {
             const layerCounts = await getLayerContentCounts(layer.id);
@@ -46,8 +46,7 @@ export function useLayersManagement({ worldId }: UseLayersManagementProps) {
     };
 
     fetchCounts();
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- Zustand store values are stable
-  }, [worldId, layers]);
+  }, [worldId, _layers]);
 
   // Create layer
   const createNewLayer = useCallback(async (
@@ -101,7 +100,7 @@ export function useLayersManagement({ worldId }: UseLayersManagementProps) {
 
   // Delete layer
   const deleteLayer = useCallback(async (layerId: string) => {
-    const layer = layers.find((l) => l.id === layerId);
+    const layer = _layers.find((l) => l.id === layerId);
     if (layer?.isBaseMap || layer?.type === "BASE_MAP") return false;
 
     setIsDeletingLayer(layerId);
@@ -120,11 +119,10 @@ export function useLayersManagement({ worldId }: UseLayersManagementProps) {
     } finally {
       setIsDeletingLayer(null);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- Zustand store values are stable
-  }, [layers, removeLayer]);
+  }, [_layers, removeLayer]);
 
   return {
-    layers,
+    layers: _layers,
     selectedLayerId,
     activeLayerId,
     contentCountsCache,

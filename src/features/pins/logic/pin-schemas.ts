@@ -28,8 +28,8 @@ export const PinSchema = z.object({
   title: z.string().min(1, "Title is required").max(200, "Title too long"),
   description: z.string().max(5000, "Description too long").optional().nullable(),
   pinType: PinTypeSchema.default("CUSTOM"),
-  latitude: z.number().min(-90).max(90),
-  longitude: z.number().min(-180).max(180),
+  latitude: z.number().min(0, "Latitude must be between 0 and 1").max(1, "Latitude must be between 0 and 1"),
+  longitude: z.number().min(0, "Longitude must be between 0 and 1").max(1, "Longitude must be between 0 and 1"),
   icon: z.string().max(100).optional().nullable(),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Invalid hex color").default("#3b82f6"),
   size: z.number().int().min(16).max(128).default(32),
@@ -53,15 +53,15 @@ export const CreatePinSchema = z
     title: z.string().min(1, "Title is required").max(200),
     description: z.string().max(5000).optional(),
     pinType: PinTypeSchema.default("CUSTOM"),
-    latitude: z.number().min(-90).max(90),
-    longitude: z.number().min(-180).max(180),
+    latitude: z.number().min(0, "Latitude must be between 0 and 1").max(1, "Latitude must be between 0 and 1"),
+    longitude: z.number().min(0, "Longitude must be between 0 and 1").max(1, "Longitude must be between 0 and 1"),
     icon: z.string().max(100).optional(),
-    color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).default("#3b82f6"),
-    size: z.number().int().min(16).max(128).default(32),
-    opacity: z.number().min(0).max(1).default(1.0),
+    color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional().default("#3b82f6"),
+    size: z.number().int().min(16).max(128).optional().default(32),
+    opacity: z.number().min(0).max(1).optional().default(1.0),
     minZoom: z.number().min(0, "Min zoom must be at least 0").max(200, "Min zoom cannot exceed 200").default(0),
     maxZoom: z.number().min(0, "Max zoom must be at least 0").max(200, "Max zoom cannot exceed 200").default(200),
-    isVisible: z.boolean().default(true),
+    isVisible: z.boolean().optional().default(true),
     properties: z.any().optional(),
     gameWorldId: z.string().cuid(),
     layerId: z.string().cuid().optional(),
@@ -83,8 +83,8 @@ export const UpdatePinSchema = z
     slug: z.string().max(100).regex(/^[a-z0-9-]*$/, "Slug must contain only lowercase letters, numbers, and hyphens").optional().nullable(),
     description: z.string().max(5000).optional(),
     pinType: PinTypeSchema.optional(),
-    latitude: z.number().min(-90).max(90).optional(),
-    longitude: z.number().min(-180).max(180).optional(),
+    latitude: z.number().min(0, "Latitude must be between 0 and 1").max(1, "Latitude must be between 0 and 1").optional(),
+    longitude: z.number().min(0, "Longitude must be between 0 and 1").max(1, "Longitude must be between 0 and 1").optional(),
     icon: z.string().max(100).optional(),
     color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
     size: z.number().int().min(16).max(128).optional(),
@@ -122,11 +122,11 @@ export const PinFiltersSchema = z.object({
 export type PinFilters = z.infer<typeof PinFiltersSchema>;
 
 /**
- * Pin coordinates for map placement
+ * Pin coordinates for map placement (normalized 0-1 range)
  */
 export const PinCoordinatesSchema = z.object({
-  latitude: z.number().min(-90).max(90),
-  longitude: z.number().min(-180).max(180),
+  latitude: z.number().min(0, "Latitude must be between 0 and 1").max(1, "Latitude must be between 0 and 1"),
+  longitude: z.number().min(0, "Longitude must be between 0 and 1").max(1, "Longitude must be between 0 and 1"),
 });
 
 export type PinCoordinates = z.infer<typeof PinCoordinatesSchema>;
@@ -136,8 +136,8 @@ export type PinCoordinates = z.infer<typeof PinCoordinatesSchema>;
  */
 export const QuickPinSchema = z.object({
   title: z.string().min(1).max(200),
-  latitude: z.number().min(-90).max(90),
-  longitude: z.number().min(-180).max(180),
+  latitude: z.number().min(0, "Latitude must be between 0 and 1").max(1, "Latitude must be between 0 and 1"),
+  longitude: z.number().min(0, "Longitude must be between 0 and 1").max(1, "Longitude must be between 0 and 1"),
   gameWorldId: z.string().cuid(),
   pinType: PinTypeSchema.default("CUSTOM"),
 });

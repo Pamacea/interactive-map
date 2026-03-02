@@ -107,7 +107,7 @@ describe("World CRUD Integration", () => {
 
   describe("createWorld", () => {
     it("should create world with valid data", async () => {
-      const _result = await createWorld({
+      const result = await createWorld({
         title: "New World",
         description: "A test world",
         isPublic: false,
@@ -138,7 +138,7 @@ describe("World CRUD Integration", () => {
     });
 
     it("should create public world", async () => {
-      const _result = await createWorld({
+      const result = await createWorld({
         title: "Public World",
         description: "A public test world",
         isPublic: true,
@@ -157,7 +157,7 @@ describe("World CRUD Integration", () => {
       // Mock no session
       mockGetServerSession.mockResolvedValueOnce(null);
 
-      const _result = await createWorld({
+      const result = await createWorld({
         title: "New World",
         description: "Should fail",
         isPublic: false,
@@ -172,7 +172,7 @@ describe("World CRUD Integration", () => {
     it("should validate title is present", async () => {
       // Note: Zod validation happens before server action
       // This tests the action handles invalid data
-      const _result = await createWorld({
+      const result = await createWorld({
         title: "",
         description: "Test",
         isPublic: false,
@@ -289,7 +289,7 @@ describe("World CRUD Integration", () => {
 
   describe("updateWorldTitle", () => {
     it("should update world title", async () => {
-      const _result = await updateWorldTitle(testWorldId, "Updated Title");
+      const result = await updateWorldTitle(testWorldId, "Updated Title");
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -306,7 +306,7 @@ describe("World CRUD Integration", () => {
 
   describe("updateWorldState", () => {
     it("should create new layer when updating state", async () => {
-      const _result = await updateWorldState(testWorldId, {
+      const result = await updateWorldState(testWorldId, {
         layers: [
           {
             id: "new-layer-id",
@@ -340,7 +340,7 @@ describe("World CRUD Integration", () => {
         },
       });
 
-      const _result = await updateWorldState(testWorldId, {
+      const result = await updateWorldState(testWorldId, {
         layers: [
           {
             id: "layer-to-update",
@@ -372,7 +372,7 @@ describe("World CRUD Integration", () => {
     });
 
     it("should skip base-map layer", async () => {
-      const _result = await updateWorldState(testWorldId, {
+      const result = await updateWorldState(testWorldId, {
         layers: [
           {
             id: "base-map",
@@ -407,7 +407,7 @@ describe("World CRUD Integration", () => {
         user: { id: otherUser.id, name: "Unauthorized", email: otherUser.email },
       });
 
-      const _result = await updateWorldState(testWorldId, {
+      const result = await updateWorldState(testWorldId, {
         layers: [],
       });
 
@@ -441,7 +441,7 @@ describe("World CRUD Integration", () => {
 
     describe("addWorldMember", () => {
       it("should add READER member", async () => {
-        const _result = await addWorldMember(testWorldId, "member-user@example.com", "READER");
+        const result = await addWorldMember(testWorldId, "member-user@example.com", "READER");
 
         expect(result.success).toBe(true);
         if (result.success) {
@@ -459,7 +459,7 @@ describe("World CRUD Integration", () => {
           data: { email: "editor-user@example.com" },
         });
 
-        const _result = await addWorldMember(testWorldId, "editor-user@example.com", "EDITOR");
+        const result = await addWorldMember(testWorldId, "editor-user@example.com", "EDITOR");
 
         expect(result.success).toBe(true);
       });
@@ -470,7 +470,7 @@ describe("World CRUD Integration", () => {
           user: { id: otherUserId, name: "Member", email: "member-user@example.com" },
         });
 
-        const _result = await addWorldMember(testWorldId, "anyone@example.com", "READER");
+        const result = await addWorldMember(testWorldId, "anyone@example.com", "READER");
 
         expect(result.success).toBe(false);
         if (!result.success) {
@@ -488,13 +488,13 @@ describe("World CRUD Integration", () => {
         await addWorldMember(testWorldId, "duplicate@example.com", "READER");
 
         // Try to add again
-        const _result = await addWorldMember(testWorldId, "duplicate@example.com", "READER");
+        const result = await addWorldMember(testWorldId, "duplicate@example.com", "READER");
 
         expect(result.success).toBe(false);
       });
 
       it("should reject non-existent user", async () => {
-        const _result = await addWorldMember(testWorldId, "nonexistent@example.com", "READER");
+        const result = await addWorldMember(testWorldId, "nonexistent@example.com", "READER");
 
         expect(result.success).toBe(false);
       });
@@ -521,7 +521,7 @@ describe("World CRUD Integration", () => {
       });
 
       it("should promote READER to EDITOR", async () => {
-        const _result = await updateWorldMemberPermission(memberId, "EDITOR");
+        const result = await updateWorldMemberPermission(memberId, "EDITOR");
 
         expect(result.success).toBe(true);
         if (result.success) {
@@ -536,7 +536,7 @@ describe("World CRUD Integration", () => {
           data: { permission: "EDITOR" },
         });
 
-        const _result = await updateWorldMemberPermission(memberId, "READER");
+        const result = await updateWorldMemberPermission(memberId, "READER");
 
         expect(result.success).toBe(true);
         if (result.success) {
@@ -550,7 +550,7 @@ describe("World CRUD Integration", () => {
           user: { id: otherUserId, name: "Member", email: "perm-update@example.com" },
         });
 
-        const _result = await updateWorldMemberPermission(memberId, "OWNER");
+        const result = await updateWorldMemberPermission(memberId, "OWNER");
 
         expect(result.success).toBe(false);
       });
@@ -576,7 +576,7 @@ describe("World CRUD Integration", () => {
       });
 
       it("should remove member", async () => {
-        const _result = await removeWorldMember(memberId);
+        const result = await removeWorldMember(memberId);
 
         expect(result.success).toBe(true);
         if (result.success) {
@@ -596,7 +596,7 @@ describe("World CRUD Integration", () => {
           user: { id: otherUserId, name: "Member", email: "remove-me@example.com" },
         });
 
-        const _result = await removeWorldMember(memberId);
+        const result = await removeWorldMember(memberId);
 
         expect(result.success).toBe(true);
       });
@@ -615,7 +615,7 @@ describe("World CRUD Integration", () => {
           user: { id: thirdUser.id, name: "Third", email: thirdUser.email },
         });
 
-        const _result = await removeWorldMember(memberId);
+        const result = await removeWorldMember(memberId);
 
         expect(result.success).toBe(false);
 
@@ -666,7 +666,7 @@ describe("World CRUD Integration", () => {
       const formData = new FormData();
       formData.append("file", mockFile);
 
-      const _result = await uploadWorldMap(testWorldId, formData);
+      const result = await uploadWorldMap(testWorldId, formData);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -697,7 +697,7 @@ describe("World CRUD Integration", () => {
       const formData = new FormData();
       formData.append("file", mockFile);
 
-      const _result = await uploadWorldMap(testWorldId, formData);
+      const result = await uploadWorldMap(testWorldId, formData);
 
       expect(result.success).toBe(false);
 

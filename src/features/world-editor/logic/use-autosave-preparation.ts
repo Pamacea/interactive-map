@@ -11,7 +11,7 @@ export function useAutosavePreparation(pinCount: number) {
   const scale = useMapStore((state) => state.scale);
 
   return {
-    layers,
+    layers: _layers,
     grid,
     snap,
     scale,

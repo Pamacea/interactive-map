@@ -237,7 +237,7 @@ export const useGalleryStore = create<GalleryStore>()(
           }
 
           // Upload to server
-          const _result = await uploadGalleryImage(formData);
+          const result = await uploadGalleryImage(formData);
 
           if (!result.success) {
             throw new Error(result.error.message);
@@ -270,7 +270,7 @@ export const useGalleryStore = create<GalleryStore>()(
 
       deleteGalleryItemServer: async (itemId) => {
         const _state = get();
-        const originalItem = state.galleryItems.find((item) => item.id === itemId);
+        const originalItem = _state.galleryItems.find((item) => item.id === itemId);
 
         // Optimistic delete
         set(
@@ -307,7 +307,7 @@ export const useGalleryStore = create<GalleryStore>()(
 
       updateGalleryItemServer: async (data) => {
         const _state = get();
-        const originalItem = state.galleryItems.find(
+        const originalItem = _state.galleryItems.find(
           (item) => item.id === data.id
         );
 
@@ -334,7 +334,7 @@ export const useGalleryStore = create<GalleryStore>()(
         );
 
         try {
-          const _result = await updateGalleryItemAction(data);
+          const result = await updateGalleryItemAction(data);
 
           if (!result.success) {
             throw new Error(result.error.message);
@@ -417,7 +417,7 @@ export const useGalleryStore = create<GalleryStore>()(
 
       applyFilters: () => {
         const _state = get();
-        const { galleryItems, searchTerm, type, linkedTo } = state;
+        const { galleryItems, searchTerm, type, linkedTo } = _state;
 
         const filtered = galleryItems.filter((item) => {
           // Search term filter

@@ -15,8 +15,7 @@ import type { Layer } from "@/features/world-editor/store/map-store";
  * Memoized to prevent unnecessary recalculations
  */
 export function useWorldInitialization(worldLayers: OptimizedWorldLayer[] | null) {
-  const _initializeLayers = useMapStore((state) => state.initializeLayers);
-  const _setWorldId = useMapStore((state) => state.setWorldId);
+  const initializeLayers = useMapStore((state) => state.initializeLayers);
 
   // Track previous world ID to detect world changes
   const prevWorldIdRef = useRef<string | null>(null);
@@ -62,7 +61,6 @@ export function useWorldInitialization(worldLayers: OptimizedWorldLayer[] | null
   useEffect(() => {
     // Initialize layers from server data
     initializeLayers(uiLayers);
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- Zustand store functions are stable
   }, [uiLayers, initializeLayers]);
 }
 
@@ -75,9 +73,8 @@ export function useWorldInitializationWithWorldId(worldId: string, worldLayers: 
 
   // Set world ID first
   useEffect(() => {
-    setWorldId(worldId);
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- Zustand store functions are stable
-  }, [worldId, setWorldId]);
+    _setWorldId(worldId);
+  }, [worldId, _setWorldId]);
 
   // Then initialize layers
   useWorldInitialization(worldLayers);

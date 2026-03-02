@@ -65,7 +65,7 @@ async function processJSONImport(
   };
 
   // Validate JSON structure
-  if (!data || typeof data !== 'object') {
+  if (!_data || typeof _data !== 'object') {
     throw new Error('Invalid JSON format');
   }
 
@@ -73,12 +73,12 @@ async function processJSONImport(
   let importedLayers = 0;
 
   // Update world metadata if present
-  if (data.world?.title || data.world?.description) {
+  if (_data.world?.title || _data.world?.description) {
     await prisma.gameWorld.update({
       where: { id: worldId },
       data: {
-        ...(data.world.title && { title: data.world.title }),
-        ...(data.world.description && { description: data.world.description }),
+        ...(_data.world.title && { title: _data.world.title }),
+        ...(_data.world.description && { description: _data.world.description }),
       },
     });
   }
@@ -179,14 +179,14 @@ async function processGeoJSONImport(
 ): Promise<ProcessResult> {
   const _data = rawData as { type?: string; features?: Array<unknown> };
 
-  if (data.type !== 'FeatureCollection' || !Array.isArray(data.features)) {
+  if (_data.type !== 'FeatureCollection' || !Array.isArray(_data.features)) {
     throw new Error('Invalid GeoJSON format. Expected FeatureCollection.');
   }
 
   let imported = 0;
   const userId = (await getAuthenticatedUser()).id;
 
-  for (const feature of data.features) {
+  for (const feature of _data.features) {
     if (typeof feature !== 'object' || feature === null) continue;
 
     const f = feature as {
@@ -235,11 +235,11 @@ async function processImageImport(
 
   const _data = rawData as { filename?: string; url?: string };
 
-  if (!data.url) {
+  if (!_data.url) {
     throw new Error('Invalid image data: missing URL');
   }
 
-  console.log('[processImageImport] Importing image:', { filename: data.filename, hasUrl: !!data.url });
+  console.log('[processImageImport] Importing image:', { filename: _data.filename, hasUrl: !!_data.url });
 
   // Get current max zIndex
   const maxLayer = await prisma.mapLayer.findFirst({
@@ -253,8 +253,8 @@ async function processImageImport(
     data: {
       worldId,
       gameWorldId: worldId,
-      name: data.filename ?? 'Imported Image Layer',
-      imageUrl: data.url,
+      name: _data.filename ?? 'Imported Image Layer',
+      imageUrl: _data.url,
       offsetX: 0,
       offsetY: 0,
       scale: 1,

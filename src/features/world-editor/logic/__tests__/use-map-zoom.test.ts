@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useMapZoom } from "../use-map-zoom";
 
 describe("useMapZoom", () => {
-  const _mockTransform = { scale: 1, translateX: 0, translateY: 0 };
+  const mockTransform = { scale: 1, translateX: 0, translateY: 0 };
   const mockSetTransform = vi.fn();
 
   beforeEach(() => {
@@ -251,7 +251,7 @@ describe("useMapZoom", () => {
     });
 
     it("should preserve translateX and translateY when zooming", () => {
-      const _transform = { scale: 1, translateX: 100, translateY: 200 };
+      const transform = { scale: 1, translateX: 100, translateY: 200 };
       const { result } = renderHook(() =>
         useMapZoom(transform, mockSetTransform)
       );

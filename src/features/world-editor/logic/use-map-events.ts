@@ -118,7 +118,7 @@ export function useMapEvents(options: UseMapEventsOptions): MapEventsResult {
     reset: resetTransform,
     setTransform,
     centerToPin,
-  } = useMapPan({ isCreatingPin });
+  } = useMapPan({ isCreatingPin: _isCreatingPin });
 
   const { handleZoomIn, handleZoomOut } = useMapZoom(transform, setTransform);
 
@@ -136,7 +136,7 @@ export function useMapEvents(options: UseMapEventsOptions): MapEventsResult {
   } = useMapImage(mapImage);
 
   // Pin filtering
-  const { visiblePins } = usePinsFiltering({ pins, layers, transform });
+  const { visiblePins } = usePinsFiltering({ pins: _pins, layers, transform });
 
   // Map interactions (for context menu)
   const {
@@ -145,8 +145,8 @@ export function useMapEvents(options: UseMapEventsOptions): MapEventsResult {
     handleSelectPinType,
   } = useMapInteractions({
     worldId,
-    selectedPin,
-    isCreatingPin,
+    selectedPin: _selectedPin,
+    isCreatingPin: _isCreatingPin,
     transform,
     imageDimensions,
     containerRef,
@@ -164,7 +164,7 @@ export function useMapEvents(options: UseMapEventsOptions): MapEventsResult {
 
   // Map handlers
   const { handlePinClick, handlePopupClose } = useMapHandlers({
-    isCreatingPin,
+    isCreatingPin: _isCreatingPin,
     selectPin,
     clearSelection,
     stopCreating,
@@ -179,19 +179,11 @@ export function useMapEvents(options: UseMapEventsOptions): MapEventsResult {
 
   // Tools manager - handles all tool interactions
   const toolsManager = useToolsManager({
-    worldId,
     containerRef,
     imageDimensions,
     transform,
     visiblePins,
     visibleRegions: regionsManager.regions,
-    selectedLayerId,
-    onCreatePin: (data) => {
-      createPin({
-        ...data,
-        layerId: activeLayerId || undefined,
-      });
-    },
     onCreateRegion: (coords) => {
       // Pass the active layer ID to createRegionFromArea
       regionsManager.createRegionFromArea(activeLayerId || "", coords);
@@ -223,13 +215,13 @@ export function useMapEvents(options: UseMapEventsOptions): MapEventsResult {
   // Center on pin function (exposed via context)
   const centerOnPin = useMemo(() => {
     return (pinId: string) => {
-      const pin = pins.find((p) => p.id === pinId);
+      const pin = _pins.find((p) => p.id === pinId);
       if (!pin || !imageDimensions || !containerRef.current) return;
 
       // Calculate pin position using the same logic as the marker
       const layer = layers.find((l) => l.id === pin.layerId);
-      const _layerOffsetX = layer?.offsetX ?? 0;
-      const _layerOffsetY = layer?.offsetY ?? 0;
+      const layerOffsetX = layer?.offsetX ?? 0;
+      const layerOffsetY = layer?.offsetY ?? 0;
 
       // Convert lat/lng to pixel coordinates
       const pinX = pin.longitude * imageDimensions.width + layerOffsetX;
@@ -244,8 +236,7 @@ export function useMapEvents(options: UseMapEventsOptions): MapEventsResult {
         containerRef
       );
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- Zustand store values are stable
-  }, [pins, imageDimensions, layers, centerToPin, containerRef]);
+  }, [_pins, imageDimensions, layers, centerToPin, containerRef]);
 
   return {
     transform,
@@ -256,8 +247,8 @@ export function useMapEvents(options: UseMapEventsOptions): MapEventsResult {
     imageDimensions,
     shouldShowGrid,
     visiblePins,
-    selectedPin,
-    isCreatingPin,
+    selectedPin: _selectedPin,
+    isCreatingPin: _isCreatingPin,
     handleMouseDown: toolsManager.handleMapMouseDown,
     handleMouseMove: toolsManager.handleMapMouseMove,
     handleMouseUp: toolsManager.handleMapMouseUp,
@@ -277,7 +268,7 @@ export function useMapEvents(options: UseMapEventsOptions): MapEventsResult {
     closeContextMenu,
     handleSelectPinType,
     getGridSize,
-    layerScale,
+    layerScale: _layerScale,
     centerOnPin,
     toolCursor: toolsManager.cursor,
   };

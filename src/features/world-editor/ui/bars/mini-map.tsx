@@ -197,11 +197,14 @@ export function MiniMap({
 
   const mapAspectRatio = imageSize ? imageSize.width / imageSize.height : 1;
   let miniMapWidth: number;
+  let miniMapHeight: number;
 
   if (mapAspectRatio > 1) {
     miniMapWidth = MINIMAP_SIZE;
+    miniMapHeight = MINIMAP_SIZE / mapAspectRatio;
   } else {
     miniMapWidth = MINIMAP_SIZE * mapAspectRatio;
+    miniMapHeight = MINIMAP_SIZE;
   }
 
   return (

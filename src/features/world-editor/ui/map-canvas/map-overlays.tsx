@@ -15,12 +15,10 @@ import { cn } from "@/shared/utils";
 // ============== Measure Overlay ==============
 
 interface MeasureOverlayProps {
-  containerRef: React.RefObject<HTMLDivElement | null>;
-  transform: { scale: number; translateX: number; translateY: number };
   imageDimensions: { width: number; height: number } | null;
 }
 
-export function MeasureOverlay({ transform, _imageDimensions }: MeasureOverlayProps) {
+export function MeasureOverlay({ imageDimensions }: MeasureOverlayProps) {
   const measurePoints = useMeasurePoints();
   const segments = useMeasureSegments();
   const isMeasuring = useIsMeasuring();
@@ -37,12 +35,13 @@ export function MeasureOverlay({ transform, _imageDimensions }: MeasureOverlayPr
     >
       {/* Render line segments */}
       {segments.map((seg, i) => {
-        // Convert normalized coordinates (lat/lng) to screen position
+        // Convert normalized coordinates (lat/lng) to map-space position
         // lat = y position (0-1 from top to bottom), lng = x position (0-1 from left to right)
-        const x1 = seg.start.lng * imageDimensions.width * transform.scale + transform.translateX;
-        const y1 = seg.start.lat * imageDimensions.height * transform.scale + transform.translateY;
-        const x2 = seg.end.lng * imageDimensions.width * transform.scale + transform.translateX;
-        const y2 = seg.end.lat * imageDimensions.height * transform.scale + transform.translateY;
+        // Note: CSS transform (scale/translate) is applied by MapTransformLayer parent
+        const x1 = seg.start.lng * imageDimensions.width;
+        const y1 = seg.start.lat * imageDimensions.height;
+        const x2 = seg.end.lng * imageDimensions.width;
+        const y2 = seg.end.lat * imageDimensions.height;
 
         return (
           <g key={i}>
@@ -73,9 +72,9 @@ export function MeasureOverlay({ transform, _imageDimensions }: MeasureOverlayPr
 
       {/* Render points */}
       {measurePoints.map((point, i) => {
-        // Convert normalized coordinates (lat/lng) to screen position
-        const x = point.lng * imageDimensions.width * transform.scale + transform.translateX;
-        const y = point.lat * imageDimensions.height * transform.scale + transform.translateY;
+        // Convert normalized coordinates (lat/lng) to map-space position
+        const x = point.lng * imageDimensions.width;
+        const y = point.lat * imageDimensions.height;
 
         return (
           <circle
@@ -93,8 +92,8 @@ export function MeasureOverlay({ transform, _imageDimensions }: MeasureOverlayPr
       {/* Total distance label */}
       {segments.length > 0 && (
         <text
-          x={measurePoints[0].lng * imageDimensions.width * transform.scale + transform.translateX}
-          y={measurePoints[0].lat * imageDimensions.height * transform.scale + transform.translateY - 20}
+          x={measurePoints[0].lng * imageDimensions.width}
+          y={measurePoints[0].lat * imageDimensions.height - 20}
           fill="rgb(250 204 21)"
           fontSize={14}
           fontWeight="bold"
@@ -111,21 +110,20 @@ export function MeasureOverlay({ transform, _imageDimensions }: MeasureOverlayPr
 // ============== Selection Rectangle Overlay ==============
 
 interface SelectionRectangleProps {
-  containerRef: React.RefObject<HTMLDivElement | null>;
-  transform: { scale: number; translateX: number; translateY: number };
   imageDimensions: { width: number; height: number } | null;
 }
 
-export function SelectionRectangle({ transform, _imageDimensions }: SelectionRectangleProps) {
+export function SelectionRectangle({ imageDimensions }: SelectionRectangleProps) {
   const selectionRect = useSelectionRect();
 
   if (!selectionRect) return null;
 
-  // Calculate rectangle in screen coordinates using pixel coordinates (startX, startY)
-  const x = Math.min(selectionRect.startX, selectionRect.endX) * transform.scale + transform.translateX;
-  const y = Math.min(selectionRect.startY, selectionRect.endY) * transform.scale + transform.translateY;
-  const width = Math.abs(selectionRect.endX - selectionRect.startX) * transform.scale;
-  const height = Math.abs(selectionRect.endY - selectionRect.startY) * transform.scale;
+  // Calculate rectangle in map-space coordinates using pixel coordinates (startX, startY)
+  // Note: CSS transform (scale/translate) is applied by MapTransformLayer parent
+  const x = Math.min(selectionRect.startX, selectionRect.endX);
+  const y = Math.min(selectionRect.startY, selectionRect.endY);
+  const width = Math.abs(selectionRect.endX - selectionRect.startX);
+  const height = Math.abs(selectionRect.endY - selectionRect.startY);
 
   return (
     <div
@@ -189,16 +187,14 @@ export function ToolStatus({ className }: ToolStatusProps) {
 // ============== Combined Overlays Component ==============
 
 interface MapOverlaysProps {
-  containerRef: React.RefObject<HTMLDivElement | null>;
-  transform: { scale: number; translateX: number; translateY: number };
   imageDimensions: { width: number; height: number } | null;
 }
 
-export function MapOverlays({ containerRef, transform, imageDimensions }: MapOverlaysProps) {
+export function MapOverlays({ imageDimensions }: MapOverlaysProps) {
   return (
     <>
-      <MeasureOverlay containerRef={containerRef} transform={transform} imageDimensions={imageDimensions} />
-      <SelectionRectangle containerRef={containerRef} transform={transform} imageDimensions={imageDimensions} />
+      <MeasureOverlay imageDimensions={imageDimensions} />
+      <SelectionRectangle imageDimensions={imageDimensions} />
       <ToolStatus />
     </>
   );

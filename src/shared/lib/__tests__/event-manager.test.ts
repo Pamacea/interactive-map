@@ -20,7 +20,7 @@ describe("eventManager", () => {
     });
 
     it("should have no active elements", () => {
-      const _state = eventManager.getState();
+      const state = eventManager.getState();
       expect(state.activeElements.size).toBe(0);
     });
   });
@@ -222,7 +222,7 @@ describe("eventManager", () => {
       eventManager.setMode("dragging-pin");
       eventManager.capture("pin-marker");
 
-      const _state = eventManager.getState();
+      const state = eventManager.getState();
 
       expect(state.mode).toBe("dragging-pin");
       expect(state.capturedBy).toBe("pin-marker");

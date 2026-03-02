@@ -6,7 +6,8 @@ import { Button } from "@/shared/ui/button";
 import type { Pin } from "@/types/pin.type";
 import { generateSlug } from "@/shared/lib/slug";
 import { useUpdatePin } from "@/features/pins/store";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { useMapStore } from "@/features/world-editor/store/map-store";
 import { TagAutosuggestTextarea } from "@/features/world-editor/ui/shared/tag-autosuggest-textarea";
 import { LinkedContentRenderer } from "@/features/world-editor/ui/shared/linked-content-renderer";
 import { CollapsibleSection } from "./shared/collapsible-section";
@@ -30,8 +31,8 @@ interface PinDetailsPanelProps {
  * - Metadata (coords, properties)
  * - Appearance settings
  */
-export function PinDetailsPanel({ pin, _worldId }: PinDetailsPanelProps) {
-  const _queryClient = useQueryClient();
+export function PinDetailsPanel({ pin, worldId }: PinDetailsPanelProps) {
+  const queryClient = useQueryClient();
   const updatePin = useUpdatePin();
 
   const [isEditingTitle, setIsEditingTitle] = React.useState(false);
@@ -409,20 +410,20 @@ interface PinLayerSectionProps {
 }
 
 function PinLayerSection({ pin }: PinLayerSectionProps) {
-  const _queryClient = useQueryClient();
-  const _layers = useMapStore((state) => state.layers);
+  const queryClient = useQueryClient();
+  const layers = useMapStore((state) => state.layers);
   const updatePin = useUpdatePin();
   const [isChangingLayer, setIsChangingLayer] = React.useState(false);
 
   // Filter out base map layer from options (pins shouldn't be on base map)
   const availableLayers = React.useMemo(() => {
     return layers.filter(layer => !(layer.isBaseMap || layer.type === "BASE_MAP"));
-  /* eslint-disable react-hooks/exhaustive-deps */ }, [layers]);
+  }, [layers]);
 
   // Find current layer name
   const currentLayer = React.useMemo(() => {
     return layers.find(layer => layer.id === pin.layerId);
-  /* eslint-disable react-hooks/exhaustive-deps */ }, [layers, pin.layerId]);
+  }, [layers, pin.layerId]);
 
   const handleLayerChange = async (newLayerId: string) => {
     if (newLayerId === pin.layerId) return;
@@ -535,7 +536,7 @@ interface PinGalleryCollapsibleSectionProps {
 function PinGalleryCollapsibleSection({ pin, worldId }: PinGalleryCollapsibleSectionProps) {
   const [_optimisticallyAddedImages, setOptimisticallyAddedImages] = React.useState<Set<string>>(new Set());
   const [optimisticallyRemovedImages, setOptimisticallyRemovedImages] = React.useState<Set<string>>(new Set());
-  const _queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
   // Load gallery images for this pin
   const { data: galleryImages = [] } = useQuery({
@@ -593,7 +594,7 @@ interface AppearanceSectionProps {
 }
 
 function AppearanceSection({ pin, updatePin }: AppearanceSectionProps) {
-  const _queryClient = useQueryClient();
+  const queryClient = useQueryClient();
   const [isIconPickerOpen, setIsIconPickerOpen] = React.useState(false);
 
   const handleIconUpdate = async (data: {
@@ -605,7 +606,7 @@ function AppearanceSection({ pin, updatePin }: AppearanceSectionProps) {
     iconBackground?: string | null;
   }) => {
     const { updatePinIconCustomization } = await import("@/features/pins/actions");
-    const _result = await updatePinIconCustomization(pin.id, data);
+    const result = await updatePinIconCustomization(pin.id, data);
 
     if (!result.success) {
       console.error("Failed to update icon customization:", result.error);

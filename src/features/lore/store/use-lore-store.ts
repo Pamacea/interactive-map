@@ -427,7 +427,7 @@ export const useLoreStore = create<LoreStore>()(
       applyFilters: () => {
         const _state = get();
         const { loreEntries, searchTerm, categoryFilters, showVisibleOnly } =
-          state;
+          _state;
 
         const filtered = loreEntries.filter((lore) => {
           // Search term filter
@@ -457,7 +457,7 @@ export const useLoreStore = create<LoreStore>()(
 
       getVisibleCategories: () => {
         const _state = get();
-        return Object.entries(state.categoryFilters)
+        return Object.entries(_state.categoryFilters)
           .filter(([_, enabled]) => enabled)
           .map(([category]) => category as LoreCategory);
       },

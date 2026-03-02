@@ -8,7 +8,7 @@ const mockSetZoom = vi.fn();
 // Mock dependencies
 vi.mock("@/features/world-editor/store/map-store", () => ({
   useMapStore: vi.fn((selector) => {
-    const _state = {
+    const state = {
       zoom: 1,
       setZoom: mockSetZoom,
     };
@@ -145,7 +145,7 @@ describe("useMapPan", () => {
 
   describe("centerToPin", () => {
     it("should do nothing if containerRef is null", () => {
-      const _containerRef = { current: null };
+      const containerRef = { current: null };
       const { result } = renderHook(() => useMapPan());
 
       act(() => {
@@ -158,7 +158,7 @@ describe("useMapPan", () => {
     });
 
     it("should calculate correct translation to center pin", () => {
-      const _containerRef = {
+      const containerRef = {
         current: {
           getBoundingClientRect: vi.fn(() => ({
             width: 800,

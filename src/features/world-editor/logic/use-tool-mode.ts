@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export type ToolMode = "select" | "create-pin" | "pan" | "measure" | "area";
+export type ToolMode = "select" | "pan" | "measure" | "area";
 
 interface ToolModeState {
   mode: ToolMode;
@@ -27,7 +27,6 @@ export const useToolMode = create<ToolModeState>()(
 // Keyboard shortcuts for tool switching
 export const TOOL_SHORTCUTS: Record<ToolMode, string> = {
   select: "v",
-  "create-pin": "p",
   pan: "h",
   measure: "m",
   area: "a",

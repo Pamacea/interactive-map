@@ -123,8 +123,8 @@ export function useLayerActions({
   }, [layers]);
 
   // Create layer actions object
-  return useMemo(() =>
-    createLayerActions({
+  return useMemo(
+    () => ({
       onToggleVisibility: toggleLayerVisibility,
       onToggleLock: toggleLayerLock,
       onOpacityChange: updateLayerOpacity,

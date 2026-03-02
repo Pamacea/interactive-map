@@ -304,11 +304,13 @@ describe("useMeasureTotalDistance", () => {
     const store = useToolsStore.getState();
 
     act(() => {
+      // Use different lng values to create distance (hook uses lng/lat for calculation)
       store.addMeasurePoint({ x: 0, y: 0, lat: 0, lng: 0 });
-      store.addMeasurePoint({ x: 100, y: 0, lat: 0, lng: 0 });
+      store.addMeasurePoint({ x: 100, y: 0, lat: 0, lng: 0.1 });
     });
 
-    // Distance = sqrt(100^2 + 0^2) = 100 pixels
+    // Distance = sqrt(0.1^2 + 0^2) = 0.1 normalized
+    // Pixel distance = 0.1 * 1000 = 100 pixels
     // World distance = 100 / 100 = 1 unit
     expect(result.current.pixels).toBe(100);
     expect(result.current.world).toBe(1);
@@ -319,12 +321,15 @@ describe("useMeasureTotalDistance", () => {
     const store = useToolsStore.getState();
 
     act(() => {
+      // Use different lng/lat values to create distance
       store.addMeasurePoint({ x: 0, y: 0, lat: 0, lng: 0 });
-      store.addMeasurePoint({ x: 100, y: 0, lat: 0, lng: 0 });
-      store.addMeasurePoint({ x: 100, y: 100, lat: 0, lng: 0 });
+      store.addMeasurePoint({ x: 100, y: 0, lat: 0, lng: 0.1 });
+      store.addMeasurePoint({ x: 100, y: 100, lat: 0.1, lng: 0.1 });
     });
 
-    // Distance = 100 + 100 = 200 pixels
+    // Distance = 0.1 + 0.1 = 0.2 normalized
+    // Pixel distance = 0.2 * 1000 = 200 pixels
+    // World distance = 200 / 100 = 2 units
     expect(result.current.pixels).toBe(200);
     expect(result.current.world).toBe(2);
   });
@@ -347,7 +352,7 @@ describe("useMeasureSegments", () => {
     act(() => {
       // Use different lng values to create distance (hook uses lng/lat for calculation)
       store.addMeasurePoint({ x: 0, y: 0, lat: 0, lng: 0 });
-      store.addMeasurePoint({ x: 100, y: 0, lat: 0, lng: 100 });
+      store.addMeasurePoint({ x: 100, y: 0, lat: 0, lng: 0.1 });
     });
 
     expect(result.current).toHaveLength(1);
@@ -362,8 +367,8 @@ describe("useMeasureSegments", () => {
     act(() => {
       // Use different lng/lat values to create distance
       store.addMeasurePoint({ x: 0, y: 0, lat: 0, lng: 0 });
-      store.addMeasurePoint({ x: 100, y: 0, lat: 0, lng: 100 });
-      store.addMeasurePoint({ x: 100, y: 100, lat: 100, lng: 100 });
+      store.addMeasurePoint({ x: 100, y: 0, lat: 0, lng: 0.1 });
+      store.addMeasurePoint({ x: 100, y: 100, lat: 0.1, lng: 0.1 });
     });
 
     expect(result.current).toHaveLength(2);

@@ -12,7 +12,7 @@ import {
   OpacitySchema,
   ZoomLevelSchema,
   UrlSchema,
-} from "../property-schemas";
+} from "./property-schemas";
 
 describe("Property Validation Schemas", () => {
   describe("TitleSchema", () => {

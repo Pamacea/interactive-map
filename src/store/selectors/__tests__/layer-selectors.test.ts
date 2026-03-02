@@ -79,20 +79,20 @@ describe("Layer Selectors", () => {
 
   describe("selectLayerById", () => {
     it("should return layer by ID", () => {
-      const _result = selectors.selectLayerById(mockLayers, "2");
+      const result = selectors.selectLayerById(mockLayers, "2");
       expect(result).toEqual(mockLayers[1]);
       expect(result?.name).toBe("Terrain");
     });
 
     it("should return undefined for non-existent ID", () => {
-      const _result = selectors.selectLayerById(mockLayers, "999");
+      const result = selectors.selectLayerById(mockLayers, "999");
       expect(result).toBeUndefined();
     });
   });
 
   describe("selectVisibleLayers", () => {
     it("should return only visible layers", () => {
-      const _result = selectors.selectVisibleLayers(mockLayers);
+      const result = selectors.selectVisibleLayers(mockLayers);
       expect(result).toHaveLength(3);
       expect(result.every((l) => l.visible)).toBe(true);
     });
@@ -100,7 +100,7 @@ describe("Layer Selectors", () => {
 
   describe("selectLockedLayers", () => {
     it("should return only locked layers", () => {
-      const _result = selectors.selectLockedLayers(mockLayers);
+      const result = selectors.selectLockedLayers(mockLayers);
       expect(result).toHaveLength(1);
       expect(result[0].id).toBe("1");
     });
@@ -108,7 +108,7 @@ describe("Layer Selectors", () => {
 
   describe("selectUnlockedLayers", () => {
     it("should return only unlocked layers", () => {
-      const _result = selectors.selectUnlockedLayers(mockLayers);
+      const result = selectors.selectUnlockedLayers(mockLayers);
       expect(result).toHaveLength(3);
       expect(result.every((l) => !l.locked)).toBe(true);
     });
@@ -120,7 +120,7 @@ describe("Layer Selectors", () => {
 
   describe("selectLayersSortedByZIndex", () => {
     it("should sort layers by z-index ascending", () => {
-      const _result = selectors.selectLayersSortedByZIndex(mockLayers);
+      const result = selectors.selectLayersSortedByZIndex(mockLayers);
       expect(result[0].zIndex).toBeLessThanOrEqual(result[1].zIndex);
       expect(result[1].zIndex).toBeLessThanOrEqual(result[2].zIndex);
       expect(result[2].zIndex).toBeLessThanOrEqual(result[3].zIndex);
@@ -135,7 +135,7 @@ describe("Layer Selectors", () => {
 
   describe("selectLayersSortedByName", () => {
     it("should sort layers alphabetically", () => {
-      const _result = selectors.selectLayersSortedByName(mockLayers);
+      const result = selectors.selectLayersSortedByName(mockLayers);
       expect(result[0].name).toBe("Base Map");
       expect(result[1].name).toBe("Labels");
       expect(result[2].name).toBe("Markers");
@@ -149,14 +149,14 @@ describe("Layer Selectors", () => {
 
   describe("selectVisibleLayerIds", () => {
     it("should return IDs of visible layers", () => {
-      const _result = selectors.selectVisibleLayerIds(mockLayers);
+      const result = selectors.selectVisibleLayerIds(mockLayers);
       expect(result).toEqual(["1", "2", "4"]);
     });
   });
 
   describe("selectActiveLayerIds", () => {
     it("should return IDs of unlocked layers", () => {
-      const _result = selectors.selectActiveLayerIds(mockLayers);
+      const result = selectors.selectActiveLayerIds(mockLayers);
       expect(result).toEqual(["2", "3", "4"]);
     });
   });
@@ -167,20 +167,20 @@ describe("Layer Selectors", () => {
 
   describe("selectIsBaseMapVisible", () => {
     it("should return true when base map is visible", () => {
-      const _result = selectors.selectIsBaseMapVisible(mockLayers);
+      const result = selectors.selectIsBaseMapVisible(mockLayers);
       expect(result).toBe(true);
     });
 
     it("should return false when base map is hidden", () => {
-      const _layers = mockLayers.map((l) =>
+      const layers = mockLayers.map((l) =>
         l.id === "1" ? { ...l, visible: false } : l
       );
-      const _result = selectors.selectIsBaseMapVisible(layers);
+      const result = selectors.selectIsBaseMapVisible(layers);
       expect(result).toBe(false);
     });
 
     it("should return true when no base map exists", () => {
-      const _result = selectors.selectIsBaseMapVisible(
+      const result = selectors.selectIsBaseMapVisible(
         mockLayers.slice(1) // Remove base map
       );
       expect(result).toBe(true); // Default to true
@@ -189,24 +189,24 @@ describe("Layer Selectors", () => {
 
   describe("selectLayerOpacity", () => {
     it("should return layer opacity", () => {
-      const _result = selectors.selectLayerOpacity(mockLayers, "2");
+      const result = selectors.selectLayerOpacity(mockLayers, "2");
       expect(result).toBe(0.8);
     });
 
     it("should return 1 for non-existent layer", () => {
-      const _result = selectors.selectLayerOpacity(mockLayers, "999");
+      const result = selectors.selectLayerOpacity(mockLayers, "999");
       expect(result).toBe(1);
     });
   });
 
   describe("selectLayerOffset", () => {
     it("should return layer offset", () => {
-      const _result = selectors.selectLayerOffset(mockLayers, "2");
+      const result = selectors.selectLayerOffset(mockLayers, "2");
       expect(result).toEqual({ offsetX: 10, offsetY: 10 });
     });
 
     it("should return zero offset for non-existent layer", () => {
-      const _result = selectors.selectLayerOffset(mockLayers, "999");
+      const result = selectors.selectLayerOffset(mockLayers, "999");
       expect(result).toEqual({ offsetX: 0, offsetY: 0 });
     });
   });
@@ -217,7 +217,7 @@ describe("Layer Selectors", () => {
 
   describe("selectLayersAtZoom", () => {
     it("should return layers visible at zoom level", () => {
-      const _result = selectors.selectLayersAtZoom(mockLayers, 100);
+      const result = selectors.selectLayersAtZoom(mockLayers, 100);
       expect(result.every((l) => {
         const minZoom = l.minZoom ?? 0;
         const maxZoom = l.maxZoom ?? 200;
@@ -226,7 +226,7 @@ describe("Layer Selectors", () => {
     });
 
     it("should exclude layers outside zoom range", () => {
-      const _result = selectors.selectLayersAtZoom(mockLayers, 25);
+      const result = selectors.selectLayersAtZoom(mockLayers, 25);
       expect(result.every((l) => l.id !== "3")).toBe(true); // Layer 3 has minZoom: 50
     });
   });
@@ -252,19 +252,19 @@ describe("Layer Selectors", () => {
 
   describe("selectLayerTransform", () => {
     it("should return transform CSS string", () => {
-      const _result = selectors.selectLayerTransform(mockLayers, "2");
+      const result = selectors.selectLayerTransform(mockLayers, "2");
       expect(result).toBe("scale(1) translate(10px, 10px)");
     });
 
     it("should return empty string for non-existent layer", () => {
-      const _result = selectors.selectLayerTransform(mockLayers, "999");
+      const result = selectors.selectLayerTransform(mockLayers, "999");
       expect(result).toBe("");
     });
   });
 
   describe("selectLayerStyle", () => {
     it("should return style object", () => {
-      const _result = selectors.selectLayerStyle(mockLayers, "2");
+      const result = selectors.selectLayerStyle(mockLayers, "2");
       expect(result).toEqual({
         opacity: 0.8,
         zIndex: 1,
@@ -273,7 +273,7 @@ describe("Layer Selectors", () => {
     });
 
     it("should return empty object for non-existent layer", () => {
-      const _result = selectors.selectLayerStyle(mockLayers, "999");
+      const result = selectors.selectLayerStyle(mockLayers, "999");
       expect(result).toEqual({});
     });
   });
@@ -316,7 +316,7 @@ describe("Layer Selectors", () => {
     });
 
     it("should return false when no layers have images", () => {
-      const _layers = mockLayers.map((l) => ({ ...l, imageUrl: undefined }));
+      const layers = mockLayers.map((l) => ({ ...l, imageUrl: undefined }));
       expect(selectors.selectHasLayerImages(layers)).toBe(false);
     });
   });
@@ -327,7 +327,7 @@ describe("Layer Selectors", () => {
 
   describe("selectLayerStateSummary", () => {
     it("should return layer state summary", () => {
-      const _result = selectors.selectLayerStateSummary(mockLayers);
+      const result = selectors.selectLayerStateSummary(mockLayers);
       expect(result).toEqual({
         total: 4,
         visible: 3,
@@ -341,7 +341,7 @@ describe("Layer Selectors", () => {
 
   describe("selectDisplayLayers", () => {
     it("should exclude base map and sort by z-index", () => {
-      const _result = selectors.selectDisplayLayers(mockLayers);
+      const result = selectors.selectDisplayLayers(mockLayers);
       expect(result).toHaveLength(3);
       expect(result.every((l) => l.id !== "1")).toBe(true);
       expect(result[0].zIndex).toBeLessThanOrEqual(result[1].zIndex);

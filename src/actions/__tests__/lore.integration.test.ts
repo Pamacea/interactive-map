@@ -148,7 +148,7 @@ describe("Lore Entry CRUD Integration", () => {
 
   describe("createLoreEntry", () => {
     it("should create lore entry with valid data", async () => {
-      const _result = await createLoreEntry({
+      const result = await createLoreEntry({
         title: "Kingdom of Eldoria",
         content: "A mighty kingdom in the north",
         slug: "eldoria",
@@ -175,7 +175,7 @@ describe("Lore Entry CRUD Integration", () => {
     });
 
     it("should create lore with default visibility values", async () => {
-      const _result = await createLoreEntry({
+      const result = await createLoreEntry({
         title: "Hidden Lore",
         content: "Secret content",
         slug: "hidden-lore",
@@ -201,7 +201,7 @@ describe("Lore Entry CRUD Integration", () => {
       });
 
       // Create second lore with same slug
-      const _result = await createLoreEntry({
+      const result = await createLoreEntry({
         title: "Second Entry",
         content: "Second content",
         slug: "duplicate-slug",
@@ -219,7 +219,7 @@ describe("Lore Entry CRUD Integration", () => {
     it("should reject unauthenticated request", async () => {
       mockGetServerSession.mockResolvedValueOnce(null);
 
-      const _result = await createLoreEntry({
+      const result = await createLoreEntry({
         title: "Should Fail",
         content: "No auth",
         slug: "fail",
@@ -234,7 +234,7 @@ describe("Lore Entry CRUD Integration", () => {
     });
 
     it("should reject access to non-existent world", async () => {
-      const _result = await createLoreEntry({
+      const result = await createLoreEntry({
         title: "Orphan Lore",
         content: "No world",
         slug: "orphan",
@@ -331,7 +331,7 @@ describe("Lore Entry CRUD Integration", () => {
 
   describe("updateLoreEntry", () => {
     it("should update lore title and content", async () => {
-      const _result = await updateLoreEntry({
+      const result = await updateLoreEntry({
         id: testLoreId,
         title: "Updated Title",
         content: "Updated content",
@@ -345,7 +345,7 @@ describe("Lore Entry CRUD Integration", () => {
     });
 
     it("should update lore category", async () => {
-      const _result = await updateLoreEntry({
+      const result = await updateLoreEntry({
         id: testLoreId,
         category: "MAGIC",
       });
@@ -369,7 +369,7 @@ describe("Lore Entry CRUD Integration", () => {
         },
       });
 
-      const _result = await updateLoreEntry({
+      const result = await updateLoreEntry({
         id: testLoreId,
         slug: "new-slug",
       });
@@ -383,7 +383,7 @@ describe("Lore Entry CRUD Integration", () => {
     });
 
     it("should update visibility flags", async () => {
-      const _result = await updateLoreEntry({
+      const result = await updateLoreEntry({
         id: testLoreId,
         isVisible: true,
         isPublic: false,
@@ -408,7 +408,7 @@ describe("Lore Entry CRUD Integration", () => {
         user: { id: otherUser.id, name: "Unauthorized", email: otherUser.email },
       });
 
-      const _result = await updateLoreEntry({
+      const result = await updateLoreEntry({
         id: testLoreId,
         title: "Hacked Title",
       });
@@ -422,7 +422,7 @@ describe("Lore Entry CRUD Integration", () => {
 
   describe("deleteLoreEntry", () => {
     it("should delete lore entry successfully", async () => {
-      const _result = await deleteLoreEntry(testLoreId);
+      const result = await deleteLoreEntry(testLoreId);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -448,7 +448,7 @@ describe("Lore Entry CRUD Integration", () => {
         user: { id: otherUser.id, name: "Attacker", email: otherUser.email },
       });
 
-      const _result = await deleteLoreEntry(testLoreId);
+      const result = await deleteLoreEntry(testLoreId);
 
       expect(result.success).toBe(false);
 
@@ -470,7 +470,7 @@ describe("Lore Entry CRUD Integration", () => {
         data: { isVisible: true },
       });
 
-      const _result = await toggleLoreVisibility(testLoreId);
+      const result = await toggleLoreVisibility(testLoreId);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -484,7 +484,7 @@ describe("Lore Entry CRUD Integration", () => {
         data: { isVisible: false },
       });
 
-      const _result = await toggleLoreVisibility(testLoreId);
+      const result = await toggleLoreVisibility(testLoreId);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -495,7 +495,7 @@ describe("Lore Entry CRUD Integration", () => {
 
   describe("Lore-Pin Linking", () => {
     it("should link lore to pin", async () => {
-      const _result = await linkLoreToPin(testLoreId, testPinId, "REFERENCES", "Some notes");
+      const result = await linkLoreToPin(testLoreId, testPinId, "REFERENCES", "Some notes");
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -511,7 +511,7 @@ describe("Lore Entry CRUD Integration", () => {
       await linkLoreToPin(testLoreId, testPinId);
 
       // Try to link again
-      const _result = await linkLoreToPin(testLoreId, testPinId);
+      const result = await linkLoreToPin(testLoreId, testPinId);
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -523,7 +523,7 @@ describe("Lore Entry CRUD Integration", () => {
       // First create the link
       await linkLoreToPin(testLoreId, testPinId);
 
-      const _result = await unlinkLoreFromPin(testLoreId, testPinId);
+      const result = await unlinkLoreFromPin(testLoreId, testPinId);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -543,7 +543,7 @@ describe("Lore Entry CRUD Integration", () => {
     });
 
     it("should reject unlinking non-existent link", async () => {
-      const _result = await unlinkLoreFromPin(testLoreId, testPinId);
+      const result = await unlinkLoreFromPin(testLoreId, testPinId);
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -555,7 +555,7 @@ describe("Lore Entry CRUD Integration", () => {
       // Link the pin
       await linkLoreToPin(testLoreId, testPinId, "DESCRIBES");
 
-      const _pins = await getPinsForLore(testLoreId);
+      const pins = await getPinsForLore(testLoreId);
 
       expect(pins).toBeInstanceOf(Array);
       expect(pins.length).toBe(1);
@@ -595,7 +595,7 @@ describe("Lore Entry CRUD Integration", () => {
     });
 
     it("should create reference between lore entries", async () => {
-      const _result = await createLoreReference(
+      const result = await createLoreReference(
         testLoreId,
         targetLoreId,
         "See Also",
@@ -618,7 +618,7 @@ describe("Lore Entry CRUD Integration", () => {
       await createLoreReference(testLoreId, targetLoreId, "Initial", "MENTION");
 
       // Update with new data
-      const _result = await createLoreReference(
+      const result = await createLoreReference(
         testLoreId,
         targetLoreId,
         "Updated Link",
@@ -637,7 +637,7 @@ describe("Lore Entry CRUD Integration", () => {
       // Create reference first
       await createLoreReference(testLoreId, targetLoreId, "To Delete");
 
-      const _result = await deleteLoreReference(testLoreId, targetLoreId);
+      const result = await deleteLoreReference(testLoreId, targetLoreId);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -681,7 +681,7 @@ describe("Lore Entry CRUD Integration", () => {
     ];
 
     it.each(categories)("should create lore with category %s", async (category) => {
-      const _result = await createLoreEntry({
+      const result = await createLoreEntry({
         title: `${category} Lore`,
         content: `Content for ${category}`,
         slug: `${category.toLowerCase()}-lore`,
@@ -700,7 +700,7 @@ describe("Lore Entry CRUD Integration", () => {
     const relationTypes = ["REFERENCES", "DESCRIBES", "CONTAINS", "IS_LOCATED_AT", "CUSTOM"];
 
     it.each(relationTypes)("should link lore to pin with relation %s", async (relationType) => {
-      const _result = await linkLoreToPin(testLoreId, testPinId, relationType as RelationType);
+      const result = await linkLoreToPin(testLoreId, testPinId, relationType as RelationType);
 
       expect(result.success).toBe(true);
       if (result.success) {

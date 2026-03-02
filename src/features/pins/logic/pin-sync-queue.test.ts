@@ -45,14 +45,14 @@ describe("PinSyncQueue", () => {
       const rollbackPos = { latitude: 0.5, longitude: 0.5 };
       pinSyncQueue.registerRequest("pin-1", rollbackPos);
 
-      const _result = pinSyncQueue.cancelPendingRequest("pin-1");
+      const result = pinSyncQueue.cancelPendingRequest("pin-1");
 
       expect(result).toEqual(rollbackPos);
       expect(pinSyncQueue.hasPendingRequest("pin-1")).toBe(false);
     });
 
     it("should return null when no pending request exists", () => {
-      const _result = pinSyncQueue.cancelPendingRequest("non-existent");
+      const result = pinSyncQueue.cancelPendingRequest("non-existent");
 
       expect(result).toBeNull();
     });

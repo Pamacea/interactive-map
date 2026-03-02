@@ -149,7 +149,7 @@ export async function getPinById(id: string) {
  */
 export async function getPinsByWorld(gameWorldId: string) {
   try {
-    const _pins = await prisma.pin.findMany({
+    const pins = await prisma.pin.findMany({
       where: { gameWorldId },
       select: {
         id: true,
@@ -459,7 +459,7 @@ export async function batchUpdatePinPositions(
     const user = await getAuthenticatedUser();
 
     // Verify all pins exist and user has permission
-    const _pins = await prisma.pin.findMany({
+    const pins = await prisma.pin.findMany({
       where: {
         id: { in: updates.map((u) => u.id) },
       },

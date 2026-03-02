@@ -15,7 +15,7 @@ export function useMyWorlds() {
         setLoading(true);
         setError(null);
         const _data = await getMyWorlds();
-        setWorlds(data);
+        setWorlds(_data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to fetch worlds");
         setWorlds([]);

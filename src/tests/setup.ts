@@ -94,3 +94,30 @@ vi.mock('next/navigation', () => ({
     getAll: vi.fn(),
   }),
 }))
+
+// Mock next-auth to avoid Next.js dependency issues
+vi.mock('next-auth', () => ({
+  default: () => ({
+    auth: vi.fn(),
+    signIn: vi.fn(),
+    signOut: vi.fn(),
+  }),
+  handlers: vi.fn(() => ({
+    GET: vi.fn(),
+    POST: vi.fn(),
+  })),
+}))
+
+vi.mock('next-auth/react', () => ({
+  useSession: vi.fn(() => ({
+    data: null,
+    status: 'unauthenticated',
+  })),
+  signIn: vi.fn(),
+  signOut: vi.fn(),
+}))
+
+// Mock NextAuth auth config
+vi.mock('@/shared/lib/auth', () => ({
+  auth: vi.fn(),
+}))

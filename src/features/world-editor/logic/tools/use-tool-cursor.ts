@@ -5,7 +5,7 @@
  * and interaction state (dragging, selecting, measuring, etc.).
  *
  * The cursor reflects:
- * - Active tool mode (select, create-pin, pan, measure, area)
+ * - Active tool mode (select, pan, measure, area)
  * - Interaction state (isDragging, isSelecting, isMeasuring)
  * - Temporary mode overrides (space+drag for pan)
  *

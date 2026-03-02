@@ -889,8 +889,8 @@ export async function updateItemTags(
     });
 
     const _worldId = item.pin?.gameWorldId || item.loreEntry?.gameWorldId || item.worldId;
-    if (worldId) {
-      revalidatePath(`/world/${worldId}`);
+    if (_worldId) {
+      revalidatePath(`/world/${_worldId}`);
     }
 
     return updated;
@@ -1010,8 +1010,8 @@ export async function updateGalleryItemCaption(
 
     // Revalidate if needed
     const _worldId = item.pin?.gameWorldId || item.loreEntry?.gameWorldId || item.worldId;
-    if (worldId) {
-      revalidatePath(`/world/${worldId}`);
+    if (_worldId) {
+      revalidatePath(`/world/${_worldId}`);
     }
 
     return updated;

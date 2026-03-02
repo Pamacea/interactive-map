@@ -29,8 +29,8 @@ export function useContextMenuPosition({
 
     const menu = menuRef.current;
     const rect = menu.getBoundingClientRect();
-    const _viewportWidth = window.innerWidth;
-    const _viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
 
     let adjustedX = position.x;
     let adjustedY = position.y;

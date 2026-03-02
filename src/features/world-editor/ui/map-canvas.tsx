@@ -144,10 +144,10 @@ export const MapCanvas = memo(function MapCanvas({ mapImage, worldId }: MapCanva
               />
             )}
           </MapContent>
-        </MapTransformLayer>
 
-        {/* Tool overlays */}
-        <MapOverlays containerRef={containerRef} transform={transform} imageDimensions={imageDimensions} />
+          {/* Tool overlays - now inside MapTransformLayer to inherit CSS transform */}
+          <MapOverlays imageDimensions={imageDimensions} />
+        </MapTransformLayer>
 
         <PlacementIndicator show={isCreatingPin && !contextMenu} />
       </MapContainer>

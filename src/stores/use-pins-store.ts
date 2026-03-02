@@ -232,8 +232,8 @@ export const usePinsStore = (): LegacyPinsStore => {
 
 // Export a convenience hook for getting the selected pin
 export const useSelectedPin = () => {
-  const _selectedPinId = useSelectedPinIdFromUI();
-  const _pins = usePins();
+  const selectedPinId = useSelectedPinIdFromUI();
+  const pins = usePins();
 
   return selectedPinId
     ? pins.find((pin) => pin.id === selectedPinId)

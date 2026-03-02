@@ -17,7 +17,7 @@ export function useActivityEvents(worldId: string, enabled = true) {
   return useQuery<ActivityEvent[]>({
     queryKey: ['activity-events', worldId],
     queryFn: async () => {
-      const _result = await getRecentEvents({ worldId, limit: 50 });
+      const result = await getRecentEvents({ worldId, limit: 50 });
       if (!result.success) {
         throw new Error(result.error?.message || 'Failed to fetch activity events');
       }

@@ -19,7 +19,8 @@ export function Layout({ children }: LayoutProps) {
   // Determine if we should show header/footer based on route
   const isAuthRoute = pathname?.startsWith("/auth") || pathname?.startsWith("/login") || pathname?.startsWith("/register");
   const isEmbedRoute = pathname?.startsWith("/embed");
-  const showChrome = !isAuthRoute && !isEmbedRoute;
+  const isWorldEditorRoute = pathname?.startsWith("/world/");
+  const showChrome = !isAuthRoute && !isEmbedRoute && !isWorldEditorRoute;
 
   return (
     <ToastProvider>

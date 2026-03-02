@@ -107,7 +107,7 @@ describe("Layer CRUD Integration", () => {
 
   describe("createLayer", () => {
     it("should create layer with valid data", async () => {
-      const _result = await createLayer(testWorldId, {
+      const result = await createLayer(testWorldId, {
         name: "New Layer",
         description: "A test layer",
         isVisible: true,
@@ -142,7 +142,7 @@ describe("Layer CRUD Integration", () => {
       });
 
       // Create second layer without specifying zIndex
-      const _result = await createLayer(testWorldId, {
+      const result = await createLayer(testWorldId, {
         name: "Second Layer",
       });
 
@@ -153,7 +153,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should use custom zIndex when specified", async () => {
-      const _result = await createLayer(testWorldId, {
+      const result = await createLayer(testWorldId, {
         name: "Custom Z Layer",
         zIndex: 10,
       });
@@ -165,7 +165,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should set default values for optional fields", async () => {
-      const _result = await createLayer(testWorldId, {
+      const result = await createLayer(testWorldId, {
         name: "Defaults Layer",
       });
 
@@ -182,7 +182,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should create layer with position offset", async () => {
-      const _result = await createLayer(testWorldId, {
+      const result = await createLayer(testWorldId, {
         name: "Offset Layer",
         offsetX: 100.5,
         offsetY: -50.25,
@@ -196,7 +196,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should create layer with custom scale", async () => {
-      const _result = await createLayer(testWorldId, {
+      const result = await createLayer(testWorldId, {
         name: "Scaled Layer",
         scale: 1.5,
       });
@@ -208,7 +208,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should create layer with zoom constraints", async () => {
-      const _result = await createLayer(testWorldId, {
+      const result = await createLayer(testWorldId, {
         name: "Zoomed Layer",
         minZoom: 50,
         maxZoom: 150,
@@ -224,7 +224,7 @@ describe("Layer CRUD Integration", () => {
     it("should reject unauthenticated request", async () => {
       mockGetServerSession.mockResolvedValueOnce(null);
 
-      const _result = await createLayer(testWorldId, {
+      const result = await createLayer(testWorldId, {
         name: "Should Fail",
       });
 
@@ -235,7 +235,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should reject access to non-existent world", async () => {
-      const _result = await createLayer("non-existent-world", {
+      const result = await createLayer("non-existent-world", {
         name: "Orphan Layer",
       });
 
@@ -245,7 +245,7 @@ describe("Layer CRUD Integration", () => {
 
   describe("updateLayer", () => {
     it("should update layer name", async () => {
-      const _result = await updateLayer(testLayerId, {
+      const result = await updateLayer(testLayerId, {
         name: "Updated Name",
       });
 
@@ -256,7 +256,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should update layer description", async () => {
-      const _result = await updateLayer(testLayerId, {
+      const result = await updateLayer(testLayerId, {
         description: "New description",
       });
 
@@ -267,7 +267,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should update layer visibility", async () => {
-      const _result = await updateLayer(testLayerId, {
+      const result = await updateLayer(testLayerId, {
         isVisible: false,
       });
 
@@ -278,7 +278,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should update layer opacity", async () => {
-      const _result = await updateLayer(testLayerId, {
+      const result = await updateLayer(testLayerId, {
         opacity: 0.5,
       });
 
@@ -289,7 +289,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should update layer zIndex", async () => {
-      const _result = await updateLayer(testLayerId, {
+      const result = await updateLayer(testLayerId, {
         zIndex: 5,
       });
 
@@ -300,7 +300,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should update position offset", async () => {
-      const _result = await updateLayer(testLayerId, {
+      const result = await updateLayer(testLayerId, {
         offsetX: 200,
         offsetY: -100,
       });
@@ -313,7 +313,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should update scale", async () => {
-      const _result = await updateLayer(testLayerId, {
+      const result = await updateLayer(testLayerId, {
         scale: 0.75,
       });
 
@@ -324,7 +324,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should update zoom constraints", async () => {
-      const _result = await updateLayer(testLayerId, {
+      const result = await updateLayer(testLayerId, {
         minZoom: 25,
         maxZoom: 175,
       });
@@ -337,7 +337,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should update multiple fields at once", async () => {
-      const _result = await updateLayer(testLayerId, {
+      const result = await updateLayer(testLayerId, {
         name: "Multi Update",
         opacity: 0.6,
         zIndex: 3,
@@ -365,7 +365,7 @@ describe("Layer CRUD Integration", () => {
         user: { id: otherUser.id, name: "Unauthorized", email: otherUser.email },
       });
 
-      const _result = await updateLayer(testLayerId, {
+      const result = await updateLayer(testLayerId, {
         name: "Hacked Name",
       });
 
@@ -379,7 +379,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should reject updating non-existent layer", async () => {
-      const _result = await updateLayer("non-existent-layer", {
+      const result = await updateLayer("non-existent-layer", {
         name: "Ghost Layer",
       });
 
@@ -392,7 +392,7 @@ describe("Layer CRUD Integration", () => {
 
   describe("updateLayerPosition", () => {
     it("should update layer position for drag operation", async () => {
-      const _result = await updateLayerPosition(testLayerId, 150, -75);
+      const result = await updateLayerPosition(testLayerId, 150, -75);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -402,7 +402,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should support negative offsets", async () => {
-      const _result = await updateLayerPosition(testLayerId, -200, -300);
+      const result = await updateLayerPosition(testLayerId, -200, -300);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -418,7 +418,7 @@ describe("Layer CRUD Integration", () => {
         data: { offsetX: 100, offsetY: 100 },
       });
 
-      const _result = await updateLayerPosition(testLayerId, 0, 0);
+      const result = await updateLayerPosition(testLayerId, 0, 0);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -430,7 +430,7 @@ describe("Layer CRUD Integration", () => {
 
   describe("updateLayerScale", () => {
     it("should increase layer scale", async () => {
-      const _result = await updateLayerScale(testLayerId, 1.5);
+      const result = await updateLayerScale(testLayerId, 1.5);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -439,7 +439,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should decrease layer scale", async () => {
-      const _result = await updateLayerScale(testLayerId, 0.5);
+      const result = await updateLayerScale(testLayerId, 0.5);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -453,7 +453,7 @@ describe("Layer CRUD Integration", () => {
         data: { scale: 1.5 },
       });
 
-      const _result = await updateLayerScale(testLayerId, 1.0);
+      const result = await updateLayerScale(testLayerId, 1.0);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -464,7 +464,7 @@ describe("Layer CRUD Integration", () => {
 
   describe("updateLayerZIndex", () => {
     it("should update layer zIndex", async () => {
-      const _result = await updateLayerZIndex(testLayerId, 10);
+      const result = await updateLayerZIndex(testLayerId, 10);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -473,7 +473,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should support negative zIndex", async () => {
-      const _result = await updateLayerZIndex(testLayerId, -1);
+      const result = await updateLayerZIndex(testLayerId, -1);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -493,7 +493,7 @@ describe("Layer CRUD Integration", () => {
         },
       });
 
-      const _result = await deleteLayer(tempLayer.id);
+      const result = await deleteLayer(tempLayer.id);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -519,7 +519,7 @@ describe("Layer CRUD Integration", () => {
         user: { id: otherUser.id, name: "Attacker", email: otherUser.email },
       });
 
-      const _result = await deleteLayer(testLayerId);
+      const result = await deleteLayer(testLayerId);
 
       expect(result.success).toBe(false);
 
@@ -534,7 +534,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should reject deleting non-existent layer", async () => {
-      const _result = await deleteLayer("non-existent-layer");
+      const result = await deleteLayer("non-existent-layer");
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -570,7 +570,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should reorder multiple layers by zIndex", async () => {
-      const _result = await batchUpdateLayers([
+      const result = await batchUpdateLayers([
         { id: testLayerId, zIndex: 2 },
         { id: layer2Id, zIndex: 0 },
         { id: layer3Id, zIndex: 1 },
@@ -589,7 +589,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should update positions and scales in batch", async () => {
-      const _result = await batchUpdateLayers([
+      const result = await batchUpdateLayers([
         { id: testLayerId, zIndex: 5, offsetX: 100, offsetY: 50, scale: 1.2 },
         { id: layer2Id, zIndex: 6, offsetX: 200, offsetY: 100, scale: 0.8 },
       ]);
@@ -608,7 +608,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should handle empty updates array", async () => {
-      const _result = await batchUpdateLayers([]);
+      const result = await batchUpdateLayers([]);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -617,7 +617,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should reject batch with non-existent layer", async () => {
-      const _result = await batchUpdateLayers([
+      const result = await batchUpdateLayers([
         { id: testLayerId, zIndex: 1 },
         { id: "non-existent-layer", zIndex: 2 },
       ]);
@@ -637,7 +637,7 @@ describe("Layer CRUD Integration", () => {
         user: { id: otherUser.id, name: "Attacker", email: otherUser.email },
       });
 
-      const _result = await batchUpdateLayers([
+      const result = await batchUpdateLayers([
         { id: testLayerId, zIndex: 99 },
       ]);
 
@@ -650,7 +650,7 @@ describe("Layer CRUD Integration", () => {
 
   describe("Zoom Constraints", () => {
     it("should create layer with zoom constraints", async () => {
-      const _result = await createLayer(testWorldId, {
+      const result = await createLayer(testWorldId, {
         name: "Zoom Constrained Layer",
         minZoom: 50,
         maxZoom: 150,
@@ -667,7 +667,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should update zoom constraints", async () => {
-      const _result = await updateLayer(testLayerId, {
+      const result = await updateLayer(testLayerId, {
         minZoom: 25,
         maxZoom: 175,
       });
@@ -680,7 +680,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should allow minZoom of 0", async () => {
-      const _result = await createLayer(testWorldId, {
+      const result = await createLayer(testWorldId, {
         name: "Zero Min Zoom",
         minZoom: 0,
         maxZoom: 100,
@@ -693,7 +693,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should allow maxZoom of 200", async () => {
-      const _result = await createLayer(testWorldId, {
+      const result = await createLayer(testWorldId, {
         name: "Max Max Zoom",
         minZoom: 0,
         maxZoom: 200,
@@ -710,7 +710,7 @@ describe("Layer CRUD Integration", () => {
     it("should handle very long descriptions", async () => {
       const longDescription = "A".repeat(5000);
 
-      const _result = await createLayer(testWorldId, {
+      const result = await createLayer(testWorldId, {
         name: "Long Description Layer",
         description: longDescription,
       });
@@ -724,7 +724,7 @@ describe("Layer CRUD Integration", () => {
     it("should handle special characters in names", async () => {
       const specialName = "Layer with émojis 🎨 and spëcial çhars";
 
-      const _result = await createLayer(testWorldId, {
+      const result = await createLayer(testWorldId, {
         name: specialName,
       });
 
@@ -735,7 +735,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should handle fractional offsets", async () => {
-      const _result = await updateLayerPosition(testLayerId, 123.456, -789.012);
+      const result = await updateLayerPosition(testLayerId, 123.456, -789.012);
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -745,7 +745,7 @@ describe("Layer CRUD Integration", () => {
     });
 
     it("should handle fractional scale", async () => {
-      const _result = await updateLayerScale(testLayerId, 0.123);
+      const result = await updateLayerScale(testLayerId, 0.123);
 
       expect(result.success).toBe(true);
       if (result.success) {

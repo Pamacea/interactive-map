@@ -61,15 +61,15 @@ export interface CoordinateResult {
 export function usePinScreenCoordinates(input: CoordinateInput): CoordinateResult {
   const { pin, imageDimensions, layers } = input;
 
-  const _result = useMemo(() => {
+  const result = useMemo(() => {
     // Find the layer this pin belongs to (if any)
     const layer = pin.layerId
       ? layers.find((l) => l.id === pin.layerId) ?? null
       : null;
 
     // Extract layer offset (null-safe)
-    const _layerOffsetX = layer?.offsetX ?? 0;
-    const _layerOffsetY = layer?.offsetY ?? 0;
+    const layerOffsetX = layer?.offsetX ?? 0;
+    const layerOffsetY = layer?.offsetY ?? 0;
 
     // Get image dimensions
     const actualWidth = imageDimensions?.width ?? 0;

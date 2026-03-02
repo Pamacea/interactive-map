@@ -2,6 +2,17 @@ import type { NextConfig } from "next";
 import path from "path";
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'cdn.discordapp.com',
+        port: '',
+        pathname: '/avatars/**',
+      },
+    ],
+  },
+
   experimental: {
     serverActions: {
       bodySizeLimit: '10mb', // Allow file uploads up to 10MB

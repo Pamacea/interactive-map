@@ -27,7 +27,7 @@ export function WebSiteSchema() {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(_schema) }}
     />
   );
 }
@@ -58,7 +58,7 @@ export function OrganizationSchema() {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(_schema) }}
     />
   );
 }
@@ -98,7 +98,7 @@ export function ArticleSchema({ article }: { article: {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(_schema) }}
     />
   );
 }
@@ -111,7 +111,16 @@ export function ArticleSchema({ article }: { article: {
  *
  * @see https://schema.org/CreativeWork
  */
-export function CreativeWorkSchema({ work }: { work: {
+export function CreativeWorkSchema({
+  name,
+  description,
+  image,
+  author,
+  dateCreated,
+  dateModified,
+  url,
+  genre = "Fantasy",
+}: {
   name?: string;
   description?: string;
   image?: string;
@@ -120,27 +129,27 @@ export function CreativeWorkSchema({ work }: { work: {
   dateModified?: string;
   url?: string;
   genre?: string;
-}}) {
+}) {
   const _schema = {
     "@context": "https://schema.org",
     "@type": "CreativeWork",
-    name: work.name || siteConfig.name,
-    description: work.description || siteConfig.description,
-    image: work.image || `${siteConfig.url}/og-image.png`,
+    name: name || siteConfig.name,
+    description: description || siteConfig.description,
+    image: image || `${siteConfig.url}/og-image.png`,
     author: {
       "@type": "Person",
-      name: work.author || siteConfig.name,
+      name: author || siteConfig.name,
     },
-    dateCreated: work.dateCreated || new Date().toISOString(),
-    dateModified: work.dateModified || new Date().toISOString(),
-    url: work.url || siteConfig.url,
-    genre: work.genre || "Fantasy",
+    dateCreated: dateCreated || new Date().toISOString(),
+    dateModified: dateModified || new Date().toISOString(),
+    url: url || siteConfig.url,
+    genre,
   };
 
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(_schema) }}
     />
   );
 }

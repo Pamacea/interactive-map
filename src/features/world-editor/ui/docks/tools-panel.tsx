@@ -3,7 +3,6 @@
 import { useEffect, useCallback } from "react";
 import {
   MousePointer2,
-  MapPin,
   Hand,
   Ruler,
   Square,
@@ -13,11 +12,10 @@ import { useToolMode, useSetToolMode } from "@/features/world-editor/store/tools
 import { useLeftDock } from "../../logic/use-left-dock";
 
 // Re-export types from the new store
-type ToolMode = "select" | "create-pin" | "pan" | "measure" | "area";
+type ToolMode = "select" | "pan" | "measure" | "area";
 
 const TOOL_SHORTCUTS: Record<ToolMode, string> = {
   select: "v",
-  "create-pin": "p",
   pan: "h",
   measure: "m",
   area: "a",
@@ -149,11 +147,6 @@ export function ToolsPanel({ className }: ToolsPanelProps) {
       mode: "select",
       label: "Select",
       icon: <MousePointer2 className="w-full h-full" strokeWidth={2.5} />,
-    },
-    {
-      mode: "create-pin",
-      label: "Add Pin",
-      icon: <MapPin className="w-full h-full" strokeWidth={2.5} />,
     },
     {
       mode: "pan",

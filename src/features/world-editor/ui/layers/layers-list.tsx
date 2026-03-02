@@ -70,7 +70,7 @@ export function LayersList({
   }, [sortedLayers, selectedLayerId]);
 
   // Handle drag start
-  const _handleDragStart = useCallback((layerId: string) => {
+  const handleDragStart = useCallback((layerId: string) => {
     setDraggingLayerId(layerId);
   }, []);
 
@@ -107,7 +107,7 @@ export function LayersList({
     onDragOver: handleDragOver,
     onDragEnd: handleDragEnd,
     onDrop: handleDrop,
-  /* eslint-disable react-hooks/exhaustive-deps */ }), [actions, handleDragStart, handleDragOver, handleDragEnd, handleDrop]);
+  }), [actions, handleDragStart, handleDragOver, handleDragEnd, handleDrop]);
 
   // Generate layer colors
   const getLayerColor = useMemo(() => {

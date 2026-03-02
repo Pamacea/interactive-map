@@ -43,11 +43,11 @@ import {
 } from "@/features/pins/store";
 import type { PinWithLayer } from "../use-pins-filtering";
 import type { RegionCoordinates } from "@/types/region.type";
+import { inputManager, INPUT_PRIORITY } from "@/shared/lib/input-manager";
 
 // ============== Options ==============
 
 export interface UseToolsManagerOptions {
-  worldId?: string;
   containerRef: React.RefObject<HTMLDivElement | null>;
   imageDimensions: { width: number; height: number } | null;
   transform: { scale: number; translateX: number; translateY: number };
@@ -58,15 +58,6 @@ export interface UseToolsManagerOptions {
     coordinates: RegionCoordinates;
     locked: boolean;
   }>;
-  onCreatePin?: (data: {
-    gameWorldId: string;
-    title: string;
-    pinType: string;
-    latitude: number;
-    longitude: number;
-    layerId?: string;
-    isVisible: boolean;
-  }) => void;
   onCreateRegion?: (coords: {
     x: number;
     y: number;
@@ -76,7 +67,6 @@ export interface UseToolsManagerOptions {
   onPinClick?: (pin: PinWithLayer) => void;
   onRegionClick?: (regionId: string) => void;
   onClearSelection?: () => void;
-  selectedLayerId?: string | null;
 }
 
 // ============== Event Handlers ==============
@@ -180,18 +170,15 @@ function isPointInRegion(
 
 export function useToolsManager(options: UseToolsManagerOptions): ToolsManagerHandlers {
   const {
-    worldId,
     containerRef,
     imageDimensions,
     transform,
     visiblePins,
     visibleRegions,
-    onCreatePin,
     onCreateRegion,
     onPinClick,
     onRegionClick,
     onClearSelection,
-    selectedLayerId,
   } = options;
 
   // Tool state from store
@@ -225,6 +212,109 @@ export function useToolsManager(options: UseToolsManagerOptions): ToolsManagerHa
   // Refs for values only needed in event handlers
   const dragStartRef = useRef<{ x: number; y: number } | null>(null);
   const justFinishedDragRef = useRef(false);
+
+  // Register area tool with input manager to prevent map panning during selection
+  useEffect(() => {
+    // Only register when tool mode is "area"
+    if (toolMode !== "area") return;
+
+    const cleanup = inputManager.register({
+      element: "map-canvas",
+      priority: INPUT_PRIORITY.PIN_MARKER, // Higher priority than map-canvas pan
+      handlers: {
+        mouse: {
+          down: (e: MouseEvent) => {
+            // Only left click
+            if (e.button !== 0) return false;
+
+            // Check if we're clicking on interactive elements
+            const target = e.target;
+            if (
+              target instanceof HTMLElement &&
+              (target.closest("button") ||
+                target.closest("a") ||
+                target.closest('[role="button"]') ||
+                target.closest("input") ||
+                target.closest("textarea"))
+            ) {
+              return false;
+            }
+
+            // Start selection - capture the event to prevent map panning
+            if (containerRef.current && imageDimensions) {
+              const rect = containerRef.current.getBoundingClientRect();
+              const coords = screenToMapCoordinates(
+                e.clientX,
+                e.clientY,
+                rect,
+                transform,
+                imageDimensions
+              );
+              startSelection(coords.x, coords.y);
+              return true; // Capture event to prevent map pan
+            }
+
+            return false;
+          },
+          move: (e: MouseEvent) => {
+            // Update selection if we're selecting
+            if (isSelecting && containerRef.current && imageDimensions) {
+              const rect = containerRef.current.getBoundingClientRect();
+              const coords = screenToMapCoordinates(
+                e.clientX,
+                e.clientY,
+                rect,
+                transform,
+                imageDimensions
+              );
+              updateSelection(coords.x, coords.y);
+              return true; // Capture event to prevent map pan
+            }
+
+            return false;
+          },
+          up: (_e: MouseEvent) => {
+            // End selection if we were selecting
+            if (isSelecting) {
+              const selectionRect = useToolsStore.getState().selectionRect;
+              endSelection();
+
+              if (selectionRect && imageDimensions) {
+                const startX = Math.min(selectionRect.startX, selectionRect.endX);
+                const startY = Math.min(selectionRect.startY, selectionRect.endY);
+                const width = Math.abs(selectionRect.endX - selectionRect.startX);
+                const height = Math.abs(selectionRect.endY - selectionRect.startY);
+
+                // Only create region if it has meaningful size (> 10px)
+                if (width > 10 && height > 10) {
+                  onCreateRegion?.({ x: startX, y: startY, width, height });
+                }
+              }
+
+              clearToolSelection();
+              return true; // Capture event
+            }
+
+            return false;
+          },
+        },
+      },
+      enabled: () => toolMode === "area",
+    });
+
+    return cleanup;
+  }, [
+    toolMode,
+    containerRef,
+    imageDimensions,
+    transform,
+    isSelecting,
+    startSelection,
+    updateSelection,
+    endSelection,
+    onCreateRegion,
+    clearToolSelection,
+  ]);
 
   // ==================== SELECT TOOL ====================
 
@@ -284,39 +374,6 @@ export function useToolsManager(options: UseToolsManagerOptions): ToolsManagerHa
     [containerRef, imageDimensions, transform, visiblePins, visibleRegions, onPinClick, onRegionClick, onClearSelection, clearToolSelection, togglePinSelection, setMultiplePinSelection]
   );
 
-  // ==================== CREATE PIN TOOL ====================
-
-  const handleCreatePinClick = useCallback(
-    (e: React.MouseEvent) => {
-      if (!worldId || !containerRef.current || !imageDimensions) return;
-
-      const rect = containerRef.current.getBoundingClientRect();
-      const coords = screenToMapCoordinates(e.clientX, e.clientY, rect, transform, imageDimensions);
-
-      // Check if clicking on existing pin
-      const clickedPin = visiblePins.find((pin) => {
-        const pinX = pin.longitude * imageDimensions.width;
-        const pinY = pin.latitude * imageDimensions.height;
-        const dx = coords.x - pinX;
-        const dy = coords.y - pinY;
-        return Math.sqrt(dx * dx + dy * dy) < 15;
-      });
-
-      if (!clickedPin) {
-        onCreatePin?.({
-          gameWorldId: worldId,
-          title: "New Pin",
-          pinType: "marker",
-          latitude: coords.lat,
-          longitude: coords.lng,
-          layerId: selectedLayerId || undefined,
-          isVisible: true,
-        });
-      }
-    },
-    [worldId, containerRef, imageDimensions, transform, visiblePins, onCreatePin, selectedLayerId]
-  );
-
   // ==================== MEASURE TOOL ====================
 
   const handleMeasureClick = useCallback(
@@ -331,60 +388,9 @@ export function useToolsManager(options: UseToolsManagerOptions): ToolsManagerHa
     [containerRef, imageDimensions, transform, addMeasurePoint]
   );
 
-  // ==================== AREA/SELECTION TOOL ====================
-
-  const handleAreaMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      if (!containerRef.current || !imageDimensions) return;
-
-      const rect = containerRef.current.getBoundingClientRect();
-      const coords = screenToMapCoordinates(e.clientX, e.clientY, rect, transform, imageDimensions);
-
-      // Pass pixel coordinates (x, y) for rendering
-      startSelection(coords.x, coords.y);
-    },
-    [containerRef, imageDimensions, transform, startSelection]
-  );
-
-  const handleAreaMouseMove = useCallback(
-    (e: React.MouseEvent) => {
-      if (!isSelecting || !containerRef.current || !imageDimensions) return;
-
-      const rect = containerRef.current.getBoundingClientRect();
-      const coords = screenToMapCoordinates(e.clientX, e.clientY, rect, transform, imageDimensions);
-
-      // Pass pixel coordinates (x, y) for rendering
-      updateSelection(coords.x, coords.y);
-    },
-    [isSelecting, containerRef, imageDimensions, transform, updateSelection]
-  );
-
-  const handleAreaMouseUp = useCallback(() => {
-    if (!isSelecting) return;
-
-    // Get the selection rectangle from store before clearing
-    const selectionRect = useToolsStore.getState().selectionRect;
-
-    endSelection();
-
-    if (selectionRect && imageDimensions) {
-      // Use pixel coordinates directly from selection rectangle
-      const startX = Math.min(selectionRect.startX, selectionRect.endX);
-      const startY = Math.min(selectionRect.startY, selectionRect.endY);
-      const width = Math.abs(selectionRect.endX - selectionRect.startX);
-      const height = Math.abs(selectionRect.endY - selectionRect.startY);
-
-      // Only create region if it has meaningful size (> 10px)
-      if (width > 10 && height > 10) {
-        onCreateRegion?.({ x: startX, y: startY, width, height });
-      }
-    }
-
-    // Clear selection after region creation
-    clearToolSelection();
-  }, [isSelecting, imageDimensions, endSelection, onCreateRegion, clearToolSelection]);
-
   // ==================== UNIFIED HANDLERS ====================
+  // Note: Area tool is now handled by input manager registration above
+  // to properly capture events and prevent map panning during selection
 
   const handleMapClick = useCallback(
     (e: React.MouseEvent) => {
@@ -397,9 +403,6 @@ export function useToolsManager(options: UseToolsManagerOptions): ToolsManagerHa
       switch (toolMode) {
         case "select":
           handleSelectClick(e);
-          break;
-        case "create-pin":
-          handleCreatePinClick(e);
           break;
         case "measure":
           handleMeasureClick(e);
@@ -415,7 +418,6 @@ export function useToolsManager(options: UseToolsManagerOptions): ToolsManagerHa
     [
       toolMode,
       handleSelectClick,
-      handleCreatePinClick,
       handleMeasureClick,
     ]
   );
@@ -428,13 +430,10 @@ export function useToolsManager(options: UseToolsManagerOptions): ToolsManagerHa
       dragStartRef.current = { x: e.clientX, y: e.clientY };
       setIsDragging(false);
 
-      switch (toolMode) {
-        case "area":
-          handleAreaMouseDown(e);
-          break;
-      }
+      // Area tool is now handled by input manager registration above
+      // No need to handle it here
     },
-    [toolMode, handleAreaMouseDown]
+    []
   );
 
   const handleMapMouseMove = useCallback(
@@ -450,13 +449,10 @@ export function useToolsManager(options: UseToolsManagerOptions): ToolsManagerHa
         }
       }
 
-      switch (toolMode) {
-        case "area":
-          handleAreaMouseMove(e);
-          break;
-      }
+      // Area tool is now handled by input manager registration above
+      // No need to handle it here
     },
-    [toolMode, handleAreaMouseMove]
+    []
   );
 
   const handleMapMouseUp = useCallback(
@@ -469,13 +465,10 @@ export function useToolsManager(options: UseToolsManagerOptions): ToolsManagerHa
       }
       setIsDragging(false);
 
-      switch (toolMode) {
-        case "area":
-          handleAreaMouseUp();
-          break;
-      }
+      // Area tool is now handled by input manager registration above
+      // No need to handle it here
     },
-    [toolMode, handleAreaMouseUp, isDragging]
+    [isDragging]
   );
 
   const handleMapContextMenu = useCallback((e: React.MouseEvent) => {

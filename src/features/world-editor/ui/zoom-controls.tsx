@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Plus, Minus, Maximize2, ChevronDown } from "lucide-react";
 import { createPortal } from "react-dom";
-import { useScale, useMapStore } from "@/features/map-store";
+import { useScale, useMapStore } from "@/stores/map-store";
 
 interface ZoomControlsProps {
   scale: number;
@@ -12,7 +12,7 @@ interface ZoomControlsProps {
   onReset: () => void;
 }
 
-const _SCALE_OPTIONS = ["1:1000", "1:500", "1:100"] as const;
+const SCALE_OPTIONS = ["1:1000", "1:500", "1:100"] as const;
 
 export function ZoomControls({ scale, onZoomIn, onZoomOut, onReset }: ZoomControlsProps) {
   const mapScale = useScale();

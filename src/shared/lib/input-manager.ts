@@ -323,7 +323,7 @@ class InputManager {
       const handler = mouseHandlers[eventType];
       if (handler) {
         try {
-          const _result = handler(event);
+          const result = handler(event);
           // Handler returns true = handled/captured, false = continue
           if (result === true && stopIfHandled) {
             event.preventDefault();
@@ -402,7 +402,7 @@ class InputManager {
 
       if (reg.handlers.mouse.down) {
         try {
-          const _result = reg.handlers.mouse.down(e);
+          const result = reg.handlers.mouse.down(e);
           if (result === true) {
             // Handler captured the event (true = handled)
             this.state.capturedBy = reg.element;

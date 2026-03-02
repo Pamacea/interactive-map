@@ -28,7 +28,7 @@ import {
   type RegionWithLayer,
   type RegionCoordinates,
 } from "@/features/world-editor/store/regions";
-import type { Layer } from "@/features/map-store";
+import type { Layer } from "@/stores/map-store";
 
 interface UseRegionsInMapOptions {
   worldId?: string;

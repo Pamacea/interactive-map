@@ -14,12 +14,12 @@ import { AuthenticationError, AuthorizationError, NotFoundError } from "@/shared
 export async function getAuthenticatedUser() {
   const _session = await auth();
 
-  if (!session?.user?.id) {
+  if (!_session?.user?.id) {
     throw new AuthenticationError();
   }
 
   const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
+    where: { id: _session.user.id },
   });
 
   if (!user) {
@@ -210,9 +210,9 @@ export async function verifyGalleryPermission(itemId: string, userId: string) {
 
   const _worldId = item.pin?.gameWorldId || item.loreEntry?.gameWorldId || item.character?.gameWorldId;
 
-  if (worldId) {
+  if (_worldId) {
     const world = await prisma.gameWorld.findUnique({
-      where: { id: worldId },
+      where: { id: _worldId },
     });
 
     if (world?.userId !== userId) {

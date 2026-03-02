@@ -34,11 +34,12 @@ export function AuthButton() {
   return (
     <div ref={menuRef} className="relative">
       {!user ? (
-        <Link href="/auth/signin">
-          <button className="flex items-center gap-2 px-4 py-2 text-accent-gold font-display-ornate text-xs tracking-wider hover:text-accent-gold-light transition-colors">
-            <span className="text-accent-gold-dark opacity-60">ᛟ</span>
-            <span className="hidden sm:inline">ENTER</span>
-          </button>
+        <Link
+          href="/auth/signin"
+          className="flex items-center gap-2 px-4 py-2 text-accent-gold font-display-ornate text-xs tracking-wider hover:text-accent-gold-light transition-colors"
+        >
+          <span className="text-accent-gold-dark opacity-60">ᛟ</span>
+          <span className="hidden sm:inline">ENTER</span>
         </Link>
       ) : (
         <>

@@ -3,8 +3,17 @@
  * Unit tests for the lore Zustand store (local state only)
  */
 
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
+
+// Mock server actions before importing the store
+vi.mock("@/features/lore/actions/lore", () => ({
+  createLoreEntry: vi.fn(),
+  updateLoreEntry: vi.fn(),
+  deleteLoreEntry: vi.fn(),
+  reorderLoreEntries: vi.fn(),
+}));
+
 import { useLoreStore } from "../store/use-lore-store";
 import type { LoreEntry, LoreCategory } from "@prisma/client";
 

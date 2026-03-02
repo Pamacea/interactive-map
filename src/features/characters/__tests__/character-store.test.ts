@@ -3,8 +3,22 @@
  * Unit tests for the character Zustand store (local state only)
  */
 
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
+
+// Mock server actions before importing the store
+vi.mock("@/features/characters/actions", () => ({
+  createCharacter: vi.fn(),
+  updateCharacter: vi.fn(),
+  deleteCharacter: vi.fn(),
+  toggleCharacterVisibility: vi.fn(),
+  linkCharacterToPin: vi.fn(),
+  unlinkCharacterFromPin: vi.fn(),
+  createCharacterRelationship: vi.fn(),
+  updateCharacterRelationship: vi.fn(),
+  deleteCharacterRelationship: vi.fn(),
+}));
+
 import { useCharacterStore } from "../store/use-character-store";
 import type { Character } from "@prisma/client";
 

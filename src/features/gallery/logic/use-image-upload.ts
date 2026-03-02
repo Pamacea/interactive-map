@@ -52,7 +52,7 @@ export function useImageUpload({
 
     for (const file of fileArray) {
       const preview = createPreviewURL(file);
-      const _result = await validateAndPrepareImage(file);
+      const result = await validateAndPrepareImage(file);
 
       if (!result.valid && result.error) {
         errors.push(result.error);

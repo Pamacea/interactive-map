@@ -7,7 +7,7 @@
 
 import { useState, useMemo, useCallback } from "react";
 import { Plus } from "lucide-react";
-import { useMapStore } from "@/features/map-store";
+import { useMapStore } from "@/stores/map-store";
 import {
   LayersList,
   LayersEmptyState,

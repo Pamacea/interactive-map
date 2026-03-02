@@ -56,7 +56,7 @@ vi.mock("@/shared/lib/server-helpers", () => ({
 vi.mock("@/shared/lib/errors", () => ({
   safeAsync: async (fn: () => Promise<unknown>, _errorMessage: string) => {
     try {
-      const _result = await fn();
+      const result = await fn();
       // Simulate Result<T> wrapper - return as success
       return { success: true, data: result };
     } catch (error) {
@@ -100,7 +100,7 @@ describe("Worlds Server Actions", () => {
 
       const { createWorld } = await import("@/features/worlds/actions");
 
-      const _result = await createWorld({
+      const result = await createWorld({
         title: "Test World",
         description: "Test Description",
         isPublic: false,
@@ -123,7 +123,7 @@ describe("Worlds Server Actions", () => {
 
       const { createWorld } = await import("@/features/worlds/actions");
 
-      const _result = await createWorld({ title: "New World", description: "", isPublic: false });
+      const result = await createWorld({ title: "New World", description: "", isPublic: false });
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -142,7 +142,7 @@ describe("Worlds Server Actions", () => {
 
       const { getMyWorlds } = await import("@/features/worlds/actions");
 
-      const _result = await getMyWorlds();
+      const result = await getMyWorlds();
 
       expect(result).toEqual(mockWorlds);
     });
@@ -164,7 +164,7 @@ describe("Worlds Server Actions", () => {
 
       const { getWorldById } = await import("@/features/worlds/actions");
 
-      const _result = await getWorldById("world-1");
+      const result = await getWorldById("world-1");
 
       expect(result).not.toBeNull();
       expect(result?.id).toBe("world-1");
@@ -175,7 +175,7 @@ describe("Worlds Server Actions", () => {
 
       const { getWorldById } = await import("@/features/worlds/actions");
 
-      const _result = await getWorldById("non-existent");
+      const result = await getWorldById("non-existent");
 
       expect(result).toBeNull();
     });
@@ -198,7 +198,7 @@ describe("Worlds Server Actions", () => {
 
       const { updateWorldTitle } = await import("@/features/worlds/actions");
 
-      const _result = await updateWorldTitle("world-1", "Updated Title");
+      const result = await updateWorldTitle("world-1", "Updated Title");
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -217,7 +217,7 @@ describe("Worlds Server Actions", () => {
 
       const { updateWorldState } = await import("@/features/worlds/actions");
 
-      const _result = await updateWorldState("world-1", {
+      const result = await updateWorldState("world-1", {
         isPublic: true,
       });
 
@@ -233,7 +233,7 @@ describe("Worlds Server Actions", () => {
 
       const { createWorld } = await import("@/features/worlds/actions");
 
-      const _result = await createWorld({ title: "Duplicate", description: "Test", isPublic: false });
+      const result = await createWorld({ title: "Duplicate", description: "Test", isPublic: false });
 
       expect(result.success).toBe(false);
     });
@@ -243,7 +243,7 @@ describe("Worlds Server Actions", () => {
 
       const { getMyWorlds } = await import("@/features/worlds/actions");
 
-      const _result = await getMyWorlds();
+      const result = await getMyWorlds();
 
       // Should return empty array on error
       expect(result).toEqual([]);

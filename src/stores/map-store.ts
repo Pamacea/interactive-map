@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
-const _SCALE_OPTIONS = ["1:1000", "1:500", "1:100"] as const;
+const SCALE_OPTIONS = ["1:1000", "1:500", "1:100"] as const;
 type ScaleOption = (typeof SCALE_OPTIONS)[number];
 
 export type LayerType = "BASE_MAP" | "MARKERS" | "IMAGES" | "REGIONS" | "GROUP" | "CUSTOM";

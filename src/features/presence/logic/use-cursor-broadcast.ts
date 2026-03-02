@@ -71,6 +71,12 @@ export function useCursorBroadcast({
     (x: number, y: number) => {
       if (!enabled) return;
 
+      // Handle NaN values - treat as undefined (don't send)
+      if (!Number.isFinite(x) || !Number.isFinite(y)) {
+        // Don't update position for invalid coordinates
+        return;
+      }
+
       // Clamp values to valid range [0, 1]
       const clampedX = Math.max(0, Math.min(1, x));
       const clampedY = Math.max(0, Math.min(1, y));

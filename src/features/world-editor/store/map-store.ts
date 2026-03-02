@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
-const _SCALE_OPTIONS = ["1:1000", "1:500", "1:100"] as const;
+const SCALE_OPTIONS = ["1:1000", "1:500", "1:100"] as const;
 type ScaleOption = (typeof SCALE_OPTIONS)[number];
 
 export type LayerType = "BASE_MAP" | "MARKERS" | "IMAGES" | "REGIONS" | "GROUP" | "CUSTOM";
@@ -437,9 +437,9 @@ export const useMapStore = create<MapState>()(
       initializeLayers: (layers) =>
         set((_state) => {
           // Idempotency check: if layers are already initialized with same data, skip
-          if (state.layers.length === layers.length &&
-              state.layers.every((l, i) => l.id === layers[i]?.id)) {
-            return state;
+          if (_state.layers.length === layers.length &&
+              _state.layers.every((l, i) => l.id === layers[i]?.id)) {
+            return _state;
           }
 
           // Ensure there's always a base map layer

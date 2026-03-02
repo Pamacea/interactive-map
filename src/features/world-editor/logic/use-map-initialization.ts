@@ -58,7 +58,7 @@ export function useMapInitialization(
     containerRef,
     grid,
     scale,
-    _layers,
+    layers: _layers,
     selectedLayerId,
     baseMapVisible,
   };

@@ -216,7 +216,7 @@ export const useLoreStore = create<LoreStore>()(
         );
 
         try {
-          const _result = await createLoreAction(data);
+          const result = await createLoreAction(data);
 
           if (!result.success) {
             throw new Error(result.error.message);
@@ -256,7 +256,7 @@ export const useLoreStore = create<LoreStore>()(
 
       deleteLoreEntryServer: async (loreId) => {
         const _state = get();
-        const originalLore = state.loreEntries.find((lore) => lore.id === loreId);
+        const originalLore = _state.loreEntries.find((lore) => lore.id === loreId);
 
         // Optimistic delete
         set(
@@ -316,7 +316,7 @@ export const useLoreStore = create<LoreStore>()(
         );
 
         try {
-          const _result = await updateLoreAction(data);
+          const result = await updateLoreAction(data);
 
           if (!result.success) {
             throw new Error(result.error.message);
@@ -427,7 +427,7 @@ export const useLoreStore = create<LoreStore>()(
       applyFilters: () => {
         const _state = get();
         const { loreEntries, searchTerm, categoryFilters, showVisibleOnly } =
-          state;
+          _state;
 
         const filtered = loreEntries.filter((lore) => {
           // Search term filter
@@ -457,7 +457,7 @@ export const useLoreStore = create<LoreStore>()(
 
       getVisibleCategories: () => {
         const _state = get();
-        return Object.entries(state.categoryFilters)
+        return Object.entries(_state.categoryFilters)
           .filter(([_, enabled]) => enabled)
           .map(([category]) => category as LoreCategory);
       },

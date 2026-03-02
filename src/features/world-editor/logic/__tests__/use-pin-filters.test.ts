@@ -245,7 +245,7 @@ describe("useFilteredPins", () => {
   });
 
   it("should filter pins by visible types", () => {
-    const _pins = [
+    const pins = [
       { id: "1", pinType: PinType.CITY },
       { id: "2", pinType: PinType.DUNGEON },
       { id: "3", pinType: PinType.VILLAGE },
@@ -260,7 +260,7 @@ describe("useFilteredPins", () => {
   it("should return empty array when no types visible", () => {
     mockVisibleTypes = [];
 
-    const _pins = [
+    const pins = [
       { id: "1", pinType: PinType.CITY },
       { id: "2", pinType: PinType.DUNGEON },
     ] as Array<{ id: string; pinType: string }>;
@@ -273,7 +273,7 @@ describe("useFilteredPins", () => {
   it("should return all pins when all types visible", () => {
     mockVisibleTypes = Object.values(PinType);
 
-    const _pins = [
+    const pins = [
       { id: "1", pinType: PinType.CITY },
       { id: "2", pinType: PinType.DUNGEON },
       { id: "3", pinType: PinType.VILLAGE },

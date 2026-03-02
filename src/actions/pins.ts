@@ -159,7 +159,7 @@ export async function getPinsByWorld(gameWorldId: string) {
       orderBy: { title: "asc" },
     });
 
-    return pins;
+    return _pins;
   } catch (error) {
     console.error("[getPinsByWorld] Failed to fetch pins:", error);
     return [];
@@ -407,7 +407,7 @@ export async function uploadPinIcon(
     const randomId = Math.random().toString(36).substring(2, 15);
     const _ext = path.default.extname(file.name);
     const _sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
-    const fileName = `${timestamp}-${randomId}-${sanitizedName}`;
+    const fileName = `${timestamp}-${randomId}-${_sanitizedName}`;
     const filePath = path.default.join(uploadsDir, fileName);
 
     const bytes = await file.arrayBuffer();
@@ -465,12 +465,12 @@ export async function batchUpdatePinPositions(
       },
     });
 
-    if (pins.length !== updates.length) {
+    if (_pins.length !== updates.length) {
       throw new ValidationError("One or more pins not found");
     }
 
     // Check permissions for all pins
-    const worldIds = [...new Set(pins.map((p) => p.gameWorldId))];
+    const worldIds = [...new Set(_pins.map((p) => p.gameWorldId))];
 
     for (const worldId of worldIds) {
       await verifyWorldPermission(worldId, user.id);

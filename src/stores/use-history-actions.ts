@@ -32,7 +32,7 @@ export function useCreatePinWithHistory(
 
   return useCallback(
     async (data: unknown & { gameWorldId?: string }) => {
-      const _result = await createPinFn(data);
+      const result = await createPinFn(data);
 
       if (result) {
         addHistory({
@@ -160,7 +160,7 @@ export function useUpdatePinWithHistory(
       const pinId = data.id;
       const changes = { ...data };
 
-      const _result = await updatePinFn(data);
+      const result = await updatePinFn(data);
 
       if (result && previousData) {
         addHistory({
@@ -198,7 +198,7 @@ export function useCreateLayerWithHistory(
 
   return useCallback(
     async (worldId: string, data: unknown) => {
-      const _result = await createLayerFn(worldId, data);
+      const result = await createLayerFn(worldId, data);
 
       if (result) {
         addHistory({
@@ -310,7 +310,7 @@ export function useCreateRegionWithHistory(
 
   return useCallback(
     async (layerId: string, data: unknown) => {
-      const _result = await createRegionFn(layerId, data);
+      const result = await createRegionFn(layerId, data);
 
       if (result) {
         addHistory({

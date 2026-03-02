@@ -158,10 +158,10 @@ export function PropertyInput({
     if (isLoading) {
       return <Loader2 className="h-4 w-4 animate-spin text-text-muted" />;
     }
-    if (state === "success" && hasValue) {
+    if (_state === "success" && hasValue) {
       return <Check className="h-4 w-4 text-status-success" />;
     }
-    if (state === "error") {
+    if (_state === "error") {
       return <X className="h-4 w-4 text-status-error" />;
     }
     return null;
@@ -179,7 +179,7 @@ export function PropertyInput({
               ? "text-accent-gold"
               : error
                 ? "text-status-error"
-                : state === "success"
+                : _state === "success"
                   ? "text-status-success"
                   : "text-text-muted"
           )}
@@ -236,9 +236,9 @@ export function PropertyInput({
             "focus:shadow-lg",
             sizeClasses[size],
             variantClasses[variant],
-            stateClasses[state],
+            stateClasses[_state],
             (icon || leftAddon) && "pl-10",
-            (suffix || rightAddon || showClear || showCopy || state === "success" || state === "error") && "pr-10"
+            (suffix || rightAddon || showClear || showCopy || _state === "success" || _state === "error") && "pr-10"
           )}
           onFocus={(e) => {
             setIsFocused(true);
@@ -256,8 +256,8 @@ export function PropertyInput({
           rightAddon ||
           showClear ||
           showCopy ||
-          state === "success" ||
-          state === "error") && (
+          _state === "success" ||
+          _state === "error") && (
           <div
             className={cn(
               "absolute right-0 top-0 flex h-full items-center pr-2 gap-1",

@@ -3,7 +3,7 @@
 import { prisma } from "@/shared/lib/prisma";
 import { unstable_cache } from "next/cache";
 import type { OptimizedWorld } from "@/types/world.type";
-import { getAuthenticatedUser } from "@/shared/lib/server-helpers";
+import { getAuthenticatedUser, verifyWorldPermission } from "@/shared/lib/server-helpers";
 import { safeAsync, type Result } from "@/shared/lib/errors";
 import { createLogger } from "@/shared/lib/logger";
 
