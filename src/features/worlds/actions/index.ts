@@ -23,6 +23,8 @@ export {
 
 export {
   updateWorldTitle,
+  updateWorldDescription,
+  updateWorldBackgroundColor,
   updateWorldState,
   uploadWorldMap,
 } from "./update";

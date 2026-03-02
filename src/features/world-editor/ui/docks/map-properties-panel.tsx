@@ -20,6 +20,7 @@ import { PropertyColorPicker } from "@/shared/ui/properties/property-color-picke
 import { useBackgroundColor, useMapStore } from "@/features/world-editor/store/map-store";
 import { PermissionsPanel } from "./permissions/permissions-panel";
 import type { GameWorld } from "@/types/world.type";
+import { updateWorldTitle, updateWorldDescription, updateWorldBackgroundColor } from "@/features/worlds/actions/update";
 
 // Background color presets for map backgrounds
 const BACKGROUND_COLOR_PRESETS = [
@@ -86,25 +87,29 @@ export function MapPropertiesPanel({
 
   const handleSaveName = async () => {
     if (editedName.trim() && editedName !== world?.title) {
-      // TODO: Implement server action to update world name
-      onUpdate?.({ ...world!, title: editedName.trim() });
+      const result = await updateWorldTitle(worldId, editedName.trim());
+      if (result.success) {
+        onUpdate?.({ ...world!, title: editedName.trim() });
+      }
     }
     setIsEditingName(false);
   };
 
   const handleSaveDesc = async () => {
     if (editedDesc !== (world?.description ?? "")) {
-      // TODO: Implement server action to update world description
-      onUpdate?.({ ...world!, description: editedDesc });
+      const result = await updateWorldDescription(worldId, editedDesc.trim() || null);
+      if (result.success) {
+        onUpdate?.({ ...world!, description: editedDesc || null });
+      }
     }
     setIsEditingDesc(false);
   };
 
   const handleBackgroundColorChange = async (color: string) => {
     // Update local state immediately for responsive UI
-    // Note: For now, background color is stored in Zustand + localStorage
-    // TODO: Add backgroundColor field to GameWorld schema for DB persistence
     setBackgroundColor(color);
+    // Persist to database
+    await updateWorldBackgroundColor(worldId, color);
   };
 
   const handleKeyDown = (

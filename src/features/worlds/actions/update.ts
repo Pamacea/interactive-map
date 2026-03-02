@@ -37,6 +37,46 @@ export async function updateWorldTitle(id: string, title: string): Promise<Resul
 }
 
 /**
+ * Update world description
+ */
+export async function updateWorldDescription(id: string, description: string | null): Promise<Result<GameWorld>> {
+  return safeAsync(async () => {
+    const user = await getAuthenticatedUser();
+
+    await verifyWorldPermission(id, user.id);
+
+    const updated = await prisma.gameWorld.update({
+      where: { id },
+      data: { description: description ?? null },
+    });
+
+    revalidatePath(`/world/${id}`);
+
+    return updated;
+  }, "updateWorldDescription");
+}
+
+/**
+ * Update world background color
+ */
+export async function updateWorldBackgroundColor(id: string, backgroundColor: string): Promise<Result<GameWorld>> {
+  return safeAsync(async () => {
+    const user = await getAuthenticatedUser();
+
+    await verifyWorldPermission(id, user.id);
+
+    const updated = await prisma.gameWorld.update({
+      where: { id },
+      data: { backgroundColor },
+    });
+
+    revalidatePath(`/world/${id}`);
+
+    return updated;
+  }, "updateWorldBackgroundColor");
+}
+
+/**
  * Update world state (layers, map properties, etc.) for autosave
  */
 export async function updateWorldState(

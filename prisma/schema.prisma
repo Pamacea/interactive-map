@@ -87,14 +87,15 @@ enum Permission {
 }
 
 model GameWorld {
-  id          String        @id @default(cuid())
-  title       String
-  description String?       @db.Text
-  map         String?
-  isPublished Boolean       @default(false)
-  isPublic    Boolean       @default(true)
-  userId      String
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id             String        @id @default(cuid())
+  title          String
+  description    String?       @db.Text
+  map            String?
+  backgroundColor String?       @default("#1a1a1a")
+  isPublished    Boolean       @default(false)
+  isPublic       Boolean       @default(true)
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   members     WorldMember[]
   invites     WorldInvite[]
   pins        Pin[]
