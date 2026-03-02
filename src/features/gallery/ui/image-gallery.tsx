@@ -11,10 +11,14 @@ import { ImageCard } from "./image-card";
 import { ImageLightbox } from "./image-lightbox";
 import { ImageUploadZone } from "./image-upload-zone";
 import { DeleteConfirmDialog } from "@/shared/ui/delete-confirm-dialog";
+import { EditImageDialog } from "./edit-image-dialog";
+import { LinkToPinDialog } from "./link-to-pin-dialog";
+import { LinkToLoreDialog } from "./link-to-lore-dialog";
 import { useGalleryStore } from "@/features/gallery/store";
 import { useGallery } from "../logic/use-gallery-query";
 import { galleryKeys } from "../logic/use-gallery-query";
-// import type { GalleryItemWithRelations } from "@/types/gallery.type"; // Not used yet
+import type { GalleryItemWithRelations } from "@/types/gallery.type";
+import { usePins } from "@/features/pins/store";
 
 export interface ImageGalleryProps {
   worldId: string;
@@ -26,9 +30,23 @@ export function ImageGallery({ worldId, className }: ImageGalleryProps) {
   const [imageToDelete, setImageToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // New dialog states
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [linkToPinDialogOpen, setLinkToPinDialogOpen] = useState(false);
+  const [linkToLoreDialogOpen, setLinkToLoreDialogOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<GalleryItemWithRelations | null>(null);
+
   // TanStack Query for data fetching
   const { data: galleryItems = [], isLoading: isLoadingQuery, refetch } = useGallery(worldId);
   const _queryClient = useQueryClient();
+
+  // Fetch pins for linking (from store)
+  const pins = usePins();
+
+  // Get lore entries from gallery items (they have lore relations)
+  const loreEntries = galleryItems
+    .map((item) => item.loreEntry)
+    .filter((lore): lore is NonNullable<typeof lore> => lore !== null);
 
   const galleryStore = useGalleryStore();
 
@@ -101,6 +119,27 @@ export function ImageGallery({ worldId, className }: ImageGalleryProps) {
     } finally {
       setIsDeleting(false);
     }
+  };
+
+  const handleEdit = (image: GalleryItemWithRelations) => {
+    setSelectedImage(image);
+    setEditDialogOpen(true);
+  };
+
+  const handleLinkToPin = (image: GalleryItemWithRelations) => {
+    setSelectedImage(image);
+    setLinkToPinDialogOpen(true);
+  };
+
+  const handleLinkToLore = (image: GalleryItemWithRelations) => {
+    setSelectedImage(image);
+    setLinkToLoreDialogOpen(true);
+  };
+
+  const handleDialogSuccess = () => {
+    // Invalidate queries to refresh data
+    queryClient.invalidateQueries({ queryKey: galleryKeys.world(worldId) });
+    refetch();
   };
 
   return (
@@ -198,16 +237,10 @@ export function ImageGallery({ worldId, className }: ImageGalleryProps) {
                   image={image}
                   isSelected={galleryStore.selectedImageId === image.id}
                   onSelect={() => handleImageClick(index)}
-                  onEdit={() => {
-                    /* TODO: Implement edit dialog */
-                  }}
+                  onEdit={() => handleEdit(image)}
                   onDelete={() => handleDelete(image.id)}
-                  onLinkToPin={() => {
-                    /* TODO: Implement link to pin dialog */
-                  }}
-                  onLinkToLore={() => {
-                    /* TODO: Implement link to lore dialog */
-                  }}
+                  onLinkToPin={() => handleLinkToPin(image)}
+                  onLinkToLore={() => handleLinkToLore(image)}
                 />
               ))}
             </div>
@@ -223,12 +256,8 @@ export function ImageGallery({ worldId, className }: ImageGalleryProps) {
         onClose={closeLightbox}
         onNext={nextImage}
         onPrevious={previousImage}
-        onLinkToPin={(_image) => {
-          /* TODO: Implement link to pin dialog */
-        }}
-        onLinkToLore={(_image) => {
-          /* TODO: Implement link to lore dialog */
-        }}
+        onLinkToPin={(image) => handleLinkToPin(image)}
+        onLinkToLore={(image) => handleLinkToLore(image)}
       />
 
       {/* Delete confirmation dialog */}
@@ -240,6 +269,38 @@ export function ImageGallery({ worldId, className }: ImageGalleryProps) {
         title="Delete Image?"
         description="Are you sure you want to delete this image? This action cannot be undone."
       />
+
+      {/* Edit image dialog */}
+      {selectedImage && (
+        <EditImageDialog
+          image={selectedImage}
+          open={editDialogOpen}
+          onClose={() => setEditDialogOpen(false)}
+          onSuccess={handleDialogSuccess}
+        />
+      )}
+
+      {/* Link to pin dialog */}
+      {selectedImage && (
+        <LinkToPinDialog
+          image={selectedImage}
+          pins={pins}
+          open={linkToPinDialogOpen}
+          onClose={() => setLinkToPinDialogOpen(false)}
+          onSuccess={handleDialogSuccess}
+        />
+      )}
+
+      {/* Link to lore dialog */}
+      {selectedImage && (
+        <LinkToLoreDialog
+          image={selectedImage}
+          loreEntries={loreEntries}
+          open={linkToLoreDialogOpen}
+          onClose={() => setLinkToLoreDialogOpen(false)}
+          onSuccess={handleDialogSuccess}
+        />
+      )}
     </div>
   );
 }
