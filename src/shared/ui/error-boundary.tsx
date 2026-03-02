@@ -3,6 +3,7 @@
 import React from "react";
 import { Button } from "@/shared/ui/button";
 import { AlertCircle, RefreshCw } from "lucide-react";
+import { captureException, addSentryBreadcrumb } from "@/shared/lib/sentry";
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
@@ -70,24 +71,25 @@ export class ErrorBoundary extends React.Component<
   };
 
   /**
-   * Log errors to external service (placeholder for future integration)
+   * Log errors to Sentry
    */
   private logErrorToService = (error: Error, errorInfo: React.ErrorInfo): void => {
-    // Prepare error payload
-    const errorPayload = {
-      message: error.message,
-      stack: error.stack,
+    // Add breadcrumb for context
+    addSentryBreadcrumb(
+      "React Error Boundary caught error",
+      "react",
+      "error",
+      {
+        componentStack: errorInfo.componentStack,
+        errorMessage: error.message,
+      }
+    );
+
+    // Capture exception with context
+    captureException(error, {
       componentStack: errorInfo.componentStack,
-      timestamp: new Date().toISOString(),
-      userAgent: navigator.userAgent,
-      url: window.location.href,
-    };
-
-    // TODO: Send to error reporting service
-    // Example: fetch('/api/errors', { method: 'POST', body: JSON.stringify(errorPayload) });
-
-    // For now, log to console in production as well
-    console.error("[ErrorBoundary] Error logged:", errorPayload);
+      errorBoundary: "ErrorBoundary",
+    });
   };
 
   render(): React.ReactNode {

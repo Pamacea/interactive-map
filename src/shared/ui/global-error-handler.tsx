@@ -2,6 +2,7 @@
 
 import { useEffect, ReactNode } from "react";
 import { ErrorBoundary } from "@/shared/ui/error-boundary";
+import { captureException, addSentryBreadcrumb } from "@/shared/lib/sentry";
 
 interface GlobalErrorHandlerProps {
   children: ReactNode;
@@ -25,10 +26,15 @@ export function GlobalErrorHandler({ children }: GlobalErrorHandlerProps) {
       // Prevent default browser error logging (we handle it ourselves)
       event.preventDefault();
 
-      // In production, send to error reporting service
+      // Send to Sentry in production
       if (process.env.NODE_ENV === "production") {
-        // TODO: Send to error reporting service (Sentry, LogRocket, etc.)
-        reportError(event.reason);
+        addSentryBreadcrumb(
+          "Unhandled Promise Rejection",
+          "promise",
+          "error",
+          { reason: String(event.reason) }
+        );
+        captureException(event.reason instanceof Error ? event.reason : new Error(String(event.reason)));
       }
     };
 
@@ -39,10 +45,15 @@ export function GlobalErrorHandler({ children }: GlobalErrorHandlerProps) {
       // Prevent default browser error logging
       event.preventDefault();
 
-      // In production, send to error reporting service
+      // Send to Sentry in production
       if (process.env.NODE_ENV === "production") {
-        // TODO: Send to error reporting service
-        reportError(event.error);
+        addSentryBreadcrumb(
+          "Uncaught Error",
+          "window",
+          "error",
+          { message: event.message, filename: event.filename, lineno: event.lineno }
+        );
+        captureException(event.error);
       }
     };
 
@@ -61,22 +72,15 @@ export function GlobalErrorHandler({ children }: GlobalErrorHandlerProps) {
 }
 
 /**
- * Report error to external service
- * Placeholder for future error reporting integration
+ * Report error to Sentry
  */
 function reportError(error: unknown): void {
-  // Prepare error payload
-  const errorPayload = {
-    message: error instanceof Error ? error.message : "Unknown error",
-    stack: error instanceof Error ? error.stack : undefined,
-    timestamp: new Date().toISOString(),
+  // Capture error details for Sentry
+  const errorContext = {
     userAgent: navigator.userAgent,
     url: window.location.href,
+    timestamp: new Date().toISOString(),
   };
 
-  // TODO: Send to error reporting service
-  // Example: fetch('/api/errors', { method: 'POST', body: JSON.stringify(errorPayload) });
-
-  // For now, just log to console
-  console.error("[GlobalErrorHandler] Error reported:", errorPayload);
+  captureException(error, errorContext);
 }

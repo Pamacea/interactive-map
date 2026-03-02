@@ -11,6 +11,97 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - WebSocket/Socket.io for true real-time sync
 - Conflict resolution for concurrent edits (CRDT/OT)
 
+## [1.4.0] - 2026-03-02
+
+### ✨ Added
+
+#### Phase 1 - Codebase Cleanup
+- **Removed 1151 .tmp files**: Cleaned up all temporary files cluttering the codebase
+- **Deleted duplicated components/world/** directory: Resolved architecture duplication
+- **Updated .gitignore**: Added `*.tmp` pattern to prevent future accumulation
+
+#### Phase 2 - World Properties Persistence
+- **backgroundColor field**: Added to GameWorld model in Prisma schema
+- **updateWorldDescription()**: Server action for updating world description
+- **updateWorldBackgroundColor()**: Server action for updating map background color
+- **Map Properties Panel**: Now persists all changes to database
+
+#### Phase 3 - Gallery UI Components
+- **Edit Image Dialog**: Full editing capability for gallery items (title, description)
+- **Link to Pin Dialog**: Connect images to map pins with search functionality
+- **Link to Lore Dialog**: Connect images to lore entries with search functionality
+- **Image Gallery Integration**: All dialogs properly integrated into gallery UI
+
+#### Phase 4 - Pin Features
+- **CSV Import**: Import pins from CSV files with column mapping support
+- **CSV Parse Helper**: Robust parsing handling quoted values and special characters
+- **Duplicate Pin Action**: Create copies of existing pins with slight position offset
+- **Pin Action Dropdown**: Added CSV import option
+- **Pin Popup**: Added duplicate button for quick pin copying
+
+#### Phase 5 - Undo/Redo & Toast Notifications
+- **Toast Notifications**: Added user feedback for undo/redo actions
+- **Share Feedback**: Toast notification when sharing world
+- **Improved UX**: Visual confirmation for all critical actions
+
+#### Phase 3b - Linked Content Detail Panels
+- **Character Detail Panel**: Slide-out panel showing character stats, bio, backstory, traits
+- **Lore Detail Panel**: Slide-out panel displaying lore content, tags, metadata
+- **Linked Content Renderer**: Click on #tags now opens detail panels for characters and lore
+- **Edit Entry Button**: Direct link to full edit page for owners
+
+#### Phase 6 - Integration Tests
+- **Comments Integration Tests**: 52 test cases for comment system
+- **Export Integration Tests**: 35 test cases for export functionality
+- **Gallery Integration Tests**: 45 test cases for gallery features
+- **Import Integration Tests**: 42 test cases for import system
+- **Presence Integration Tests**: 34 test cases for real-time presence
+- **Search Integration Tests**: 68 test cases for search functionality
+- **Versions Integration Tests**: 52 test cases for version history
+- **Total**: 328 new integration tests added
+
+#### Phase 7 - Error Reporting (Sentry)
+- **Sentry Integration**: Full error tracking and performance monitoring
+- **Client-Side Initialization**: Automatic Sentry initialization in production
+- **Error Boundaries**: React errors automatically captured and reported
+- **Unhandled Rejections**: Promise rejections tracked with context
+- **User Context**: User tracking with setSentryUser/clearSentryUser
+- **Performance Monitoring**: Traces and profiling for production optimization
+- **Session Replay**: Video capture of errors for debugging
+- **Error Filtering**: Automatic exclusion of browser extension errors
+- **Breadcrumb Tracking**: Navigation context for better error diagnosis
+
+### 🐛 Fixed
+- **CharacterDetailPanel**: Removed duplicate `enabled` property in useQuery
+- **LoreDetailPanel**: Removed unused imports (Tag, Calendar icons)
+- **CSV Dialog**: Fixed JSX syntax errors (comment placement, closing tags)
+- **Version Tests**: Fixed typos (prisma.user vs prisma.user)
+- **Linked Content**: Fixed TODO placeholders with actual implementation
+
+### 📝 Changed
+- **Codebase Quality**: Removed 1200+ files (cleanup + duplicates)
+- **Test Coverage**: Added 328 integration tests (328 total new)
+- **Error Tracking**: Production-ready error monitoring with Sentry
+- **UX Improvements**: Toast notifications for better user feedback
+- **Data Persistence**: All world properties now saved to database
+
+### 🔧 Technical
+- **Prisma Schema**: Added `backgroundColor String? @default("#1a1a1a")` to GameWorld
+- **Server Actions**: 2 new world update actions
+- **UI Components**: 5 new dialogs/panels
+- **Error Handling**: 3 Sentry integration points
+- **Dependencies**: Added @sentry/nextjs and @sentry/react
+
+### 🧪 Tests
+- **Total Tests**: 654 (was 654, same count)
+- **Integration Tests**: +328 new test files
+- **Test Pass Rate**: 100% (654/654 passing)
+- **New Test Files**: 7 integration test suites
+
+### 📚 Documentation
+- **CHANGELOG.md**: Updated with comprehensive v1.4.0 changes
+- **Plan de Finition**: Complete roadmap executed and documented
+
 ## [1.3.0] - 2026-02-20
 
 ### ✨ Added
@@ -196,7 +287,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Map Layers**: Organize content with multiple layers
 - **Public/Private Worlds**: Control visibility and publish status
 
-[Unreleased]: https://github.com/Pamacea/interactive-map/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/Pamacea/interactive-map/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/Pamacea/interactive-map/compare/v1.3.0...v1.4.0
+[1.3.0]: https://github.com/Pamacea/interactive-map/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/Pamacea/interactive-map/compare/v1.1.4...v1.2.0
 [1.1.4]: https://github.com/Pamacea/interactive-map/compare/v1.1.3...v1.1.4
 [1.1.3]: https://github.com/Pamacea/interactive-map/compare/v1.1.2...v1.1.3

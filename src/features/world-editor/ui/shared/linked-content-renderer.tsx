@@ -5,6 +5,8 @@ import { cn } from "@/shared/utils";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useSelectPin } from "@/features/pins/store";
+import { CharacterDetailPanel } from "./character-detail-panel";
+import { LoreDetailPanel } from "./lore-detail-panel";
 
 interface LinkedContentRendererProps {
   content: string;
@@ -20,6 +22,10 @@ interface LinkedContentRendererProps {
 export function LinkedContentRenderer({ content, className, worldId }: LinkedContentRendererProps) {
   const _router = useRouter();
   const selectPin = useSelectPin();
+
+  // State for detail panels
+  const [openCharacterId, setOpenCharacterId] = React.useState<string | null>(null);
+  const [openLoreId, setOpenLoreId] = React.useState<string | null>(null);
 
   // Fetch all entities to resolve tags
   const { data: pins = [] } = useQuery({
@@ -110,9 +116,12 @@ export function LinkedContentRenderer({ content, className, worldId }: LinkedCon
       // If it's a pin, select it
       if (entity.type === "pin") {
         selectPin(entity.id);
-      } else {
-        // For other entities, open their details
-        // TODO: Implement character/lore detail panels
+      } else if (entity.type === "character") {
+        // Open character detail panel
+        setOpenCharacterId(entity.id);
+      } else if (entity.type === "lore") {
+        // Open lore detail panel
+        setOpenLoreId(entity.id);
       }
     } else {
       // Fallback to search
@@ -121,9 +130,30 @@ export function LinkedContentRenderer({ content, className, worldId }: LinkedCon
   };
 
   return (
-    <div className={cn("text-sm text-text-secondary leading-relaxed", className)}>
-      {renderContent()}
-    </div>
+    <>
+      <div className={cn("text-sm text-text-secondary leading-relaxed", className)}>
+        {renderContent()}
+      </div>
+
+      {/* Detail Panels */}
+      {openCharacterId && (
+        <CharacterDetailPanel
+          characterId={openCharacterId}
+          worldId={worldId}
+          open={!!openCharacterId}
+          onClose={() => setOpenCharacterId(null)}
+        />
+      )}
+
+      {openLoreId && (
+        <LoreDetailPanel
+          loreId={openLoreId}
+          worldId={worldId}
+          open={!!openLoreId}
+          onClose={() => setOpenLoreId(null)}
+        />
+      )}
+    </>
   );
 }
 

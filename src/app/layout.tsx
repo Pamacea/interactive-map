@@ -5,6 +5,7 @@ import { Layout } from "@/shared/ui/layout";
 import { GlobalErrorHandler } from "@/shared/ui/global-error-handler";
 import { AuthProvider } from "@/shared/providers/session-provider";
 import { QueryProvider } from "@/shared/providers/query-provider";
+import { SentryInit } from "@/shared/components/sentry-init";
 import { siteConfig } from "@/config/site";
 import { WebSiteSchema, OrganizationSchema } from "@/shared/components/seo";
 
@@ -68,6 +69,9 @@ export default function RootLayout({
         <OrganizationSchema />
       </head>
       <body className={inter.className} suppressHydrationWarning>
+        {/* Initialize Sentry for error tracking */}
+        <SentryInit />
+
         <GlobalErrorHandler />
         {/* Skip Link for Keyboard Navigation */}
         <a
